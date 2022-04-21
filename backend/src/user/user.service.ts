@@ -1,6 +1,6 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { EditUserDto, UserDto } from './dto';
+import { EditUserDto } from './dto';
 
 @Injectable()
 export class UserService {
@@ -19,6 +19,7 @@ export class UserService {
 
         const {id, ...rest} = user;
 
+        console.log({rest});
         return rest;
     }
 

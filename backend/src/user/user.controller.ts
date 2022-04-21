@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Req, UseGuards } from '@nestjs/common';
 import { GetUser } from './decorator';
 import { EditUserDto, UserDto } from './dto';
 import { JwtAuthGuard } from './guard';
@@ -16,7 +16,7 @@ export class UserController {
         return dto;
     }
 
-    @Patch('edit')
+    @Post('edit')
     edit(@GetUser('email') email: string, @Body() dto: EditUserDto) {
         return this.userService.edit(email, dto);
     }

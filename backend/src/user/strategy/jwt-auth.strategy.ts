@@ -24,8 +24,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
             },
         });
 
-        const dto: UserDto = user;
-        // const { id, ...dto} = user;
+        const { id, ...dto} = user;
 
         return cb(null, dto);
     }
