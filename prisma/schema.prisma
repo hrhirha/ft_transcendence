@@ -1,0 +1,41 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  username    String
+  email       String  @unique
+  displayName String?
+  firstName   String?
+  lastName    String?
+  profileUrl  String?
+  imageUrl    String
+
+  sentReq       FriendReq[] @relation("sent")
+  recievedReq   FriendReq[] @relation("received")
+
+  @@map("users")
+}
+
+model FriendReq {
+  // id        String @id @default(cuid())
+  snd_id      String // who sent the request
+  rcv_id      String // who received the request
+  status      String // accepted, pending, blocked
+
+  sender      User @relation("sent",fields: [snd_id], references: [id])
+  receiver    User @relation("received",fields: [rcv_id], references: [id])
+
+  @@id([snd_id, rcv_id])
+  @@map("friend_requests")
+}
