@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { Contains, IsDefined, IsEmail, IsNotEmpty, IsNotEmptyObject, IsNotIn, IsNumber, IsOptional, IsString, IsUrl, Matches, NotContains } from "class-validator";
 
 export class UserDto {
     @IsNotEmpty()
@@ -9,33 +9,54 @@ export class UserDto {
     @IsEmail()
     email: string;
 
-    @IsNotEmpty()
     @IsString()
-    displayName: string;
-
-    @IsNotEmpty()
     @IsOptional()
-    firstName: string;
+    displayName?: string;
 
-    @IsNotEmpty()
+    @IsString()
     @IsOptional()
-    lastName: string;
+    firstName?: string;
 
-    @IsNotEmpty()
+    @IsString()
     @IsOptional()
-    profileUrl: string;
+    lastName?: string;
+
+    @IsString()
+    @IsOptional()
+    profileUrl?: string;
 
     @IsNotEmpty()
     @IsString()
     imageUrl: string;
+
+    @IsNumber()
+    @IsOptional()
+    score?: number;
+
+    @IsString()
+    @IsOptional()
+    status?: string;
+
+    @IsNumber()
+    @IsOptional()
+    wins?: number;
+
+    @IsNumber()
+    @IsOptional()
+    loses?: number;
 }
 
 export class EditUserDto {
     @IsString()
     @IsOptional()
+    @IsNotEmpty()
+    @NotContains(' ')
+    // @Matches(/[a-zA-Z0-9_]/)
     username?: string;
 
     @IsString()
     @IsOptional()
+    @IsNotEmpty()
+    @NotContains(' ')
     imageUrl?: string;
 }
