@@ -1,5 +1,5 @@
-import { Controller, ForbiddenException, Get, Redirect, Req, Res, UseGuards } from '@nestjs/common';
-import { GetUser, GetUserProfile } from 'src/user/decorator';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { GetUserProfile } from 'src/user/decorator';
 import { UserDto } from 'src/user/dto';
 import { AuthService } from './auth.service';
 import { OAUth42Guard } from './guard';

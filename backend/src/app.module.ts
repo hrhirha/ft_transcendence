@@ -12,6 +12,7 @@ import { MulterModule } from '@nestjs/platform-express';
             MulterModule.register({}),
             AuthModule,
             UserModule,
-            PrismaModule],
+            PrismaModule,
+          ],
 })
 export class AppModule {}

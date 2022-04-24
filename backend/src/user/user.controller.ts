@@ -2,12 +2,11 @@ import { Body, Controller, ForbiddenException, Get, Post, UploadedFile, UseGuard
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from './decorator';
 import { EditUserDto } from './dto';
-import { JwtAuthGuard } from './guard';
 import { UserService } from './user.service';
 import { Express } from 'express'
 import { diskStorage } from 'multer';
 import { User } from '@prisma/client';
-import { OAUth42Guard } from 'src/auth/guard';
+import { JwtAuthGuard } from 'src/auth/guard';
 
 @UseGuards(JwtAuthGuard)
 @Controller('user')
@@ -98,4 +97,9 @@ export class UserController {
         return this.userService.list(user.id);
     }
     // end of Friend Relation
+
+    @Get('match/history')
+    matchHistory() {
+        return 'match history';
+    }
 }

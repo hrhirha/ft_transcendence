@@ -10,6 +10,9 @@ CREATE TABLE "users" (
     "lastName" TEXT,
     "profileUrl" TEXT,
     "imageUrl" TEXT NOT NULL,
+    "refresh_token" TEXT,
+    "is2fa" BOOLEAN DEFAULT false,
+    "code2fa" TEXT,
     "score" INTEGER DEFAULT 0,
     "status" TEXT,
     "wins" INTEGER DEFAULT 0,
@@ -20,6 +23,8 @@ CREATE TABLE "users" (
 
 -- CreateTable
 CREATE TABLE "friend_requests" (
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "snd_id" TEXT NOT NULL,
     "rcv_id" TEXT NOT NULL,
     "status" TEXT NOT NULL,

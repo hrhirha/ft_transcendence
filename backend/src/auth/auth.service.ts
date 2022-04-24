@@ -17,31 +17,17 @@ export class AuthService {
             }
         });
         if (!user) {
-            user = await this.prisma.user.create({
-                data: {
-                    username: dto.username,
-                    email: dto.email,
-                    displayName: dto.displayName,
-                    firstName: dto.firstName,
-                    lastName: dto.lastName,
-                    profileUrl: dto.profileUrl,
-                    imageUrl: dto.imageUrl,
-                }
-            });
+            user = await this.prisma.user.create({ data: { ...dto, } });
         }
 
         const payload = {
             sub: user.id,
             email: user.email,
         };
-        const secret = this.config.get('JWT_SECRET');
-        const token = await this.jwt.signAsync(
-            payload,
-            {
-                secret,
-                // expiresIn: '30s',
-            }
-        );
-        return {access_token: token,}
+        const secret = this.config.get('JWT_ACCESS_SECRET');
+        const options = { secret,  };
+        // const access_token = await this.jwt.signAsync(payload, options);
+        const access_token = this.jwt.sign(payload, options);
+        return {access_token,}
     }
 }
