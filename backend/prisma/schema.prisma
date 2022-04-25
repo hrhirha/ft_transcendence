@@ -22,8 +22,8 @@ model User {
   imageUrl      String
 
   refresh_token String?
-  is2fa         Boolean? @default(false)
-  code2fa       String?
+  isTfaEnabled  Boolean? @default(false)
+  tfaSecret     String?
 
   score         Int? @default(0)   // updated when a game is played
   status        String?            // "online", "offline", "in a game" ...

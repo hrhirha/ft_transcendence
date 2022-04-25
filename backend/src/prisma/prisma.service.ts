@@ -8,9 +8,7 @@ export class PrismaService extends PrismaClient {
     constructor(config: ConfigService) {
         super({
             datasources: {
-                db: {
-                    url: config.get('DATABASE_URL'),
-                },
+                db: { url: config.get('DATABASE_URL'), },
             },
         });
     }
@@ -28,7 +26,7 @@ export class PrismaService extends PrismaClient {
         return user;
     }
 
-    // a friendReq is already sent by user with id 'by'
+    // a friendReq is already sent by user with id 'snd_id'
     async reqAlreadySent(snd_id: string, rcv_id: string) {
         const freq = await this.friendReq.findUnique({
             where: {

@@ -1,4 +1,5 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Request } from 'express';
 import { GetUserProfile } from 'src/user/decorator';
 import { UserDto } from 'src/user/dto';
 import { AuthService } from './auth.service';
@@ -8,7 +9,7 @@ import { OAUth42Guard } from './guard';
 @Controller('auth')
 export class AuthController {
 
-    constructor (private authService: AuthService) {}
+    constructor (private _authS: AuthService) {}
 
     @Get('login')
     login() {
@@ -16,7 +17,7 @@ export class AuthController {
     }
 
     @Get('redirect')
-    redirect(@GetUserProfile() dto: UserDto) {
-        return this.authService.redirect(dto);
+    redirect(@GetUserProfile() dto: UserDto, @Req() req: Request) {
+        return this._authS.redirect(dto, req);
     }
 }

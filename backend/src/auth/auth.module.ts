@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { OAuth42Strategy } from './strategy';
+import { JwtStrategy, OAuth42Strategy } from './strategy';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
+import { Jwt2FAAuthStrategy } from './strategy/jwt-2fa-auth.strategy';
 
 @Module({
   imports: [JwtModule.register({})],
-  providers: [AuthService, OAuth42Strategy],
+  providers: [AuthService, OAuth42Strategy, JwtStrategy, Jwt2FAAuthStrategy],
   exports: [AuthService],
   controllers: [AuthController]
 })

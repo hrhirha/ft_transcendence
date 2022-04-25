@@ -7,23 +7,23 @@ import { Express } from 'express'
 import { diskStorage } from 'multer';
 import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/guard';
+import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(Jwt2FAAuthGuard)
 @Controller('user')
 export class UserController {
 
-    constructor(private userService: UserService) {}
+    constructor(private _userS: UserService) {}
 
     // User
     @Get('me')
     me(@GetUser() dto: User) {
-        console.log({dto});
         return dto;
     }
 
     @Post('edit')
     edit(@GetUser('id') id: string, @Body() dto: EditUserDto) {
-        return this.userService.edit(id, dto);
+        return this._userS.edit(id, dto);
     }
 
     @Post('avatar/upload')
@@ -42,7 +42,6 @@ export class UserController {
         },
     }))
     changeAvatar(@UploadedFile() file: Express.Multer.File) {
-        console.log(file);
         return file;
     }
     // end of User
@@ -50,51 +49,51 @@ export class UserController {
     // Friend Requests
     @Post('friendreq/send')
     sendFriendReq(@GetUser() snd: User, @Body() rcv: { id: string }) {
-        this.userService.sendFriendReq(snd.id, rcv.id);
+        this._userS.sendFriendReq(snd.id, rcv.id);
     }
 
     @Post('friendreq/accept')
     acceptFriendReq(@GetUser() snd: User, @Body() rcv: { id: string }) {
-        this.userService.acceptFriendReq(snd.id, rcv.id);
+        this._userS.acceptFriendReq(snd.id, rcv.id);
     }
 
     @Post('friendreq/decline')
     declineFriendReq(@GetUser() snd: User, @Body() rcv: { id: string }) {
-        this.userService.declineFriendReq(snd.id, rcv.id);
+        this._userS.declineFriendReq(snd.id, rcv.id);
     }
 
 
     @Get('friendreqs/sent')
     sentReqs(@GetUser() user: User) {
-        return this.userService.sentReqs(user.id);
+        return this._userS.sentReqs(user.id);
     }
     
     @Get('friendreqs/received')
     receivedReqs(@GetUser() user: User) {
-        return this.userService.receivedReqs(user.id);
+        return this._userS.receivedReqs(user.id);
     }
     // end of Friend Requests
 
     // Friends Relation
     @Post('friend/unfriend')
     unfriend(@GetUser() snd: User, @Body() rcv: { id: string }) {
-        this.userService.unfriend(snd.id, rcv.id);
+        this._userS.unfriend(snd.id, rcv.id);
     }
 
     @Post('friend/block')
     block(@GetUser() snd: User, @Body() rcv: { id: string }) {
-        this.userService.block(snd.id, rcv.id);
+        this._userS.block(snd.id, rcv.id);
     }
 
     @Post('friend/unblock')
     unblock(@GetUser() snd: User, @Body() rcv: { id: string }) {
-        this.userService.unblock(snd.id, rcv.id);
+        this._userS.unblock(snd.id, rcv.id);
     }
 
 
     @Get('friends')
     friends(@GetUser() user: User) {
-        return this.userService.list(user.id);
+        return this._userS.list(user.id);
     }
     // end of Friend Relation
 
