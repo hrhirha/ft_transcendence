@@ -24,7 +24,7 @@ main#loginPage {
         > button {
             @include _flex(row, center, center);
             @include _roundedButtonStyle();
-            box-shadow: 0rem 0rem 5rem 0.005rem $aqua;
+            box-shadow: 0rem 0rem 5rem 0.005rem $purple;
             padding: .45rem .5rem;
             min-width: 10rem;
             img {

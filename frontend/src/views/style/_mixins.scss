@@ -23,7 +23,7 @@
     -webkit-text-fill-color: transparent!important;
 }
 
-@mixin _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $aqua, $bgcolor2: $light4, $font: $MFont, $bradius: 5rem) {
+@mixin _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $purple, $bgcolor2: $light4, $font: $MFont, $bradius: 5rem) {
     @include _gradientBg($bgcolor1, $bgcolor2, 170);
     cursor: pointer;
     font-family: $font;
