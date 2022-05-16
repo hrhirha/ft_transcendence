@@ -1,0 +1,75 @@
+@import "grid";
+@import "mixins";
+@import "variables";
+//components
+@import "../components/navbar/navbar";
+@import "../components/brand/brand";
+@import "../components/card/card";
+//containers
+
+//pages
+@import "../pages/login/login";
+
+@font-face {
+    font-family: 'Poppins_XL';
+    src: url(./fonts/Poppins-ExtraLight.ttf);
+}
+@font-face {
+    font-family: 'Poppins_L';
+    src: url(./fonts/Poppins-Light.ttf);
+}
+@font-face {
+    font-family: 'Poppins_M';
+    src: url(./fonts/Poppins-Medium.ttf);
+}
+@font-face {
+    font-family: 'Poppins_R';
+    src: url(./fonts/Poppins-Regular.ttf);
+}
+@font-face {
+    font-family: 'Poppins_B';
+    src: url(./fonts/Poppins-Bold.ttf);
+}
+@font-face {
+    font-family: 'Poppins_XB';
+    src: url(./fonts/Poppins-Black.ttf);
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: $dark3;
+}
+
+::-webkit-scrollbar-thumb {
+    background: $light4;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: $light4;
+}
+
+*
+{
+    font-family: $RFont;
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+    color: $light1;
+    z-index: 1;
+}
+
+body {
+    background: $dark1;
+    min-height: 100vh;
+    min-width: 300px;
+    overflow: auto;
+}
+
+.center {
+    @include _flex(row, center, center);
+    height: calc(100vh - 88px);
+}

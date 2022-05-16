@@ -1,0 +1,44 @@
+@mixin _flex($direction, $content, $items) {
+    display: flex;
+    justify-content: $content;
+    align-items: $items;
+    flex-direction: $direction;
+}
+
+@mixin _gradientBg($cradientCol_1, $cradientCol_2, $angle : 154) {
+    background:-moz-linear-gradient($angle+deg, $cradientCol_1 0%, $cradientCol_2 100%);
+    background:-webkit-linear-gradient($angle+deg, $cradientCol_1 0%, $cradientCol_2 100%);
+    background:-o-linear-gradient($angle+deg, $cradientCol_1 0%, $cradientCol_2 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr=$cradientCol_2, endColorstr=$cradientCol_1, GradientType=1 );
+    background:-ms-linear-gradient($angle+deg, $cradientCol_1 0%, $cradientCol_2 100%);
+    background:linear-gradient($angle+deg, $cradientCol_1 0%, $cradientCol_2 100%);
+}
+
+@mixin __gradientTxt($color1, $color2, $color3) {
+    background: $color1!important;
+    background: -webkit-repeating-linear-gradient(to right, $color1 0%, $color2 50%, $color3 100%)!important;
+    background: -moz-repeating-linear-gradient(to right, $color1 0%, $color2 50%, $color3 100%)!important;
+    background: repeating-linear-gradient(to right, $color1 0%, $color2 50%, $color3 100%)!important;
+    -webkit-background-clip: text!important;
+    -webkit-text-fill-color: transparent!important;
+}
+
+@mixin _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $aqua, $bgcolor2: $light4, $font: $MFont, $bradius: 5rem) {
+    @include _gradientBg($bgcolor1, $bgcolor2, 170);
+    cursor: pointer;
+    font-family: $font;
+    padding: .4rem 1.5rem;
+    color: $txtcolor;
+    border-radius: $bradius;
+    border: none;
+}
+
+@mixin _selectionOff {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                        supported by Chrome, Edge, Opera and Firefox */
+}

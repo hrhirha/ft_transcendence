@@ -1,0 +1,54 @@
+header#navbar {
+    background-color: $dark2;
+    width: auto;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    @include _selectionOff();
+    @include _gradientBg($light4, $dark2, 145);
+    #brand {
+        @include _flex(row, flex-start, center);
+        @media (max-width: 549px) {
+            justify-content: center;
+        }
+        align-items: center;
+        a {
+            text-decoration: none;
+            color: $light1;
+            font-size: $fsize * 1.8;
+        }
+    }
+    #Menu {
+        #navMenu {
+            list-style: none;
+            @include _flex(row, flex-end, center);
+            @media (max-width: 549px) {
+                justify-content: space-evenly;
+                margin-top: 1rem;
+            }
+            li {
+                padding: .5rem .8rem;
+                a#navBtn {
+                    svg path {
+                        color: $light3;
+                    }
+                    font-size: $fsize * 1.5;
+                }
+                a.active {
+                    svg path {
+                        color: $light2!important;
+                    }
+                }
+                a#profileNavBtn {
+                    @include _flex(column, center, center);
+                    background-repeat: no-repeat;
+                    background-size: cover;
+                    background-color: $light3;
+                    border-radius: 100%;
+                    width: 2.2rem;
+                    height: 2.2rem;
+                    border: .15rem solid $light3;
+                }
+            }
+        }
+    }
+}

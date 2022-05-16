@@ -1,0 +1,46 @@
+main#loginPage {
+    @include _flex(column, center, center);
+    min-height: 100vh;
+    > div {
+        @include _flex(column, space-evenly, center);
+        @include _gradientBg($dark2, $dark3, 180);
+        min-width: 275px;
+        max-width: 300px;
+        min-height: 20rem;
+        border-radius: .75rem;
+        padding: 1.5rem .75rem;
+        h4 {
+            text-align: center;
+            font-size: $fsize * 1.5;
+            font-family: $MFont;
+            p {
+                font-size: $fsize * .75;
+                font-family: $LFont;
+                color: $light2;
+            }
+            z-index: 2;
+        }
+
+        > button {
+            @include _flex(row, center, center);
+            @include _roundedButtonStyle();
+            box-shadow: 0rem 0rem 5rem 0.005rem $aqua;
+            padding: .45rem .5rem;
+            min-width: 10rem;
+            img {
+                width: 1.5rem;
+            }
+            span {
+                margin-left: .5rem;
+                font-family: $BFont;
+                font-size: $fsize;
+                text-transform: uppercase;
+            }
+        }
+
+        > img {
+            max-width: 5rem;
+            z-index: 2;
+        }
+    }
+}

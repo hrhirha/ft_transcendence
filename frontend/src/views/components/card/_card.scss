@@ -1,0 +1,38 @@
+@mixin  _cardSizes() {
+    min-width: 15rem;
+    max-width: 25rem;
+    min-height: 15rem;
+    max-height: 25rem;
+}
+
+div#card {
+    @include _flex(column, center, center);
+    @include _cardSizes();
+    @include _selectionOff();
+    overflow: hidden;
+    border-radius: .75rem;
+    background-color: $dark2;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    div.overlay {    
+        @include _gradientBg(rgba($light4, .25), $light4, 180);
+        @include _flex(column, flex-end, center);
+        @include _cardSizes();
+        width: 100%;
+        height: 100%;
+        padding: 1rem;
+        button {
+            @include _roundedButtonStyle($bgcolor1: $light3, $bgcolor2: $purple);
+            margin: 1rem;
+            font-size: $fsize;
+            svg {
+                margin-right: .45rem;
+            }
+        }
+        h6 {
+            font-size: $fsize ;
+            font-family: $XLFont;
+        }
+    }
+}

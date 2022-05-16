@@ -1,0 +1,25 @@
+#brandLogo {
+    @include _flex(row, flex-start, center);
+    svg {
+        font-size: $fsize * 2.2;
+    }
+    svg path {
+        color: $light2;
+    }
+    div {
+        font-size: $fsize * 1.65;
+        margin-left: .5rem;
+        @include _flex(column, center, flex-start);
+        line-height: 1.1;
+        span {
+            font-family: $XLFont;
+        }
+        i {
+            margin-top: .15rem;
+            font-size: $fsize;
+            font-family: $XLFont;
+            text-transform: lowercase;
+            font-style: normal;
+        }
+    }
+}
