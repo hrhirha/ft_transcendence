@@ -16,7 +16,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <NavBar />
+    {/* <NavBar />
     <div className='container'>
       <div className='row center' >
         <div className='col col-md-6 col-lg-4'>
@@ -26,6 +26,7 @@ root.render(
           <Card cardTitle='Play default game with your friend' icon="faPuzzlePiece" btnTitle='Play' background='https://i.pinimg.com/originals/d4/1a/3e/d41a3e3cce22dbc082a46c607a013c24.jpg'/>
         </div>
       </div>
-    </div>
+    </div> */}
+    <Login/>
   </React.StrictMode>
 );
