@@ -23,7 +23,7 @@ root.render(
           {/* <Route path="/notifications" element={<Notifications/>} /> */}
           {/* <Route path="/friends" element={<Friends/>} /> */}
           {/* <Route path="/profile" element={<Profile/>} /> */}
-          <Route path="*" element={<Login/>} />
+          <Route path="*" element={<Home/>} />
 
       </Routes>
   </BrowserRouter>

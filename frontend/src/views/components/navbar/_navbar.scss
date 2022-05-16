@@ -5,9 +5,14 @@ header#navbar {
     padding-bottom: 1rem;
     @include _selectionOff();
     @include _gradientBg($light4, $dark2, 145);
+    div.container {
+        @media (max-width: 576px) {
+            width: auto;
+        }
+    }
     #brand {
         @include _flex(row, flex-start, center);
-        @media (max-width: 549px) {
+        @media (max-width: 569px) {
             justify-content: center;
         }
         align-items: center;
@@ -21,22 +26,30 @@ header#navbar {
         #navMenu {
             list-style: none;
             @include _flex(row, flex-end, center);
-            @media (max-width: 549px) {
+            @media (max-width: 569px) {
                 justify-content: space-evenly;
                 margin-top: 1rem;
             }
+
             li {
                 padding: .5rem .8rem;
+                @media (max-width: 330px) {
+                    padding: .2rem .55rem;
+                }
                 a#navBtn {
                     svg path {
                         color: $light3;
                     }
                     font-size: $fsize * 1.5;
+                    @media (max-width: 330px) {
+                        font-size: $fsize * 1.3;
+                    }
                 }
                 a.active {
                     svg path {
                         color: $light2!important;
                     }
+                    border-color: $light2!important;
                 }
                 a#profileNavBtn {
                     @include _flex(column, center, center);
@@ -47,6 +60,10 @@ header#navbar {
                     width: 2.2rem;
                     height: 2.2rem;
                     border: .15rem solid $light3;
+                    @media (max-width: 330px) {
+                        width: 2rem;
+                        height: 2rem;
+                    }
                 }
             }
         }

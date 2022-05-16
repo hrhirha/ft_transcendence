@@ -2,6 +2,7 @@ import React from "react";
 import { FontAwesomeIcon, FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
 import { IconDefinition, faHouse, faRankingStar, faComments, faBell, faUserGroup} from "@fortawesome/free-solid-svg-icons";
 import { Brand } from "../brand/brand";
+import { useLocation } from "react-router-dom";
 
 interface NavButtonData {
     icon: IconDefinition,
@@ -38,16 +39,20 @@ const MenuData: Array<NavButtonData> = [
 ];
 
 const NavButton:React.FC<{element: NavButtonData}> = ({element}) => {
+    const location = useLocation();
+
     return (
-        <a id="navBtn" title={element.title} href={element.url}>
+        <a id="navBtn" className={location.pathname === element.url ? "active" : undefined} title={element.title} href={element.url}>
             <FontAwesomeIcon icon={element.icon}/>
         </a>
     );
 }
 
 const ProfileNavBtn:React.FC<{picture: string}> = ({picture}) => {
+    const location = useLocation();
+
     return (
-        <a id="profileNavBtn" title="Profile" href="/profile" style={{backgroundImage: `url(${picture})`}}></a>
+        <a id="profileNavBtn" className={location.pathname === "/profile" ? "active" : undefined} title="Profile" href="/profile" style={{backgroundImage: `url(${picture})`}}></a>
     );
 }
 
