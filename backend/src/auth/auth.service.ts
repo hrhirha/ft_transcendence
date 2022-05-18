@@ -14,7 +14,7 @@ export class AuthService {
         private _prismaS: PrismaService
     ){}
 
-    async redirect(dto: UserDto, req: Request) {
+    async login(dto: UserDto, req: Request) {
 
         let user = await this._prismaS.user.findUnique({
             where: {
@@ -26,10 +26,10 @@ export class AuthService {
         }
 
         const cookie = this.getCookieWithJwtAccessToken(user.id);
-        req.res.setHeader('Set-Cookie', cookie)
-            .setHeader('Location', '/user/me')
-            .status(HttpStatus.PERMANENT_REDIRECT)
-            .send();
+        req.res.setHeader('Set-Cookie', cookie);
+            // .setHeader('Location', '/user/me')
+            // .status(HttpStatus.PERMANENT_REDIRECT)
+            // .send();
     }
 
     getCookieWithJwtAccessToken(id: string, is2fauthenticated = false) {

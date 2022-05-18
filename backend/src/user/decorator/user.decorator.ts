@@ -7,7 +7,6 @@ export const GetUserProfile = createParamDecorator(
     const dto: UserDto = {
         username: request.user.username,
         email: request.user._json.email,
-        displayName: request.user.displayName,
         firstName: request.user.name.givenName,
         lastName: request.user.name.familyName,
         profileUrl: request.user.profileUrl,
@@ -22,7 +21,9 @@ export const GetUser = createParamDecorator(
   (data: string | undefined, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
 
-    if (data) return request.user[data];
-    return request.user;
+    const {createdAt, updatedAt, refresh_token, isTfaEnabled, tfaSecret, ...dto} = request.user;
+
+    if (data) return dto[data];
+    return dto;
   }
 );

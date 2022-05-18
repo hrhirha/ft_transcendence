@@ -1,12 +1,11 @@
 import { Body, Controller, ForbiddenException, Get, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from './decorator';
-import { EditUserDto } from './dto';
+import { EditUserDto, UserDto } from './dto';
 import { UserService } from './user.service';
 import { Express } from 'express'
 import { diskStorage } from 'multer';
 import { User } from '@prisma/client';
-import { JwtAuthGuard } from 'src/auth/guard';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
 
 @UseGuards(Jwt2FAAuthGuard)
@@ -17,7 +16,7 @@ export class UserController {
 
     // User
     @Get('me')
-    me(@GetUser() dto: User) {
+    me(@GetUser() dto: UserDto) {
         return dto;
     }
 

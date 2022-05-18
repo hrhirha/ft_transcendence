@@ -11,13 +11,13 @@ export class AuthController {
 
     constructor (private _authS: AuthService) {}
 
-    @Get('login')
-    login() {
-        return ;
-    }
+    // @Get('login')
+    // login() {
+    //     return ;
+    // }
 
-    @Get('redirect')
-    redirect(@GetUserProfile() dto: UserDto, @Req() req: Request) {
-        return this._authS.redirect(dto, req);
+    @Get('login')
+    login(@GetUserProfile() dto: UserDto, @Req() req: Request) {
+        return this._authS.login(dto, req);
     }
 }

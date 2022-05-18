@@ -11,10 +11,6 @@ export class UserDto {
 
     @IsString()
     @IsOptional()
-    displayName?: string;
-
-    @IsString()
-    @IsOptional()
     firstName?: string;
 
     @IsString()

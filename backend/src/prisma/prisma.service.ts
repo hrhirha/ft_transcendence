@@ -6,6 +6,7 @@ import { EditUserDto } from 'src/user/dto';
 @Injectable()
 export class PrismaService extends PrismaClient {
     constructor(config: ConfigService) {
+        console.log({url: config.get('DATABASE_URL')});
         super({
             datasources: {
                 db: { url: config.get('DATABASE_URL'), },
