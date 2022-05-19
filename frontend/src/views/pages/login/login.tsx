@@ -1,9 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Brand } from "../../components/brand/brand";
 import { LoginBg, Logo1337, Logo42} from '../../../assets';
 import { useNavigate } from "react-router-dom";
+import { get_user_me } from "../../../controller/user.me";
 
-export const Login:React.FC = () => {
+
+export const Login:React.FC = () =>  {
+    const [con, setCon] = useState()
+
+    get_user_me();
     const navigate = useNavigate();
     return (
     <main id="loginPage">
@@ -12,11 +17,12 @@ export const Login:React.FC = () => {
             <h4>Welcome !
                 <p>We're so excited to see you !</p>
             </h4>
-            <button onClick={() => navigate("/")}>
+            <button > 
                 <img src={Logo42} alt="42" />
                 <span>Login</span>
-            </button>
+            </button >
             <img src={Logo1337} alt="1337"/>
+            <p>{con}</p>
         </div>
     </main>
     );

@@ -7,7 +7,10 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Home } from './views/pages/home/home';
 
+
 library.add(faPuzzlePiece);
+
+
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -16,7 +19,7 @@ root.render(
   <React.StrictMode>
   <BrowserRouter>
       <Routes>
-          <Route path="/" element={<Home/>} />
+          <Route path="/" element={<Login/>} />
           {/* <Route path="/" element={<Home/>} /> */}
           {/* <Route path="/leader_board" element={<LeaderBoard/>} /> */}
           {/* <Route path="/chat" element={<Chat/>} /> */}
