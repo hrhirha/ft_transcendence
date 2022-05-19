@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Get, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, ForbiddenException, Get, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from './decorator';
 import { EditUserDto, UserDto } from './dto';
@@ -48,17 +48,20 @@ export class UserController {
     // Friend Requests
     @Post('friendreq/send')
     sendFriendReq(@GetUser() snd: User, @Body() rcv: { id: string }) {
-        this._userS.sendFriendReq(snd.id, rcv.id);
+        if (!rcv.id) throw new BadRequestException('invalid id')
+        return this._userS.sendFriendReq(snd.id, rcv.id);
     }
 
     @Post('friendreq/accept')
     acceptFriendReq(@GetUser() snd: User, @Body() rcv: { id: string }) {
-        this._userS.acceptFriendReq(snd.id, rcv.id);
+        if (!rcv.id) throw new BadRequestException('invalid id')
+        return this._userS.acceptFriendReq(snd.id, rcv.id);
     }
 
     @Post('friendreq/decline')
     declineFriendReq(@GetUser() snd: User, @Body() rcv: { id: string }) {
-        this._userS.declineFriendReq(snd.id, rcv.id);
+        if (!rcv.id) throw new BadRequestException('invalid id')
+        return this._userS.declineFriendReq(snd.id, rcv.id);
     }
 
 

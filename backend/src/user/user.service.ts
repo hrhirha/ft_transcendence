@@ -104,7 +104,7 @@ export class UserService {
                 rcv_id: id,
                 AND: {
                     status: 'PENDING',
-                }
+                },
             },
         });
     }

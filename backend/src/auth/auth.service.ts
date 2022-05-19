@@ -30,6 +30,7 @@ export class AuthService {
             // .setHeader('Location', '/user/me')
             // .status(HttpStatus.PERMANENT_REDIRECT)
             // .send();
+        return dto;
     }
 
     getCookieWithJwtAccessToken(id: string, is2fauthenticated = false) {

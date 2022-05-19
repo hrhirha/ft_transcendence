@@ -8,12 +8,13 @@
   "scripts": {
     "db:dev:up": "docker-compose up -d db-dev",
     "db:dev:rm": "docker-compose rm -sfv db-dev",
-    "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up && sleep 1 && prisma migrate deploy",
+    "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up && sleep 20 && prisma migrate deploy",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "prestart": "prisma migrate deploy",
     "start": "nest start",
-    
+    "prestart:dev": "npm run db:dev:restart",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -54,7 +55,6 @@
     "@types/jest": "27.4.1",
     "@types/multer": "^1.4.7",
     "@types/node": "^16.0.0",
-    "@types/otplib": "^10.0.0",
     "@types/passport-jwt": "^3.0.6",
     "@types/qrcode": "^1.4.2",
     "@types/supertest": "^2.0.11",

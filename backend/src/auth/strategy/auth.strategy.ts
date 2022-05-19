@@ -9,7 +9,7 @@ export class OAuth42Strategy extends PassportStrategy(Strategy, '42') {
         super({
             clientID: config.get('42_UID'),
             clientSecret: config.get('42_SECRET'),
-            callbackURL: '/auth/login',
+            callbackURL: config.get('42_REDIR_URL'),
         });
     }
 
