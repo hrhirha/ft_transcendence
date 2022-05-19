@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { FriendReq, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EditUserDto } from './dto';
 
@@ -88,7 +89,7 @@ export class UserService {
 
 
     async sentReqs(id: string) {
-        return await this._prismaS.friendReq.findMany({
+        const freqs =  await this._prismaS.friendReq.findMany({
             where: {
                 snd_id: id,
                 AND: {
@@ -96,10 +97,17 @@ export class UserService {
                 }
             },
         });
+        let users: User[] = [];
+        for (let req of freqs)
+        {
+            const user = await this.findById(req.rcv_id);
+            users.push(user);
+        }
+        return users;
     }
 
     async receivedReqs(id: string) {
-        return await this._prismaS.friendReq.findMany({
+        const freqs = await this._prismaS.friendReq.findMany({
             where: {
                 rcv_id: id,
                 AND: {
@@ -107,6 +115,13 @@ export class UserService {
                 },
             },
         });
+        let users: User[] = [];
+        for (let req of freqs)
+        {
+            const user = await this.findById(req.rcv_id);
+            users.push(user);
+        }
+        return users;
     }
     // end Friend Requests
 
