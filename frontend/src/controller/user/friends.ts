@@ -25,3 +25,44 @@ export async function get_friends() {
     console.log(res);
     return res;
 }
+
+export async function post_friend_block(user_id : string) {
+    // "friend/block"
+    try {
+        const res  = await api.post("contact", {id : user_id});
+        return res;
+    }catch (err) {
+        return new Error("error : " + err);
+    }
+}
+
+export async function post_friend_unfriend(user_id : string) {
+    // "friend/unfriend"
+    try {
+        const res  = await api.post("contact", {id : user_id});
+        return res;
+    }catch (err) {
+        return new Error("error : " + err);
+    }
+}
+
+
+export async function post_friend_unblock(user_id : string) {
+    // "friend/unblock"
+    try {
+        const res  = await api.post("contact", {id : user_id});
+        return res;
+    }catch (err) {
+        return new Error("error : " + err);
+    }
+}
+
+export async function post_friend_decline(user_id : string) {
+    // "friendreq/decline"
+    try {
+        const res  = await api.post("contact", {id : user_id});
+        return res;
+    }catch (err) {
+        return new Error("error : " + err);
+    }
+}
