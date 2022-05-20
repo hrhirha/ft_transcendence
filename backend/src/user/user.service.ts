@@ -158,7 +158,7 @@ export class UserService {
 
 
     async list(id: string) {
-        return await this._prismaS.friendReq.findMany({
+        const freqs = await this._prismaS.friendReq.findMany({
             where: {
                 OR: [
                     {snd_id: id,},
@@ -169,6 +169,14 @@ export class UserService {
                 }
             },
         });
+        let friends: User[] = [];
+        for (let req of freqs)
+        {
+            const fid = id === req.snd_id ? req.rcv_id : req.snd_id;
+            const user = await this.findById(fid);
+            friends.push(user);
+        }
+        return friends;
     }
     // end Friends
 }
