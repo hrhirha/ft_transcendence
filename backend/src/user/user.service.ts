@@ -118,7 +118,7 @@ export class UserService {
         let users: User[] = [];
         for (let req of freqs)
         {
-            const user = await this.findById(req.rcv_id);
+            const user = await this.findById(req.snd_id);
             users.push(user);
         }
         return users;
