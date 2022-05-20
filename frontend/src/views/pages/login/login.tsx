@@ -2,15 +2,14 @@ import React, { useState } from "react";
 import { Brand } from "../../components/brand/brand";
 import { LoginBg, Logo1337, Logo42} from '../../../assets';
 import { useNavigate } from "react-router-dom";
-import { get_user_me } from "../../../controller/user/me";
 import { get_friendreq_send } from "../../../controller/user/friendreqs.sent";
+import { post_friend_accept } from "../../../controller/user/friendreq.accept";
 
 
 export const Login:React.FC = () =>  {
     const [con, setCon] = useState()
 
-    //get_user_me();
-    get_friendreq_send();
+    post_friend_accept("dfg");
     const navigate = useNavigate();
     return (
     <main id="loginPage">
