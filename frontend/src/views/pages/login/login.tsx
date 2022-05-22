@@ -7,10 +7,9 @@ import { post_friend_accept } from "../../../controller/user/friendreq.accept";
 
 
 export const Login:React.FC = () =>  {
-    const [con, setCon] = useState()
-
-    post_friend_accept("dfg");
+    const [con, setCon] = useState();
     const navigate = useNavigate();
+    
     return (
     <main id="loginPage">
         <div>
