@@ -2,6 +2,9 @@ import { FontAwesomeIcon, FontAwesomeIconProps } from "@fortawesome/react-fontaw
 import { faGamepad } from "@fortawesome/free-solid-svg-icons";
 import React from "react";
 import { library } from "@fortawesome/fontawesome-svg-core";
+import { DefaultGame } from '../../../assets';
+import { CircleAvatar } from "../circle_avatar/circle_avatar";
+
 
 
 interface Props {
@@ -18,7 +21,7 @@ export const Card:React.FC<Props> = (Props) => {
     return (
         <div id="card" style={{backgroundImage: `url(${Props.background})`}}>
             <div className="overlay">
-                {/* <FontAwesomeIcon icon={Props.icon}/> */}
+                <img src={DefaultGame} />
                 <h6>{Props.cardTitle}</h6>
                 <button>
                     <FontAwesomeIcon icon="gamepad"/>

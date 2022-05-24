@@ -1,4 +1,8 @@
 
-div#circleAvatar {
-    
+span#circleAvatar {
+    display: block;
+    background-color: $light1;
+    background-size: cover;
+    border-radius: 10rem;
+    background-position: center;
 }
