@@ -4,6 +4,8 @@ RUN apk update && apk upgrade
 
 WORKDIR /usr/app
 COPY . .
-RUN cd backend && npm i
+RUN cd /usr/app/backend && npm i
+# RUN cd /usr/app/frontend && npm i
 
-# ENTRYPOINT cd backend && npx prisma migrate deploy && npm run start
+CMD cd /usr/app/backend && npm run start
+# CMD while [ 1 ]; do echo; done

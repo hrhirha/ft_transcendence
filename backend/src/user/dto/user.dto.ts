@@ -42,6 +42,13 @@ export class UserDto {
     loses?: number;
 }
 
+export class UserIdDto
+{
+    @IsString()
+    @IsNotEmpty()
+    id: string;
+}
+
 export class EditUserDto {
     @IsString()
     @IsOptional()

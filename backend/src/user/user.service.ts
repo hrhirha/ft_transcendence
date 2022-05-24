@@ -1,6 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { FriendReq, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { friend_status } from 'src/utils';
 import { EditUserDto } from './dto';
 
 @Injectable()
@@ -75,14 +76,14 @@ export class UserService {
         const friend = await this._prismaS.reqAlreadySent(rcv_id, snd_id);
         if (!friend)
             throw new ForbiddenException();
-        return await this._prismaS.updateReq(friend.snd_id, friend.rcv_id, {status: 'ACCEPTED'});
+        return await this._prismaS.updateReq(friend.snd_id, friend.rcv_id, {status: friend_status.ACCEPTED});
     }
 
     async declineFriendReq(snd_id: string, rcv_id: string) {
         const friend = await this._prismaS.reqAlreadySent(rcv_id, snd_id);
         if (!friend)
             throw new ForbiddenException();
-        if (friend.status === 'PENDING')
+        if (friend.status === friend_status.PENDING)
             return await this._prismaS.delReq(friend.snd_id, friend.rcv_id);
         return friend;
     }
@@ -93,7 +94,7 @@ export class UserService {
             where: {
                 snd_id: id,
                 AND: {
-                    status: 'PENDING',
+                    status: friend_status.PENDING,
                 }
             },
         });
@@ -111,7 +112,7 @@ export class UserService {
             where: {
                 rcv_id: id,
                 AND: {
-                    status: 'PENDING',
+                    status: friend_status.PENDING,
                 },
             },
         });
@@ -129,11 +130,9 @@ export class UserService {
     async unfriend(snd_id: string, rcv_id: string) {
         const friend = await this._prismaS.reqAlreadySent(rcv_id, snd_id)
                     || await this._prismaS.reqAlreadySent(snd_id, rcv_id);
-        if (!friend)
-            throw new ForbiddenException();
-        if (friend.status === 'ACCEPTED' || friend.status === 'BLOCKED')
-            return await this._prismaS.delReq(friend.snd_id, friend.rcv_id);
-        return friend;
+        if (!friend || friend.status === friend_status.PENDING)
+            throw new ForbiddenException('You are not friends');
+        return await this._prismaS.delReq(friend.snd_id, friend.rcv_id);
     }
 
     async block(snd_id: string, rcv_id: string) {
@@ -141,8 +140,8 @@ export class UserService {
                     || await this._prismaS.reqAlreadySent(snd_id, rcv_id);
         if (!friend)
             throw new ForbiddenException();
-        if (friend.status === 'ACCEPTED')
-            return await this._prismaS.updateReq(friend.snd_id, friend.rcv_id, {snd_id, rcv_id, status: 'BLOCKED'});
+        if (friend.status === friend_status.ACCEPTED)
+            return await this._prismaS.updateReq(friend.snd_id, friend.rcv_id, {snd_id, rcv_id, status: friend_status.BLOCKED});
         return friend;
     }
 
@@ -151,8 +150,8 @@ export class UserService {
                     || await this._prismaS.reqAlreadySent(snd_id, rcv_id);
         if (!friend)
             throw new ForbiddenException();
-        if (friend.status === 'BLOCKED' && friend.snd_id === snd_id)
-            return await this._prismaS.updateReq(friend.snd_id, friend.rcv_id, {status: 'ACCEPTED'});
+        if (friend.status === friend_status.BLOCKED && friend.snd_id === snd_id)
+            return await this._prismaS.updateReq(friend.snd_id, friend.rcv_id, {status: friend_status.ACCEPTED});
         return friend;
     }
 
@@ -165,7 +164,7 @@ export class UserService {
                     {rcv_id: id},
                 ],
                 NOT: {
-                    status: 'PENDING',
+                    status: friend_status.PENDING,
                 }
             },
         });

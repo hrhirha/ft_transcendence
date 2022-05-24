@@ -1,18 +1,19 @@
 import { BadRequestException, Body, Controller, ForbiddenException, Get, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from './decorator';
-import { EditUserDto, UserDto } from './dto';
+import { EditUserDto, UserDto, UserIdDto } from './dto';
 import { UserService } from './user.service';
 import { Express } from 'express'
 import { diskStorage } from 'multer';
 import { User } from '@prisma/client';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
+import { ChatService } from 'src/chat/chat.service';
 
 @UseGuards(Jwt2FAAuthGuard)
 @Controller('user')
 export class UserController {
 
-    constructor(private _userS: UserService) {}
+    constructor(private _userS: UserService, private _chatS: ChatService) {}
 
     // User
     @Get('me')
@@ -43,23 +44,29 @@ export class UserController {
     changeAvatar(@UploadedFile() file: Express.Multer.File) {
         return file;
     }
+
+    @Get('chatrooms')
+    getJoinedChatRooms(@GetUser() user: User)
+    {
+        return this._chatS.getJoinedRooms(user);
+    }
     // end of User
 
     // Friend Requests
     @Post('friendreq/send')
-    sendFriendReq(@GetUser() snd: User, @Body() rcv: { id: string }) {
+    sendFriendReq(@GetUser() snd: User, @Body() rcv: UserIdDto) {
         if (!rcv.id) throw new BadRequestException('invalid id')
         return this._userS.sendFriendReq(snd.id, rcv.id);
     }
 
     @Post('friendreq/accept')
-    acceptFriendReq(@GetUser() snd: User, @Body() rcv: { id: string }) {
+    acceptFriendReq(@GetUser() snd: User, @Body() rcv: UserIdDto) {
         if (!rcv.id) throw new BadRequestException('invalid id')
         return this._userS.acceptFriendReq(snd.id, rcv.id);
     }
 
     @Post('friendreq/decline')
-    declineFriendReq(@GetUser() snd: User, @Body() rcv: { id: string }) {
+    declineFriendReq(@GetUser() snd: User, @Body() rcv: UserIdDto) {
         if (!rcv.id) throw new BadRequestException('invalid id')
         return this._userS.declineFriendReq(snd.id, rcv.id);
     }
@@ -78,18 +85,18 @@ export class UserController {
 
     // Friends Relation
     @Post('friend/unfriend')
-    unfriend(@GetUser() snd: User, @Body() rcv: { id: string }) {
-        this._userS.unfriend(snd.id, rcv.id);
+    unfriend(@GetUser() snd: User, @Body() rcv: UserIdDto) {
+        return this._userS.unfriend(snd.id, rcv.id);
     }
 
     @Post('friend/block')
-    block(@GetUser() snd: User, @Body() rcv: { id: string }) {
-        this._userS.block(snd.id, rcv.id);
+    block(@GetUser() snd: User, @Body() rcv: UserIdDto) {
+        return this._userS.block(snd.id, rcv.id);
     }
 
     @Post('friend/unblock')
-    unblock(@GetUser() snd: User, @Body() rcv: { id: string }) {
-        this._userS.unblock(snd.id, rcv.id);
+    unblock(@GetUser() snd: User, @Body() rcv: UserIdDto) {
+        return this._userS.unblock(snd.id, rcv.id);
     }
 
 

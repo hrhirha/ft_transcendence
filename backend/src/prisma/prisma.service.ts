@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { prisma, PrismaClient } from '@prisma/client';
 import { EditUserDto } from 'src/user/dto';
+import { friend_status } from 'src/utils';
 
 @Injectable()
 export class PrismaService extends PrismaClient {
@@ -47,7 +48,7 @@ export class PrismaService extends PrismaClient {
             data: {
                 snd_id,
                 rcv_id,
-                status: 'PENDING',
+                status: friend_status.PENDING,
             },
         });
         return freq;
@@ -72,14 +73,14 @@ export class PrismaService extends PrismaClient {
 
     // delete a friendReq record if it exists and status=='ACCEPTED'
     async delReq(snd_id: string, rcv_id: string) {
-        const del = await this.friendReq.delete({
-            where: {
-                snd_id_rcv_id: {
-                    snd_id,
-                    rcv_id,
+            const del = await this.friendReq.delete({
+                where: {
+                    snd_id_rcv_id: {
+                        snd_id,
+                        rcv_id,
+                    },
                 },
-            },
-        });
+            });
         return del;
     }
 

@@ -26,10 +26,9 @@ export class AuthService {
         }
 
         const cookie = this.getCookieWithJwtAccessToken(user.id);
-        req.res.setHeader('Set-Cookie', cookie);
-            // .setHeader('Location', '/user/me')
-            // .status(HttpStatus.PERMANENT_REDIRECT)
-            // .send();
+        req.res.setHeader('Set-Cookie', cookie)
+            .setHeader('Location', 'http://127.0.0.1:3000/home')
+            .status(HttpStatus.PERMANENT_REDIRECT);
         return dto;
     }
 
