@@ -1,0 +1,57 @@
+.item {
+    @include _flex(column, center,center);
+    .item-container{
+        padding-top: 5px;
+        padding-bottom: 5px;
+        width: fill;
+        //background-color: rgb(247, 0, 0);
+        border-radius:10px;
+        .item-row {
+            .user_lastmsg{
+                @include _flex(column, center,left);
+                .lastmsg {
+                    overflow:hidden;
+                    display:inline-block;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    color: $light4;
+                    font-family: $MFont;
+                    font-size: $fsize * 0.7;
+                }
+                .username{
+                    color: $dark2;
+                    font-family: $MFont;
+                    font-size: $fsize * 0.9;
+                }
+            }
+            .time_nbrmsg{
+                @include _flex(column, center,center);
+                .time{
+                    color: $dark1;
+                    font-family: $MFont;
+                    font-size: $fsize * 0.7;
+                }
+                .nbrmsg{
+                    color: $dark1;
+                    justify-content:center;
+                    align-items: center;
+                    color: $light2;
+                    font-family: $MFont;
+                    font-size: $fsize * 0.7;
+                    height: $fsize * 1.3;
+                    width: $fsize * 1.3;
+                    background-color: $light4;
+                    border-radius: 50%;
+                    display: flex;
+                }
+            }
+        }
+    }
+    .line {
+        width: 90%;
+        margin-top: 3px;
+        margin-bottom: 3px;
+        background-color: $light3;
+        height: 1px;
+    }
+}

@@ -6,6 +6,7 @@ import { faPuzzlePiece } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Home } from './views/pages/home/home';
+import { Chat } from './views/pages/chat/chat';
 
 
 library.add(faPuzzlePiece);
@@ -22,7 +23,7 @@ root.render(
           <Route path="/" element={<Login/>} />
           {/* <Route path="/" element={<Home/>} /> */}
           {/* <Route path="/leader_board" element={<LeaderBoard/>} /> */}
-          {/* <Route path="/chat" element={<Chat/>} /> */}
+          { <Route path="/chat" element={<Chat/>} /> }
           {/* <Route path="/notifications" element={<Notifications/>} /> */}
           {/* <Route path="/friends" element={<Friends/>} /> */}
           {/* <Route path="/profile" element={<Profile/>} /> */}
