@@ -1,0 +1,51 @@
+div#chatRoomItem {
+    @include _flex(row, space-between, center);
+    padding: 0.25rem;
+    margin: .2rem;
+    border-radius: 0.5rem;
+    div.dataColumn {
+        width: 100%;
+        margin: .5rem;
+        margin-left: 1rem;
+        @include _flex(column, space-between, space-between);
+        .dataRow_1 {
+            @include _flex(row, space-between, center);
+            .userName {
+                font-family: $BFont;
+                color: $light1;
+                font-size: $fsize * .85;
+            }
+            .time {
+                color: $light2;
+                width: 4rem;
+                text-align: end;
+                font-size: $fsize * .65; 
+            }
+        }
+        .dataRow_2 {
+            @include _flex(row, space-between, center);
+            font-size: $fsize * .75;
+            p.lastMsg {
+                color: $light2;
+                font-size: $fsize * .7;
+                max-width: 10rem;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+            span.nbNotifs {
+                display: block;
+                max-height: 1rem;
+                padding: .07rem .3rem;
+                background-color: $purple;
+                border-radius: 5rem;
+                font-size: $fsize * .6;
+                font-family: $MFont;
+            }
+        }
+    }
+}
+
+div.active {
+    // background-color: $dark3;
+}

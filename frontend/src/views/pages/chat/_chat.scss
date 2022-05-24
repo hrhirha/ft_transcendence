@@ -1,16 +1,19 @@
-.chat {
-    .chat-container{
-        background-color: rgba(208, 215, 225, 0.272);
-        border-radius: 10px;
-        padding : 10px;
-        .chat-row{
-            background-color: rgba(208, 215, 225, 0.42);
-            border-radius: 10px;
-            margin : 10px;
-            .lst_msg{
-                border-radius: 0 10px 10px 0;
-                background-color: rgba(208, 215, 225, 0.42);
-            }
+@import "./chat_room/chat_room";
+@import "./chatroom_item/chatroom_item";
+
+
+main#chatPage {
+    .chat {
+        background-color: $light4;
+        border-radius: .75rem;
+        .chatSearch {
+            
+        }
+        .chatOptions{
+
+        }
+        .chatRooms {
+
         }
     }
 }
