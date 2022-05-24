@@ -1,5 +1,6 @@
 div#chatRoomItem {
     @include _flex(row, space-between, center);
+    cursor: pointer;
     padding: 0.25rem;
     margin: .2rem;
     border-radius: 0.5rem;
