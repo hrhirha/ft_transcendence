@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faMagnifyingGlass, faTrashCan} from "@fortawesome/free-solid-svg-icons";
+import {faMagnifyingGlass, faTrashCan, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
 
 
 interface Props {
@@ -48,9 +48,11 @@ const ChatRoomBody:React.FC = () => {
 
 const ChatRoomFooter:React.FC = () => {
     return <div id="chatRoomFooter">
-       <form action="">
-            <input type="search" placeholder="Search here ..."/>
-            <FontAwesomeIcon icon={faTrashCan}/>
+       <form>
+            <input type="text" placeholder="aznasssss..."/>
+            <div className="icon">
+                <FontAwesomeIcon icon={faPaperPlane}/>
+            </div>
         </form>
     </div>;
 }

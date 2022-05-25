@@ -55,35 +55,50 @@ section#chatRoom {
     }
     div#chatRoomFooter {
         @include _flex(row, center, center);
-        background-color: $light4;
         width: 100%;
-
-       // https://codepen.io/fghty/pen/poePyao
        
         form{
+            margin : 10px;
             position: relative;
-            width: 100%;
+            width: 90%;
             height: 50px;
-            background: white;
             box-sizing: border-box;
             border-radius: 25px;
             border: 4px solid white;
             padding: 5px;
-        }
-        input{
             display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;;
-            height: 42.5px;
-            line-height: 30px;
-            outline: 0;
-            border: 0;
-            display: none;
-            font-size: 1em;
-            border-radius: 20px;
-            padding: 0 20px;
+            cursor: pointer;
+            @include _flex(row, space-between, center);
+            input{
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                color: #000;
+                height: 42.5px;
+                line-height: 30px;
+                outline: 0;
+                border: 0;
+                display: block;
+                font-size: 1em;
+                border-radius: 20px;
+            }
+            .icon {
+                box-sizing: border-box;
+                align-items:center;
+                justify-content:center;
+                display: flex;
+                width: 42.5px;
+                background: $dark2;
+                height: 42.5px;
+                position: absolute;
+                right: 0;
+                border-radius: 50%;
+                svg path {
+                    color: $light3;
+                }
+            }
         }
+        
     }
 }
