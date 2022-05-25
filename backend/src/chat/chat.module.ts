@@ -1,11 +1,13 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ChatGateway } from './chat.gateway';
 import { ChatController } from './chat.controller';
 import { ChatService } from './chat.service';
-import { UserService } from 'src/user/user.service';
+import { AuthModule } from 'src/auth/auth.module';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
-  providers: [ChatGateway, ChatService, UserService],
+  imports: [forwardRef(()=>AuthModule), forwardRef(() => UserModule)],
+  providers: [ChatGateway, ChatService],
   controllers: [ChatController],
   exports: [ChatService]
 })

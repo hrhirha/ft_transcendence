@@ -1,6 +1,9 @@
 import { ForbiddenException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { WsException } from '@nestjs/websockets';
 import { Chat, User } from '@prisma/client';
 import * as argon2 from 'argon2'
+import { Socket } from 'socket.io';
+import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { room_type } from 'src/utils';
@@ -8,7 +11,11 @@ import { AddMessageDto, DeleteMessageDto, NewChatDto, OldChatDto, UserChatDto } 
 
 @Injectable()
 export class ChatService {
-    constructor (private _prismaS: PrismaService, private _userS: UserService) {}
+    constructor (
+        private _prismaS: PrismaService,
+        private _userS: UserService,
+        private _authS: AuthService
+        ) {}
 
     async createChat(user: User, chat: NewChatDto)
     {
@@ -296,16 +303,15 @@ export class ChatService {
         return messages;
     }
 
-    async addMessage(user: User, msg: AddMessageDto)
+    async addMessage(data: AddMessageDto)
     {
-        const user_chat = await this._getUserChatById(user.id, msg.chat_id);
+        const user_chat = await this._getUserChatById(data.user_id, data.chat_id);
         if (!user_chat)
-            throw new ForbiddenException('not a member');
+            return null;
+            // throw new ForbiddenException('not a member');
         const new_msg = await this._prismaS.message.create({
             data: {
-                user_id: user.id,
-                chat_id: msg.chat_id,
-                msg: msg.msg
+                ...data,
             }
         });
         return new_msg;
@@ -326,6 +332,18 @@ export class ChatService {
         return await this._prismaS.message.delete({
             where: {id: msg.id}
         });
+    }
+
+    //
+    async getUserFromSocket(client: Socket)
+    {
+        const cookie = client.handshake.headers.cookie;
+        const token = cookie?.split("=")[1];
+        
+        const user = await this._authS.getUserFromToken(token);
+        // if (!user)
+        //     throw new WsException('user not logged in');
+        return user;
     }
 
     // Private methods

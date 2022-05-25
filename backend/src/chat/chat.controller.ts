@@ -103,11 +103,11 @@ export class ChatController
     }
 
     // add message
-    @Post('add_message') // { user_id: string, chat_id: string, msg: string }
-    addMessage(@GetUser() user: User, @Body() msg: AddMessageDto)
-    {
-        return this._chatS.addMessage(user, msg);
-    }
+    // @Post('add_message') // { user_id: string, chat_id: string, msg: string }
+    // addMessage(@GetUser() user: User, @Body() msg: AddMessageDto)
+    // {
+    //     return this._chatS.addMessage(user, msg);
+    // }
 
     // delete message
     @Post('delete_message') // { id: string, chat_id: string}
