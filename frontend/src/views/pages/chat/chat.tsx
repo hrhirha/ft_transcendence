@@ -4,22 +4,46 @@ import { Links } from "../../../test_data/roomchatdata";
 import { NavBar } from "../../components/navbar/navbar";
 import { ChatRoom } from "./chat_room/chat_room";
 import  {ChatRoomItem }  from "./chatroom_item/chatroom_item";
+import {faPlus, faBell, faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+interface Props {
+    username: string,
+    image: string,
+}
 
 
 export const Chat:React.FC = () => {
     const navigate = useNavigate();
+    let user_info : Props = {username : "walid ben", image : "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg"};
+
     return (
     <main id="chatPage">
         <NavBar />
         <div className='container'>
             <div className="row chat">
                 <div className="col-sm-12 col-md-5 col-lg-4 col-xl-3">
-                    <div className="chatSearch">
-                        search input
-                    </div>
                     <div className="chatOptions">
-                        creat new chat, creat group
-                        icons 
+                        <div className='dataColumn'>
+                            <div className='dataRow'>
+                                <span className='status'>Good Morning</span>
+                                <span className='userName'>{user_info.username}</span>
+                            </div>
+                            <div className='dataRow'>
+                                <div className="options">
+                                    <div className="icon_add">
+                                        <FontAwesomeIcon icon={faPlus}/>
+                                    </div>
+                                    <div className="icon_notification">
+                                        <FontAwesomeIcon icon={faBell}/>
+                                    </div>
+                                    <div className="icon_search">
+                                        <FontAwesomeIcon icon={faMagnifyingGlass} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="line"></div>
                     </div>
                     <div className="chatRooms">
                         { Links && Links.map (({username, image, last_msg, time_last_msg, nbr_msg_not_read}, k ) => (

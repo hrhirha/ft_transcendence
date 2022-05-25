@@ -4,9 +4,50 @@ section#chatRoom {
     background-color: $dark3;
     @include _flex(column, space-between, center);
     div#chatRoomHeader {
-        @include _flex(row, center, space-between);
+        @include _flex(row, space-between, space-between);
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
         background-color: $light4;
         width: 100%;
+        div.dataColumn {
+            width: 100%;
+            @include _flex(row, space-between, space-between);
+            .dataRow {
+                @include _flex(column, center, left);
+                padding-left: 0.9rem;
+                .userName {
+                    font-family: $BFont;
+                    color: $light1;
+                    font-size: $fsize * .85;
+                }
+                .status {
+                    color: $light2;
+                    font-size: $fsize * .7;
+                    max-width: 10rem;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                }
+                .options {
+                    @include _flex(row, center, left);
+                    >div{
+                        @include _flex(row, center, center);
+                        width: 1.9rem;
+                        height: 1.9rem;
+                        margin: 0rem 0.2rem;
+                        padding: .1rem .1rem;
+                        background-color: $dark3;
+                        border-radius:50%;
+                        font-size: $fsize * .6;
+                        font-family: $MFont;
+                    }
+                }
+            }
+        }
+
+        div.img {
+            padding-left: 0.4rem;
+        }
 
     }
     div#chatRoomBody {
@@ -16,5 +57,33 @@ section#chatRoom {
         @include _flex(row, center, center);
         background-color: $light4;
         width: 100%;
+
+       // https://codepen.io/fghty/pen/poePyao
+       
+        form{
+            position: relative;
+            width: 100%;
+            height: 50px;
+            background: white;
+            box-sizing: border-box;
+            border-radius: 25px;
+            border: 4px solid white;
+            padding: 5px;
+        }
+        input{
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;;
+            height: 42.5px;
+            line-height: 30px;
+            outline: 0;
+            border: 0;
+            display: none;
+            font-size: 1em;
+            border-radius: 20px;
+            padding: 0 20px;
+        }
     }
 }
