@@ -6,6 +6,12 @@ main#chatPage {
     .chat {
         background-color: $light4;
         border-radius: .75rem;
+        margin-top: 4rem;
+        overflow: hidden;
+        .col {
+            padding: 0;
+            border-left: .5px solid $dark3;
+        }
         .chatSearch {
             
         }
@@ -13,7 +19,7 @@ main#chatPage {
 
         }
         .chatRooms {
-
+            margin-bottom: .5rem;
         }
     }
 }

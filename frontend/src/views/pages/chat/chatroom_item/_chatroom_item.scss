@@ -6,10 +6,10 @@ div#chatRoomItem {
     border-radius: 0.5rem;
     div.dataColumn {
         width: 100%;
-        margin: .5rem;
-        margin-left: 1rem;
+        margin: .3rem;
+        margin-left: .75rem;
         @include _flex(column, space-between, space-between);
-        .dataRow_1 {
+        .dataRow {
             @include _flex(row, space-between, center);
             .userName {
                 font-family: $BFont;
@@ -22,10 +22,6 @@ div#chatRoomItem {
                 text-align: end;
                 font-size: $fsize * .65; 
             }
-        }
-        .dataRow_2 {
-            @include _flex(row, space-between, center);
-            font-size: $fsize * .75;
             p.lastMsg {
                 color: $light2;
                 font-size: $fsize * .7;
@@ -48,5 +44,5 @@ div#chatRoomItem {
 }
 
 div.active {
-    // background-color: $dark3;
+    background-color: $light5;
 }
