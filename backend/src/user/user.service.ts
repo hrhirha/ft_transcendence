@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { FriendReq, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { friend_status } from 'src/utils';
 import { EditUserDto } from './dto';
@@ -13,6 +13,15 @@ export class UserService {
     async findById(id:string) {
         const user = await this._prismaS.user.findUnique({
             where: { id, },
+        });
+        return user;
+    }
+
+    async updateStatus(id:string, status: string)
+    {
+        const user = await this._prismaS.user.update({
+            where: {id},
+            data: {status}
         });
         return user;
     }

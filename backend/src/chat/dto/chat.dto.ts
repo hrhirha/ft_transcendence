@@ -32,7 +32,11 @@ export class OldChatDto
 
 export class AddMessageDto
 {
-    // { user_id: string, chat_id: string, msg: string }
+    // { user_id:  string, chat_id: string, msg: string }
+
+    @IsString()
+    @IsNotEmpty()
+    user_id: string;
 
     @IsString()
     @IsNotEmpty()

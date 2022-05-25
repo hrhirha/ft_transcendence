@@ -13,7 +13,9 @@ import { ChatService } from 'src/chat/chat.service';
 @Controller('user')
 export class UserController {
 
-    constructor(private _userS: UserService, private _chatS: ChatService) {}
+    constructor(
+        private _userS: UserService,
+        private _chatS: ChatService) {}
 
     // User
     @Get('me')

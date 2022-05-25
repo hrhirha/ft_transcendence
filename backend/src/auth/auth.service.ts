@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserDto } from 'src/user/dto';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -11,7 +12,8 @@ export class AuthService {
     constructor(
         private _configS: ConfigService,
         private _jwtS: JwtService,
-        private _prismaS: PrismaService
+        private _prismaS: PrismaService,
+        private _userS: UserService
     ){}
 
     async login(dto: UserDto, req: Request) {
@@ -42,5 +44,18 @@ export class AuthService {
         const access_token = this._jwtS.sign(payload, options);
 
         return `Authentication=${access_token}; HttpOnly; Path=/; Max-Age=${exp_time}`;
-    } 
+    }
+
+    async getUserFromToken(token: string)
+    {
+        const payload = this._jwtS.verify(token, {
+            secret: this._configS.get('JWT_ACCESS_SECRET')
+        });
+
+        if (payload.sub) {
+            const user =  await this._userS.findById(payload.sub);
+            return user;
+        }
+        return null;
+    }
 }

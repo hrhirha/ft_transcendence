@@ -16,19 +16,23 @@ div#card {
     background-repeat: no-repeat;
     background-size: cover;
     div.overlay {    
-        @include _gradientBg(rgba($light4, .25), $light4, 180);
+        @include _gradientBg(rgba($light4, .25), $dark2, 180);
         @include _flex(column, flex-end, center);
         @include _cardSizes();
         width: 100%;
         height: 100%;
         padding: 1rem;
+        img {
+            width: 15rem;
+        }
         button {
-            @include _roundedButtonStyle($bgcolor1: $light3, $bgcolor2: $purple);
-            margin: 1rem;
+            @include _roundedButtonStyle($bgcolor1: $purple, $bgcolor2: $light3);
+            margin: .5rem;
             font-size: $fsize;
             svg {
                 margin-right: .45rem;
             }
+            zoom: 1.5;
         }
         h6 {
             font-size: $fsize ;
