@@ -49,7 +49,7 @@ const ChatRoomBody:React.FC = () => {
 const ChatRoomFooter:React.FC = () => {
     return <div id="chatRoomFooter">
        <form>
-            <input type="text" placeholder="aznasssss..."/>
+            <input type="text" placeholder="Type your Message Here"/>
             <div className="icon">
                 <FontAwesomeIcon icon={faPaperPlane}/>
             </div>

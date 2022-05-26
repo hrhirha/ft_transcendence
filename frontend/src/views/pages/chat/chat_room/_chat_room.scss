@@ -64,7 +64,7 @@ section#chatRoom {
             height: 50px;
             box-sizing: border-box;
             border-radius: 25px;
-            border: 4px solid white;
+            border: 4px solid $light4;
             padding: 5px;
             display: block;
             cursor: pointer;
@@ -74,14 +74,22 @@ section#chatRoom {
                 top: 0;
                 left: 0;
                 width: 100%;
-                color: #000;
+                color: $light3;
+                background-color: $light4;
                 height: 42.5px;
-                line-height: 30px;
                 outline: 0;
                 border: 0;
                 display: block;
                 font-size: 1em;
                 border-radius: 20px;
+                font-family: $MFont;
+                
+            }
+            ::placeholder {
+                color: $light3;
+                padding-left: 10px;
+                font-size: $fsize * .8;
+                font-family: $MFont;
             }
             .icon {
                 box-sizing: border-box;
