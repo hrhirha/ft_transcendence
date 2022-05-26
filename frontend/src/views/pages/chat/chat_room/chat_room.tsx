@@ -26,7 +26,10 @@ const ChatRoomHeader = (Props : Props) => {
             <div className='dataRow'>
                 <div className="options">
                     <div className="icon_search">
-                        <FontAwesomeIcon icon={faMagnifyingGlass}/>
+                        <form >
+                            <input type="text" placeholder="Search here ..."/>
+                            <FontAwesomeIcon className="fa" icon={faMagnifyingGlass}/>
+                        </form>
                     </div>
                     <div className="icon_delete">
                         <FontAwesomeIcon icon={faTrashCan}/>

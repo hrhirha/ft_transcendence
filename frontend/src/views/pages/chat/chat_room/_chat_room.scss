@@ -30,10 +30,11 @@ section#chatRoom {
                 }
                 .options {
                     @include _flex(row, center, left);
-                    >div{
+                    >div.icon_delete{
+                        cursor: pointer;
                         @include _flex(row, center, center);
-                        width: 1.9rem;
-                        height: 1.9rem;
+                        width: 36px;
+                        height: 36px;
                         margin: 0rem 0.2rem;
                         padding: .1rem .1rem;
                         background-color: $dark3;
@@ -41,6 +42,62 @@ section#chatRoom {
                         font-size: $fsize * .6;
                         font-family: $MFont;
                     }
+                    //--------- testttttttt
+                    .icon_search{
+                        @include _flex(row, center, center);
+                        form{
+                            @include _flex(row, center, center);
+                            position: relative;
+                            transition: all 1s;
+                            width: 40px;
+                            height: 40px;
+                            box-sizing: border-box;
+                            border-radius: 25px;
+                            border: 3px solid $dark3;
+                            background-color: $dark3;
+                            input{
+                                position: absolute;
+                                height: 100%;
+                                width : 100%;
+                                outline: 0;
+                                border: 0;
+                                display: none;
+                                font-size: 1em;
+                                border-radius: 16px;
+                            }
+                        }
+                        
+                        .fa{
+                            padding :8px;
+                            position: absolute;
+                            top: 0;
+                            right: 0;
+                            border-radius: 50%;
+                        }
+                    
+                        svg path {
+                            color: $light3;
+                        }
+                        
+                        form:hover{
+                            width: 300px;
+                            cursor: pointer;
+                            svg path {
+                                color: $light4;
+                            }
+                            .fa{
+                                background-color: $light3;
+                            }
+                        }
+                        
+                        form:hover input{
+                            display: block;
+                            background-color: $dark3;
+                            
+                        }
+                        
+                    }
+                    //---------
                 }
             }
         }
@@ -51,7 +108,6 @@ section#chatRoom {
 
     }
     div#chatRoomBody {
-        
     }
     div#chatRoomFooter {
         @include _flex(row, center, center);
@@ -83,6 +139,7 @@ section#chatRoom {
                 font-size: 1em;
                 border-radius: 20px;
                 font-family: $MFont;
+                 font-size: $fsize * .8;
                 
             }
             ::placeholder {
