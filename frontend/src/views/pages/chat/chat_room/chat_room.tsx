@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faMagnifyingGlass, faTrashCan, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
+import { faClose, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
 
 
 interface Props {
@@ -14,11 +14,16 @@ interface Props {
 const ChatRoomHeader = (Props : Props) => {
     return (
     <div id="chatRoomHeader">
-        <CircleAvatar avatarURL={Props.image} dimensions={45}/>
-        <div className='dataRow'>
-            <span className='userName'>{Props.username}</span>
-            <span className='status'>{Props.status}</span>
+        <div className="userInfos">
+            <CircleAvatar avatarURL={Props.image} dimensions={45}/>
+            <div className='dataRow'>
+                <span className='userName'>{Props.username}</span>
+                <span className='status'>{Props.status}</span>
+            </div>
         </div>
+        <button id="closeChatRoom" title="close">
+            <FontAwesomeIcon icon={faClose}/>
+        </button>
     </div>
     );
 }

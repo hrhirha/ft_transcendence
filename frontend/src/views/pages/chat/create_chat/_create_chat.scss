@@ -1,0 +1,6 @@
+section#createNewChat {
+    width: 100%;
+    height: 100%;
+    background-color: $dark3;
+    @include _flex(column, center, center);
+}

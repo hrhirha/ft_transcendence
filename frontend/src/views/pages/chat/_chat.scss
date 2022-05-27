@@ -51,6 +51,9 @@ main#chatPage {
                     font-size: $fsize;
                 }
             }
+            #newMessage:hover {
+                background-color: $dark2;
+            }
         }
         .chatRooms {
 

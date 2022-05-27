@@ -5,6 +5,7 @@ import { ChatRoom } from "./chat_room/chat_room";
 import  {ChatRoomItem }  from "./chatroom_item/chatroom_item";
 import {faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { CreateNewChat } from "./create_chat/create_chat";
 
 interface Props {
     username: string,
@@ -47,6 +48,7 @@ export const Chat:React.FC = () => {
                 </div>
                 <div className="col">
                     <ChatRoom />
+                    {/* <CreateNewChat /> AJJ taddgh ardass kmmlgh */}
                 </div>
             </div>
         </div>

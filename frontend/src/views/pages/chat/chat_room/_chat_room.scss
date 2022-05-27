@@ -4,32 +4,52 @@ section#chatRoom {
     background-color: $dark3;
     @include _flex(column, space-between, center);
     div#chatRoomHeader {
-        @include _flex(row, flex-start, center);
+        @include _flex(row, space-between, center);
         padding-top: 0.4rem;
         padding-bottom: 0.4rem;
         background-color: $light4;
         width: 100%;
-        #circleAvatar {
-            margin-left: 1rem
-        }
-        .dataRow {
-            @include _flex(column, center, left);
-            margin-left: 1rem;
-            .userName {
-                font-family: $BFont;
-                color: $light1;
-                font-size: $fsize * .85;
+        .userInfos {
+            @include _flex(row, flex-start, center);
+            cursor: pointer;
+            #circleAvatar {
+                margin-left: 1rem
             }
-            .status {
-                color: $light2;
-                font-size: $fsize * .7;
-                max-width: 10rem;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
+            .dataRow {
+                @include _flex(column, center, left);
+                margin-left: 1rem;
+                .userName {
+                    font-family: $BFont;
+                    color: $light1;
+                    font-size: $fsize * .85;
+                }
+                .status {
+                    color: $light2;
+                    font-size: $fsize * .7;
+                    max-width: 10rem;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                }
             }
         }
-
+        button#closeChatRoom {
+            @include _flex(row, center, center);
+            cursor: pointer;
+            border: none;
+            background-color: $dark3;
+            padding: .5rem;
+            border-radius: 100%;
+            min-width: 2.3rem;
+            min-height: 2.3rem;
+            margin: auto .75rem;
+            svg {
+                font-size: $fsize;
+            }
+        }
+        #closeChatRoom:hover {
+            background-color: $dark2;
+        }
     }
     div#chatRoomBody {
         //TO DO
