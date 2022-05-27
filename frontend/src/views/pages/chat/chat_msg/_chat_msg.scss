@@ -1,0 +1,39 @@
+.Me{
+    margin: 0.3rem;
+    @include _flex(row, right, center);
+    flex-direction: row-reverse;
+    span{
+        padding: 0.5rem;
+        background-color:  $light3;
+        font-size: $fsize * .9;
+        font-family: $MFont;
+        border-radius: 1rem 0rem 1rem 1rem;
+    }
+    .image{
+        margin-left: 0.3rem;
+    }
+    .display_image{
+        margin-left: 0.3rem;
+        visibility: hidden;
+    }
+}
+
+.User{
+    margin: 0.3rem;
+    @include _flex(row, left, center);
+    span{
+        padding: 0.5rem;
+        background-color:  $light4;
+        font-size: $fsize * .9;
+        font-family: $MFont;
+        border-radius: 0rem 1rem 1rem 1rem;
+    }
+    .image{
+        margin-right: 0.3rem;
+
+    }
+    .display_image{
+        margin-right: 0.3rem;
+        visibility: hidden;
+    }
+}

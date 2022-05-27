@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
+import { chat_data } from "../../../../test_data/chat_data";
+import { Chat_msg } from "../chat_msg/chat_msg";
 
 
 interface Props {
@@ -30,8 +32,16 @@ const ChatRoomHeader = (Props : Props) => {
 
 const ChatRoomBody:React.FC = () => {
     return <div id="chatRoomBody">
-        Body
-        chat
+        { chat_data && chat_data.map (({sender_user, image, msg, time}, k ) => (
+            <Chat_msg
+                key={k}
+                display_image={(chat_data[k - 1] && chat_data[k].sender_user === chat_data[k - 1].sender_user) ? true : false }
+                sender_user={sender_user}
+                image = {image}
+                msg={msg}
+                time={time}
+            />
+        ))}
     </div>;
 }
 
