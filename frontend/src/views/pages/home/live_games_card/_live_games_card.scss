@@ -1,13 +1,5 @@
-@mixin  _cardSizes() {
-    min-width: 15rem;
-    max-width: 25rem;
-    min-height: 15rem;
-    max-height: 25rem;
-}
-
-div#card {
+div#liveGamesCard {
     @include _flex(column, center, center);
-    @include _cardSizes();
     @include _selectionOff();
     overflow: hidden;
     border-radius: .75rem;
@@ -15,28 +7,29 @@ div#card {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    margin-bottom: 1.5rem;
+    transition: .5s ease all;
     div.overlay {    
-        @include _gradientBg(rgba($light4, .25), $dark2, 180);
+        @include _gradientBg(rgba($light4, .5), $dark2, 180);
         @include _flex(column, flex-end, center);
-        @include _cardSizes();
         width: 100%;
         height: 100%;
         padding: 1rem;
-        img {
-            width: 15rem;
-        }
         button {
-            @include _roundedButtonStyle($bgcolor1: $purple, $bgcolor2: $light3);
+            @include _roundedButtonStyle($bgcolor1: $pink, $bgcolor2: $pink);
             margin: .5rem;
             font-size: $fsize;
             svg {
                 margin-right: .45rem;
             }
-            zoom: 1.5;
+            zoom: 1.25;
         }
         h6 {
-            font-size: $fsize ;
-            font-family: $XLFont;
+            font-size: $fsize * 1.75;
+            font-family: $BFont;
+            @media (max-width: $sm) {
+                font-size: $fsize * 1.25;
+            }
         }
     }
 }

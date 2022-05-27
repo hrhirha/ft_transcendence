@@ -1,0 +1,38 @@
+div#gameCard {
+    @include _flex(column, center, center);
+    @include _selectionOff();
+    overflow: hidden;
+    border-radius: .75rem;
+    background-color: $dark2;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin-bottom: 1.5rem;
+    transition: .5s ease all;
+    div.overlay {    
+        @include _gradientBg(rgba($light4, .5), $dark2, 180);
+        @include _flex(column, flex-end, center);
+        width: 100%;
+        height: 100%;
+        padding: 1rem;
+        img {
+            width: 15rem;
+            @media (max-width: $sm) {
+                width: 10rem;
+            }
+        }
+        button {
+            @include _roundedButtonStyle($bgcolor1: $purple, $bgcolor2: $purple);
+            margin: .5rem;
+            font-size: $fsize;
+            svg {
+                margin-right: .45rem;
+            }
+            zoom: 1.25;
+        }
+        h6 {
+            font-size: $fsize ;
+            font-family: $XLFont;
+        }
+    }
+}

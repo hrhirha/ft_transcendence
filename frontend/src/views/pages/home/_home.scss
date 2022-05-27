@@ -1,0 +1,23 @@
+@import "./game_card/game_card";
+@import "./live_games_card/live_games_card";
+
+main#homePage {
+    min-height: calc(100vh - 10rem);
+    > div.container {
+        * {
+            transition: .5s ease all;
+        }
+        @include _flex(column, center, center);
+        min-height: calc(100vh - 10rem);
+        margin-top: 2rem;
+        @media (max-width: $xs) {
+            padding: 0;
+            justify-content: flex-start;
+        }
+    }
+    .center {
+        @include _flex(row, center, center);
+        width: 100%;
+    }
+    
+}

@@ -4,7 +4,6 @@
 //components
 @import "../components/navbar/navbar";
 @import "../components/brand/brand";
-@import "../components/card/card";
 @import "../components/circle_avatar/circle_avatar";
 //containers
 
@@ -14,7 +13,6 @@
 @import "../pages/chat/chat";
 @import "../pages/friends/friends";
 @import "../pages/leader_board/leader_board";
-@import "../pages/notifications/notifications";
 @import "../pages/profile/profile";
 
 @font-face {
@@ -66,7 +64,6 @@
     padding: 0;
     scroll-behavior: smooth;
     color: $light1;
-    transition: .5s ease all;
     z-index: 1;
 }
 
@@ -75,9 +72,4 @@ body {
     min-height: 100vh;
     min-width: 280px;
     overflow: auto;
-}
-
-.center {
-    @include _flex(row, center, center);
-    height: calc(100vh - 88px);
 }
