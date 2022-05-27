@@ -4,166 +4,76 @@ section#chatRoom {
     background-color: $dark3;
     @include _flex(column, space-between, center);
     div#chatRoomHeader {
-        @include _flex(row, space-between, space-between);
+        @include _flex(row, flex-start, center);
         padding-top: 0.4rem;
         padding-bottom: 0.4rem;
         background-color: $light4;
         width: 100%;
-        div.dataColumn {
-            width: 100%;
-            @include _flex(row, space-between, space-between);
-            .dataRow {
-                @include _flex(column, center, left);
-                padding-left: 0.9rem;
-                .userName {
-                    font-family: $BFont;
-                    color: $light1;
-                    font-size: $fsize * .85;
-                }
-                .status {
-                    color: $light2;
-                    font-size: $fsize * .7;
-                    max-width: 10rem;
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                }
-                .options {
-                    @include _flex(row, center, left);
-                    >div.icon_delete{
-                        cursor: pointer;
-                        @include _flex(row, center, center);
-                        width: 36px;
-                        height: 36px;
-                        margin: 0rem 0.2rem;
-                        padding: .1rem .1rem;
-                        background-color: $dark3;
-                        border-radius:50%;
-                        font-size: $fsize * .6;
-                        font-family: $MFont;
-                    }
-                    //--------- testttttttt
-                    .icon_search{
-                        @include _flex(row, center, center);
-                        form{
-                            @include _flex(row, center, center);
-                            position: relative;
-                            transition: all 1s;
-                            width: 40px;
-                            height: 40px;
-                            box-sizing: border-box;
-                            border-radius: 25px;
-                            border: 3px solid $dark3;
-                            background-color: $dark3;
-                            input{
-                                position: absolute;
-                                height: 100%;
-                                width : 100%;
-                                outline: 0;
-                                border: 0;
-                                display: none;
-                                font-size: 1em;
-                                border-radius: 16px;
-                            }
-                        }
-                        
-                        .fa{
-                            padding :8px;
-                            position: absolute;
-                            top: 0;
-                            right: 0;
-                            border-radius: 50%;
-                        }
-                    
-                        svg path {
-                            color: $light3;
-                        }
-                        
-                        form:hover{
-                            width: 300px;
-                            cursor: pointer;
-                            svg path {
-                                color: $light4;
-                            }
-                            .fa{
-                                background-color: $light3;
-                            }
-                        }
-                        
-                        form:hover input{
-                            display: block;
-                            background-color: $dark3;
-                            
-                        }
-                        
-                    }
-                    //---------
-                }
-            }
+        #circleAvatar {
+            margin-left: 1rem
         }
-
-        div.img {
-            padding-left: 0.4rem;
+        .dataRow {
+            @include _flex(column, center, left);
+            margin-left: 1rem;
+            .userName {
+                font-family: $BFont;
+                color: $light1;
+                font-size: $fsize * .85;
+            }
+            .status {
+                color: $light2;
+                font-size: $fsize * .7;
+                max-width: 10rem;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
         }
 
     }
     div#chatRoomBody {
+        //TO DO
     }
     div#chatRoomFooter {
         @include _flex(row, center, center);
         width: 100%;
-       
-        form{
-            margin : 10px;
-            position: relative;
-            width: 90%;
-            height: 50px;
-            box-sizing: border-box;
-            border-radius: 25px;
-            border: 4px solid $light4;
-            padding: 5px;
-            display: block;
-            cursor: pointer;
-            @include _flex(row, space-between, center);
-            input{
-                position: absolute;
-                top: 0;
-                left: 0;
+        background-color: $light4;
+        form#messageForm {
+            @include _flex(row, flex-end, center);
                 width: 100%;
-                color: $light3;
-                background-color: $light4;
-                height: 42.5px;
-                outline: 0;
-                border: 0;
-                display: block;
-                font-size: 1em;
-                border-radius: 20px;
-                font-family: $MFont;
-                 font-size: $fsize * .8;
-                
-            }
-            ::placeholder {
-                color: $light3;
-                padding-left: 10px;
-                font-size: $fsize * .8;
-                font-family: $MFont;
-            }
-            .icon {
-                box-sizing: border-box;
-                align-items:center;
-                justify-content:center;
-                display: flex;
-                width: 42.5px;
-                background: $dark2;
-                height: 42.5px;
-                position: absolute;
-                right: 0;
-                border-radius: 50%;
-                svg path {
+                margin: 1rem;
+                input {
+                    width: 100%;
+                    display: block;
+                    padding: .75rem 1.25rem;
+                    padding-right: 6rem;
+                    font-size: $fsize;
+                    background-color: $dark3;
+                    border: none;
+                    border-radius: 50rem;
+                    outline: none;
+                    font-size: $fsize * .9;
+                }
+                ::placeholder {
                     color: $light3;
                 }
+        }
+        button#sendMessage {
+            @include _flex(row, space-evenly, center);
+            cursor: pointer;
+            border: none;
+            background-color: $purple;
+            font-family: $BFont;
+            padding: .5rem;
+            border-radius: 50rem;
+            min-width: 5.25rem;
+            min-height: 2.3rem;
+            margin-left: .5rem;
+            position: absolute;
+            margin-right: .25rem;
+            svg {
+                font-size: $fsize;
             }
         }
-        
     }
 }

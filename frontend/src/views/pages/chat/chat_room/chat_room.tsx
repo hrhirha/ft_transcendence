@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,27 +14,10 @@ interface Props {
 const ChatRoomHeader = (Props : Props) => {
     return (
     <div id="chatRoomHeader">
-        <div className="img">
-            <CircleAvatar avatarURL={Props.image} dimensions={50}/>
-        </div>
-        <div className='dataColumn'>
-            <div className='dataRow'>
-                <span className='userName'>{Props.username}</span>
-                <span className='status'>{Props.status}</span>
-            </div>
-            <div className='dataRow'>
-                <div className="options">
-                    <div className="icon_search">
-                        <form >
-                            <input type="text" placeholder="Search here ..."/>
-                            <FontAwesomeIcon className="fa" icon={faMagnifyingGlass}/>
-                        </form>
-                    </div>
-                    <div className="icon_delete">
-                        <FontAwesomeIcon icon={faTrashCan}/>
-                    </div>
-                </div>
-            </div>
+        <CircleAvatar avatarURL={Props.image} dimensions={45}/>
+        <div className='dataRow'>
+            <span className='userName'>{Props.username}</span>
+            <span className='status'>{Props.status}</span>
         </div>
     </div>
     );
@@ -51,11 +33,12 @@ const ChatRoomBody:React.FC = () => {
 
 const ChatRoomFooter:React.FC = () => {
     return <div id="chatRoomFooter">
-       <form>
+       <form id="messageForm">
             <input type="text" placeholder="Type your Message Here"/>
-            <div className="icon">
+            <button id="sendMessage">
                 <FontAwesomeIcon icon={faPaperPlane}/>
-            </div>
+                Send
+            </button>
         </form>
     </div>;
 }

@@ -1,10 +1,9 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Links } from "../../../test_data/roomchatdata";
 import { NavBar } from "../../components/navbar/navbar";
 import { ChatRoom } from "./chat_room/chat_room";
 import  {ChatRoomItem }  from "./chatroom_item/chatroom_item";
-import {faPlus, faBell, faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
+import {faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface Props {
@@ -24,26 +23,13 @@ export const Chat:React.FC = () => {
             <div className="row chat">
                 <div className="col-sm-12 col-md-5 col-lg-4 col-xl-3">
                     <div className="chatOptions">
-                        <div className='dataColumn'>
-                            <div className='dataRow'>
-                                <span className='status'>Good Morning</span>
-                                <span className='userName'>{user_info.username}</span>
-                            </div>
-                            <div className='dataRow'>
-                                <div className="options">
-                                    <div className="icon_add">
-                                        <FontAwesomeIcon icon={faPlus}/>
-                                    </div>
-                                    <div className="icon_notification">
-                                        <FontAwesomeIcon icon={faBell}/>
-                                    </div>
-                                    <div className="icon_search">
-                                        <FontAwesomeIcon icon={faMagnifyingGlass} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="line"></div>
+                        <form id="chatSearch">
+                            <input type="text" placeholder="Search for chat"/>
+                            <FontAwesomeIcon icon={faSearch}/>
+                        </form>
+                        <button id="newMessage" title="New chat">
+                            <FontAwesomeIcon icon={faPlus}/>
+                        </button>
                     </div>
                     <div className="chatRooms">
                         { Links && Links.map (({username, image, last_msg, time_last_msg, nbr_msg_not_read}, k ) => (
