@@ -1,8 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Card } from "../../components/card/card";
 import { NavBar } from "../../components/navbar/navbar";
-import { DefaultGame, UltimateGame } from '../../../assets';
+import { DefaultGame, LiveGames, UltimateGame } from '../../../assets';
+import { GameCard } from "./game_card/game_card";
+import { LiveGamesCard } from "./live_games_card/live_games_card";
 
 export const Home:React.FC = () => {
     const navigate = useNavigate();
@@ -11,12 +12,17 @@ export const Home:React.FC = () => {
         <NavBar />
         <div className='container'>
             <div className='row center' >
-            <div className='col col-md-6 col-lg-4'>
-                <Card image={DefaultGame} cardTitle='Play default game with your friend' icon="faPuzzlePiece" btnTitle='Play' background='https://i.pinimg.com/originals/d4/1a/3e/d41a3e3cce22dbc082a46c607a013c24.jpg'/>
+                <div className='col col-lg-8'>
+                    <LiveGamesCard title="Watch Live games" background={LiveGames}/>
+                </div>
             </div>
-            <div className='col col-md-6 col-lg-4'>
-                <Card image={UltimateGame} cardTitle='Play default game with your friend' icon="faPuzzlePiece" btnTitle='Play' background='https://i.pinimg.com/originals/d4/1a/3e/d41a3e3cce22dbc082a46c607a013c24.jpg'/>
-            </div>
+            <div className='row center' >
+                <div className='col col-md-6 col-lg-4'>
+                    <GameCard image={UltimateGame} background='https://i.pinimg.com/originals/d4/1a/3e/d41a3e3cce22dbc082a46c607a013c24.jpg'/>
+                </div>
+                <div className='col col-md-6 col-lg-4'>
+                    <GameCard image={DefaultGame} background='https://i.pinimg.com/originals/d4/1a/3e/d41a3e3cce22dbc082a46c607a013c24.jpg'/>
+                </div>
             </div>
         </div>
     </main>

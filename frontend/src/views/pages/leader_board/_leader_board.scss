@@ -1,0 +1,35 @@
+#leaderBoardPage {
+    table {
+        thead {
+            tr {
+                @include _flex(row, space-between, center);
+                padding: 1rem;
+                background-color:$light4;
+                font-size: $fsize;
+                :nth-child(1) {
+                    width: 7rem;
+                }
+                :nth-child(2) {
+                    width: 100%;
+                }
+                :nth-child(3) {
+                    min-width: 7rem;
+                }
+            }
+        }
+        tbody {
+            tr {
+                @include _flex(row, space-between, center);
+                :nth-child(1) {
+                    width: 7rem;
+                }
+                :nth-child(2) {
+                    width: 100%;
+                }
+                :nth-child(3) {
+                    min-width: 7rem;
+                }
+            }
+        }
+    }
+}

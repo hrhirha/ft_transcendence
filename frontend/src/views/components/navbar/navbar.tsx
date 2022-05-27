@@ -1,6 +1,6 @@
 import React from "react";
-import { FontAwesomeIcon, FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
-import { IconDefinition, faHouse, faRankingStar, faComments, faBell, faUserGroup} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconDefinition, faHouse, faRankingStar, faComments, faUserGroup} from "@fortawesome/free-solid-svg-icons";
 import { Brand } from "../brand/brand";
 import { useLocation } from "react-router-dom";
 
@@ -25,11 +25,6 @@ const MenuData: Array<NavButtonData> = [
         icon: faComments,
         title: "Chat",
         url: "/chat"
-    },
-    {
-        icon: faBell,
-        title: "Notifications",
-        url: "/notifications"
     },
     {
         icon: faUserGroup,
