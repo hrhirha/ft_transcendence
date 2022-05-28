@@ -22,7 +22,7 @@ export const Chat:React.FC = () => {
         <NavBar />
         <div className='container'>
             <div className="row chat">
-                <div className="col-sm-12 col-md-5 col-lg-4 col-xl-3">
+                <div className="col-sm-12 col-md-5 col-lg-4">
                     <div className="chatOptions">
                         <form id="chatSearch">
                             <input type="text" placeholder="Search for chat"/>

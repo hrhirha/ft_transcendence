@@ -56,7 +56,15 @@
 ::-webkit-scrollbar-thumb:hover {
     background: $light3;
 }
-
+::-moz-selection { /* Code for Firefox */
+    color: $light2;
+    background: $purple;
+}
+  
+::selection {
+    color: $light2;
+    background: $purple;
+}
 *
 {
     font-family: $RFont;

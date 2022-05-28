@@ -16,7 +16,7 @@ div#liveGamesCard {
         height: 100%;
         padding: 1rem;
         button {
-            @include _roundedButtonStyle($bgcolor1: $pink, $bgcolor2: $pink);
+            @include _roundedButtonStyle($bgcolor1: $gold, $bgcolor2: $pink);
             margin: .5rem;
             font-size: $fsize;
             svg {

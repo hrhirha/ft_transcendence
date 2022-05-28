@@ -1,39 +1,50 @@
-.Me{
-    margin: 0.3rem;
-    @include _flex(row, right, center);
-    flex-direction: row-reverse;
-    span{
-        padding: 0.5rem;
-        background-color:  $light3;
+.Me {
+    margin: .4rem;
+    @include _flex(row-reverse, right, flex-start);
+
+    span.msg, span.first_msg {
+        padding: 0.5rem .75rem;
+        max-width: 69%;
+        background-color: $light6;
         font-size: $fsize * .9;
         font-family: $MFont;
-        border-radius: 1rem 0rem 1rem 1rem;
+        border-radius: 1rem .25rem 1rem 1rem;
     }
-    .image{
-        margin-left: 0.3rem;
+
+    #circleAvatar {
+        margin-left: .5rem;
+        border: 3px solid $light6;
     }
-    .display_image{
-        margin-left: 0.3rem;
-        visibility: hidden;
+
+    span.first_msg {
+        margin-right: 2.75rem;
+        border-radius: 1rem;
     }
 }
 
-.User{
-    margin: 0.3rem;
-    @include _flex(row, left, center);
-    span{
-        padding: 0.5rem;
-        background-color:  $light4;
+.User {
+    margin: .4rem;
+    @include _flex(row, left, flex-start);
+
+    span.msg, span.first_msg {
+        padding: 0.5rem .75rem;
+        max-width: 69%;
+        background-color: $light4;
         font-size: $fsize * .9;
         font-family: $MFont;
-        border-radius: 0rem 1rem 1rem 1rem;
+        border-radius: .25rem 1rem 1rem 1rem;
     }
-    .image{
-        margin-right: 0.3rem;
 
+    #circleAvatar {
+        margin-right: .5rem;
+        border: 3px solid $light4;
     }
-    .display_image{
-        margin-right: 0.3rem;
-        visibility: hidden;
+    span.first_msg {
+        margin-left: 2.75rem;
+        border-radius: 1rem;
     }
+}
+
+.mtop {
+    margin-top: 1.5rem;
 }

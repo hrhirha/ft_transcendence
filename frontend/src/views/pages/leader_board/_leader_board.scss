@@ -1,13 +1,52 @@
+@mixin _rankStyle($color) {
+    border-left: 5px solid $color;
+    border-right: 5px solid $color;
+    .rank path{
+        color: $color;
+    }
+    #circleAvatar {
+        border-color: $color;
+    }
+}
+
 #leaderBoardPage {
+    .container {
+        @media (max-width: $sm) {
+            padding: 0;
+        }
+    }
     table {
+        @media (max-width: $sm) {
+            padding: 1rem;
+        }
+        @media (max-width: $xs) {
+            zoom: .85;
+        }
+        @media (max-width: 380px) {
+            zoom: .75;
+        }
+        @media (max-width: 320px) {
+            zoom: .65;
+        }
+        overflow: hidden;
+        margin: 2rem auto;
+        td {
+            text-align: center;
+        }
         thead {
+            padding: 0;
             tr {
+                border-radius: 1rem;
                 @include _flex(row, space-between, center);
                 padding: 1rem;
+                margin: .25rem 0;
                 background-color:$light4;
-                font-size: $fsize;
+                th {
+                    font-family: $BFont;
+                    font-size: $fsize * 1.07;
+                }
                 :nth-child(1) {
-                    width: 7rem;
+                    min-width: 5rem;
                 }
                 :nth-child(2) {
                     width: 100%;
@@ -18,17 +57,52 @@
             }
         }
         tbody {
+            padding: 0;
             tr {
                 @include _flex(row, space-between, center);
+                margin: .5rem 0;
+                border-radius: 1rem;
+                padding: .5rem 1rem;
+                background-color:$dark3;
+                font-size: $fsize;
+                width: auto;
+                .rank span {
+                    color: $light3;
+                }
                 :nth-child(1) {
-                    width: 7rem;
+                    min-width: 5rem;
+                    max-width: 7rem;
+                    font-size: $fsize * 1.25;
+                    font-family: $BFont;
                 }
                 :nth-child(2) {
                     width: 100%;
+                    @include _flex(row, flex-start, center);
+                    #circleAvatar {
+                        border: .185rem solid $light3;
+                    }
+                    .fullName {
+                        @include _textOverflow(10rem);
+                        font-family: $BFont;
+                        font-size: $fsize * 1.05;
+                        margin-left: .75rem;
+                    }
                 }
                 :nth-child(3) {
                     min-width: 7rem;
+                    span.score {
+                        color: $light2;
+                    }
                 }
+            }
+            #_1 {
+                @include _rankStyle($gold);
+            }
+            #_2 {
+                @include _rankStyle($silver);
+            }
+            #_3 {
+                @include _rankStyle($bronze);
             }
         }
     }

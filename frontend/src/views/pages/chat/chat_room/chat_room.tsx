@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
 import { chat_data } from "../../../../test_data/chat_data";
 import { Chat_msg } from "../chat_msg/chat_msg";
+import { BgVectors } from "../../../../assets";
 
 
 interface Props {
@@ -61,7 +62,7 @@ const ChatRoomFooter:React.FC = () => {
 export const ChatRoom:React.FC = () => {
     const navigate = useNavigate();
     return (
-    <section id="chatRoom">
+    <section id="chatRoom" style={{backgroundImage: `url(${BgVectors})`}}>
         <ChatRoomHeader username="Jhon don" image="https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg" status="last seen yesterday 2.30 PM"/>
         <ChatRoomBody/>
         <ChatRoomFooter/>

@@ -4,7 +4,14 @@
 
 
 main#chatPage {
+    * {
+        transition: .5s ease all;
+    }
     .chat {
+        @media (min-width: $lg) {
+            width: 85%;
+            margin: 2rem auto;
+        }
         background-color: $light4;
         border-radius: .75rem;
         margin-top: 2rem;

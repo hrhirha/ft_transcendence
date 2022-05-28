@@ -1,5 +1,6 @@
 div#chatRoomItem {
     @include _flex(row, space-between, center);
+    @include _selectionOff();
     cursor: pointer;
     padding: 0.25rem;
     margin: .2rem;
@@ -23,12 +24,9 @@ div#chatRoomItem {
                 font-size: $fsize * .65; 
             }
             p.lastMsg {
+                @include _textOverflow(10rem);
                 color: $light2;
                 font-size: $fsize * .7;
-                max-width: 10rem;
-                overflow: hidden;
-                white-space: nowrap;
-                text-overflow: ellipsis;
             }
             span.nbNotifs {
                 display: block;

@@ -24,12 +24,9 @@ section#chatRoom {
                     font-size: $fsize * .85;
                 }
                 .status {
+                    @include _textOverflow(10rem);
                     color: $light2;
                     font-size: $fsize * .7;
-                    max-width: 10rem;
-                    overflow: hidden;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
                 }
             }
         }
@@ -52,13 +49,10 @@ section#chatRoom {
         }
     }
     div#chatRoomBody {
-        //TO DO
         width: 100%;
         height: 100%;
         max-height: calc(100vh - 18rem);
         overflow-y: scroll;
-        background-color: $dark2;
-        
     }
     div#chatRoomFooter {
         @include _flex(row, center, center);

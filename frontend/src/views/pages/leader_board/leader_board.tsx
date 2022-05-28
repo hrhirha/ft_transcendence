@@ -14,12 +14,12 @@ interface RowProps {
 
 const BoardRow:React.FC<RowProps> = (RowProps) => {
     return(
-    <tr id={RowProps.rank.toString()} className="col-sm-12 col-8">
+    <tr id={"_"+RowProps.rank} className="col-sm-12 col-8">
         <td className="rank">
-            {RowProps.rank == 1 && <span className="firstPlace"><FontAwesomeIcon icon={faTrophy}/></span>}
-            {RowProps.rank == 2 && <span className="secondPlace"><FontAwesomeIcon icon={faMedal}/></span>}
-            {RowProps.rank == 3 && <span className="thirdPlace"><FontAwesomeIcon icon={faMedal}/></span>}
-            {RowProps.rank > 3 && <span className="ranking">{RowProps.rank}</span>}
+            {RowProps.rank == 1 && <span><FontAwesomeIcon icon={faTrophy}/></span>}
+            {RowProps.rank == 2 && <span><FontAwesomeIcon icon={faMedal}/></span>}
+            {RowProps.rank == 3 && <span><FontAwesomeIcon icon={faMedal}/></span>}
+            {RowProps.rank > 3 && <span>{RowProps.rank}</span>}
         </td>
         <td>
             <CircleAvatar avatarURL={RowProps.avatar} dimensions={40}/>
@@ -41,7 +41,7 @@ export const LeaderBoard:React.FC = () => {
     <main id="leaderBoardPage">
         <NavBar />
         <div className='container'>
-            <table className="row">
+            <table className="col-12 col-md-8 col-xl-7">
                 <thead>
                     <tr>
                         <th>#Rank</th>
