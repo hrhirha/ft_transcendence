@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { NavBar } from "../../components/navbar/navbar";
-import {faMedal, faTrophy } from "@fortawesome/free-solid-svg-icons";
+import {faMedal, faRankingStar, faTrophy } from "@fortawesome/free-solid-svg-icons";
 import { CircleAvatar } from "../../components/circle_avatar/circle_avatar";
 
 interface RowProps {
@@ -41,6 +41,10 @@ export const LeaderBoard:React.FC = () => {
     <main id="leaderBoardPage">
         <NavBar />
         <div className='container'>
+            <div className="sectionTitle">
+                <FontAwesomeIcon icon={faRankingStar}/>
+                <h2>Leader Board</h2>
+            </div>
             <table className="col-12 col-md-8 col-xl-7">
                 <thead>
                     <tr>

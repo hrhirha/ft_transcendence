@@ -7,10 +7,21 @@ main#chatPage {
     * {
         transition: .5s ease all;
     }
+    .container {
+        @media (max-width: $sm) {
+            width: auto;
+            padding: 0;
+        }
+    }
     .chat {
         @media (min-width: $lg) {
             width: 85%;
             margin: 2rem auto;
+        }
+        @media (max-width: $xs) {
+            border-radius: 0;
+            margin: 0;
+            zoom: .85;
         }
         background-color: $light4;
         border-radius: .75rem;

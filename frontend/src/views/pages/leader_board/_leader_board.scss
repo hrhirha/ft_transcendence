@@ -13,7 +13,32 @@
     .container {
         @include _selectionOff();
         @media (max-width: $sm) {
+            width: auto;
             padding: 0;
+        }
+    }
+    .sectionTitle {
+        @include _flex(row, center, center);
+        max-width: 15rem;
+        margin: 1.5rem auto;
+        svg {
+            font-size: $fsize * 3.3;
+            path {
+                color: $gold;
+            }
+        }
+        h2 {
+            margin-left: .5rem;
+            font-family: $XBFont;
+            color: $light3;
+            text-transform: uppercase;
+            font-size: $fsize * 2.2;
+            line-height: .8;
+            width: min-content;
+        }
+        @media (max-width: $sm) {
+            margin-bottom: .5rem;
+            zoom: .75;
         }
     }
     table {
@@ -30,7 +55,7 @@
             zoom: .65;
         }
         overflow: hidden;
-        margin: 2rem auto;
+        margin: 1rem auto;
         td {
             text-align: center;
         }
@@ -78,6 +103,7 @@
                 }
                 :nth-child(2) {
                     width: 100%;
+                    cursor: pointer;
                     @include _flex(row, flex-start, center);
                     #circleAvatar {
                         border: .185rem solid $light3;
@@ -93,6 +119,9 @@
                     min-width: 7rem;
                     span.score {
                         color: $light2;
+                        background: $light4;
+                        padding: 0.15rem 0.75rem;
+                        border-radius: 1rem;
                     }
                 }
             }

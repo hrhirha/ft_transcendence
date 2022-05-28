@@ -53,6 +53,7 @@ section#chatRoom {
         height: 100%;
         max-height: calc(100vh - 18rem);
         overflow-y: scroll;
+        padding-bottom: 1rem;
     }
     div#chatRoomFooter {
         @include _flex(row, center, center);
