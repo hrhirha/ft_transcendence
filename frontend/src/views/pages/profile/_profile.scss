@@ -1,0 +1,53 @@
+.profil {
+    margin-top: 60px;
+    .profile_info{
+    background-color: $dark3;
+    border-radius: 15px;
+    width: 100%;
+    height: 400px;
+    @include _flex(column, center, center);
+        .image{
+            margin-top: 10px;
+            
+        }
+        .username {
+            font-size: $fsize * 1.4;
+            font-family: $MFont;
+            color: $light2;
+            margin-top: 1rem;
+        }
+        .path {
+            font-size: $fsize * 1.1;
+            font-family: $MFont;
+            color: $light3;
+            margin-bottom: 1rem;
+        }
+        .status{
+            @include _flex(row, center, center);
+
+            width: 100%;
+            margin-bottom: 1.5rem;
+            .item_stat{
+                width: 100%;
+                .stat{
+                    font-size: $fsize * 0.7;
+                    font-family: $MFont;
+                    color: $light2;
+                }
+                .value {
+                    font-size: $fsize * 2.2;
+                    font-family: $MFont;
+                    color: $light2;
+                }
+            }
+            .vl{
+                border-left: 2px solid $light3;
+                height: 3rem;
+            }
+            .item_stat {
+                @include _flex(column, center, center);
+            }
+        }
+        
+    }
+}
