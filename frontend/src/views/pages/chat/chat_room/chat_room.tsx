@@ -32,7 +32,7 @@ const ChatRoomHeader = (Props : Props) => {
 }
 
 const ChatRoomBody:React.FC = () => {
-    return <div id="chatRoomBody">
+    return <div id="chatRoomBody" style={{backgroundImage: `url(${BgVectors})`}}>
         { chat_data && chat_data.map (({sender_user, image, msg, time}, k ) => (
             <Chat_msg
                 key={k}
@@ -62,7 +62,7 @@ const ChatRoomFooter:React.FC = () => {
 export const ChatRoom:React.FC = () => {
     const navigate = useNavigate();
     return (
-    <section id="chatRoom" style={{backgroundImage: `url(${BgVectors})`}}>
+    <section id="chatRoom">
         <ChatRoomHeader username="Jhon don" image="https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg" status="last seen yesterday 2.30 PM"/>
         <ChatRoomBody/>
         <ChatRoomFooter/>
