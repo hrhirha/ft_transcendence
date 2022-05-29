@@ -11,10 +11,14 @@ export class UserService {
 
     // User
     async findById(id:string) {
-        const user = await this._prismaS.user.findUnique({
-            where: { id, },
-        });
+        const user = await this._prismaS.user.findUnique({ where: { id, }, });
         return user;
+    }
+
+    publicData(user: User)
+    {
+        const {createdAt, updatedAt, refresh_token, isTfaEnabled, tfaSecret, ...dto} = user;
+        return dto;    
     }
 
     async updateStatus(id:string, status: string)

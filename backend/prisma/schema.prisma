@@ -34,7 +34,7 @@ model User {
   recievedReq   FriendReq[] @relation("received")
 
   messages      Message[]
-  user_chats    UserChat[]
+  user_rooms    UserRoom[]
 
   @@map("users")
 }
@@ -54,45 +54,51 @@ model FriendReq {
   @@map("friend_requests")
 }
 
-model Chat {
+model Room {
   id          String @id @default(cuid())
   name        String?
-  type        String // PRIVATE, PUBLIC, PROTECTED
+  is_channel  Boolean
+  type        String? @default("PUBLIC") // PRIVATE, PUBLIC, PROTECTED
   password    String?
 
   messages    Message[]
-  user_chats  UserChat[]
+  user_rooms  UserRoom[]
 
-  @@map("chats")
+  @@map("rooms")
 }
 
 model Message {
   id        String @id @default(cuid())
   timestamp DateTime @default(now())
 
-  user_id   String
-  user      User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  uid       String
+  user      User  @relation(fields: [uid], references: [id], onDelete: Cascade)
 
-  chat_id   String
-  chat      Chat @relation(fields: [chat_id], references: [id], onDelete: Cascade)
+  rid       String
+  room      Room @relation(fields: [rid], references: [id], onDelete: Cascade)
 
   msg       String
+
+  // is_deleted Boolean @default(false)
 
   @@map("messages")
 }
 
-model UserChat {
-  id          String @id @default(cuid())
+model UserRoom {
+  id            String @id @default(cuid())
+  joined_time   DateTime @default(now())
   
-  user_id     String
-  user        User  @relation(fields: [user_id], references: [id])
+  uid           String
+  user          User  @relation(fields: [uid], references: [id], onDelete: Cascade)
 
-  chat_id     String
-  chat        Chat @relation(fields: [chat_id], references: [id])
+  rid           String
+  room          Room @relation(fields: [rid], references: [id], onDelete: Cascade)
 
-  is_owner    Boolean
-  is_admin    Boolean
-  is_blocked  Boolean
+  is_owner      Boolean
+  is_admin      Boolean
+  is_banned     Boolean
+  is_muted      Boolean
 
-  @@map("user_chats")
+  @@unique([uid, rid])
+  @@map("user_rooms")
 }

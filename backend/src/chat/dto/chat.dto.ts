@@ -1,25 +1,35 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
-export class NewChatDto
+export class NewRoomDto
 {
-    // { name: string, type: string, password?: string }
-
+    /* {
+        name: string,
+        is_channel: boolean,
+        type: string,
+        password?: string }
+    */
     @IsString()
     @IsNotEmpty()
     name: string;
 
+    @IsBoolean()
+    is_channel: boolean;
+
     @IsString()
-    @IsNotEmpty()
-    type: string;
+    @IsOptional()
+    type?: string;
 
     @IsString()
     @IsOptional()
     password?: string;
 }
 
-export class OldChatDto
+export class OldRoomDto
 {
-    // { id: string, password?: string }
+    /* {
+        id: string,
+        password?: string }
+    */
 
     @IsString()
     @IsNotEmpty()
@@ -32,15 +42,15 @@ export class OldChatDto
 
 export class AddMessageDto
 {
-    // { user_id:  string, chat_id: string, msg: string }
+    // { uid: string, rid: string, msg: string }
 
     @IsString()
     @IsNotEmpty()
-    user_id: string;
+    uid: string;
 
     @IsString()
     @IsNotEmpty()
-    chat_id: string;
+    rid: string;
 
     @IsString()
     @IsNotEmpty()
@@ -49,7 +59,7 @@ export class AddMessageDto
 
 export class DeleteMessageDto
 {
-    // { id: string, chat_id: string}
+    // { id: string, rid: string}
 
     @IsString()
     @IsNotEmpty()
@@ -57,18 +67,18 @@ export class DeleteMessageDto
 
     @IsString()
     @IsNotEmpty()
-    chat_id: string;
+    rid: string;
 }
 
-export class UserChatDto
+export class UserRoomDto
 {
-    // { user_id: string, chat_id: string }
+    // { uid: string, rid: string }
 
     @IsString()
     @IsNotEmpty()
-    user_id: string;
+    uid: string;
 
     @IsString()
     @IsNotEmpty()
-    chat_id: string;
+    rid: string;
 }

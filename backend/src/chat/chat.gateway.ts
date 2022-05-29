@@ -1,4 +1,4 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, WsResponse, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer } from '@nestjs/websockets'
+import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, WsResponse, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, ConnectedSocket, WsException } from '@nestjs/websockets'
 import {  } from '@nestjs/platform-socket.io'
 import { ForbiddenException, InternalServerErrorException, Logger, UseGuards } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
@@ -7,6 +7,7 @@ import { ChatService } from './chat.service';
 import { UserService } from 'src/user/user.service';
 import { user_status } from 'src/utils';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
+import { Message } from '@prisma/client';
 
 @WebSocketGateway({ namespace: '/chat' })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -14,16 +15,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     constructor(
         private _chat: ChatService,
         private _userS: UserService) {}
-
+        
     @WebSocketServer() server: Server;
-
-    private _logger: Logger = new Logger('ChatGateway');
     
+    private _logger: Logger = new Logger('ChatGateway');
+
     afterInit(server: Server) {
         this._logger.log("initialized..");
     }
-
-    async handleConnection(client: Socket) {
+        
+    async handleConnection(@ConnectedSocket() client: Socket) {
         this._logger.log(`client connected: ${client.id}`);
 
         let user = await this._chat.getUserFromSocket(client);
@@ -37,7 +38,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         console.log({user});
     }
 
-    async handleDisconnect(client: any) {
+    async handleDisconnect(@ConnectedSocket() client: Socket) {
         this._logger.log(`client disconnected: ${client.id}`);
 
         let user = await this._chat.getUserFromSocket(client);
@@ -48,13 +49,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('chatToServer')
-    handleMessage(@MessageBody() data: AddMessageDto, client: Socket): void //WsResponse<string>
+    async handleMessage(@MessageBody() data: AddMessageDto, @ConnectedSocket() client: Socket) //WsResponse<string>
     {
-        // console.log({data});
         try
         {
-            this._chat.addMessage(data);
-            this.server.to(data.chat_id).emit('chatToClient', data);
+            const m: Message = await this._chat.addMessage(data);
+            this.server.to(data.rid).emit('chatToClient', m);
             return ;
         }
         catch

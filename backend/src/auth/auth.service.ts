@@ -29,7 +29,7 @@ export class AuthService {
 
         const cookie = this.getCookieWithJwtAccessToken(user.id);
         req.res.setHeader('Set-Cookie', cookie)
-            .setHeader('Location', 'http://127.0.0.1:3000/home')
+            .setHeader('Location', 'http://127.0.0.1:3000/')
             .status(HttpStatus.PERMANENT_REDIRECT);
         return dto;
     }
@@ -43,7 +43,7 @@ export class AuthService {
         
         const access_token = this._jwtS.sign(payload, options);
 
-        return `Authentication=${access_token}; HttpOnly; Path=/; Max-Age=${exp_time}`;
+        return `Authentication=${access_token}; Path=/; Max-Age=${exp_time}; HttpOnly`;
     }
 
     async getUserFromToken(token: string)

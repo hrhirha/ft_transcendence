@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, ForbiddenException, Get, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, ForbiddenException, Get, Param, Post, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from './decorator';
 import { EditUserDto, UserDto, UserIdDto } from './dto';
@@ -21,6 +21,19 @@ export class UserController {
     @Get('me')
     me(@GetUser() dto: UserDto) {
         return dto;
+    }
+
+    @Get('/:id')
+    async getUserById(@GetUser() user: User, @Param('id') uid: string)
+    {
+        let u: User;
+    
+        if (!(await this._userS.findById(user.id)))
+            throw new UnauthorizedException('user not found');
+        if (!(u = await this._userS.findById(uid)))
+            throw new UnauthorizedException('user not found');
+
+        return this._userS.publicData(u);
     }
 
     @Post('edit')

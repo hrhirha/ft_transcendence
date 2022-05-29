@@ -1,13 +1,13 @@
-import { ForbiddenException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
-import { Chat, User } from '@prisma/client';
+import { Room, User } from '@prisma/client';
 import * as argon2 from 'argon2'
 import { Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { room_type } from 'src/utils';
-import { AddMessageDto, DeleteMessageDto, NewChatDto, OldChatDto, UserChatDto } from './dto';
+import { AddMessageDto, DeleteMessageDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
 
 @Injectable()
 export class ChatService {
@@ -17,296 +17,231 @@ export class ChatService {
         private _authS: AuthService
         ) {}
 
-    async createChat(user: User, chat: NewChatDto)
+    async createRoom(user: User, room: NewRoomDto)
     {
-        // hash password for PROTECTED ChatRoom
-        if (chat.type === room_type.PROTECTED)
+        // hash password for PROTECTED Room
+        if (room.type === room_type.PROTECTED)
         {
-            if (!chat.password)
-                throw new ForbiddenException('protected chat room must have a password');
-            // chat.password = 'hashed_password';
-            try
-            {
+            if (!room.password)
+                throw new ForbiddenException('protected room requires a password');
 
-                chat.password = await argon2.hash(chat.password);
-            }
-            catch
-            {
-                throw new InternalServerErrorException('argon3 failed');
-            }
+            room.password = await argon2.hash(room.password);
         }
 
-        const new_chat = await this._prismaS.chat.create({
+        const new_room = await this._prismaS.room.create({
             data: {
-                ...chat,
+                ...room,
             }
         });
-        const user_chat = await this._prismaS.userChat.create({
+        await this._prismaS.userRoom.create({
             data: {
-                user_id: user.id,
-                chat_id: new_chat.id,
+                uid: user.id,
+                rid: new_room.id,
                 is_owner: true,
                 is_admin: true,
-                is_blocked: false,
+                is_banned: false,
+                is_muted: false,
             }
         });
-        return new_chat;
+        return new_room;
     }
 
-    async deleteChat(user: User, chat: OldChatDto)
+    async deleteRoom(user: User, room: OldRoomDto)
     {
-        const user_chat = await this._getUserChatById(user.id, chat.id);
-        if (!user_chat || !user_chat.is_owner)
+        const user_room = await this._getUserRoom(user.id, room.id);
+        if (!user_room)
+        throw new ForbiddenException('room not found');
+        if (!user_room.is_owner)
             throw new ForbiddenException('you are not the owner');
-        const del = await this._prismaS.chat.delete({
+        const del = await this._prismaS.room.delete({
             where: {
-                id: chat.id,
+                id: room.id,
             },
         });
         if (!del)
-            throw new ForbiddenException('record not found');
+            throw new ForbiddenException('room not found');
         return {success: true}
     }
 
-    async joinChat(user: User, chat: OldChatDto)
+    async joinRoom(user: User, room: OldRoomDto)
     {
-        if (!chat.password)
-            throw new ForbiddenException('protected chat room requires a password');
-        const old_chat = await this._getChatById(chat.id);
-        if (!old_chat)
-            throw new ForbiddenException('record not found');
-        if (old_chat.type === room_type.PRIVATE)
-            throw new ForbiddenException('private chat room');
-        if (old_chat.type == room_type.PROTECTED)
+        const old_room = await this._getRoom(room.id);
+        if (!old_room)
+            throw new ForbiddenException('room not found');
+        if (old_room.type === room_type.PRIVATE)
+            throw new ForbiddenException('you can\'t join a private room');
+        if (old_room.type == room_type.PROTECTED)
         {
-            if (!(await argon2.verify(old_chat.password, chat.password)))
+            if (!room.password)
+                throw new ForbiddenException('protected room requires a password');
+            if (!(await argon2.verify(old_room.password, room.password)))
                 throw new ForbiddenException('invalid password');
         }
 
-        try 
+        try
         {
-            const user_chat = await this._prismaS.userChat.create({
+            const user_room = await this._prismaS.userRoom.create({
                 data: {
-                    user_id: user.id,
-                    chat_id: old_chat.id,
+                    uid: user.id,
+                    rid: old_room.id,
                     is_owner: false,
                     is_admin: false,
-                    is_blocked: false,
+                    is_banned: false,
+                    is_muted: false,
                 }
             });
+            return old_room;
         }
-        catch
+        catch (e)
         {
-            throw new ForbiddenException('similar record exist');
+            throw new ForbiddenException('already a member');
         }
-        return {success: true};
     }
 
-    async leaveChat(user: User, chat: OldChatDto)
+    async leaveRoom(user: User, room: OldRoomDto)
     {
         // what should happen if the owner left the room?
+        let r: Room;
+        if (!(r = await this._getRoom(room.id)))
+            throw new ForbiddenException('room not found');
 
         try
         {
-
-            const user_chat = await this._prismaS.userChat.delete({
-                where: {user_id_chat_id: {
-                    user_id: user.id,
-                    chat_id: chat.id
+            await this._prismaS.userRoom.delete({
+                where: {uid_rid: {
+                    uid: user.id,
+                    rid: room.id
                 }}
             });
+            return r;
         }
         catch
         {
-            throw new ForbiddenException('record not found');
+            throw new ForbiddenException('not a member');
         }
-        return {success: true};
     }
 
-    async getJoinedRooms(user: User) {
-        const user_chats = await this._getAllUserChats(user.id);
-        if (!user_chats)
-            throw new ForbiddenException('no joined rooms found');
-        const rooms: Chat[] = [];
-        for (let user_chat of user_chats)
+    async addUser(user: User, member: UserRoomDto)
+    {
+        let user_room = await this._getUserRoom(user.id, member.rid);
+        if (!user_room)
+            throw new ForbiddenException('not a member');
+        if (!user_room.is_owner)
+            throw new ForbiddenException('not the owner');
+        const u = await this._userS.findById(member.uid);
+        if (!u)
+            throw new ForbiddenException('user not found');
+
+        try
         {
-            const room = await this._getChatById(user_chat.chat_id);
-            if (!room)
-                throw new ForbiddenException('no chatRoom found');
-            rooms.push(room);
+            user_room = await this._prismaS.userRoom.create({
+                data: {
+                    uid: member.uid,
+                    rid: member.rid,
+                    is_owner: false,
+                    is_admin: false,
+                    is_banned: false,
+                    is_muted: false,
+                }
+            });
+            return this._userS.publicData(u);
         }
-        return rooms;
-    }
-
-    async getPublicRooms()
-    {
-        const rooms = await this._getChatsByType(room_type.PUBLIC);
-        if (!rooms)
-            throw new ForbiddenException('no public chatRooms found');
-        return rooms;
-    }
-
-    async getProtectedRooms()
-    {
-        const rooms = await this._getChatsByType(room_type.PROTECTED);
-        if (!rooms)
-            throw new ForbiddenException('no public chatRooms found');
-        return rooms;
-    }
-
-    async getAllMembers(chat: OldChatDto)
-    {
-        const user_chats = await this._prismaS.userChat.findMany({
-            where: {
-                chat_id: chat.id,
-            }
-        });
-        if (!user_chats)
-            throw new ForbiddenException('records not found');
-        let members: User[] = [];
-        for (let user_chat of user_chats)
+        catch (e)
         {
-            const user = await this._userS.findById(user_chat.user_id);
-            members.push(user);
+            throw new ForbiddenException('user already a member');
         }
-        return members;
     }
 
-    async addAdminToChat(user: User, user_chat: UserChatDto)
+    async removeUser(user: User, member: UserRoomDto)
     {
-        let uc = await this._getUserChatById(user.id, user_chat.chat_id);
+        let user_room = await this._getUserRoom(user.id, member.rid);
+        if (!user_room)
+            throw new ForbiddenException('not a member');
+        if (!user_room.is_owner)
+            throw new ForbiddenException('not the owner');
+        const u = await this._userS.findById(member.uid);
+        if (!u)
+            throw new ForbiddenException('user not found');
+        try
+        {
+            user_room = await this._prismaS.userRoom.delete({
+                where: {
+                    uid_rid: { ...member, }
+                }
+            });
+            return this._userS.publicData(u);
+        }
+        catch
+        {
+            throw new ForbiddenException('user already removed from room');
+        }
+    }
+
+    async addAdmin(user: User, user_room: UserRoomDto)
+    {
+        let uc = await this._getUserRoom(user.id, user_room.rid);
+
         if (!uc)
             throw new ForbiddenException('not a member');
         if (!uc.is_owner)
             throw new ForbiddenException('not the owner');
 
-        try
-        {
-
-            uc = await this._prismaS.userChat.update({
-                where: { user_id_chat_id: { ...user_chat } },
-                data: { is_admin: true, }
-            });
-            return {success: true}
-        }
-        catch
-        {
-            throw new ForbiddenException('record not found');
-        }
+        uc = await this._prismaS.userRoom.update({
+            where: { uid_rid: { ...user_room } },
+            data: { is_admin: true, }
+        });
+        return {success: true}
     }
 
-    async removeAdminToChat(user: User, user_chat: UserChatDto)
+    async removeAdmin(user: User, user_room: UserRoomDto)
     {
-        let uc = await this._getUserChatById(user.id, user_chat.chat_id);
+        let uc = await this._getUserRoom(user.id, user_room.rid);
         if (!uc)
             throw new ForbiddenException('not a member');
         if (!uc.is_owner)
             throw new ForbiddenException('not the owner');
 
-        try
-        {
+        uc = await this._prismaS.userRoom.update({
+            where: { uid_rid: { ...user_room } },
+            data: { is_admin: false, }
+        });
+        return {success: true}
+}
 
-            uc = await this._prismaS.userChat.update({
-                where: { user_id_chat_id: { ...user_chat } },
-                data: { is_admin: false, }
-            });
-            return {success: true}
-        }
-        catch
-        {
-            throw new ForbiddenException('record not found');
-        }
-    }
-
-    async blockUser(user: User, user_chat: UserChatDto)
+    async banUser(user: User, user_room: UserRoomDto)
     {
-        let uc = await this._getUserChatById(user.id, user_chat.chat_id);
+        let uc = await this._getUserRoom(user.id, user_room.rid);
         if (!uc)
             throw new ForbiddenException('not a member');
         if (!uc.is_admin)
             throw new ForbiddenException('not and admin');
 
-        try
-        {
-
-            uc = await this._prismaS.userChat.update({
-                where: { user_id_chat_id: { ...user_chat } },
-                data: { is_blocked: true, }
-            });
-            return {success: true}
-        }
-        catch
-        {
-            throw new ForbiddenException('record not found');
-        }
+        uc = await this._prismaS.userRoom.update({
+            where: { uid_rid: { ...user_room } },
+            data: { is_banned: true, }
+        });
+        return {success: true}
     }
 
-    async unblockUser(user: User, user_chat: UserChatDto)
+    async unbanUser(user: User, user_room: UserRoomDto)
     {
-        let uc = await this._getUserChatById(user.id, user_chat.chat_id);
+        let uc = await this._getUserRoom(user.id, user_room.rid);
         if (!uc)
             throw new ForbiddenException('not a member');
         if (!uc.is_admin)
-            throw new ForbiddenException('not and admin');
+            throw new ForbiddenException('not an admin');
 
-        try
-        {
-
-            uc = await this._prismaS.userChat.update({
-                where: { user_id_chat_id: { ...user_chat } },
-                data: { is_blocked: false, }
-            });
-            return {success: true}
-        }
-        catch
-        {
-            throw new ForbiddenException('record not found');
-        }
-    }
-
-    async addUserToChat(user: User, member: UserChatDto)
-    {
-        let user_chat = await this._getUserChatById(user.id, member.chat_id);
-        // console.log({user_id: user.id, chat_id: member.chat_id});
-        if (!user_chat || !user_chat.is_admin)
-            throw new ForbiddenException('not a member or not an admin');
-        user_chat = await this._prismaS.userChat.create({
-            data: {
-                user_id: member.user_id,
-                chat_id: member.chat_id,
-                is_owner: false,
-                is_admin: false,
-                is_blocked: false
-            }
+        uc = await this._prismaS.userRoom.update({
+            where: { uid_rid: { ...user_room } },
+            data: { is_banned: false, }
         });
-        return user_chat;
-    }
-
-    async getAllMessages(user: User, chat: OldChatDto)
-    {
-        let user_chat = await this._getUserChatById(user.id, chat.id);
-        if (!user_chat)
-            throw new ForbiddenException('not a member');
-        const messages = await this._prismaS.message.findMany({
-            where: {
-                chat_id: chat.id
-            },
-            orderBy:{
-                timestamp: 'desc',
-            },
-        });
-        if (!messages)
-            throw new ForbiddenException('record not found');
-        messages.filter((message) => {
-            message.timestamp >= user_chat.joined_time;
-        });
-        return messages;
+        return {success: true}
     }
 
     async addMessage(data: AddMessageDto)
     {
-        const user_chat = await this._getUserChatById(data.user_id, data.chat_id);
-        if (!user_chat)
+        const user_room = await this._getUserRoom(data.uid, data.rid);
+        if (!this._isMember(data.uid, data.rid))
             return null;
             // throw new ForbiddenException('not a member');
         const new_msg = await this._prismaS.message.create({
@@ -319,57 +254,146 @@ export class ChatService {
 
     async deleteMessage(user: User, msg: DeleteMessageDto)
     {
-        const user_chat = await this._getUserChatById(user.id, msg.chat_id);
-        if (!user_chat)
+        if (!this._isMember(user.id, msg.rid))
             throw new ForbiddenException('not a member');
         const old_msg = await this._prismaS.message.findUnique({
             where: {id: msg.id}
         });
         if (!old_msg)
-            throw new ForbiddenException('record not found');
-        if (old_msg.user_id !== user.id)
+            throw new ForbiddenException('message not found');
+        if (old_msg.uid !== user.id)
             throw new ForbiddenException('not your message');
         return await this._prismaS.message.delete({
             where: {id: msg.id}
         });
     }
 
-    //
+
+    // get requests
+
+    async getJoinedRooms(user: User) {
+        const user_rooms = await this._getUserRoomsByUid(user.id);
+        if (!user_rooms)
+            throw new ForbiddenException('no joined rooms found');
+        const rooms: Room[] = [];
+        for (let user_room of user_rooms)
+        {
+            const room = await this._getRoom(user_room.rid);
+            if (!room)
+                throw new ForbiddenException('room not found');
+            rooms.push(room);
+        }
+        return rooms;
+    }
+
+    async getPublicRooms()
+    {
+        const rooms = await this._getRoomsByType(room_type.PUBLIC);
+        if (!rooms)
+            throw new ForbiddenException('no public rooms found');
+        return rooms;
+    }
+
+    async getProtectedRooms()
+    {
+        const rooms = await this._getRoomsByType(room_type.PROTECTED);
+        if (!rooms)
+            throw new ForbiddenException('no protected rooms found');
+        return rooms;
+    }
+
+    async getRoomMembers(uid: string, rid: string)
+    {
+        if (!this._isMember(uid, rid))
+            throw new ForbiddenException('not a member');
+        const user_rooms = await this._getUserRoomsByRid(rid);
+        if (!user_rooms)
+            throw new ForbiddenException('no users found in this room');
+        let members: User[] = [];
+        for (let user_room of user_rooms)
+        {
+            const user = await this._userS.findById(user_room.uid);
+            members.push(user);
+        }
+        return members;
+    }
+
+    async getRoomMessages(uid: string, rid: string)
+    {
+        const user_room = await this._getUserRoom(uid, rid);
+        if (!user_room)
+            throw new ForbiddenException('not a member');
+        const messages = await this._prismaS.message.findMany({
+            where: { rid, },
+            orderBy:{ timestamp: 'desc', },
+        });
+        if (!messages)
+            throw new ForbiddenException('messages not found');
+        messages.filter((message) => {
+            message.timestamp >= user_room.joined_time;
+        });
+        return messages;
+    }
+
+    // public helpers
+
     async getUserFromSocket(client: Socket)
     {
         const cookie = client.handshake.headers.cookie;
+        if (!cookie)
+            return null;
         const token = cookie?.split("=")[1];
         
         const user = await this._authS.getUserFromToken(token);
-        // if (!user)
-        //     throw new WsException('user not logged in');
         return user;
     }
 
-    // Private methods
-    private async _getChatById(id: string) {
-        return await this._prismaS.chat.findUnique({
+    // Private helpers
+
+    private async _isMember(uid: string, rid: string)
+    {
+        return !(await this._prismaS.userRoom.findFirst({
+            where: { uid, rid }
+        })) ? false : true;
+    }
+
+    private async _getRoom(id: string) {
+        return await this._prismaS.room.findUnique({
             where: { id }
         });
     }
 
-    private async _getUserChatById(user_id: string, chat_id: string)
+    private async _getUserRoom(uid: string, rid: string)
     {
-        return await this._prismaS.userChat.findFirst({
-            where: { user_id, chat_id }
+        if (!(await this._getRoom(rid)))
+            throw new ForbiddenException('room not found');
+        if (!(await this._userS.findById(uid)))
+            throw new ForbiddenException('user not found');
+        return await this._prismaS.userRoom.findUnique({
+            where: { uid_rid: {
+                uid,
+                rid
+            } }
         });
     }
 
-    private async _getAllUserChats(user_id: string)
+    private async _getUserRoomsByUid(uid: string)
     {
-        return await this._prismaS.userChat.findMany({
-            where: { user_id }
+        return await this._prismaS.userRoom.findMany({
+            where: { uid }
         });
     }
 
-    private async _getChatsByType(type: string)
+    private async _getUserRoomsByRid(rid: string)
     {
-        return await this._prismaS.chat.findMany({
+        return await this._prismaS.userRoom.findMany({
+            where: { rid }
+        });
+    }
+
+    private async _getRoomsByType(type: string)
+    {
+        return await this._prismaS.room.findMany({
             where: {
                 type
             }

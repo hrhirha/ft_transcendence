@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, InternalServerErrorException, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
 import { GetUser } from 'src/user/decorator';
 import { ChatService } from './chat.service';
-import { AddMessageDto, DeleteMessageDto, NewChatDto, OldChatDto, UserChatDto } from './dto';
+import { DeleteMessageDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
 
 @UseGuards(Jwt2FAAuthGuard)
 @Controller('chat')
@@ -13,101 +14,277 @@ export class ChatController
 
     // create ChatRoom
     @Post('create') // { name: string, type: string, password?: string }
-    createChat(@GetUser() user: User, @Body() chat: NewChatDto)
+    async createRoom(@GetUser() user: User, @Body() chat: NewRoomDto)
     {
-        return this._chatS.createChat(user, chat);
+        /**
+         *  request:
+         *  {
+         *      name: string,
+         *      is_channel: boolean,
+         *      type: string,
+         *      password?: string
+         *  }
+         * 
+         *  response:
+         *  {
+         *      "id": string,
+         *      "name": string,
+         *      "is_channel": boolean,
+         *      "type": string,
+         *      "password": string
+         *  }
+         */
+
+        return await this._chatS.createRoom(user, chat);
     }
 
     // delete ChatRoom
     @Post('delete') // { id: string }
-    deleteChat(@GetUser() user: User, @Body() chat: OldChatDto)
+    deleteRoom(@GetUser() user: User, @Body() chat: OldRoomDto)
     {
-        return this._chatS.deleteChat(user, chat);
+        /**
+         * request:
+         * {
+         *      id: string,
+         * }
+         * 
+         * response:
+         * {
+         *      "success": true
+         * }
+         */
+        return this._chatS.deleteRoom(user, chat);
     }
 
     // join ChatRoom
     @Post('join') // { id: string, password?: string }
-    joinChat(@GetUser() user: User, @Body() chat: OldChatDto)
+    joinRoom(@GetUser() user: User, @Body() chat: OldRoomDto)
     {
-        return this._chatS.joinChat(user, chat);
+        /**
+         * request:
+         * {
+         *      id: string,
+         *      password?: string
+         * }
+         * response:
+         * {
+         *      "id": string,
+         *      "name": string,
+         *      "is_channel": boolean,
+         *      "type": string,
+         *      "password": string
+         * }
+         */
+        return this._chatS.joinRoom(user, chat);
     }
 
     // leave ChatRoom
     @Post('leave') // { id: string }
-    leaveChat(@GetUser() user: User, @Body() chat: OldChatDto)
+    leaveRoom(@GetUser() user: User, @Body() chat: OldRoomDto)
     {
-        return this._chatS.leaveChat(user, chat);
+        /**
+         * request:
+         * {
+         *      id: string,
+         *      password?: string
+         * }
+         * response:
+         * {
+         *      "id": string,
+         *      "name": string,
+         *      "is_channel": boolean,
+         *      "type": string,
+         *      "password": string
+         * }
+         */
+        return this._chatS.leaveRoom(user, chat);
     }
 
-    // list public chatRooms
-    @Get('all_public')
-    listPublicChatRooms()
-    {
-        return this._chatS.getPublicRooms();
-    }
-
-    // list protected chatRooms
-    @Get('all_protected')
-    listProtectedChatRooms()
-    {
-        return this._chatS.getProtectedRooms();
-    }
-
-    // get ChatRoom members
-    @Post('members') // { id: string }
-    getAllMembers(@Body() chat: OldChatDto)
-    {
-        return this._chatS.getAllMembers(chat);
-    }
-
-    // add admin to ChatRoom
-    @Post('add_admin') // { user_id: string, chat_id: string }
-    addAdminToChat(@GetUser() user: User, @Body() user_chat: UserChatDto)
-    {
-        return this._chatS.addAdminToChat(user, user_chat);
-    }
-
-    // remove admin from ChatRoom
-    @Post('remove_admin') // { user_id: string, chat_id: string }
-    removeAdminFromChat(@GetUser() user: User, @Body() user_chat: UserChatDto)
-    {
-        return this._chatS.removeAdminToChat(user, user_chat);
-    }
-
-    // block User
-    @Post('block_user') // { user_id: string, chat_id: string }
-    blockUser(@GetUser() user: User, @Body() user_chat: UserChatDto)
-    {
-        return this._chatS.blockUser(user, user_chat);
-    }
-
-    // unblock User
-    @Post('unblock_user') // { user_id: string, chat_id: string }
-    unblockUser(@GetUser() user: User, @Body() user_chat: UserChatDto)
-    {
-        return this._chatS.unblockUser(user, user_chat);
-    }
-
-    // add user to chat
+    // add user to chat room
     @Post('add_user')
-    addUserToChat(@GetUser() user: User, @Body() member: UserChatDto)
+    addUser(@GetUser() user: User, @Body() member: UserRoomDto)
     {
-        return this._chatS.addUserToChat(user, member);
+        /**
+         * request:
+         * {
+         *      uid: string,
+         *      rid: string
+         * }
+         * 
+         * response:
+         * {
+         *      "id": string,
+         *      "username": string,
+         *      "email": string,
+         *      "firstName": string,
+         *      "lastName": string,
+         *      "profileUrl": string,
+         *      "imageUrl": string,
+         *      "score": number,
+         *      "status": string,
+         *      "wins": number,
+         *      "loses": number
+         * }
+         */
+        return this._chatS.addUser(user, member);
     }
 
-    // retreive old messages
-    @Post('messages') // { user_id: string, chat_id: string }
-    getAllMessages(@GetUser() user: User, @Body() chat: OldChatDto)
+    // remove user from chat room
+    @Post('remove_user')
+    removeUser(@GetUser() user: User, @Body() member: UserRoomDto)
     {
-        return this._chatS.getAllMessages(user, chat);
+        /**
+         * request:
+         * {
+         *      uid: string,
+         *      rid: string
+         * }
+         * 
+         * response:
+         * {
+         *      "id": string,
+         *      "username": string,
+         *      "email": string,
+         *      "firstName": string,
+         *      "lastName": string,
+         *      "profileUrl": string,
+         *      "imageUrl": string,
+         *      "score": number,
+         *      "status": string,
+         *      "wins": number,
+         *      "loses": number
+         * }
+         */
+        return this._chatS.removeUser(user, member);
     }
 
-    // add message
-    // @Post('add_message') // { user_id: string, chat_id: string, msg: string }
-    // addMessage(@GetUser() user: User, @Body() msg: AddMessageDto)
-    // {
-    //     return this._chatS.addMessage(user, msg);
-    // }
+    // add admin to chat room
+    @Post('add_admin') // { user_id: string, chat_id: string }
+    async addAdmin(@GetUser() user: User, @Body() user_chat: UserRoomDto)
+    {
+        /**
+         * request:
+         * {
+         *      uid: string,
+         *      rid: string
+         * }
+         * 
+         * response:
+         * {
+         *      "success": boolean
+         * }
+         */
+        try
+        {
+            return await this._chatS.addAdmin(user, user_chat);
+        }
+        catch (e)
+        {
+            console.log({e});
+            if (e instanceof PrismaClientKnownRequestError)
+            {
+                const err_msg = e.code === 'P2025' ? "user or room not found" : e.message;
+                throw new ForbiddenException(err_msg);
+            }
+            throw new InternalServerErrorException();
+        }
+    }
+
+    // remove admin from chat room
+    @Post('remove_admin') // { user_id: string, chat_id: string }
+    removeAdmin(@GetUser() user: User, @Body() user_chat: UserRoomDto)
+    {
+        /**
+         * request:
+         * {
+         *      uid: string,
+         *      rid: string
+         * }
+         * 
+         * response:
+         * {
+         *      "success": boolean
+         * }
+         */
+        try
+        {
+            return this._chatS.removeAdmin(user, user_chat);
+        }
+        catch (e)
+        {
+            console.log({e});
+            if (e instanceof PrismaClientKnownRequestError)
+            {
+                const err_msg = e.code === 'P2025' ? "user or room not found" : e.message;
+                throw new ForbiddenException(err_msg);
+            }
+            throw new InternalServerErrorException();
+        }
+    }
+
+    // ban User
+    @Post('ban_user') // { user_id: string, chat_id: string }
+    banUser(@GetUser() user: User, @Body() user_chat: UserRoomDto)
+    {
+        /**
+         * request:
+         * {
+         *      uid: string,
+         *      rid: string
+         * }
+         * 
+         * response:
+         * {
+         *      "success": boolean
+         * }
+         */
+        try
+        {
+            return this._chatS.banUser(user, user_chat);
+        }
+        catch (e)
+        {
+            console.log({e});
+            if (e instanceof PrismaClientKnownRequestError)
+            {
+                const err_msg = e.code === 'P2025' ? "user or room not found" : e.message;
+                throw new ForbiddenException(err_msg);
+            }
+            throw new InternalServerErrorException();
+        }
+    }
+
+    // unban User
+    @Post('unban_user') // { user_id: string, chat_id: string }
+    unbanUser(@GetUser() user: User, @Body() user_chat: UserRoomDto)
+    {
+        /**
+         * request:
+         * {
+         *      uid: string,
+         *      rid: string
+         * }
+         * 
+         * response:
+         * {
+         *      "success": boolean
+         * }
+         */
+        try
+        {
+            return this._chatS.unbanUser(user, user_chat);
+        }
+        catch (e)
+        {
+            console.log({e});
+            if (e instanceof PrismaClientKnownRequestError)
+            {
+                const err_msg = e.code === 'P2025' ? "user or room not found" : e.message;
+                throw new ForbiddenException(err_msg);
+            }
+            throw new InternalServerErrorException();
+        }
+    }
 
     // delete message
     @Post('delete_message') // { id: string, chat_id: string}
@@ -118,5 +295,34 @@ export class ChatController
 
     // clear ChatRoom
     @Post('clear_chat')
-    clearChat(@GetUser() user: User, @Body() chat: OldChatDto) {}
+    clearRoom(@GetUser() user: User, @Body() chat: OldRoomDto) {}
+
+
+    // list public chatRooms
+    @Get('all_public')
+    listPublicRooms()
+    {
+        return this._chatS.getPublicRooms();
+    }
+
+    // list protected chatRooms
+    @Get('all_protected')
+    listProtectedRooms()
+    {
+        return this._chatS.getProtectedRooms();
+    }
+
+    // get ChatRoom members
+    @Get('/:rid/members')
+    getAllMembers(@GetUser() me: User, @Param('rid') rid: string)
+    {
+        return this._chatS.getRoomMembers(me.id, rid);
+    }
+
+    // retreive old messages
+    @Get('/:rid/messages')
+    getAllMessages(@GetUser() me: User, @Param('rid') rid: string)
+    {
+        return this._chatS.getRoomMessages(me.id, rid);
+    }
 }
