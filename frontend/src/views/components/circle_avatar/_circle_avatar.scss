@@ -5,4 +5,15 @@ span#circleAvatar {
     background-size: cover;
     border-radius: 10rem;
     background-position: center;
+    i {
+        display: block;
+        min-width: 10px!important;
+        max-width: 10px!important;
+        min-height: 10px;
+        max-height: 10px;
+        border-radius: 100%;
+    }
+    .online {
+        background-color: $green;
+    }
 }

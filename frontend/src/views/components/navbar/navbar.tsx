@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition, faHouse, faRankingStar, faComments, faUserGroup} from "@fortawesome/free-solid-svg-icons";
 import { Brand } from "../brand/brand";
-import { useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 interface NavButtonData {
     icon: IconDefinition,
@@ -37,9 +37,9 @@ const NavButton:React.FC<{element: NavButtonData}> = ({element}) => {
     const location = useLocation();
 
     return (
-        <a id="navBtn" className={location.pathname === element.url ? "active" : undefined} title={element.title} href={element.url}>
+        <NavLink to={element.url} id="navBtn" className={location.pathname === element.url ? "active" : undefined} title={element.title} >
             <FontAwesomeIcon icon={element.icon}/>
-        </a>
+        </NavLink>
     );
 }
 

@@ -10,6 +10,7 @@ import { Chat } from './views/pages/chat/chat';
 import { LeaderBoard } from './views/pages/leader_board/leader_board';
 import { Friends } from './views/pages/friends/friends';
 import { Profile } from './views/pages/profile/profile';
+import { NotFound } from './views/pages/not_found/not_found';
 
 
 library.add(faPuzzlePiece);
@@ -29,7 +30,7 @@ root.render(
           { <Route path="/chat" element={<Chat/>} /> }
           <Route path="/friends" element={<Friends/>} />
           <Route path="/profile" element={<Profile/>} />
-          <Route path="*" element={<Home/>} />
+          <Route path="*" element={<NotFound/>} />
 
       </Routes>
   </BrowserRouter>
