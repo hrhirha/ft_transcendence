@@ -3,7 +3,7 @@ import { Links } from "../../../test_data/roomchatdata";
 import { NavBar } from "../../components/navbar/navbar";
 import { ChatRoom } from "./chat_room/chat_room";
 import  {ChatRoomItem }  from "./chatroom_item/chatroom_item";
-import {faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
+import {faCommentDots, faCommentMedical, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CreateNewChat } from "./create_chat/create_chat";
 
@@ -29,7 +29,7 @@ export const Chat:React.FC = () => {
                             <FontAwesomeIcon icon={faSearch}/>
                         </form>
                         <button id="newMessage" title="New chat">
-                            <FontAwesomeIcon icon={faPlus}/>
+                            <FontAwesomeIcon icon={faCommentMedical}/>
                         </button>
                     </div>
                     <div className="chatRooms">

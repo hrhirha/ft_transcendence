@@ -75,10 +75,12 @@ main#chatPage {
             }
         }
         .chatRooms {
-
             overflow-y: scroll;
             max-height: calc(100vh - 15rem);
             margin-bottom: .5rem;
+            @media (max-width: $xs) {
+                max-height: none;
+            }
         }
     }
 }

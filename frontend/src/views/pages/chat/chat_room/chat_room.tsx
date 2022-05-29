@@ -5,6 +5,7 @@ import { faClose, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
 import { chat_data } from "../../../../test_data/chat_data";
 import { Chat_msg } from "../chat_msg/chat_msg";
 import { BgVectors } from "../../../../assets";
+import { useEffect, useState } from "react";
 
 
 interface Props {

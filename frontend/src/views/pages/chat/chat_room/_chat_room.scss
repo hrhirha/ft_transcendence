@@ -54,11 +54,20 @@ section#chatRoom {
         max-height: calc(100vh - 18rem);
         overflow-y: scroll;
         padding-bottom: 1rem;
+        @media (max-width: $xs) {
+            max-height: none;
+            margin-bottom: 80px;
+        }
     }
     div#chatRoomFooter {
         @include _flex(row, center, center);
         width: 100%;
         background-color: $light4;
+        @media (max-width: $xs) {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+        }
         form#messageForm {
             @include _flex(row, flex-end, center);
                 width: 100%;
