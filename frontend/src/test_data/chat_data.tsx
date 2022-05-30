@@ -1,9 +1,3 @@
-interface Props {
-    sender_user: string,
-    msg: string,
-    time: string
-    
-}
 
 export const chat_data = [
     {

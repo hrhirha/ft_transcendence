@@ -12,9 +12,8 @@ export const Login:React.FC = () =>  {
     const [con, setCon] = useState();
     const navigate = useNavigate();
 
-    const getData = async () => {
-        const res = await get_me();
-        console.log(res);
+    const ConnectTo42 = async () => {
+        window.open("http://127.0.0.1:3001/auth/login", '_self');
     }
     
     return (
@@ -24,7 +23,7 @@ export const Login:React.FC = () =>  {
             <h4>Welcome !
                 <p>We're so excited to see you !</p>
             </h4>
-            <button onClick={getData}> 
+            <button onClick={ConnectTo42}> 
                 <img src={Logo42} alt="42" />
                 <span>Login</span>
             </button >

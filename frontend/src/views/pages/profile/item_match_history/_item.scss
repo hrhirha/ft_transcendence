@@ -1,0 +1,68 @@
+.item {
+    @include _flex(row, space-between, center);
+    background-color: $dark2;
+    margin-top: 0.6rem;
+    margin-bottom: 0.2rem;
+    border-radius: 10px;
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    width: 96%;
+    .info_users{
+        @include _flex(row, space-between, center);
+        width: 60%;
+        .image_user1 {
+            margin-left: 1rem;
+        }
+        .status_score{
+            @include _flex(column, center, center);
+            .win {
+                font-size: $fsize * 1.2;
+                font-family: $MFont;
+                color: rgba(68, 255, 0, 0.614);
+            }
+            .lose {
+                font-size: $fsize * 1.2;
+                font-family: $MFont;
+                color: rgba(255, 0, 0, 0.821);
+            }
+            .score {
+                font-size: $fsize * 1.2;
+                font-family: $MFont;
+                color: $light3;
+            }
+        }
+        .line{
+            width: 2px;
+            height: 50px;
+            background-color: $light4;
+        }
+        .image_user2 {
+            @include _flex(row, center, center);
+            .line{
+                margin-left: 0.6rem
+            }
+        }
+    }
+    .game_info{
+        @include _flex(row, space-between, center);
+        width: 40%;
+        .game{
+           margin-left: 1rem
+        }
+        .time_typegame{
+            @include _flex(column, center, center);
+            margin-right: 1rem;
+            .name{
+                font-size: $fsize * 1.3;
+                font-family: $MFont;
+                color: $light3;
+            }
+            .time{
+                font-size: $fsize * 0.5;
+                font-family: $MFont;
+                color: $light5;
+            }
+        }
+    }
+   
+}

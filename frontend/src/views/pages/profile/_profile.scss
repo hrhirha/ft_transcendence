@@ -1,10 +1,12 @@
+@import "./item_match_history/item";
+
 .profil {
     margin-top: 60px;
     .profile_info{
     background-color: $dark3;
     border-radius: 15px;
     width: 100%;
-    height: 400px;
+    height: auto;
     @include _flex(column, center, center);
         .image{
             margin-top: 10px;
@@ -49,5 +51,87 @@
             }
         }
         
+    }
+    .btns{
+        margin-top: 0.6rem;
+        background-color: $dark3;
+        border-radius: 15px;
+        width: 100%;
+        height: auto;
+        @include _flex(column, center, center);
+        span{
+            font-size: $fsize * 0.9;
+            font-family: $MFont;
+            color: $light2;
+            margin-left: 8px;
+        }
+        svg path{
+            color: $light2;
+        }
+        .btn_SendMsg
+        {
+            @include _flex(row, center, center);
+            height: 3rem;
+            width: 100%;
+        }
+        .line{
+            width: 100%;
+            height: 2px;
+            background-color: $light4;
+        }
+        .btn_status
+        {
+            @include _flex(row, center, center);
+            height: 3rem;
+            width: 100%;
+        }
+    }
+    .btnBlock{
+        margin-top: 0.6rem;
+        background-color: $dark3;
+        border-radius: 15px;
+        margin-bottom: 0.6rem;
+        width: 100%;
+        height: auto;
+        @include _flex(column, center, center);
+        height: 3rem;
+        span{
+            font-size: $fsize * 0.9;
+            font-family: $MFont;
+            color: rgba(255, 0, 0, 0.508);
+            margin-left: 8px;
+        }
+        svg path{
+            color: rgba(255, 0, 0, 0.508);
+        }
+    }
+    .match_history{
+        .Titile {
+            @include _flex(row, center, center);
+            margin-bottom: 0.6rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            background-color: $dark3;
+            border-radius: 15px;
+            svg {
+                font-size: $fsize * 3.3;
+                path {
+                    color: $light6;
+                }
+            }
+            h2 {
+                margin-left: .5rem;
+                font-family: $XBFont;
+                color: $light6;
+                text-transform: uppercase;
+                font-size: $fsize * 2.2;
+                line-height: .8;
+                width: min-content;
+            }
+            @media (max-width: $sm) {
+                margin-bottom: .5rem;
+                zoom: .75;
+            }
+        }
     }
 }

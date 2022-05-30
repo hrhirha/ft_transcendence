@@ -2,8 +2,10 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { CircleAvatar } from "../../components/circle_avatar/circle_avatar";
 import { NavBar } from "../../components/navbar/navbar";
-import {faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
+import {faMessage, faUserPlus , faBan, faClockRotateLeft} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Match_data } from "../../../test_data/matchs_data";
+import { Item } from "./item_match_history/item";
 
 export const Profile:React.FC = () => {
     const navigate = useNavigate();
@@ -36,15 +38,45 @@ export const Profile:React.FC = () => {
                                     <span className="value">15</span>
                                 </div>
                             </div>
+                        </div>
+                        <div className="btns">
+                            <div className="btn_status">
+                                <FontAwesomeIcon icon={faUserPlus}/>
+                                <span>Add friend</span>
+                            </div>
+                            <div className="line"></div>
                             <div className="btn_SendMsg">
-                            <FontAwesomeIcon icon={faPlus}/>
+                                <FontAwesomeIcon icon={faMessage}/>
                                 <span>Send Message</span>
+                            </div>
+                        </div>
+                        <div className="btnBlock">
+                            <div className="btn_SendMsg">
+                                <FontAwesomeIcon icon={faBan}/>
+                                <span>Block</span>
                             </div>
                         </div>
                     </div>
                     <div className=" col-sm-12 col-md-7 col-lg-8">
-                        <div className="profile_info">
-                            match history
+                        <div className="match_history">
+                            <div className="Titile">
+                                <FontAwesomeIcon icon={faClockRotateLeft}/>
+                                <h2>match history</h2>
+                            </div>
+                            <div className="profile_info">
+                                { Match_data && Match_data.map (({user1, image_user1, user2, image_user2, score, status, typegame, time}, k ) => (
+                                    <Item
+                                        key={k}
+                                        user1 = {user1}
+                                        image_user1 = {image_user1}
+                                        user2 = {user2}
+                                        image_user2 = {image_user2}
+                                        score = {score}
+                                        status = {status}
+                                        typegame = {typegame}
+                                        time = {time} />
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>

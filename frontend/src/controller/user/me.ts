@@ -15,8 +15,6 @@ interface user_info {
 }
 
 export async function get_me() {
-    // "user/me"
     const res  : user_info = (await api.get("user/me")).data;
-    console.log(res);
     return res;
 }
