@@ -1,0 +1,37 @@
+main#notFound {
+    > .container {
+        @include _flex(column, center, center);
+        min-height: calc(100vh - 90px);
+        @media (max-width: $sm) {
+            width: auto;
+        }
+         
+        img {
+            width: 60%;
+            @media (max-width: $md) {
+                width: 85%;
+            }
+            @media (max-width: $sm) {
+                width: 90%;
+            }
+        }
+        h3 {
+            font-size: $fsize * 2;
+            font-family: $XBFont;
+            text-align: center;
+            @media (max-width: $sm) {
+                font-size: $fsize * 1.25;
+            }
+        }
+        a {
+            text-decoration: none;
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $purple, $bgcolor2: $light4, $font: $MFont, $bradius: 5rem);
+            font-size: $fsize;
+            font-family: $BFont;
+            margin-top: 1rem;
+            svg {
+                margin-right: .5rem;
+            }
+        }
+    }
+}
