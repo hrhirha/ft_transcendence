@@ -63,19 +63,21 @@ export const Profile:React.FC = () => {
                                 <FontAwesomeIcon icon={faClockRotateLeft}/>
                                 <h2>match history</h2>
                             </div>
-                            <div className="profile_info">
-                                { Match_data && Match_data.map (({user1, image_user1, user2, image_user2, score, status, typegame, time}, k ) => (
-                                    <Item
-                                        key={k}
-                                        user1 = {user1}
-                                        image_user1 = {image_user1}
-                                        user2 = {user2}
-                                        image_user2 = {image_user2}
-                                        score = {score}
-                                        status = {status}
-                                        typegame = {typegame}
-                                        time = {time} />
-                                ))}
+                            <div className="matchs">
+                                <div className="items_match">
+                                    { Match_data && Match_data.map (({user1, image_user1, user2, image_user2, score, status, typegame, time}, k ) => (
+                                        <Item
+                                            key={k}
+                                            user1 = {user1}
+                                            image_user1 = {image_user1}
+                                            user2 = {user2}
+                                            image_user2 = {image_user2}
+                                            score = {score}
+                                            status = {status}
+                                            typegame = {typegame}
+                                            time = {time} />
+                                    ))}
+                                </div>  
                             </div>
                         </div>
                     </div>

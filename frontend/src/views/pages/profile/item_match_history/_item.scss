@@ -1,11 +1,11 @@
 .item {
     @include _flex(row, space-between, center);
-    background-color: $dark2;
-    margin-top: 0.6rem;
+    background-color: $dark3;
+    margin-top: 0.1rem;
     margin-bottom: 0.2rem;
     border-radius: 10px;
-    padding-top: 0.6rem;
-    padding-bottom: 0.6rem;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
     width: 96%;
     .info_users{
         @include _flex(row, space-between, center);
@@ -18,17 +18,36 @@
             .win {
                 font-size: $fsize * 1.2;
                 font-family: $MFont;
-                color: rgba(68, 255, 0, 0.614);
+                color: rgba(68, 255, 0, 0.392);
+
+                @media (min-width: $sm) {
+                    font-size: $fsize * 1;
+                }
+                @media (min-width: $md) {
+                    font-size: $fsize * 1.1;
+                }
             }
             .lose {
                 font-size: $fsize * 1.2;
                 font-family: $MFont;
-                color: rgba(255, 0, 0, 0.821);
+                color: rgba(255, 0, 0, 0.5);
+                @media (min-width: $sm) {
+                    font-size: $fsize * 1;
+                }
+                @media (min-width: $md) {
+                    font-size: $fsize * 1.1;
+                }
             }
             .score {
                 font-size: $fsize * 1.2;
                 font-family: $MFont;
                 color: $light3;
+                @media (min-width: $sm) {
+                    font-size: $fsize * 0.8;
+                }
+                @media (min-width: $md) {
+                    font-size: $fsize * 1.1;
+                }
             }
         }
         .line{
@@ -53,14 +72,28 @@
             @include _flex(column, center, center);
             margin-right: 1rem;
             .name{
-                font-size: $fsize * 1.3;
+                font-size: $fsize * 0.9;
                 font-family: $MFont;
                 color: $light3;
+                @media (min-width: $md) {
+                    font-size: $fsize * 1.1;
+                }
+                @media (min-width: $lg) {
+                    font-size: $fsize * 1.3;
+                }
+                
             }
             .time{
                 font-size: $fsize * 0.5;
                 font-family: $MFont;
                 color: $light5;
+                @media (min-width: $md) {
+                    font-size: $fsize * 0.7;
+                }
+                @media (min-width: $lg) {
+                    font-size: $fsize * 0.8;
+                }
+                
             }
         }
     }
