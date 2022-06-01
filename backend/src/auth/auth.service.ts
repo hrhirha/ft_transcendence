@@ -16,20 +16,18 @@ export class AuthService {
         private _userS: UserService
     ){}
 
-    async login(dto: UserDto, req: Request) {
-
-        let user = await this._prismaS.user.findUnique({
-            where: {
-                email: dto.email,
-            }
-        });
+    async login(dto: UserDto, req: Request)
+    {
+        let user = await this._prismaS.user.findUnique({ where: { email: dto.email, } });
         if (!user) {
             user = await this._prismaS.user.create({ data: { ...dto, } });
         }
 
+        const referer = req.header("Referer") || "http://127.0.0.1:3000";
+
         const cookie = this.getCookieWithJwtAccessToken(user.id);
         req.res.setHeader('Set-Cookie', cookie)
-            .setHeader('Location', 'http://127.0.0.1:3000/')
+            .setHeader('Location', referer)
             .status(HttpStatus.PERMANENT_REDIRECT);
         return dto;
     }
@@ -43,7 +41,7 @@ export class AuthService {
         
         const access_token = this._jwtS.sign(payload, options);
 
-        return `Authentication=${access_token}; Path=/; Max-Age=${exp_time}; HttpOnly`;
+        return `access_token=${access_token}; Path=/; Max-Age=${exp_time}; HttpOnly; SameSite=Lax`;
     }
 
     async getUserFromToken(token: string)

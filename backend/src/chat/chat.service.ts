@@ -240,7 +240,7 @@ export class ChatService {
 
     async addMessage(data: AddMessageDto)
     {
-        const user_room = await this._getUserRoom(data.uid, data.rid);
+        // const user_room = await this._getUserRoom(data.uid, data.rid);
         if (!this._isMember(data.uid, data.rid))
             return null;
             // throw new ForbiddenException('not a member');

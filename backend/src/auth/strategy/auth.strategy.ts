@@ -7,9 +7,9 @@ import { Strategy, Profile, VerifyCallback } from 'passport-42';
 export class OAuth42Strategy extends PassportStrategy(Strategy, '42') {
     constructor (config: ConfigService) {
         super({
-            clientID: config.get('42_UID'),
-            clientSecret: config.get('42_SECRET'),
-            callbackURL: config.get('42_REDIR_URL'),
+            clientID: process.env.CLIENT_ID,
+            clientSecret: process.env.CLIENT_SECRET,
+            callbackURL: process.env.REDIRECT_URI,
         });
     }
 

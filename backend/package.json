@@ -8,7 +8,7 @@
   "scripts": {
     "db:dev:up": "docker-compose up -d db-dev",
     "db:dev:rm": "docker-compose rm -sfv db-dev",
-    "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up && sleep 20 && prisma migrate deploy",
+    "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up && sleep 2 && prisma migrate deploy",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -36,6 +36,7 @@
     "@nestjs/websockets": "^8.4.5",
     "@prisma/client": "^3.12.0",
     "argon2": "^0.28.5",
+    "axios": "^0.27.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "cookie-parser": "^1.4.6",

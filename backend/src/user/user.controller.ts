@@ -22,20 +22,7 @@ export class UserController {
     me(@GetUser() dto: UserDto) {
         return dto;
     }
-
-    @Get('/:id')
-    async getUserById(@GetUser() user: User, @Param('id') uid: string)
-    {
-        let u: User;
     
-        if (!(await this._userS.findById(user.id)))
-            throw new UnauthorizedException('user not found');
-        if (!(u = await this._userS.findById(uid)))
-            throw new UnauthorizedException('user not found');
-
-        return this._userS.publicData(u);
-    }
-
     @Post('edit')
     edit(@GetUser('id') id: string, @Body() dto: EditUserDto) {
         return this._userS.edit(id, dto);
@@ -64,6 +51,19 @@ export class UserController {
     getJoinedChatRooms(@GetUser() user: User)
     {
         return this._chatS.getJoinedRooms(user);
+    }
+
+    @Get('/:id')
+    async getUserById(@GetUser() user: User, @Param('id') uid: string)
+    {
+        let u: User;
+    
+        if (!(await this._userS.findById(user.id)))
+            throw new UnauthorizedException('user not found1');
+        if (!(u = await this._userS.findById(uid)))
+            throw new UnauthorizedException('user not found2');
+
+        return this._userS.publicData(u);
     }
     // end of User
 

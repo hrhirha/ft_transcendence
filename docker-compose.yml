@@ -2,7 +2,7 @@ version: '3.8'
 services:
   web:
     build: .
-    # command: 'cd backend && npm run start'
+    command: 'sh start.sh'
     # volumes:
     #  - .:/usr/app
     ports:
@@ -11,6 +11,8 @@ services:
     depends_on:
       db-dev:
         condition: service_healthy
+    environment:
+      DB_HOST: db-dev
 
   db-dev:
     image: postgres:14.2

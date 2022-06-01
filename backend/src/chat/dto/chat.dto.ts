@@ -28,7 +28,8 @@ export class OldRoomDto
 {
     /* {
         id: string,
-        password?: string }
+        password?: string
+        }
     */
 
     @IsString()

@@ -13,7 +13,8 @@ export class AuthController {
     
     @UseGuards(OAUth42Guard)
     @Get('login')
-    login(@GetUserProfile() dto: UserDto, @Req() req: Request) {
+    login(@GetUserProfile() dto: UserDto, @Req() req: Request)
+    {    
         return this._authS.login(dto, req);
     }
 

@@ -10,7 +10,7 @@ export class Jwt2FAAuthGuard extends AuthGuard('jwt-2fa')
     handleRequest<TUser = any>(err: any, user: any, info: any, context: any, status?: any): TUser {
         if (err || !user)
         {
-            throw new UnauthorizedException('invalid two-factor authentication');
+            throw new UnauthorizedException('you are not logged in');
         }
         return user;
     }
