@@ -39,22 +39,20 @@ export const Profile:React.FC = () => {
                                 </div>
                             </div>
                         </div>
+
                         <div className="btns">
-                            <div className="btn_status">
+                            <button className="btn_add">
                                 <FontAwesomeIcon icon={faUserPlus}/>
-                                <span>Add friend</span>
-                            </div>
-                            <div className="line"></div>
-                            <div className="btn_SendMsg">
+                                Add friend
+                            </button>
+                            <button className="btn_SendMsg">
                                 <FontAwesomeIcon icon={faMessage}/>
-                                <span>Send Message</span>
-                            </div>
-                        </div>
-                        <div className="btnBlock">
-                            <div className="btn_SendMsg">
+                                Send Message
+                            </button>
+                            <button className="btn_block">
                                 <FontAwesomeIcon icon={faBan}/>
-                                <span>Block</span>
-                            </div>
+                                Block
+                            </button>
                         </div>
                     </div>
                     <div className=" col-sm-12 col-md-7 col-lg-8">
