@@ -71,9 +71,8 @@
                     color: $light3;
                 }
             }
-            
             zoom: 1.25;
-           
+            
         }
         :first-child{
             border-radius: 10px 10px 0px 0px;
@@ -85,11 +84,14 @@
 
         button.btn_block{
             color: rgba(153, 17, 17, 0.828);
-            svg {
-                margin-right: .45rem;
-                path{
-                    color: rgba(153, 17, 17, 0.828);
-                }
+            svg path{
+                color: rgba(153, 17, 17, 0.828);
+            }
+        }
+        button:active{
+            color: $dark3;
+            svg path{
+                color: $dark3;
             }
         }
     }
