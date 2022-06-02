@@ -1,6 +1,34 @@
 section#createNewChat {
+    @include _flex(column, center, center);
+    @include _selectionOff();
     width: 100%;
     height: 100%;
-    background-color: $dark3;
-    @include _flex(column, center, center);
+    background-color: $dark2;
+    ul {
+        position: absolute;
+        list-style: none;
+        background-color: $dark3;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin: 2rem 0;
+        li {
+            margin: .5rem auto;
+            button {
+                @include _flex(row, flex-start, center);
+                @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $purple, $bgcolor2: $light6, $font: $MFont, $bradius: 5rem);
+                min-width: 15rem;
+                max-width: 15rem;
+                font-size: $fsize * .9;
+                font-family: $BFont;
+                text-transform: uppercase;
+                padding: .6rem 1rem ;
+                svg {
+                    margin-right: .75rem;
+                }
+            }
+        }
+    }
+    form#newPrivateChat {
+        
+    }
 }

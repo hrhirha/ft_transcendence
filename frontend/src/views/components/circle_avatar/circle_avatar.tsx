@@ -15,5 +15,5 @@ export const CircleAvatar:React.FC<Props> = (Props) => {
     maxWidth: Props.dimensions,
     maxHeight: Props.dimensions,
     borderWidth: Props.borderWidth,
-    borderColor: Props.borderColor}}><i className="online"></i></span>);
+    borderColor: Props.borderColor}}></span>);
 }

@@ -1,0 +1,40 @@
+section#searchUser {
+    @include _flex(column, center, center);
+    input#username {
+        padding: .5rem 1rem;
+        font-size: $fsize * .75;
+        border: none;
+        background-color: $light4;
+        border-radius: 1rem;
+        outline: none;
+    }
+    ::placeholder {
+        color: $light3;
+    }
+    ul#suggestions {
+        @include _flex(column, flex-start, center);
+        margin-top: .25rem;
+        background-color: $light4;
+        border-radius: 1rem;
+        width: 100%;
+        padding: 0;
+        overflow: hidden;
+        li {
+            width: 100%;
+            margin: 0;
+            div.suggestionCard {
+                @include _flex(row, flex-start, center);
+                cursor: pointer;
+                padding: .4rem .75rem;
+                text-decoration: none;
+                font-size: $fsize * 1.1;
+                h6 {
+                    margin-left: .5rem;
+                }
+            }
+            :hover {
+                background-color: $light5;
+            }
+        }
+    }
+}

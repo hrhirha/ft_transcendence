@@ -47,8 +47,8 @@ export const Chat:React.FC = () => {
                     </div>
                 </div>
                 <div className="col">
-                    <ChatRoom />
-                    {/* <CreateNewChat /> AJJ taddgh ardass kmmlgh */}
+                    {/* <ChatRoom /> */}
+                    <CreateNewChat />
                 </div>
             </div>
         </div>

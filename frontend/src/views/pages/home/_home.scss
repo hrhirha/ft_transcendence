@@ -3,6 +3,11 @@
 
 main#homePage {
     min-height: calc(100vh - 10rem);
+    .container {
+        @media (max-width: $xs) {
+            padding: 0;
+        }
+    }
     > div.container {
         * {
             transition: .5s ease all;
@@ -11,7 +16,6 @@ main#homePage {
         min-height: calc(100vh - 10rem);
         margin-top: 2rem;
         @media (max-width: $xs) {
-            padding: 0;
             justify-content: flex-start;
         }
     }
