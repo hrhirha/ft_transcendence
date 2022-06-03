@@ -20,7 +20,7 @@ const PrivateChat = () => {
     return (
     <form id="newPrivateChat">
         <h6><FontAwesomeIcon icon={faLock}/>Private Chat</h6>
-        <UserSearchForm callback={(i: string) => {console.log(i)}}/>
+        <UserSearchForm callback={(i: any) => {console.log(i)}}/>
         <button id="closeChatRoom" title="close">
             <FontAwesomeIcon icon={faClose}/>
         </button>

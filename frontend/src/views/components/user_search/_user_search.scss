@@ -1,5 +1,6 @@
 section#searchUser {
     @include _flex(column, center, center);
+    position: relative;
     input#username {
         padding: .5rem 1rem;
         font-size: $fsize * .75;
@@ -11,29 +12,42 @@ section#searchUser {
     ::placeholder {
         color: $light3;
     }
-    ul#suggestions {
-        @include _flex(column, flex-start, center);
-        margin-top: .25rem;
+    div.suggestions {
+        position: absolute;
+        top: 2.25rem;
+        left: 0;
         background-color: $light4;
+        overflow: hidden;
+        max-height: 15rem;
         border-radius: 1rem;
         width: 100%;
         padding: 0;
-        overflow: hidden;
-        li {
-            width: 100%;
+        ul#suggestions {
+            @include _flex(column, flex-start, center);
             margin: 0;
-            div.suggestionCard {
-                @include _flex(row, flex-start, center);
-                cursor: pointer;
-                padding: .4rem .75rem;
-                text-decoration: none;
-                font-size: $fsize * 1.1;
-                h6 {
-                    margin-left: .5rem;
+            border-radius: 1rem;
+            background-color: $light4;
+            width: 100%;
+            max-height: 15rem;
+            overflow: hidden;
+            overflow-y: scroll;
+            padding: 0;
+            li {
+                width: 100%;
+                margin: 0;
+                div.suggestionCard {
+                    @include _flex(row, flex-start, center);
+                    cursor: pointer;
+                    padding: .4rem .75rem;
+                    text-decoration: none;
+                    font-size: $fsize * 1.1;
+                    h6 {
+                        margin-left: .5rem;
+                    }
                 }
-            }
-            :hover {
-                background-color: $light5;
+                :hover {
+                    background-color: $light5;
+                }
             }
         }
     }
