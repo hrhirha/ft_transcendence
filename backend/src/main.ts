@@ -11,7 +11,10 @@ async function bootstrap() {
   // for chat dev
   app.useStaticAssets(join(__dirname, "..", "static"));
 
-  app.useGlobalPipes(new ValidationPipe({whitelist: true}));
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    transform: true,
+  }));
   app.use(cookieParser());
   app.enableCors({
     origin: 'http://127.0.0.1:3000',

@@ -1,13 +1,14 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, WsResponse, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, ConnectedSocket, WsException } from '@nestjs/websockets'
 import {  } from '@nestjs/platform-socket.io'
-import { ForbiddenException, InternalServerErrorException, Logger, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { ForbiddenException, InternalServerErrorException, Logger, UnauthorizedException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { AddMessageDto, NewRoomDto, OldRoomDto } from './dto';
+import { AddMessageDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
 import { ChatService } from './chat.service';
 import { UserService } from 'src/user/user.service';
 import { user_status } from 'src/utils';
 import { Message } from '@prisma/client';
 
+@UsePipes(new ValidationPipe({whitelist: true}))
 @WebSocketGateway({ namespace: '/chat' })
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -68,10 +69,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         let user = await this._chat.getUserFromSocket(client);
         if (!user)
         {
-            throw new UnauthorizedException('you must login first');
+            throw new WsException('you must login first');
         }
-        const r = await this._chat.createRoom(user, room);
-        client.emit('room_created', r);
+        try
+        {
+            const r = await this._chat.createRoom(user, room);
+            client.emit('room_created', r);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to create room');
+        }
     }
 
     @SubscribeMessage('delete_room')
@@ -80,33 +89,56 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         let user = await this._chat.getUserFromSocket(client);
         if (!user)
         {
-            throw new UnauthorizedException('you must login first');
+            throw new WsException('you must login first');
         }
-        const r = await this._chat.deleteRoom(user, room);
-        client.emit('room_deleted', r);
+        try
+        {
+            const r = await this._chat.deleteRoom(user, room);
+            client.emit('room_deleted', r);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to delete room');
+        }
+    }
+
+    @SubscribeMessage('ban_user')
+    async banUser(@MessageBody() ur: UserRoomDto, @ConnectedSocket() client: Socket)
+    {
+        let u = await this._chat.getUserFromSocket(client);
+        if (!u)
+        {
+            throw new WsException('you must login first');
+        }
+        try
+        {
+            const b = await this._chat.banUser(u, ur);
+            this.server.emit('user_banned', b);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, messasge: e.message});
+        }
     }
 
     @SubscribeMessage('send_message')
     async handleMessage(@MessageBody() data: AddMessageDto, @ConnectedSocket() client: Socket) //WsResponse<string>
     {
-        const u = await this._userS.findById(data.uid);
+        let u = await this._chat.getUserFromSocket(client);
+        if (!u)
+            throw new WsException('you must login first');
         try
         {
-            const m: Message = await this._chat.addMessage(data);
-            if (!m) return ;
-            const ret = {
-                sender: {
-                    uid: u.id,
-                    imageUrl: u.imageUrl
-                },
-                msg: data.msg,
-                timestamp: m.timestamp
-            };
-            this.server.to(data.rid).emit('receive_message', ret);
+            const m = await this._chat.addMessage(u, data);
+            this.server.to(data.rid).emit('receive_message', m);
             return ;
         }
-        catch
-        {}
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to send message');
+        }
         // return {event: 'msgToClient', data}
     }
 

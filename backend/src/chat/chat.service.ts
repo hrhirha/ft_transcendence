@@ -2,9 +2,11 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import { Room, User } from '@prisma/client';
 import * as argon2 from 'argon2'
+import { timeStamp } from 'console';
 import { Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UserIdDto } from 'src/user/dto';
 import { UserService } from 'src/user/user.service';
 import { room_type } from 'src/utils';
 import { AddMessageDto, DeleteMessageDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
@@ -23,102 +25,167 @@ export class ChatService {
         if (room.type === room_type.PROTECTED)
         {
             if (!room.password)
-                throw new ForbiddenException('protected room requires a password');
-
+                throw new WsException('protected room requires a password');
+            
             room.password = await argon2.hash(room.password);
         }
-
-        const new_room = await this._prismaS.room.create({
+        
+        const r = await this._prismaS.room.create({
             data: {
                 ...room,
+                is_channel: true,
+                user_rooms: {
+                    create: {
+                        uid: user.id,
+                        is_owner: true,
+                        is_admin: true,
+                        is_banned: false,
+                        is_muted: false,
+                    }
+                }
+            },
+            select: {
+                id: true,
+                is_channel: true,
+                name: true,
+                type: true,
             }
         });
-        await this._prismaS.userRoom.create({
-            data: {
-                uid: user.id,
-                rid: new_room.id,
-                is_owner: true,
-                is_admin: true,
-                is_banned: false,
-                is_muted: false,
-            }
-        });
-        return new_room;
+        
+        return r;
     }
-
+    
     async deleteRoom(user: User, room: OldRoomDto)
     {
-        const user_room = await this._getUserRoom(user.id, room.id);
-        if (!user_room)
-        throw new ForbiddenException('room not found');
-        if (!user_room.is_owner)
-            throw new ForbiddenException('you are not the owner');
-        const del = await this._prismaS.room.delete({
+        const del = await this._prismaS.room.deleteMany({
             where: {
                 id: room.id,
+                user_rooms: {
+                    every: {
+                        uid: user.id,
+                        is_owner: true
+                    }
+                },
             },
         });
-        if (!del)
-            throw new ForbiddenException('room not found');
-        return {success: true}
+        return {success: del.count === 0 ? false: true}
     }
 
+    async start_dm(u1: User, u2: UserIdDto) {
+        const r = await this._prismaS.room.create({
+            data: {
+                name: '',
+                type: room_type.PRIVATE,
+                is_channel: false,
+                user_rooms: {
+                    createMany: {
+                        data: [
+                            {
+                                uid: u1.id,
+                                is_owner: true,
+                                is_admin: true,
+                                is_banned: false,
+                                is_muted: false,
+                            },
+                            {
+                                uid: u2.id,
+                                is_owner: false,
+                                is_admin: true,
+                                is_banned: false,
+                                is_muted: false,
+                            }
+                        ]
+                    }
+                }
+            },
+            select: {
+                id: true,
+                is_channel: true,
+            }
+        });
+    }
+                
     async joinRoom(user: User, room: OldRoomDto)
     {
-        const old_room = await this._getRoom(room.id);
-        if (!old_room)
+        let r = await this._getRoom(room.id);
+        if (!r)
             throw new ForbiddenException('room not found');
-        if (old_room.type === room_type.PRIVATE)
+        if (r.type === room_type.PRIVATE)
             throw new ForbiddenException('you can\'t join a private room');
-        if (old_room.type == room_type.PROTECTED)
+        if (r.type === room_type.PROTECTED)
         {
             if (!room.password)
                 throw new ForbiddenException('protected room requires a password');
-            if (!(await argon2.verify(old_room.password, room.password)))
+            if (!(await argon2.verify(r.password, room.password)))
                 throw new ForbiddenException('invalid password');
         }
 
-        try
-        {
-            const user_room = await this._prismaS.userRoom.create({
-                data: {
-                    uid: user.id,
-                    rid: old_room.id,
-                    is_owner: false,
-                    is_admin: false,
-                    is_banned: false,
-                    is_muted: false,
+        return await this._prismaS.room.update({
+            where: { id: room.id },
+            data: {
+                user_rooms: {
+                    create: {
+                        uid: user.id,
+                        is_owner: false,
+                        is_admin: false,
+                        is_banned: false,
+                        is_muted: false,
+                    },
                 }
-            });
-            return old_room;
-        }
-        catch (e)
-        {
-            throw new ForbiddenException('already a member');
-        }
+            },
+            select: {
+                id: true,
+                name: true,
+                type: true,
+            }
+        });
     }
 
     async leaveRoom(user: User, room: OldRoomDto)
     {
-        // what should happen if the owner left the room?
-        let r: Room;
-        if (!(r = await this._getRoom(room.id)))
-            throw new ForbiddenException('room not found');
+        // let r = await this._getRoom(room.id);
+        // if (!r)
+        //     throw new WsException('room not found');
+        // if (!r.is_channel)
+        //     throw new WsException('not a channel');
+        return await this._prismaS.room.update({
+            where: { id: room.id },
+            data: {
+                user_rooms: {
+                    delete: {
+                        uid_rid: {
+                            uid: user.id,
+                            rid: room.id,
+                        }
+                    },
+                }
+            },
+            select: {
+                id: true,
+                name: true,
+                type: true,
+            }
+        });
 
-        try
-        {
-            await this._prismaS.userRoom.delete({
-                where: {uid_rid: {
-                    uid: user.id,
-                    rid: room.id
-                }}
-            });
-            return r;
-        }
-        catch
-        {
-            throw new ForbiddenException('not a member');
-        }
+        // what should happen if the owner left the room?
+        // let r: Room;
+        // if (!(r = await this._getRoom(room.id)))
+        //     throw new ForbiddenException('room not found');
+
+        // try
+        // {
+        //     await this._prismaS.userRoom.delete({
+        //         where: {uid_rid: {
+        //             uid: user.id,
+        //             rid: room.id
+        //         }}
+        //     });
+        //     return r;
+        // }
+        // catch
+        // {
+        //     throw new ForbiddenException('not a member');
+        // }
     }
 
     async addUser(user: User, member: UserRoomDto)
@@ -210,16 +277,36 @@ export class ChatService {
 
     async banUser(user: User, user_room: UserRoomDto)
     {
-        let uc = await this._getUserRoom(user.id, user_room.rid);
-        if (!uc)
-            throw new ForbiddenException('not a member');
-        if (!uc.is_admin)
-            throw new ForbiddenException('not and admin');
-
-        uc = await this._prismaS.userRoom.update({
-            where: { uid_rid: { ...user_room } },
-            data: { is_banned: true, }
+        const ur = await this._prismaS.userRoom.updateMany({
+            data: {
+                is_banned: true,
+            },
+            where: {
+                uid: user_room.uid,
+                rid: user_room.rid,
+                room: {
+                    user_rooms: {
+                        some: {
+                            uid: user.id,
+                            // rid: user_room.rid,
+                            is_admin: true,
+                        }
+                    }
+                }
+            },
         });
+        console.log({ur});
+
+        // let uc = await this._getUserRoom(user.id, user_room.rid);
+        // if (!uc)
+        //     throw new ForbiddenException('not a member');
+        // if (!uc.is_admin)
+        //     throw new ForbiddenException('not and admin');
+
+        // uc = await this._prismaS.userRoom.update({
+        //     where: { uid_rid: { ...user_room } },
+        //     data: { is_banned: true, },
+        // });
         return {success: true}
     }
 
@@ -238,16 +325,38 @@ export class ChatService {
         return {success: true}
     }
 
-    async addMessage(data: AddMessageDto)
+    async addMessage(user: User, data: AddMessageDto)
     {
-        // const user_room = await this._getUserRoom(data.uid, data.rid);
-        if (!this._isMember(data.uid, data.rid))
-            return null;
-            // throw new ForbiddenException('not a member');
+        const d1 = Date.parse(Date());
+        console.log({d1, d2:Date.parse(Date())});
+        const ur = await this._prismaS.userRoom.findMany({
+            where: {
+                uid: user.id,
+                rid: data.rid,
+                // is_muted: false,
+                is_banned: false,
+            },
+        });
+        if (ur.length === 0)
+            throw new WsException('you can\'t send messages in this room');
+
         const new_msg = await this._prismaS.message.create({
             data: {
+                uid: user.id,
                 ...data,
-            }
+            },
+            select: {
+                id: true,
+                msg: true,
+                timestamp: true,
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        imageUrl: true,
+                    }
+                }
+            },
         });
         return new_msg;
     }

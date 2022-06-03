@@ -12,8 +12,8 @@ export class NewRoomDto
     @IsNotEmpty()
     name: string;
 
-    @IsBoolean()
-    is_channel: boolean;
+    // @IsBoolean()
+    // is_channel: boolean;
 
     @IsString()
     @IsOptional()
@@ -45,9 +45,9 @@ export class AddMessageDto
 {
     // { uid: string, rid: string, msg: string }
 
-    @IsString()
-    @IsNotEmpty()
-    uid: string;
+    // @IsString()
+    // @IsNotEmpty()
+    // uid: string;
 
     @IsString()
     @IsNotEmpty()

@@ -97,7 +97,10 @@ model UserRoom {
   is_owner      Boolean
   is_admin      Boolean
   is_banned     Boolean
+  
   is_muted      Boolean
+  muted_at      Int?
+  mute_period   Int? // if muted_at + mute_period >= now() => unmute
 
   @@unique([uid, rid])
   @@map("user_rooms")
