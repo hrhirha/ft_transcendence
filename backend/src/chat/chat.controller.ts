@@ -223,68 +223,68 @@ export class ChatController
     }
 
     // ban User
-    @Post('ban_user') // { user_id: string, chat_id: string }
-    banUser(@GetUser() user: User, @Body() user_chat: UserRoomDto)
-    {
-        /**
-         * request:
-         * {
-         *      uid: string,
-         *      rid: string
-         * }
-         * 
-         * response:
-         * {
-         *      "success": boolean
-         * }
-         */
-        try
-        {
-            return this._chatS.banUser(user, user_chat);
-        }
-        catch (e)
-        {
-            console.log({e});
-            if (e instanceof PrismaClientKnownRequestError)
-            {
-                const err_msg = e.code === 'P2025' ? "user or room not found" : e.message;
-                throw new ForbiddenException(err_msg);
-            }
-            throw new InternalServerErrorException();
-        }
-    }
+    // @Post('ban_user') // { user_id: string, chat_id: string }
+    // banUser(@GetUser() user: User, @Body() user_chat: UserRoomDto)
+    // {
+    //     /**
+    //      * request:
+    //      * {
+    //      *      uid: string,
+    //      *      rid: string
+    //      * }
+    //      * 
+    //      * response:
+    //      * {
+    //      *      "success": boolean
+    //      * }
+    //      */
+    //     try
+    //     {
+    //         return this._chatS.banUser(user, user_chat);
+    //     }
+    //     catch (e)
+    //     {
+    //         console.log({e});
+    //         if (e instanceof PrismaClientKnownRequestError)
+    //         {
+    //             const err_msg = e.code === 'P2025' ? "user or room not found" : e.message;
+    //             throw new ForbiddenException(err_msg);
+    //         }
+    //         throw new InternalServerErrorException();
+    //     }
+    // }
 
     // unban User
-    @Post('unban_user') // { user_id: string, chat_id: string }
-    unbanUser(@GetUser() user: User, @Body() user_chat: UserRoomDto)
-    {
-        /**
-         * request:
-         * {
-         *      uid: string,
-         *      rid: string
-         * }
-         * 
-         * response:
-         * {
-         *      "success": boolean
-         * }
-         */
-        try
-        {
-            return this._chatS.unbanUser(user, user_chat);
-        }
-        catch (e)
-        {
-            console.log({e});
-            if (e instanceof PrismaClientKnownRequestError)
-            {
-                const err_msg = e.code === 'P2025' ? "user or room not found" : e.message;
-                throw new ForbiddenException(err_msg);
-            }
-            throw new InternalServerErrorException();
-        }
-    }
+    // @Post('unban_user') // { user_id: string, chat_id: string }
+    // unbanUser(@GetUser() user: User, @Body() user_chat: UserRoomDto)
+    // {
+    //     /**
+    //      * request:
+    //      * {
+    //      *      uid: string,
+    //      *      rid: string
+    //      * }
+    //      * 
+    //      * response:
+    //      * {
+    //      *      "success": boolean
+    //      * }
+    //      */
+    //     try
+    //     {
+    //         return this._chatS.unbanUser(user, user_chat);
+    //     }
+    //     catch (e)
+    //     {
+    //         console.log({e});
+    //         if (e instanceof PrismaClientKnownRequestError)
+    //         {
+    //             const err_msg = e.code === 'P2025' ? "user or room not found" : e.message;
+    //             throw new ForbiddenException(err_msg);
+    //         }
+    //         throw new InternalServerErrorException();
+    //     }
+    // }
 
     // delete message
     @Post('delete_message') // { id: string, chat_id: string}

@@ -1,12 +1,11 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, WsResponse, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, ConnectedSocket, WsException } from '@nestjs/websockets'
 import {  } from '@nestjs/platform-socket.io'
-import { ForbiddenException, InternalServerErrorException, Logger, UnauthorizedException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { AddMessageDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
 import { ChatService } from './chat.service';
 import { UserService } from 'src/user/user.service';
 import { user_status } from 'src/utils';
-import { Message } from '@prisma/client';
 
 @UsePipes(new ValidationPipe({whitelist: true}))
 @WebSocketGateway({ namespace: '/chat' })
@@ -119,6 +118,27 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         catch (e)
         {
             console.log({code: e.code, messasge: e.message});
+            throw new WsException('user ban failed');
+        }
+    }
+
+    @SubscribeMessage('unban_user')
+    async unbanUser(@MessageBody() ur: UserRoomDto, @ConnectedSocket() client: Socket)
+    {
+        let u = await this._chat.getUserFromSocket(client);
+        if (!u)
+        {
+            throw new WsException('you must login first');
+        }
+        try
+        {
+            const b = await this._chat.unbanUser(u, ur);
+            this.server.emit('user_unbanned', b);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, messasge: e.message});
+            throw new WsException('user unban failed');
         }
     }
 

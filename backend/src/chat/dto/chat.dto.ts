@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsBoolean, isNotEmpty, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class NewRoomDto
 {
@@ -82,4 +82,19 @@ export class UserRoomDto
     @IsString()
     @IsNotEmpty()
     rid: string;
+}
+
+export class MuteUserDto
+{
+    @IsString()
+    @IsNotEmpty()
+    uid: string;
+
+    @IsString()
+    @IsNotEmpty()
+    rid: string;
+
+    @IsString()
+    @IsNotEmpty()
+    mute_period: string;
 }

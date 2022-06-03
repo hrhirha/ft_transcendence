@@ -2,14 +2,13 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import { Room, User } from '@prisma/client';
 import * as argon2 from 'argon2'
-import { timeStamp } from 'console';
 import { Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserIdDto } from 'src/user/dto';
 import { UserService } from 'src/user/user.service';
 import { room_type } from 'src/utils';
-import { AddMessageDto, DeleteMessageDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
+import { AddMessageDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
 
 @Injectable()
 export class ChatService {
@@ -61,14 +60,15 @@ export class ChatService {
             where: {
                 id: room.id,
                 user_rooms: {
-                    every: {
+                    some: {
                         uid: user.id,
+                        rid: room.id,
                         is_owner: true
                     }
                 },
             },
         });
-        return {success: del.count === 0 ? false: true}
+        return {success: del.count === 0 ? false: true};
     }
 
     async start_dm(u1: User, u2: UserIdDto) {
@@ -284,11 +284,12 @@ export class ChatService {
             where: {
                 uid: user_room.uid,
                 rid: user_room.rid,
+                is_banned: false,
                 room: {
                     user_rooms: {
                         some: {
                             uid: user.id,
-                            // rid: user_room.rid,
+                            rid: user_room.rid,
                             is_admin: true,
                         }
                     }
@@ -296,6 +297,8 @@ export class ChatService {
             },
         });
         console.log({ur});
+        if (ur.count === 0)
+            throw new WsException('ban operation failed');
 
         // let uc = await this._getUserRoom(user.id, user_room.rid);
         // if (!uc)
@@ -312,33 +315,84 @@ export class ChatService {
 
     async unbanUser(user: User, user_room: UserRoomDto)
     {
-        let uc = await this._getUserRoom(user.id, user_room.rid);
-        if (!uc)
-            throw new ForbiddenException('not a member');
-        if (!uc.is_admin)
-            throw new ForbiddenException('not an admin');
-
-        uc = await this._prismaS.userRoom.update({
-            where: { uid_rid: { ...user_room } },
-            data: { is_banned: false, }
+        const ur = await this._prismaS.userRoom.updateMany({
+            data: {
+                is_banned: false,
+            },
+            where: {
+                uid: user_room.uid,
+                rid: user_room.rid,
+                is_banned: true,
+                room: {
+                    user_rooms: {
+                        some: {
+                            uid: user.id,
+                            rid: user_room.rid,
+                            is_admin: true,
+                        }
+                    }
+                }
+            },
         });
+        console.log({ur});
+        if (ur.count === 0)
+            throw new WsException('unban operation failed');
+
+        // let uc = await this._getUserRoom(user.id, user_room.rid);
+        // if (!uc)
+        //     throw new ForbiddenException('not a member');
+        // if (!uc.is_admin)
+        //     throw new ForbiddenException('not an admin');
+
+        // uc = await this._prismaS.userRoom.update({
+        //     where: { uid_rid: { ...user_room } },
+        //     data: { is_banned: false, }
+        // });
+        return {success: true}
+    }
+
+    async muteUser(user: User, user_room: MuteUserDto)
+    {
+        const ur = await this._prismaS.userRoom.updateMany({
+            data: {
+                is_muted: true,
+                muted_at: 0,
+                mute_period: 0,
+            },
+            where: {
+                uid: user_room.uid,
+                rid: user_room.rid,
+                is_muted: false,
+                room: {
+                    user_rooms: {
+                        some: {
+                            uid: user.id,
+                            rid: user_room.rid,
+                            is_admin: true,
+                        }
+                    }
+                }
+            },
+        });
+        console.log({ur});
+        if (ur.count === 0)
+            throw new WsException('ban operation failed');
+
         return {success: true}
     }
 
     async addMessage(user: User, data: AddMessageDto)
     {
-        const d1 = Date.parse(Date());
-        console.log({d1, d2:Date.parse(Date())});
         const ur = await this._prismaS.userRoom.findMany({
             where: {
                 uid: user.id,
                 rid: data.rid,
                 // is_muted: false,
-                is_banned: false,
+                is_banned: true,
             },
         });
-        if (ur.length === 0)
-            throw new WsException('you can\'t send messages in this room');
+        if (ur.length === 1)
+            throw new WsException('you are banned from this room');
 
         const new_msg = await this._prismaS.message.create({
             data: {
