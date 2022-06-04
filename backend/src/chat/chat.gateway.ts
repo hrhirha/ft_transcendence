@@ -1,14 +1,38 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, WsResponse, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, ConnectedSocket, WsException } from '@nestjs/websockets'
 import {  } from '@nestjs/platform-socket.io'
-import { Logger, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ArgumentMetadata, BadRequestException, Catch, Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { AddMessageDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
+import { AddMessageDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
 import { ChatService } from './chat.service';
 import { UserService } from 'src/user/user.service';
 import { user_status } from 'src/utils';
 
-@UsePipes(new ValidationPipe({whitelist: true}))
-@WebSocketGateway({ namespace: '/chat' })
+export class WsValidationPipe extends ValidationPipe
+{
+    async transform(value: any, metadata: ArgumentMetadata) {
+        try
+        {
+            return await super.transform(value, metadata);
+        }
+        catch (e)
+        {
+            if (e instanceof BadRequestException)
+            {
+                console.log({error: e.message});
+                throw new WsException(e.message);
+            }
+        }
+    }
+}
+
+@UsePipes(new WsValidationPipe({whitelist: true, transform: true, forbidNonWhitelisted: true}))
+@WebSocketGateway({
+    namespace: '/chat',
+    cors : {
+        origin: "http://127.0.0.1:3000",
+        credentials: true,
+    }
+})
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
     constructor(
@@ -34,10 +58,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
 
         const joined_rooms = await this._chat.getJoinedRooms(user);
-        console.log('joining old rooms');
+        // console.log('joining old rooms');
         for (let r of joined_rooms)
         {
-            console.log({r});
+            // console.log({r});
             client.join(r.id);
         }
 
@@ -127,9 +151,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     {
         let u = await this._chat.getUserFromSocket(client);
         if (!u)
-        {
             throw new WsException('you must login first');
-        }
         try
         {
             const b = await this._chat.unbanUser(u, ur);
@@ -139,6 +161,24 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         {
             console.log({code: e.code, messasge: e.message});
             throw new WsException('user unban failed');
+        }
+    }
+
+    @SubscribeMessage('mute_user')
+    async muteUser(@MessageBody() mu: MuteUserDto, @ConnectedSocket() client: Socket)
+    {
+        let u = await this._chat.getUserFromSocket(client);
+        if (!u)
+            throw new WsException('you must login first');
+        try
+        {
+            const m = await this._chat.muteUser(u, mu);
+            client.emit('user_muted', m);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to mute member');
         }
     }
 
@@ -160,6 +200,24 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('failed to send message');
         }
         // return {event: 'msgToClient', data}
+    }
+
+    @SubscribeMessage('delete_message')
+    async deleteMessage(@MessageBody() msg: DeleteMessageDto, @ConnectedSocket() client: Socket)
+    {
+        let u = await this._chat.getUserFromSocket(client);
+        if (!u)
+            throw new WsException('you must login first');
+        try
+        {
+            const d = await this._chat.deleteMessage(u, msg);
+            client.emit('message_deleted', d);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message:e.message});
+            throw new WsException('failed to delete message');
+        }
     }
 
     @SubscribeMessage('join_room')

@@ -77,12 +77,37 @@ export class UserService {
     // end User
 
     // friend Requests
-    async sendFriendReq(snd_id: string, rcv_id: string) {
-        if (await this._prismaS.reqAlreadySent(snd_id, rcv_id)
-            || await this._prismaS.reqAlreadySent(rcv_id, snd_id))
-            return new ForbiddenException();
+    async sendFriendReq(snd_id: string, rcv_id: string)
+    {
+        const u = await this._prismaS.user.update({
+            data: {
+                sentReq: {},
+            },
+            where: { id: snd_id, },
+            select: {
+                sentReq: { select: { receiver: true } },
+                recievedReq: { select: { sender: true } }
+            }
+        });
 
-        return await this._prismaS.addReq(snd_id, rcv_id);
+        // const send = await this._prismaS.friendReq.create({
+        //     data: {
+        //         snd_id,
+        //         rcv_id,
+        //         status: friend_status.PENDING,
+        //     },
+        // });
+ 
+        console.log({snt: u?.sentReq[0]?.receiver});
+        console.log({rcv: u?.recievedReq[0]?.sender});
+ 
+        // return u;
+ 
+        // if (await this._prismaS.reqAlreadySent(snd_id, rcv_id)
+        //     || await this._prismaS.reqAlreadySent(rcv_id, snd_id))
+        //     return new ForbiddenException();
+
+        // return await this._prismaS.addReq(snd_id, rcv_id);
     }
 
     async acceptFriendReq(snd_id: string, rcv_id: string) {

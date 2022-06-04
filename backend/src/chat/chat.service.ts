@@ -7,7 +7,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserIdDto } from 'src/user/dto';
 import { UserService } from 'src/user/user.service';
-import { room_type } from 'src/utils';
+import { friend_status, room_type } from 'src/utils';
 import { AddMessageDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
 
 @Injectable()
@@ -353,11 +353,17 @@ export class ChatService {
 
     async muteUser(user: User, user_room: MuteUserDto)
     {
+        const unmute_at = new Date();
+        unmute_at.setTime(
+            unmute_at.getTime() + this._toMillis(user_room.mute_period)
+        );
+
+        console.log({unmute_at});
+
         const ur = await this._prismaS.userRoom.updateMany({
             data: {
                 is_muted: true,
-                muted_at: 0,
-                mute_period: 0,
+                unmute_at,
             },
             where: {
                 uid: user_room.uid,
@@ -376,7 +382,7 @@ export class ChatService {
         });
         console.log({ur});
         if (ur.count === 0)
-            throw new WsException('ban operation failed');
+            throw new WsException('mute operation failed');
 
         return {success: true}
     }
@@ -387,48 +393,126 @@ export class ChatService {
             where: {
                 uid: user.id,
                 rid: data.rid,
-                // is_muted: false,
-                is_banned: true,
-            },
-        });
-        if (ur.length === 1)
-            throw new WsException('you are banned from this room');
-
-        const new_msg = await this._prismaS.message.create({
-            data: {
-                uid: user.id,
-                ...data,
+                is_banned: false,
             },
             select: {
-                id: true,
-                msg: true,
-                timestamp: true,
                 user: {
                     select: {
-                        id: true,
-                        username: true,
-                        imageUrl: true,
+                        sentReq: {
+                            where: {
+                                rcv_id: user.id,
+                                status: friend_status.BLOCKED
+                            }
+                        },
+                        recievedReq: {
+                            where: {
+                                rcv_id: user.id,
+                                status: friend_status.BLOCKED,
+                            }
+                        }
+                    }
+                },
+                room: {
+                    select: {
+                        is_channel: true,
+                    }
+                }
+            }
+        });
+        console.log({r: ur[0]});
+        if (ur.length === 0)
+            throw new WsException('you are banned from this room');
+
+        const r = await this._prismaS.room.update({
+            data: {
+                messages: {
+                    create : { uid: user.id, msg: data.msg, }
+                },
+                user_rooms: {
+                    updateMany: {
+                        data: {
+                            is_muted: false,
+                            unmute_at: null,
+                        },
+                        where: {
+                            uid: user.id,
+                            rid: data.rid,
+                            is_muted: true,
+                            unmute_at: { lte: new Date, }
+                        }
                     }
                 }
             },
+            where: { id: data.rid },
+            select: {
+                user_rooms: {
+                    where:{
+                        uid: user.id,
+                        rid: data.rid,
+                        OR: [
+                            {
+                                AND: [
+                                    { is_muted : true },
+                                    { unmute_at: { lte: new Date() } }
+                                ]
+                            },
+                            {
+                                is_muted: false,
+                            }
+                        ]
+                    },
+                    select: {
+                        uid: true,
+                        rid: true,
+                        is_muted: true,
+                        unmute_at: true,
+                    }
+                },
+                messages: {
+                    select: {
+                        id: true,
+                        msg: true,
+                        timestamp: true,
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                imageUrl: true,
+                            },
+                        }
+                    } 
+                }
+            }
         });
-        return new_msg;
+
+        if (r.user_rooms.length === 0)
+            throw new WsException('you have been muted');
+
+        return r.messages[r.messages.length-1];
     }
 
     async deleteMessage(user: User, msg: DeleteMessageDto)
     {
-        if (!this._isMember(user.id, msg.rid))
-            throw new ForbiddenException('not a member');
-        const old_msg = await this._prismaS.message.findUnique({
-            where: {id: msg.id}
+        // if (!this._isMember(user.id, msg.rid))
+        //     throw new ForbiddenException('not a member');
+        // const old_msg = await this._prismaS.message.findUnique({
+        //     where: {id: msg.id}
+        // });
+        // if (!old_msg)
+        //     throw new ForbiddenException('message not found');
+        // if (old_msg.uid !== user.id)
+        //     throw new ForbiddenException('not your message');
+        const del =  await this._prismaS.message.deleteMany({
+            where: {
+                id: msg.id,
+                uid: user.id,
+                rid: msg.rid,
+            },
         });
-        if (!old_msg)
-            throw new ForbiddenException('message not found');
-        if (old_msg.uid !== user.id)
-            throw new ForbiddenException('not your message');
-        return await this._prismaS.message.delete({
-            where: {id: msg.id}
-        });
+        if (del.count === 0)
+            throw new WsException('unable to delete message');
+        console.log(del)
+        return {success: true}
     }
 
 
@@ -561,5 +645,17 @@ export class ChatService {
                 type
             }
         });
+    }
+
+    private _toMillis(t: string) {
+        if (t === 'inf')
+            return 64757577600000; //01/01/4022
+        const id = t[t.length-1];
+        const time = Number(t.substring(0, t.length-1))
+
+        let ms = time * 1000 * 60;
+        if (id === 'H')
+            ms *= 60;
+        return ms;
     }
 }

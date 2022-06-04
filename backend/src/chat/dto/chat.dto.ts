@@ -1,4 +1,4 @@
-import { IsBoolean, isNotEmpty, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
 
 export class NewRoomDto
 {
@@ -96,5 +96,6 @@ export class MuteUserDto
 
     @IsString()
     @IsNotEmpty()
-    mute_period: string;
+    @Matches('^15M$|^1H$|^3H$|^8H$|^24H$|^inf$')
+    mute_period: string; // 15M, 1H, 3H, 8H, 24H, inf
 }
