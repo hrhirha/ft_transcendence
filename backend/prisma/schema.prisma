@@ -36,6 +36,8 @@ model User {
   messages      Message[]
   user_rooms    UserRoom[]
 
+  user_games    UserGame[]
+
   @@map("users")
 }
 
@@ -99,9 +101,36 @@ model UserRoom {
   is_banned     Boolean
   
   is_muted      Boolean
-  muted_at      Int?
-  mute_period   Int? // if muted_at + mute_period >= now() => unmute
+  unmute_at     DateTime?
 
   @@unique([uid, rid])
   @@map("user_rooms")
+}
+
+model Game {
+  id          String @id @default(cuid())
+  createdAt   DateTime @default(now())
+
+  map       String
+
+  user_game UserGame[]
+
+  @@map("games")
+}
+
+model UserGame {
+  id        String @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  uid       String
+  user      User @relation(fields: [uid], references: [id], onDelete: Cascade)
+
+  gid       String
+  room      Game @relation(fields: [gid], references: [id], onDelete: Cascade)
+
+  is_player Boolean
+  score     Int
+
+  @@unique([uid, gid])
+  @@map("user_games")
 }
