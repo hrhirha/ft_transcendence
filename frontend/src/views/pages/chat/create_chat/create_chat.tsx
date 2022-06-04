@@ -1,45 +1,70 @@
-import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClose, faKey, faLock, faLockOpen} from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faClose, faKey, faLock, faLockOpen} from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
 import { UserSearchForm } from "../../../components/user_search/user_search";
+import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
 
 enum chatTypes {
     public, private, protected, none
 }
 
-interface Props {
-    username: string,
-    image: string,
-    status: string
+const UserCheckedCard:React.FC<{avatar: string, fullName: string, onRemove: Function}> = ({avatar, fullName, onRemove}) => {
+    return <div className="userCheckedCard">
+        <span className="userInfos">
+            <CircleAvatar dimensions={25} avatarURL={avatar} />
+            <h4>{fullName}</h4>
+        </span>
+        <FontAwesomeIcon icon={faClose} onClick={() => onRemove()} />
+    </div>;
 }
 
-
-const PrivateChat = () => {
+const PrivateChat:React.FC<{onClose: Function}> = ({onClose}) => {
+    const [userSelected, setUserSelected] = useState<any>(null);
     return (
-    <form id="newPrivateChat">
-        <h6><FontAwesomeIcon icon={faLock}/>Private Chat</h6>
-        <UserSearchForm callback={(i: any) => {console.log(i)}}/>
-        <button id="closeChatRoom" title="close">
-            <FontAwesomeIcon icon={faClose}/>
-        </button>
+    <form id="newPrivateChat" className="creatChatForm">
+        <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
+        <h5><FontAwesomeIcon icon={faLock}/>Private Chat</h5>
+        {userSelected === null && <UserSearchForm callback={(selectedUser: any) => setUserSelected(selectedUser)}/>}
+        {userSelected !== null
+            && <UserCheckedCard
+                onRemove={() => setUserSelected(null)}
+                avatar={userSelected.avatar}
+                fullName={userSelected.fullName}
+            />}
+        {userSelected !== null
+            && <button id="submitChat" onClick={() => {}}>
+                <FontAwesomeIcon icon={faCheck}/>
+                Submit
+            </button>}
     </form>
     );
 }
 
-
-const PublicChat = () => {
+const PublicChat:React.FC<{onClose: Function}> = ({onClose}) => {
+    const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
     return (
-    <form id="newPublicChat">
-        <h6>Private Chat</h6>
-        <UserSearchForm callback={(i: string) => {console.log(i)}}/>
+    <form id="newPublicChat" className="creatChatForm">
+        <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
+        <h5><FontAwesomeIcon icon={faLockOpen}/>Public Chat</h5>
+        <UserSearchForm callback={(userSelected: any) => {
+            console.log(selectedUsers);
+            if (selectedUsers.length === 0 || !selectedUsers.find(user => user.id === userSelected.id)) {
+                setSelectedUsers(prvUsers => [...prvUsers, userSelected]);
+            }
+        }}/>
         <div className="usersAdded">
-            
+            {selectedUsers.length > 0 && selectedUsers.map((user: any, k: number) => <UserCheckedCard
+                key={k}
+                onRemove={() => setSelectedUsers(prvResults => prvResults.filter((u: any) => u.id !== user.id))}
+                avatar={user.avatar}
+                fullName={user.fullName}
+            />)}
         </div>
-        <button id="closeChatRoom" title="close">
-            <FontAwesomeIcon icon={faClose}/>
-        </button>
+        {selectedUsers.length > 0
+            && <button id="submitChat" onClick={() => {}}>
+                <FontAwesomeIcon icon={faCheck}/>
+                Submit
+            </button>}
     </form>
     );
 }
@@ -55,9 +80,9 @@ export const CreateNewChat:React.FC = () => {
                 <li><button id="newPublicChat" onClick={() => setChatType(chatTypes.public)}><FontAwesomeIcon icon={faLockOpen}/> New public chat</button></li>
                 <li><button id="newProtectedChat" onClick={() => setChatType(chatTypes.protected)}><FontAwesomeIcon icon={faKey}/> New protected chat</button></li>
             </ul>}
-        {chatType === chatTypes.private && <PrivateChat />}
-        {chatType === chatTypes.public && <PublicChat />}
-        {chatType === chatTypes.protected && <PrivateChat />}
+        {chatType === chatTypes.private && <PrivateChat onClose={() => setChatType(chatTypes.none)}/>}
+        {chatType === chatTypes.public && <PublicChat onClose={() => setChatType(chatTypes.none)}/>}
+        {chatType === chatTypes.protected && <PublicChat onClose={() => setChatType(chatTypes.none)}/>}
     </section>
     );
 }

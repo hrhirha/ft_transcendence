@@ -27,7 +27,70 @@ section#createNewChat {
             }
         }
     }
-    form#newPrivateChat {
-        
+    form.creatChatForm {
+        @include _flex(column, center, center);
+        position: relative;
+        padding: 1rem;
+        background-color: $dark3;
+        border-radius: 1rem;
+        min-width: 15rem;
+        max-width: 15rem;
+        span.closeForm {
+            @include _flex(column, center, center);
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            padding: .25rem;
+            background-color:  $dark3;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 100%;
+            border: .25rem solid $dark2;
+            cursor: pointer;
+        }
+        > h5 {
+            font-size: $fsize * 1.15;
+            padding: .5rem;
+            margin-bottom: .75rem;
+            svg {
+                margin-right: .5rem;
+            }
+        }
+        .usersAdded {
+            margin-top: 0.25rem;
+            max-height: 10rem;
+            padding: .25rem;
+            overflow: auto;
+            .userCheckedCard {
+                margin: .5rem 0;
+            }
+        }
+        button#submitChat {
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $purple, $bgcolor2: $light6, $font: $MFont, $bradius: 5rem);
+            margin-top: 1rem;
+            svg {
+                margin-right: .5rem;
+            }
+        }
+    }
+
+    .userCheckedCard {
+        @include _flex(row, space-between, center);
+        padding: .5rem .75rem;
+        background-color: $light4;
+        width: 12rem;
+        border-radius: .5rem;
+        .userInfos {
+            @include _flex(row, flex-start, center);
+            > h4 {
+                margin-left: .5rem;
+                font-size: $fsize * .75;
+                @include _textOverflow(8.75rem);
+            }
+        }
+        svg {
+            margin-left: .5rem;
+            cursor: pointer;
+        }
     }
 }

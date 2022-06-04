@@ -1,23 +1,21 @@
-import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPingPongPaddleBall } from "@fortawesome/free-solid-svg-icons";
+import React, { useState, useEffect } from "react";
 import { CircleAvatar } from "../circle_avatar/circle_avatar";
 
 const resulst = [
-    {avatar: "https://i.pravatar.cc/301", username: "John Doe", status: "online"},
-    {avatar: "https://i.pravatar.cc/302", username: "Ahmed Doe", status: "offline"},
-    {avatar: "https://i.pravatar.cc/303", username: "Farid Doe", status: "ingame"},
-    {avatar: "https://i.pravatar.cc/304", username: "Souliman Doe", status: "online"},
-    {avatar: "https://i.pravatar.cc/305", username: "Nouaaman Doe", status: "online"},
-    {avatar: "https://i.pravatar.cc/306", username: "Fatima Doe", status: "offline"},
-    {avatar: "https://i.pravatar.cc/307", username: "Fedireco Doe", status: "online"},
-    {avatar: "https://i.pravatar.cc/308", username: "Sarah Doe", status: "offline"},
-    {avatar: "https://i.pravatar.cc/309", username: "Mouad Doe", status: "online"},
-    {avatar: "https://i.pravatar.cc/310", username: "Walid Doe", status: "ingame"}
+    {id: "5ads4f54adsf", avatar: "https://i.pravatar.cc/301", username: "jhondoe", fullName: "John Doe", status: "online"},
+    {id: "5ads4fs4adsf", avatar: "https://i.pravatar.cc/302", username: "ahmedoe", fullName: "Ahmed Doe", status: "offline"},
+    {id: "5addagfsadsf", avatar: "https://i.pravatar.cc/303", username: "faridoe", fullName: "Farid Doe", status: "ingame"},
+    {id: "5adsdaa4adsf", avatar: "https://i.pravatar.cc/304", username: "soulima", fullName: "Souliman Doe", status: "online"},
+    {id: "5adsghfgadsf", avatar: "https://i.pravatar.cc/305", username: "nouaama", fullName: "Nouaaman Doe", status: "online"},
+    {id: "5ads4f54adsf", avatar: "https://i.pravatar.cc/306", username: "fatimad", fullName: "Fatima Doe", status: "offline"},
+    {id: "5ads4f5sxcvf", avatar: "https://i.pravatar.cc/307", username: "fedirec", fullName: "Fedireco Doe", status: "online"},
+    {id: "5adshjgjersf", avatar: "https://i.pravatar.cc/308", username: "sarahdo", fullName: "Sarah Doe", status: "offline"},
+    {id: "5ads4fdfgdsf", avatar: "https://i.pravatar.cc/309", username: "mouaddo", fullName: "Mouad Doe", status: "online"},
+    {id: "5ads4wrttgsf", avatar: "https://i.pravatar.cc/310", username: "waliddo", fullName: "Walid Doe", status: "ingame"}
 ];
 
 const SuggestionCard:React.FC<{avatar: string, fullName: string, onClick: Function}> = ({avatar, fullName, onClick}) => {
-    return <div className="suggestionCard">
+    return <div className="suggestionCard" onClick={() => onClick()}>
         <CircleAvatar dimensions={20} avatarURL={avatar} />
         <h6>{fullName}</h6>
     </div>;
@@ -25,35 +23,37 @@ const SuggestionCard:React.FC<{avatar: string, fullName: string, onClick: Functi
 
 export const UserSearchForm:React.FC<{callback: Function}> = ({callback}) => {
     const [suggestions, setSuggestions] = useState<any[]>([]);
-    const [checkedUsers, setCheckedUsers] = useState<any[]>([]);
+    const [userSelected, setUserSelected] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
+
+    useEffect(() => {
+        if (userSelected !== null) {
+            callback(userSelected);
+        }
+    }, [userSelected]);
     const handleChange = (input: string) => {
-        console.log(input);
         setShowSuggestions(false);
         if (input.trim().length > 0) {
             setShowSuggestions(true);
-            //get results from server
             setSuggestions([]);
-            
-            setSuggestions(resulst.filter((user: any, key: number) => {
-                console.log(user.username.includes(input));
-                    if (user.username.includes(input))
-                    {
-                        return <SuggestionCard onClick={() => {
-                            setCheckedUsers([...checkedUsers, user]);
-                            callback(checkedUsers);
-                        }} avatar={user.avatar} fullName={user.username} key={key} />
-                    }
-                }));
-                console.log(suggestions);
+            //get results from server
+            resulst.forEach((user: any, key: number) => {
+                if (user.username.toLowerCase().includes(input.toLowerCase()))
+                {
+                    setSuggestions(prvSugges => [...prvSugges,<SuggestionCard onClick={() => {
+                        setShowSuggestions(false);
+                        setUserSelected(user);
+                    }} avatar={user.avatar} fullName={user.fullName} key={key} />]);
+                }
+            });
         }
     }
     return (
     <section id="searchUser">
-        <input id="username" type="text" onChange={(e) => handleChange(e.target.value)} placeholder="username"/>
+        <input id="username" type="text" onChange={(e) => handleChange(e.target.value)} placeholder="username" autoComplete="off"/>
         {showSuggestions && <div className="suggestions">
             <ul id="suggestions">
-                <li>{suggestions}</li>
+                {suggestions.map((s, k) => <li key={k}>{s}</li>)}
             </ul>
         </div>}
     </section>
