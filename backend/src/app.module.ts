@@ -1,3 +1,4 @@
+import { GameModule } from './game/game.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
@@ -17,6 +18,7 @@ import { ChatModule } from './chat/chat.module';
             PrismaModule,
             TwoFactorAuthModule,
             ChatModule,
+            GameModule,
           ],
 })
 export class AppModule {}
