@@ -1,0 +1,32 @@
+.item {
+    @include _flex(row, space-between, center);
+    background-color: $dark3;
+    margin-top: 0.1rem;
+    margin-bottom: 0.2rem;
+    border-radius: 10px;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+    width: 100%;
+    .image{
+        margin-left: .5rem;
+    }
+    .buttons{
+        @include _flex(row, space-between, center);
+        button {
+            @include _flex(row, center, center);
+            cursor: pointer;
+            border: none;
+            background-color: $dark2;
+            padding: .5rem;
+            border-radius: 50%;
+            min-width: 2.3rem;
+            min-height: 2.3rem;
+            margin-left: .5rem;
+            margin-right: .5rem;
+            svg {
+                font-size: $fsize;
+            }
+        }
+    }
+   
+}
