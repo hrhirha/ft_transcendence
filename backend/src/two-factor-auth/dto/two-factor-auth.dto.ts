@@ -1,6 +1,8 @@
-import { IsString } from "class-validator";
+import { IsDefined, IsString, Matches } from "class-validator";
 
 export class TFADto {
+    @IsDefined()
     @IsString()
-    secret: string;
+    @Matches('^[0-9]{6}$')
+    code: string;
 }

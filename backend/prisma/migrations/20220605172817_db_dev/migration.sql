@@ -11,7 +11,7 @@ CREATE TABLE "users" (
     "imageUrl" TEXT NOT NULL,
     "refresh_token" TEXT,
     "isTfaEnabled" BOOLEAN DEFAULT false,
-    "tfaSecret" TEXT,
+    "tfaSecret" TEXT DEFAULT E'',
     "score" INTEGER DEFAULT 0,
     "status" TEXT,
     "wins" INTEGER DEFAULT 0,
@@ -90,7 +90,13 @@ CREATE TABLE "user_games" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_id_tfaSecret_key" ON "users"("id", "tfaSecret");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_rooms_uid_rid_key" ON "user_rooms"("uid", "rid");

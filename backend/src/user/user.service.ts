@@ -10,8 +10,53 @@ export class UserService {
     constructor(private _prismaS: PrismaService) {}
 
     // User
-    async findById(id:string) {
-        const user = await this._prismaS.user.findUnique({ where: { id, }, });
+    async findById(id:string)
+    {
+        const user = await this._prismaS.user.findUnique({
+            where: { id, },
+        });
+        return user;
+    }
+
+    async getUserById(id: string)
+    {
+        const user = await this._prismaS.user.findUnique({
+            where: { id, },
+            select: {
+                username: true,
+                email: true,
+                firstName: true,
+                lastName: true,
+                imageUrl: true,
+                status: true,
+                score: true,
+                wins: true,
+                loses: true
+            }
+        });
+        if (!user)
+            throw new ForbiddenException('user not found');
+        return user;
+    }
+
+    async getUserByUsername(username: string)
+    {
+        const user = await this._prismaS.user.findUnique({
+            where: { username, },
+            select: {
+                username: true,
+                email: true,
+                firstName: true,
+                lastName: true,
+                imageUrl: true,
+                status: true,
+                score: true,
+                wins: true,
+                loses: true
+            }
+        });
+        if (!user)
+            throw new ForbiddenException('user not found');
         return user;
     }
 
@@ -30,43 +75,38 @@ export class UserService {
         return user;
     }
 
-    async enable2fa(id: string) {
-        const user = await this.findById(id);
-        if (!user)
-            throw new ForbiddenException('user not found')
-        if (user.isTfaEnabled === true)
-            return new Error('2fa already enabled');
-
-        return await this._prismaS.user.update({
+    async enable2fa(id: string)
+    {
+        const u = await this._prismaS.user.update({
             where: { id },
             data: { isTfaEnabled: true }
         });
+        return { success: true };
     }
 
-    async disable2fa(id: string) {
-        const user = await this.findById(id);
-        if (!user)
-            throw new ForbiddenException('user not found')
-        if (user.isTfaEnabled === false)
-            return new Error('2fa already disabled');
-        
-        return await this._prismaS.user.update({
+    async disable2fa(id: string)
+    {        
+        const u = await this._prismaS.user.update({
             where: { id },
             data: { isTfaEnabled: false }
         });
+        return { success: true }
     }
 
-    async setTwoFactorAuthSecret(id: string, secret: string) {
-        const user = await this.findById(id);
-        if (user && user.tfaSecret)
-            return new Error('two-factor auth secret already set');
-        if (user) {
-            return await this._prismaS.user.update({
-                where: { id, },
-                data: { tfaSecret: secret },
-            });
-        }
-        throw new ForbiddenException('user not found');
+    async setTwoFactorAuthSecret(id: string, secret: string)
+    {
+        const u = await this._prismaS.user.update({
+            data: {
+                tfaSecret: secret,
+            },
+            where: {
+                id_tfaSecret: {
+                    id,
+                    tfaSecret: "",
+                }
+            }
+        });
+        return u;
     }
 
     async edit(id: string, dto: EditUserDto) {
@@ -79,51 +119,70 @@ export class UserService {
     // friend Requests
     async sendFriendReq(snd_id: string, rcv_id: string)
     {
-        const u = await this._prismaS.user.update({
-            data: {
-                sentReq: {},
+        const send = await this._prismaS.friendReq.upsert({
+            where: {
+                snd_id_rcv_id: {
+                    snd_id: rcv_id,
+                    rcv_id: snd_id
+                }
             },
-            where: { id: snd_id, },
+            update: {},
+            create: {
+                snd_id,
+                rcv_id,
+                status: friend_status.PENDING,
+            },
             select: {
-                sentReq: { select: { receiver: true } },
-                recievedReq: { select: { sender: true } }
+                receiver: { select: { id: true, } },
             }
         });
-
-        // const send = await this._prismaS.friendReq.create({
-        //     data: {
-        //         snd_id,
-        //         rcv_id,
-        //         status: friend_status.PENDING,
-        //     },
-        // });
- 
-        console.log({snt: u?.sentReq[0]?.receiver});
-        console.log({rcv: u?.recievedReq[0]?.sender});
- 
-        // return u;
- 
-        // if (await this._prismaS.reqAlreadySent(snd_id, rcv_id)
-        //     || await this._prismaS.reqAlreadySent(rcv_id, snd_id))
-        //     return new ForbiddenException();
-
-        // return await this._prismaS.addReq(snd_id, rcv_id);
+        if (send.receiver.id === snd_id)
+            throw new ForbiddenException('friend request already in place');
+        return { success: true };
     }
 
-    async acceptFriendReq(snd_id: string, rcv_id: string) {
-        const friend = await this._prismaS.reqAlreadySent(rcv_id, snd_id);
-        if (!friend)
-            throw new ForbiddenException();
-        return await this._prismaS.updateReq(friend.snd_id, friend.rcv_id, {status: friend_status.ACCEPTED});
+    async acceptFriendReq(snd_id: string, rcv_id: string)
+    {
+        const u = await this._prismaS.user.update({
+            data: {
+                recievedReq: {
+                    updateMany: {
+                        where: {
+                            snd_id,
+                            rcv_id,
+                            status: friend_status.PENDING,
+                        },
+                        data: {
+                            status: friend_status.ACCEPTED,
+                        }
+                    }
+                },
+            },
+            where: {
+                id: rcv_id
+            },
+            select: {
+                recievedReq: {
+                    where: { snd_id, rcv_id },
+                }
+            }
+        });
+        if (u.recievedReq.length === 0)
+            throw new ForbiddenException('request not found');
+        console.log(u.recievedReq);
+        return { success: true };
     }
 
-    async declineFriendReq(snd_id: string, rcv_id: string) {
-        const friend = await this._prismaS.reqAlreadySent(rcv_id, snd_id);
-        if (!friend)
-            throw new ForbiddenException();
-        if (friend.status === friend_status.PENDING)
-            return await this._prismaS.delReq(friend.snd_id, friend.rcv_id);
-        return friend;
+    async declineFriendReq(snd_id: string, rcv_id: string)
+    {
+        const del = await this._prismaS.friendReq.deleteMany({
+            where: {
+                snd_id, rcv_id, status: friend_status.PENDING,
+            },
+        });
+        if (del.count === 0)
+            throw new ForbiddenException('request not found');
+        return { success: true };
     }
 
 
@@ -133,14 +192,22 @@ export class UserService {
                 snd_id: id,
                 AND: {
                     status: friend_status.PENDING,
-                }
+                },
             },
+            select: {
+                receiver: {
+                    select: {
+                        id: true,
+                        username: true,
+                        imageUrl: true,
+                    }
+                }
+            }
         });
-        let users: User[] = [];
+        let users = [];
         for (let req of freqs)
         {
-            const user = await this.findById(req.rcv_id);
-            users.push(user);
+            users.push(req.receiver);
         }
         return users;
     }
@@ -153,44 +220,79 @@ export class UserService {
                     status: friend_status.PENDING,
                 },
             },
+            select: {
+                sender: {
+                    select: {
+                        id: true,
+                        username: true,
+                        imageUrl: true,
+                    }
+                }
+            }
         });
-        let users: User[] = [];
+        let users = [];
         for (let req of freqs)
         {
-            const user = await this.findById(req.snd_id);
-            users.push(user);
+            users.push(req.sender);
         }
         return users;
     }
     // end Friend Requests
 
     // Friends
-    async unfriend(snd_id: string, rcv_id: string) {
-        const friend = await this._prismaS.reqAlreadySent(rcv_id, snd_id)
-                    || await this._prismaS.reqAlreadySent(snd_id, rcv_id);
-        if (!friend || friend.status === friend_status.PENDING)
-            throw new ForbiddenException('You are not friends');
-        return await this._prismaS.delReq(friend.snd_id, friend.rcv_id);
+    async unfriend(snd_id: string, rcv_id: string)
+    {
+        const del = await this._prismaS.friendReq.deleteMany({
+            where: {
+                OR: [
+                    {snd_id, rcv_id},
+                    {snd_id: rcv_id, rcv_id: snd_id}
+                ],
+                status: {
+                    not: friend_status.PENDING,
+                }
+            }
+        });
+        if (del.count === 0)
+            throw new ForbiddenException('no friend was found');
     }
 
-    async block(snd_id: string, rcv_id: string) {
-        const friend = await this._prismaS.reqAlreadySent(rcv_id, snd_id)
-                    || await this._prismaS.reqAlreadySent(snd_id, rcv_id);
-        if (!friend)
-            throw new ForbiddenException();
-        if (friend.status === friend_status.ACCEPTED)
-            return await this._prismaS.updateReq(friend.snd_id, friend.rcv_id, {snd_id, rcv_id, status: friend_status.BLOCKED});
-        return friend;
+    async block(snd_id: string, rcv_id: string)
+    {
+        const bl = await this._prismaS.friendReq.updateMany({
+            data: {
+                snd_id,
+                rcv_id,
+                status: friend_status.BLOCKED,
+            },
+            where : {
+                OR: [
+                    { snd_id, rcv_id },
+                    { snd_id: rcv_id, rcv_id: snd_id, }
+                ],
+                status: friend_status.ACCEPTED,
+            }
+        });
+        if (bl.count === 0)
+            throw new ForbiddenException('record not found');
+        return { success: true }
     }
 
-    async unblock(snd_id: string, rcv_id: string) {
-        const friend = await this._prismaS.reqAlreadySent(rcv_id, snd_id)
-                    || await this._prismaS.reqAlreadySent(snd_id, rcv_id);
-        if (!friend)
-            throw new ForbiddenException();
-        if (friend.status === friend_status.BLOCKED && friend.snd_id === snd_id)
-            return await this._prismaS.updateReq(friend.snd_id, friend.rcv_id, {status: friend_status.ACCEPTED});
-        return friend;
+    async unblock(snd_id: string, rcv_id: string)
+    {
+        const bl = await this._prismaS.friendReq.updateMany({
+            data: {
+                status: friend_status.BLOCKED,
+            },
+            where : {
+                snd_id,
+                rcv_id,
+                status: friend_status.BLOCKED,
+            }
+        });
+        if (bl.count === 0)
+            throw new ForbiddenException('record not found');
+        return { success: true };
     }
 
 
@@ -205,13 +307,30 @@ export class UserService {
                     status: friend_status.PENDING,
                 }
             },
+            select: {
+                status: true,
+                sender: {
+                    select: {
+                        id: true,
+                        username: true,
+                        imageUrl: true,
+                    },
+                },
+                receiver: {
+                    select: {
+                        id: true,
+                        username: true,
+                        imageUrl: true,
+                    }
+                }
+            }
         });
-        let friends: User[] = [];
+        let friends = [];
         for (let req of freqs)
         {
-            const fid = id === req.snd_id ? req.rcv_id : req.snd_id;
-            const user = await this.findById(fid);
-            friends.push(user);
+            const friend = req.sender.id === id ? req.receiver : req.sender;
+            const status = req.status;
+            friends.push({friend, status});
         }
         return friends;
     }

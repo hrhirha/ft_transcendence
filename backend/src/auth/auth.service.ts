@@ -34,11 +34,11 @@ export class AuthService {
 
     getCookieWithJwtAccessToken(id: string, is2fauthenticated = false) {
         const payload = { sub: id, is2fauthenticated };
-        
+
         const secret = this._configS.get('JWT_ACCESS_SECRET');
         const exp_time = this._configS.get('JWT_ACCESS_EXP');
         const options = { secret, expiresIn: exp_time };
-        
+
         const access_token = this._jwtS.sign(payload, options);
 
         return `access_token=${access_token}; Path=/; Max-Age=${exp_time}; HttpOnly; SameSite=Lax`;

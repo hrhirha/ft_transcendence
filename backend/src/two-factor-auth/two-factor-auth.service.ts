@@ -16,46 +16,52 @@ export class TwoFactorAuthService {
         private _authS: AuthService,
     ) {}
 
-    async generate(user: User) {
+    async generate(user: User)
+    {
         const secret = authenticator.generateSecret();
 
         const otp_auth_url = authenticator.keyuri(
             user.username,
-            this._configS.get('2FA_APP_NAME'),
+            process.env.TFA_APPNAME,
             secret
         );
         await this._userS.setTwoFactorAuthSecret(user.id, secret);
         return { secret, otp_auth_url };
     }
 
-    async pipeQrStream(res: Response, otp_auth_url: string) {
+    async pipeQrStream(res: Response, otp_auth_url: string)
+    {
         return toFileStream(res, otp_auth_url);
     }
     
-    enable(user: User, dto: TFADto) {
-        if (this.verify(user, dto)) {
-            return this._userS.enable2fa(user.id);
+    async enable(user: User, dto: TFADto)
+    {
+        if (this.verify(user, dto))
+        {
+            return await this._userS.enable2fa(user.id);
         }
-        throw new UnauthorizedException('invalide authentication code');
+        throw new UnauthorizedException('invalid authentication code');
     }
     
-    disable(user: User) {
-        return this._userS.disable2fa(user.id);
+    async disable(user: User) {
+        return await this._userS.disable2fa(user.id);
     }
     
-    verify(user: User, dto: TFADto) {
+    verify(user: User, dto: TFADto)
+    {
         return authenticator.verify({
-            token: dto.secret,
+            token: dto.code,
             secret: user.tfaSecret,
         });
     }
 
-    async authenticate(req: Request, dto: TFADto) {
+    async authenticate(req: Request, dto: TFADto)
+    {
         const user = req.user as User;
         if (!this.verify(user, dto))
             throw new UnauthorizedException('invalid authentication code');
         const cookie = this._authS.getCookieWithJwtAccessToken(user.id, true);
         req.res.setHeader('Set-Cookie', [cookie]);
-        return req.user;
+        return { success: true };
     }
 }

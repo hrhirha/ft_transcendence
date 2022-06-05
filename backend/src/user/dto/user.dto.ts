@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, NotContains } from "class-validator";
+import { IsDefined, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, NotContains } from "class-validator";
 
 export class UserDto {
     @IsNotEmpty()
@@ -44,8 +44,9 @@ export class UserDto {
 
 export class UserIdDto
 {
+    @IsDefined()
     @IsString()
-    @IsNotEmpty()
+    // @IsNotEmpty()
     id: string;
 }
 

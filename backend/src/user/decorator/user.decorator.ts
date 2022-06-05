@@ -21,7 +21,8 @@ export const GetUser = createParamDecorator(
   (data: string | undefined, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
 
-    const {createdAt, updatedAt, refresh_token, isTfaEnabled, tfaSecret, ...dto} = request.user;
+    // const {createdAt, updatedAt, refresh_token, tfaSecret, ...dto} = request.user;
+    const dto = request.user;
 
     if (data) return dto[data];
     return dto;

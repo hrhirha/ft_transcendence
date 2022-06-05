@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, ForbiddenException, Get, Param, Post, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from './decorator';
 import { EditUserDto, UserDto, UserIdDto } from './dto';
@@ -19,7 +19,8 @@ export class UserController {
 
     // User
     @Get('me')
-    me(@GetUser() dto: UserDto) {
+    me(@GetUser() dto: UserDto)
+    {
         return dto;
     }
     
@@ -43,7 +44,7 @@ export class UserController {
             return callback(null, true);
         },
     }))
-    changeAvatar(@UploadedFile() file: Express.Multer.File) {
+    changeAvatar(@UploadedFile() file: any) {
         return file;
     }
 
@@ -53,76 +54,170 @@ export class UserController {
         return this._chatS.getJoinedRooms(user);
     }
 
-    @Get('/:id')
-    async getUserById(@GetUser() user: User, @Param('id') uid: string)
-    {
-        let u: User;
-    
-        if (!(await this._userS.findById(user.id)))
-            throw new UnauthorizedException('user not found1');
-        if (!(u = await this._userS.findById(uid)))
-            throw new UnauthorizedException('user not found2');
-
-        return this._userS.publicData(u);
-    }
     // end of User
 
     // Friend Requests
     @Post('friendreq/send')
-    sendFriendReq(@GetUser() snd: User, @Body() rcv: UserIdDto) {
-        if (!rcv.id) throw new BadRequestException('invalid id')
-        return this._userS.sendFriendReq(snd.id, rcv.id);
+    async sendFriendReq(@GetUser() snd: User, @Body() rcv: UserIdDto)
+    {
+        try
+        {
+            return await this._userS.sendFriendReq(snd.id, rcv.id);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('could not send friend request');
+        }
     }
 
     @Post('friendreq/accept')
-    acceptFriendReq(@GetUser() snd: User, @Body() rcv: UserIdDto) {
-        if (!rcv.id) throw new BadRequestException('invalid id')
-        return this._userS.acceptFriendReq(snd.id, rcv.id);
+    async acceptFriendReq(@GetUser() rcv: User, @Body() snd: UserIdDto)
+    {
+        try
+        {
+            return await this._userS.acceptFriendReq(snd.id, rcv.id);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('could not accept friend request');
+        }
     }
 
     @Post('friendreq/decline')
-    declineFriendReq(@GetUser() snd: User, @Body() rcv: UserIdDto) {
-        if (!rcv.id) throw new BadRequestException('invalid id')
-        return this._userS.declineFriendReq(snd.id, rcv.id);
+    async declineFriendReq(@GetUser() rcv: User, @Body() snd: UserIdDto)
+    {
+        try
+        {
+            return await this._userS.declineFriendReq(snd.id, rcv.id);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('could not decline friend request');
+        }
     }
 
 
     @Get('friendreqs/sent')
-    sentReqs(@GetUser() user: User) {
-        return this._userS.sentReqs(user.id);
+    async sentReqs(@GetUser() user: User)
+    {
+        try
+        {
+            return await this._userS.sentReqs(user.id);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('could not get sent friend requests');
+        }
     }
     
     @Get('friendreqs/received')
-    receivedReqs(@GetUser() user: User) {
-        return this._userS.receivedReqs(user.id);
+    async receivedReqs(@GetUser() user: User)
+    {
+        try
+        {
+            return await this._userS.receivedReqs(user.id);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('could not get received friend requests');
+        }
     }
     // end of Friend Requests
 
     // Friends Relation
     @Post('friend/unfriend')
-    unfriend(@GetUser() snd: User, @Body() rcv: UserIdDto) {
-        return this._userS.unfriend(snd.id, rcv.id);
+    async unfriend(@GetUser() snd: User, @Body() rcv: UserIdDto)
+    {
+        try
+        {
+            return await this._userS.unfriend(snd.id, rcv.id);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('could not unfriend user');
+        }
     }
 
     @Post('friend/block')
-    block(@GetUser() snd: User, @Body() rcv: UserIdDto) {
-        return this._userS.block(snd.id, rcv.id);
+    async block(@GetUser() snd: User, @Body() rcv: UserIdDto)
+    {
+        try
+        {
+            return await this._userS.block(snd.id, rcv.id);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('could not block user');
+        }
     }
 
     @Post('friend/unblock')
-    unblock(@GetUser() snd: User, @Body() rcv: UserIdDto) {
-        return this._userS.unblock(snd.id, rcv.id);
+    async unblock(@GetUser() snd: User, @Body() rcv: UserIdDto)
+    {
+        try
+        {
+            return await this._userS.unblock(snd.id, rcv.id);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('could not unblock user');
+        }
     }
 
 
     @Get('friends')
-    friends(@GetUser() user: User) {
-        return this._userS.list(user.id);
+    async friends(@GetUser() user: User)
+    {
+        try
+        {
+            return await this._userS.list(user.id);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('could not get friends list');
+        }
     }
     // end of Friend Relation
 
     @Get('match/history')
     matchHistory() {
         return 'match history';
+    }
+
+    @Get('id/:id')
+    async getUserById(@GetUser() user: User, @Param('id') uid: string)
+    {
+        try
+        {
+            return await this._userS.getUserById(uid);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('user not found');
+        }
+    }
+
+    @Get('username/:username')
+    async getUserByUsername(@GetUser() user: User, @Param('username') username: string)
+    {
+        try
+        {
+            return await this._userS.getUserByUsername(username);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('user not found');
+        }
     }
 }
