@@ -8,14 +8,14 @@ import { BgVectors } from "../../../../assets";
 import { useEffect, useState } from "react";
 
 
-interface Props {
+interface HeaderProps {
     username: string,
     image: string,
     status: string,
-    
+    onClose: Function
 }
 
-const ChatRoomHeader = (Props : Props) => {
+const ChatRoomHeader = (Props : HeaderProps) => {
     return (
     <div id="chatRoomHeader">
         <div className="userInfos">
@@ -25,7 +25,7 @@ const ChatRoomHeader = (Props : Props) => {
                 <span className='status'>{Props.status}</span>
             </div>
         </div>
-        <button id="closeChatRoom" title="close">
+        <button id="closeChatRoom" onClick={() => Props.onClose()} title="close">
             <FontAwesomeIcon icon={faClose}/>
         </button>
     </div>
@@ -64,7 +64,12 @@ export const ChatRoom:React.FC<{roomId: string}> = ({roomId}) => {
     const navigate = useNavigate();
     return (
     <section id="chatRoom">
-        <ChatRoomHeader username="Jhon don" image="https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg" status="last seen yesterday 2.30 PM"/>
+        <ChatRoomHeader
+            username="Jhon don"
+            image="https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg"
+            status="last seen yesterday 2.30 PM"
+            onClose={() => navigate("/chat")}
+        />
         <ChatRoomBody/>
         <ChatRoomFooter/>
     </section>
