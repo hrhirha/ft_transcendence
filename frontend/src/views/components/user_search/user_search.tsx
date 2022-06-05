@@ -1,3 +1,5 @@
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState, useEffect } from "react";
 import { CircleAvatar } from "../circle_avatar/circle_avatar";
 
@@ -31,18 +33,19 @@ export const UserSearchForm:React.FC<{callback: Function}> = ({callback}) => {
             callback(userSelected);
         }
     }, [userSelected]);
-    const handleChange = (input: string) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setShowSuggestions(false);
-        if (input.trim().length > 0) {
+        if (e.target.value.trim().length > 0) {
             setShowSuggestions(true);
             setSuggestions([]);
             //get results from server
             resulst.forEach((user: any, key: number) => {
-                if (user.username.toLowerCase().includes(input.toLowerCase()))
+                if (user.username.toLowerCase().includes(e.target.value.toLowerCase()))
                 {
                     setSuggestions(prvSugges => [...prvSugges,<SuggestionCard onClick={() => {
                         setShowSuggestions(false);
                         setUserSelected(user);
+                        e.target.value = "";
                     }} avatar={user.avatar} fullName={user.fullName} key={key} />]);
                 }
             });
@@ -50,7 +53,10 @@ export const UserSearchForm:React.FC<{callback: Function}> = ({callback}) => {
     }
     return (
     <section id="searchUser">
-        <input id="username" type="text" onChange={(e) => handleChange(e.target.value)} placeholder="username" autoComplete="off"/>
+        <div className="searchInput">
+            <FontAwesomeIcon icon={faSearch} />
+            <input id="username" type="text" onChange={(e) => handleChange(e)} placeholder="username" autoComplete="off"/>
+        </div>
         {showSuggestions && <div className="suggestions">
             <ul id="suggestions">
                 {suggestions.map((s, k) => <li key={k}>{s}</li>)}

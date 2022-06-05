@@ -65,6 +65,19 @@ section#createNewChat {
                 margin: .5rem 0;
             }
         }
+        input.textInput {
+            padding: .5rem 1rem;
+            font-size: $fsize * .75;
+            border: none;
+            background-color: $light4;
+            border-radius: 1rem;
+            outline: none;
+            width: 85%;
+            margin: .15rem 0;
+        }
+        ::placeholder {
+            color: $light3;
+        }
         button#submitChat {
             @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $purple, $bgcolor2: $light6, $font: $MFont, $bradius: 5rem);
             margin-top: 1rem;
@@ -80,6 +93,7 @@ section#createNewChat {
         background-color: $light4;
         width: 12rem;
         border-radius: .5rem;
+        margin: .25rem 0!important;
         .userInfos {
             @include _flex(row, flex-start, center);
             > h4 {

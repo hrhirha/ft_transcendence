@@ -1,17 +1,33 @@
 section#searchUser {
     @include _flex(column, center, center);
     position: relative;
-    input#username {
-        padding: .5rem 1rem;
-        font-size: $fsize * .75;
-        border: none;
-        background-color: $light4;
-        border-radius: 1rem;
-        outline: none;
-        width: 85%;
-    }
-    ::placeholder {
-        color: $light3;
+    margin: .25rem 0;
+    margin-top: .5rem;
+    .searchInput {
+        position: relative;
+        @include _flex(row, center, center);
+        input#username {
+            padding: .5rem .5rem;
+            padding-left: 2rem;
+            font-size: $fsize * .75;
+            border: none;
+            background-color: $light4;
+            border-radius: 1rem;
+            outline: none;
+            width: 80%;
+        }
+        svg {
+            position: absolute;
+            top: .6rem;
+            left: .75rem;
+            z-index: 5;
+            path {
+                color: $light3;
+            }
+        }
+        ::placeholder {
+            color: $light3;
+        }
     }
     div.suggestions {
         position: absolute;
