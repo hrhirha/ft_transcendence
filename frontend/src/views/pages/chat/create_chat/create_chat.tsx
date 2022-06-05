@@ -105,13 +105,14 @@ const ProtectedChat:React.FC<{onClose: Function}> = ({onClose}) => {
     );
 }
 
-export const CreateNewChat:React.FC = () => {
+export const CreateNewChat:React.FC<{onClose: Function}> = ({onClose}) => {
     const [chatType, setChatType] = useState(chatTypes.none);
     
     return (
     <section id="createNewChat">
         {chatType === chatTypes.none
         &&  <ul>
+                <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
                 <li><button id="newPrivateChat" onClick={() => setChatType(chatTypes.private)}><FontAwesomeIcon icon={faLock}/> New private chat</button></li>
                 <li><button id="newPublicChat" onClick={() => setChatType(chatTypes.public)}><FontAwesomeIcon icon={faLockOpen}/> New public group</button></li>
                 <li><button id="newProtectedChat" onClick={() => setChatType(chatTypes.protected)}><FontAwesomeIcon icon={faKey}/> New protected group</button></li>

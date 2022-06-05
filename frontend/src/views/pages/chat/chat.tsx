@@ -1,5 +1,5 @@
 // import { useNavigate } from "react-router-dom";
-import { Links } from "../../../test_data/roomchatdata";
+import { Chats, joinedGroups } from "../../../test_data/roomchatdata";
 import { NavBar } from "../../components/navbar/navbar";
 import { ChatRoom } from "./chat_room/chat_room";
 import  {ChatRoomItem }  from "./chatroom_item/chatroom_item";
@@ -7,13 +7,19 @@ import {faCommentMedical, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CreateNewChat } from "./create_chat/create_chat";
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChatHomeVector } from "../../../assets";
 
 // interface Props {
 //     username: string,
 //     image: string,
 // }
+
+enum chatTabs {
+    chats,
+    joinedGroups,
+    otherGroups
+}
 
 const ChatHome:React.FC<{onClick: Function}> = ({onClick}) => {
     return (
@@ -23,12 +29,41 @@ const ChatHome:React.FC<{onClick: Function}> = ({onClick}) => {
     </div>);
 }
 
+const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem: Function}> = ({tab, activeChat, onSelectItem}) => {
+    const navigate = useNavigate();
+    let chats: any = Chats;
+    if (tab === chatTabs.joinedGroups)
+    {
+        chats = joinedGroups;
+    }
+    else if (tab === chatTabs.otherGroups)
+    {
+        chats = [];
+    }
+    return (<>{chats.length > 0 && chats.map((chat: any, index: any) => 
+            <ChatRoomItem
+                key={index}
+                avatar={chat.image}
+                fullName={chat.username}
+                lastMsg={chat.last_msg}
+                nbNotifs={chat.nbr_msg_not_read}
+                timeLastMsg={chat.time_last_msg}
+                active={chat.id === activeChat}
+                onClick={() => {
+                    onSelectItem();
+                    navigate({
+                        pathname: '/chat',
+                        search: `?id=${chat.id}`,
+                    });
+                }}
+            />)}</>);
+}
+
 
 export const Chat:React.FC = () => {
     const [showNewChatForm, setShowNewChatForm] = useState<boolean>(false);
     const [searchParams, setSearchParams] = useSearchParams();
-    // const navigate = useNavigate();
-    // let user_info : Props = {username : "walid ben", image : "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg"};
+    const [activeTab, setActiveTab] = useState<chatTabs>(chatTabs.chats);
     return (
     <main id="chatPage">
         <NavBar />
@@ -44,24 +79,34 @@ export const Chat:React.FC = () => {
                             <FontAwesomeIcon icon={faCommentMedical}/>
                         </button>
                     </div>
+                    <ul id="chatTabs">
+                        <li id="chats"
+                            onClick={() => setActiveTab(chatTabs.chats)}
+                            className={activeTab === chatTabs.chats ? "active" : undefined}>
+                                Chats
+                        </li>
+                        <li id="joinedGroups"
+                            onClick={() => setActiveTab(chatTabs.joinedGroups)}
+                            className={activeTab === chatTabs.joinedGroups ? "active" : undefined}>
+                                Joined Groups
+                        </li>
+                        <li id="groups"
+                            onClick={() => setActiveTab(chatTabs.otherGroups)}
+                            className={activeTab === chatTabs.otherGroups ? "active" : undefined}>
+                                Other Groups
+                        </li>
+                    </ul>
                     <div className="chatRooms">
-                        { Links && Links.map (({username, image, last_msg, time_last_msg, nbr_msg_not_read}, k ) => (
-                                <ChatRoomItem
-                                    key={k}
-                                    active={k === 2}
-                                    username={username}
-                                    image={image}
-                                    last_msg={last_msg}
-                                    time_last_msg={time_last_msg}
-                                    nbr_msg_not_read={nbr_msg_not_read}
-                                />
-                        ))}
+                        <ListChats
+                            tab={activeTab}
+                            onSelectItem={() => setShowNewChatForm(false)}
+                            activeChat={searchParams.get("id")}/>
                     </div>
                 </div>
                 <div className="col">
                     {!showNewChatForm && searchParams.get("id") === null && <ChatHome onClick={() => setShowNewChatForm(true)}/>}
-                    {!showNewChatForm && searchParams.get("id") !== null && <ChatRoom />}
-                    {showNewChatForm && <CreateNewChat />}
+                    {!showNewChatForm && searchParams.get("id") !== null && <ChatRoom roomId={searchParams.get("id")!}/>}
+                    {showNewChatForm && <CreateNewChat onClose={() => setShowNewChatForm(false)}/>}
                 </div>
             </div>
         </div>

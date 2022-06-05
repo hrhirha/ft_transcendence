@@ -60,7 +60,7 @@ const ChatRoomFooter:React.FC = () => {
     </div>;
 }
 
-export const ChatRoom:React.FC = () => {
+export const ChatRoom:React.FC<{roomId: string}> = ({roomId}) => {
     const navigate = useNavigate();
     return (
     <section id="chatRoom">
