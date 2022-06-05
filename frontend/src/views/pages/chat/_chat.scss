@@ -83,5 +83,22 @@ main#chatPage {
                 max-height: none;
             }
         }
+        #chatHome {
+            @include _flex(column, center, center);
+            height: 100%;
+            img {
+                width: 20rem;
+                @media (max-width: $xs) {
+                    width: 17rem;
+                }
+            }
+            button {
+                @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $purple, $bgcolor2: $light6, $font: $BFont);
+                padding: .5rem 2rem;
+                svg {
+                    margin-right: .5rem;
+                }
+            }
+        }
     }
 }

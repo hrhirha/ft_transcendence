@@ -1,22 +1,34 @@
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import { Links } from "../../../test_data/roomchatdata";
 import { NavBar } from "../../components/navbar/navbar";
 import { ChatRoom } from "./chat_room/chat_room";
 import  {ChatRoomItem }  from "./chatroom_item/chatroom_item";
-import {faCommentDots, faCommentMedical, faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
+import {faCommentMedical, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CreateNewChat } from "./create_chat/create_chat";
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { ChatHomeVector } from "../../../assets";
 
-interface Props {
-    username: string,
-    image: string,
+// interface Props {
+//     username: string,
+//     image: string,
+// }
+
+const ChatHome:React.FC<{onClick: Function}> = ({onClick}) => {
+    return (
+    <div id="chatHome">
+        <img src={ChatHomeVector} alt="empty chat"/>
+        <button onClick={() => onClick()}><FontAwesomeIcon icon={faCommentMedical} />New chat</button>
+    </div>);
 }
 
 
 export const Chat:React.FC = () => {
-    const navigate = useNavigate();
-    let user_info : Props = {username : "walid ben", image : "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg"};
-
+    const [showNewChatForm, setShowNewChatForm] = useState<boolean>(false);
+    const [searchParams, setSearchParams] = useSearchParams();
+    // const navigate = useNavigate();
+    // let user_info : Props = {username : "walid ben", image : "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg"};
     return (
     <main id="chatPage">
         <NavBar />
@@ -28,7 +40,7 @@ export const Chat:React.FC = () => {
                             <input type="text" placeholder="Search for chat"/>
                             <FontAwesomeIcon icon={faSearch}/>
                         </form>
-                        <button id="newMessage" title="New chat">
+                        <button id="newMessage" title="New chat" onClick={() => setShowNewChatForm(true)}>
                             <FontAwesomeIcon icon={faCommentMedical}/>
                         </button>
                     </div>
@@ -47,8 +59,9 @@ export const Chat:React.FC = () => {
                     </div>
                 </div>
                 <div className="col">
-                    {/* <ChatRoom /> */}
-                    <CreateNewChat />
+                    {!showNewChatForm && searchParams.get("id") === null && <ChatHome onClick={() => setShowNewChatForm(true)}/>}
+                    {!showNewChatForm && searchParams.get("id") !== null && <ChatRoom />}
+                    {showNewChatForm && <CreateNewChat />}
                 </div>
             </div>
         </div>

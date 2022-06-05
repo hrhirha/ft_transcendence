@@ -93,7 +93,11 @@ const ProtectedChat:React.FC<{onClose: Function}> = ({onClose}) => {
             />)}
         </div>
         {selectedUsers.length > 0
-            && <button id="submitChat" onClick={() => {}}>
+            && <button id="submitChat" onClick={(e) => {
+                e.preventDefault();
+                console.log(document.getElementById("chatKey")!.nodeValue);
+                console.log(document.getElementById("chatTitle")!.getAttribute("value"));
+            }}>
                 <FontAwesomeIcon icon={faCheck}/>
                 Submit
             </button>}
