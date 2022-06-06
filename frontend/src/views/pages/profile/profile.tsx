@@ -14,43 +14,41 @@ interface Props {
 }
 
 export const Btns = (Props: Props) => {
-    if(Props.type == "Me")
-    {
-        return (
+
+    return (
             <div className="btns">
+            { (Props.type == "Me") && 
                 <button className="btn_friends">
                     <FontAwesomeIcon icon={faUserGroup}/>
                     friends
                 </button>
+            }
+            { (Props.type == "Me") && 
                 <button className="btn_match_history">
                     <FontAwesomeIcon icon={faClockRotateLeft}/>
                     Match History
                 </button>
-            </div>
-        )
-    }else
-    {
-        return (
-            <div className="btns">
+            }
+            {(Props.type == "user") && 
                 <button className="btn_add">
                     <FontAwesomeIcon icon={faUserPlus}/>
                     Add friend
                 </button>
+            }
+            {(Props.type == "user") && 
                 <button className="btn_SendMsg">
                     <FontAwesomeIcon icon={faMessage}/>
                     Send Message
                 </button>
+            }
+            {(Props.type == "user") && 
                 <button className="btn_block">
                     <FontAwesomeIcon icon={faBan}/>
                     Block
                 </button>
-            </div>
-          )
-    }
-
+            }
+        </div>)
 }
-
-
 export const Profile:React.FC = () => {
     const navigate = useNavigate();
     return (
@@ -112,6 +110,7 @@ export const Profile:React.FC = () => {
                                 </button>
                             </div>
                             <div className="content">
+                                <div className="items">
                                 { frinds_data && frinds_data.map (({type, image, username}, k ) => (
                                     <Itemfriend
                                         key={k}
@@ -119,6 +118,7 @@ export const Profile:React.FC = () => {
                                         image = {image}
                                         username = {username} />
                                 ))}
+                                </div>
                             </div>
                         </div>
 

@@ -1,29 +1,41 @@
 .item {
-    @include _flex(row, space-between, center);
+    @include _flex(column, space-between, center);
     background-color: $dark3;
-    margin-top: 0.1rem;
-    margin-bottom: 0.2rem;
+    margin: 0.3rem;
     border-radius: 10px;
     padding-top: 0.3rem;
     padding-bottom: 0.3rem;
-    width: 100%;
+    width: 200px;
+    height: 200px;
+    box-shadow: 0 1px 0px 1px $dark1;
     .image{
         margin-left: .5rem;
+        border-radius: 50%;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        
+    }
+    .username{
+        span{
+            font-family: $BFont;
+            color: $light3;
+            font-size: $fsize * 1.2;
+        }
     }
     .buttons{
         @include _flex(row, space-between, center);
         button {
-            @include _flex(row, center, center);
+            @include _flex(flex, center, center);
             cursor: pointer;
             border: none;
             background-color: $dark2;
-            padding: .5rem;
-            border-radius: 50%;
+            padding:  0 0.8rem 0 0.8rem;
+            border-radius: 10px;
             min-width: 2.3rem;
             min-height: 2.3rem;
-            margin-left: .5rem;
-            margin-right: .5rem;
+            margin-left: .2rem;
+            margin-right: .2rem;
             svg {
+                margin-right: 0.3rem;
                 font-size: $fsize;
             }
         }

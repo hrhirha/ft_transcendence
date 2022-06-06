@@ -1,6 +1,7 @@
 @import "./item_match_history/item";
 @import "./item_friendstatus/item";
 
+
 .profil {
     margin-top: 60px;
     .profile_info{
@@ -119,8 +120,89 @@
             }
         }
         .content{
-            margin: 0 .1rem;
-            //background-color: $light4;
+            margin-top: 0.5rem;
+            border-radius: 10px;
+            width : 100%;
+            height: auto;
+            background-color: $light4;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            .items{
+                width : 100%;
+                display: grid;
+                overflow: auto;
+                max-height: calc(100vh - 16rem);
+                grid-template-columns: repeat(2, 1fr);
+                @media (min-width: $xs) {
+                    grid-template-columns: repeat(3, 1fr);
+                    .item{
+                        width: 167px;
+                        .buttons{
+                            @include _flex(column, center, center);
+                            width: 100%;
+                            button {
+                                margin-top: 0.3rem;
+                                width: 93%;
+                            }
+                        }
+                    }
+                }
+                @media  (min-width: $sm) {
+                    grid-template-columns: repeat(2, 1fr);
+                    .item{
+                        width: 193px;
+                        .buttons{
+                            @include _flex(column, center, center);
+                            width: 100%;
+                            button {
+                                margin-top: 0.3rem;
+                                width: 93%;
+                            }
+                        }
+                    }
+                }
+                @media  (min-width: $md) {
+                    grid-template-columns: repeat(3, 1fr);
+                    .item{
+                        width: 193px;
+                        .buttons{
+                            @include _flex(column, center, center);
+                            width: 100%;
+                            button {
+                                margin-top: 0.3rem;
+                                width: 93%;
+                            }
+                        }
+                    }
+                }
+                @media (min-width: $lg) {
+                    grid-template-columns: repeat(3, 1fr);
+                    .item{
+                        width: 230px;
+                        .buttons{
+                            @include _flex(row, center, center);
+                            button {
+                                margin-top: 0rem;
+                                width: 105px;
+                            }
+                        }
+                    }
+                }
+                @media  (min-width: $xl) {
+                    grid-template-columns: repeat(4, 1fr);
+                    .item{
+                        width: 200px;
+                        .buttons{
+                            @include _flex(row, center, center);
+                            button {
+                                margin-top: 0rem;
+                                width: 90px;
+                            }
+                        }
+                    }
+                }
+                
+            }
         }
     }
 
