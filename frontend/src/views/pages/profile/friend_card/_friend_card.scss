@@ -1,12 +1,12 @@
 .friendCard {
     @include _flex(column, flex-start, center);
+    @include _selectionOff();
     background-color: $light4;
     margin: .25rem;
     border-radius: 1rem;
     padding: 1rem .5rem;
-    max-width: 15rem;
-    min-width: 12rem;
-    min-height: 15rem;
+    min-width: 10rem;
+    width: 100%;
     .friendInfos {
         @include _flex(column, center, center);
         .avatar {
@@ -57,10 +57,14 @@
         button {
             min-width: 8rem;
             margin: .25rem auto;
+            transition: .3s ease all;
             svg {
                 margin-right: .5rem;
-                font-size: $fsize;
+                font-size: $fsize * .9;
             }
+        }
+        >:hover {
+            background-color: $dark1;
         }
     }
    

@@ -4,7 +4,10 @@
 
 
 .profil {
-    margin-top: 60px;
+    margin-top: 1.5rem;
+    .container {
+        width: auto;
+    }
     .profile_info{
     background-color: $light4;
     border-radius: 15px;

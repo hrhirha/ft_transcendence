@@ -2,7 +2,12 @@ section#friendsManager {
     @include _flex(column, center, center);
     nav.headerNav {
         width: 100%;
+        overflow-x: auto;
         padding: .5rem 0;
+        margin-bottom: .5rem;
+        @media (max-width: $md) {
+            zoom: .68;
+        }
         ul.navTabs {
             @include _flex(row, space-between, center);
             list-style: none;
@@ -18,15 +23,47 @@ section#friendsManager {
                 }
             }
             li.active {
-                @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $light4, $bgcolor2: $light4);
+                background: $light4;
             }
         }
     }
     .body {
         width: 100%;
+        min-height: calc(100vh * .75);
+        max-height: calc(100vh * .75);
+        overflow: hidden;
+        border-radius: 1rem;
+        background-color: $dark2;
         .grid {
             @include _flex(row, flex-start, center);
             flex-wrap: wrap;
+            max-height: calc(100vh * .73);
+            overflow-y: auto;
+            padding: .5rem;
+            @media (max-width: $xs) {
+                justify-content: center;
+            }
+            .friendCard {
+                @media (max-width: $xs) {
+                    max-width: 15rem;
+                    min-width: calc(100% / 2)!important;
+                }
+                @media (min-width: $xs) {
+                    width: calc(100% / 2.21)!important;
+                }
+                @media (min-width: $sm) {
+                    width: calc(100% / 2.3)!important;
+                }
+                @media (min-width: $md) {
+                    width: calc(100% / 3.41)!important;
+                }
+                @media (min-width: $lg) {
+                    width: calc(100% / 3.33)!important;
+                }
+                @media (min-width: $xl) {
+                    width: calc(100% / 4.51)!important;
+                }
+            }
         }
     }
 }
