@@ -36,13 +36,44 @@ section#friendsManager {
         border-radius: 1rem;
         background-color: $dark2;
         .grid {
-            @include _flex(row, flex-start, center);
+            @include _flex(row, flex-start, flex-start);
             flex-wrap: wrap;
+            height: 100%;
             max-height: calc(100vh * .73);
             overflow-y: auto;
             padding: .5rem;
             @media (max-width: $xs) {
                 justify-content: center;
+            }
+            .empty {
+                @include _flex(column, center, center);
+                @include _selectionOff();
+                width: 100%;
+                height: 100%;
+                margin: auto;
+                img {
+                    width: 45%;
+                    @media (max-width: $md) {
+                        width: 75%;
+                    }
+                    @media (max-width: $sm) {
+                        width: 65%;
+                    }
+                    @media (max-width: $xs) {
+                        width: 80%;
+                    }
+                }
+                h5 {
+                    position: relative;
+                    bottom: 1.5rem;
+                    font-family: $BFont;
+                    font-size: $fsize * 1.75;
+                    color: $light4;
+                    margin-top: .5rem;
+                    max-width: 15rem;
+                    text-align: center;
+                    line-height: 1.2;
+                }
             }
             .friendCard {
                 @media (max-width: $xs) {

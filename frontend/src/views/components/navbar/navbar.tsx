@@ -57,7 +57,7 @@ const Menu:React.FC = () => {
         <ul id="navMenu">
             {MenuData.map((e, i) => <li key={i}><NavButton element={e}/></li>)}
             <li>
-                <ProfileNavBtn picture="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"/>
+                <ProfileNavBtn picture="https://i.pravatar.cc/500"/>
             </li>
         </ul>
     );

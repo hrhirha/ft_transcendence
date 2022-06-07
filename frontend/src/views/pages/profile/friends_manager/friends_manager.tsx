@@ -2,6 +2,7 @@ import { faUsers, faUsersBetweenLines, faUsersRays, faUsersSlash } from "@fortaw
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { type } from "os";
 import { useEffect, useState } from "react";
+import { EmptyBlocking, EmptyFriends, EmptyFriendsRequests, EmptyPending } from "../../../../assets";
 import { frinds_data } from "../../../../test_data/frinds_data";
 import { FriendCard } from "../friend_card/friend_card";
 
@@ -47,6 +48,8 @@ export const FriendsManager:React.FC = () => {
     useEffect(() => {
         setFriendsList([]);
         //fetch data from server
+        // if (activeTab.valueOf() === tabs.friends.valueOf())
+            // return;
         {frinds_data && frinds_data.forEach (({type, avatar, fullName,  username, ranking}, k ) => {
             if (type.valueOf() === activeTab.valueOf())
                 setFriendsList(prev => [...prev, {type, avatar, fullName, username, ranking}]);
@@ -61,7 +64,18 @@ export const FriendsManager:React.FC = () => {
             </nav>
             <div className="body">
                 <div className="grid">
-                    {friendsList.map((friend, k) => 
+                    {friendsList.length === 0 && <div className="empty">
+                        {activeTab === tabs.friends && <img alt="empty" src={EmptyFriends}/>}
+                        {activeTab === tabs.friends && <h5>You Have No Friends Yet</h5>}
+                        {activeTab === tabs.requests && <img alt="empty" src={EmptyFriendsRequests}/>}
+                        {activeTab === tabs.requests && <h5>You Have No Friend Requests</h5>}
+                        {activeTab === tabs.blocking && <img alt="empty" src={EmptyBlocking}/>}
+                        {activeTab === tabs.blocking && <h5>No One Here</h5>}
+                        {activeTab === tabs.pending && <img alt="empty" src={EmptyPending}/>}
+                        {activeTab === tabs.pending && <h5>You Didn't Sent Any Request</h5>}
+                    </div>}
+                    {friendsList.length > 0
+                    && friendsList.map((friend, k) => 
                     <FriendCard
                         key={k}
                         type = {friend.type}
