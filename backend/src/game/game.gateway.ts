@@ -5,6 +5,7 @@ import {
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer,
+    WsException,
     WsResponse 
 } from '@nestjs/websockets';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -21,6 +22,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
  
     roomCreated: number = 0;
     connection: any;
+    obj: any = {
+        paddleY: 0,
+        enemyY: 0,
+    };
  
     constructor(private prisma: PrismaService, private jwt: ChatService){}
      handleDisconnect(client: Socket) {
@@ -29,21 +34,35 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
     async handleConnection(client: Socket, ...args: any[]) {
         console.log('Client Connected with ID: ' + client.id);
-        this.beforeStart(client);
+        try
+        {
+            this.beforeStart(client);
+        }
+        catch(e)
+        {
+            throw new WsException("before start exception !!! ");
+        }
+    
     }
 
-    @SubscribeMessage('server')
-    checkConnection(client: Socket, text: string) : WsResponse<string>
+    @SubscribeMessage('update')
+    checkConnection(client: Socket, data: any): void
     {
-        return {
-            event: 'FromTheServerToClient', data: text
-        };
-        // this.server.emit('game', msg);
+        try
+        {
+            this.server.to(data.roomid).emit('recv', data);
+        }
+        catch(e)
+        {
+            throw new WsException("Check Connection expection!! ");
+        }
     }
 
     async beforeStart(client: Socket)
     {
-        const user = (await this.jwt.getUserFromSocket(client));
+        const user =  (await this.jwt.getUserFromSocket(client));
+        if (!user)
+            throw new WsException("User not found !! ");
         if (!this.roomCreated)
         {
             this.connection =  await this.prisma.game.create({
@@ -60,11 +79,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 },
                 select: {
                     _count: true,
-                    id: true
+                    id: true,
                 }
             });
             this.roomCreated += 1;
             client.join(this.connection.id);
+            client.emit("flag");
             return false;
         }
         await this.prisma.userGame.create({
