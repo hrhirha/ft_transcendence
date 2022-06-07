@@ -10,51 +10,7 @@ import { DeleteMessageDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
 @Controller('chat')
 export class ChatController
 {
-    constructor (private _chatS: ChatService) {}
-
-    // create ChatRoom
-    // @Post('create') // { name: string, type: string, password?: string }
-    // async createRoom(@GetUser() user: User, @Body() chat: NewRoomDto)
-    // {
-    //     /**
-    //      *  request:
-    //      *  {
-    //      *      name: string,
-    //      *      is_channel: boolean,
-    //      *      type: string,
-    //      *      password?: string
-    //      *  }
-    //      * 
-    //      *  response:
-    //      *  {
-    //      *      "id": string,
-    //      *      "name": string,
-    //      *      "is_channel": boolean,
-    //      *      "type": string,
-    //      *      "password": string
-    //      *  }
-    //      */
-
-    //     return await this._chatS.createRoom(user, chat);
-    // }
-
-    // delete ChatRoom
-    // @Post('delete') // { id: string }
-    // deleteRoom(@GetUser() user: User, @Body() chat: OldRoomDto)
-    // {
-    //     /**
-    //      * request:
-    //      * {
-    //      *      id: string,
-    //      * }
-    //      * 
-    //      * response:
-    //      * {
-    //      *      "success": true
-    //      * }
-    //      */
-    //     return this._chatS.deleteRoom(user, chat);
-    // }
+    constructor (private _chatS: ChatService) {} 
 
     // join ChatRoom
     @Post('join') // { id: string, password?: string }

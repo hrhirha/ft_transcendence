@@ -207,7 +207,7 @@ export class UserController {
         }
     }
 
-    @Get('username/:username')
+    @Get('u/:username')
     async getUserByUsername(@GetUser() user: User, @Param('username') username: string)
     {
         try

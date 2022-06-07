@@ -248,13 +248,12 @@ export class UserService {
                     {snd_id, rcv_id},
                     {snd_id: rcv_id, rcv_id: snd_id}
                 ],
-                status: {
-                    not: friend_status.PENDING,
-                }
+                status: friend_status.ACCEPTED
             }
         });
         if (del.count === 0)
             throw new ForbiddenException('no friend was found');
+        return { success: true };
     }
 
     async block(snd_id: string, rcv_id: string)
@@ -282,7 +281,7 @@ export class UserService {
     {
         const bl = await this._prismaS.friendReq.updateMany({
             data: {
-                status: friend_status.BLOCKED,
+                status: friend_status.ACCEPTED,
             },
             where : {
                 snd_id,

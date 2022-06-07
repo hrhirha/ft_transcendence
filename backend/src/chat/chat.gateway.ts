@@ -1,11 +1,12 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, WsResponse, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, ConnectedSocket, WsException } from '@nestjs/websockets'
 import {  } from '@nestjs/platform-socket.io'
-import { ArgumentMetadata, BadRequestException, Catch, Logger, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ArgumentMetadata, Catch, HttpException, Logger, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { AddMessageDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
 import { ChatService } from './chat.service';
 import { UserService } from 'src/user/user.service';
 import { user_status } from 'src/utils';
+import { UserIdDto } from 'src/user/dto';
 
 export class WsValidationPipe extends ValidationPipe
 {
@@ -16,7 +17,7 @@ export class WsValidationPipe extends ValidationPipe
         }
         catch (e)
         {
-            if (e instanceof BadRequestException)
+            if (e instanceof HttpException)
             {
                 console.log({error: e.message});
                 throw new WsException(e.message);
@@ -50,22 +51,27 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async handleConnection(@ConnectedSocket() client: Socket) {
         this._logger.log(`client connected: ${client.id}`);
 
+        let user = await this._joinOldRooms(client);
+        user = await this._userS.updateStatus(user.id, user_status.ONLINE);
+    }
+
+    @SubscribeMessage('refresh')
+    async _joinOldRooms(@ConnectedSocket() client: Socket)
+    {
+        console.log('joining old rooms');
         let user = await this._chat.getUserFromSocket(client);
         if (!user)
         {
             client.disconnect(true);
             return ;
         }
-
         const joined_rooms = await this._chat.getJoinedRooms(user);
-        // console.log('joining old rooms');
         for (let r of joined_rooms)
         {
-            // console.log({r});
             client.join(r.id);
+            console.log({id: r.id});
         }
-
-        user = await this._userS.updateStatus(user.id, user_status.ONLINE);
+        return user;
     }
 
     async handleDisconnect(@ConnectedSocket() client: Socket) {
@@ -79,7 +85,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         console.log('leaving old rooms');
         for (let r of joined_rooms)
         {
-            console.log({r});
+            console.log({id: r.id});
             client.leave(r.id);
         }
 
@@ -97,6 +103,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const r = await this._chat.createRoom(user, room);
+            client.join(r.id);
             client.emit('room_created', r);
         }
         catch (e)
@@ -111,12 +118,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     {
         let user = await this._chat.getUserFromSocket(client);
         if (!user)
-        {
             throw new WsException('you must login first');
-        }
         try
         {
             const r = await this._chat.deleteRoom(user, room);
+            client.leave(room.id);
             client.emit('room_deleted', r);
         }
         catch (e)
@@ -126,14 +132,31 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
+    @SubscribeMessage('start_dm')
+    async startDm(@MessageBody() u: UserIdDto, @ConnectedSocket() client: Socket)
+    {
+        let user = await this._chat.getUserFromSocket(client);
+        if (!user)
+            throw new WsException('you must login first');
+        try
+        {
+            const r = await this._chat.start_dm(user, u);
+            this.server.emit('refresh');
+            client.emit('dm_started', r);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to start dm');
+        }
+    }
+
     @SubscribeMessage('ban_user')
     async banUser(@MessageBody() ur: UserRoomDto, @ConnectedSocket() client: Socket)
     {
         let u = await this._chat.getUserFromSocket(client);
         if (!u)
-        {
             throw new WsException('you must login first');
-        }
         try
         {
             const b = await this._chat.banUser(u, ur);
@@ -183,14 +206,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('send_message')
-    async handleMessage(@MessageBody() data: AddMessageDto, @ConnectedSocket() client: Socket) //WsResponse<string>
+    async sendMessage(@MessageBody() data: AddMessageDto, @ConnectedSocket() client: Socket) //WsResponse<string>
     {
         let u = await this._chat.getUserFromSocket(client);
         if (!u)
             throw new WsException('you must login first');
         try
         {
-            const m = await this._chat.addMessage(u, data);
+            const m = await this._chat.sendMessage(u, data);
             this.server.to(data.rid).emit('receive_message', m);
             return ;
         }

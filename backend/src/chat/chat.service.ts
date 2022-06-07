@@ -71,7 +71,31 @@ export class ChatService {
         return {success: del.count === 0 ? false: true};
     }
 
-    async start_dm(u1: User, u2: UserIdDto) {
+    async start_dm(u1: User, u2: UserIdDto)
+    {
+        const re = await this._prismaS.room.findMany({
+            where: {
+                AND: [
+                    {
+                        user_rooms: {
+                            some: { uid: u1.id, }
+                        }
+                    },
+                    {
+                        user_rooms: {
+                            some: { uid: u2.id }
+                        }
+                    }
+                ]
+            },
+            select: {
+                id: true,
+                is_channel: true,
+            }
+        });
+        if (re.length === 1)
+            return re[0];
+
         const r = await this._prismaS.room.create({
             data: {
                 name: '',
@@ -89,7 +113,7 @@ export class ChatService {
                             },
                             {
                                 uid: u2.id,
-                                is_owner: false,
+                                is_owner: true,
                                 is_admin: true,
                                 is_banned: false,
                                 is_muted: false,
@@ -103,6 +127,7 @@ export class ChatService {
                 is_channel: true,
             }
         });
+        return r;
     }
                 
     async joinRoom(user: User, room: OldRoomDto)
@@ -143,11 +168,6 @@ export class ChatService {
 
     async leaveRoom(user: User, room: OldRoomDto)
     {
-        // let r = await this._getRoom(room.id);
-        // if (!r)
-        //     throw new WsException('room not found');
-        // if (!r.is_channel)
-        //     throw new WsException('not a channel');
         return await this._prismaS.room.update({
             where: { id: room.id },
             data: {
@@ -166,26 +186,6 @@ export class ChatService {
                 type: true,
             }
         });
-
-        // what should happen if the owner left the room?
-        // let r: Room;
-        // if (!(r = await this._getRoom(room.id)))
-        //     throw new ForbiddenException('room not found');
-
-        // try
-        // {
-        //     await this._prismaS.userRoom.delete({
-        //         where: {uid_rid: {
-        //             uid: user.id,
-        //             rid: room.id
-        //         }}
-        //     });
-        //     return r;
-        // }
-        // catch
-        // {
-        //     throw new ForbiddenException('not a member');
-        // }
     }
 
     async addUser(user: User, member: UserRoomDto)
@@ -286,6 +286,7 @@ export class ChatService {
                 rid: user_room.rid,
                 is_banned: false,
                 room: {
+                    is_channel: true,
                     user_rooms: {
                         some: {
                             uid: user.id,
@@ -299,17 +300,6 @@ export class ChatService {
         console.log({ur});
         if (ur.count === 0)
             throw new WsException('ban operation failed');
-
-        // let uc = await this._getUserRoom(user.id, user_room.rid);
-        // if (!uc)
-        //     throw new ForbiddenException('not a member');
-        // if (!uc.is_admin)
-        //     throw new ForbiddenException('not and admin');
-
-        // uc = await this._prismaS.userRoom.update({
-        //     where: { uid_rid: { ...user_room } },
-        //     data: { is_banned: true, },
-        // });
         return {success: true}
     }
 
@@ -324,6 +314,7 @@ export class ChatService {
                 rid: user_room.rid,
                 is_banned: true,
                 room: {
+                    is_channel: true,
                     user_rooms: {
                         some: {
                             uid: user.id,
@@ -337,17 +328,6 @@ export class ChatService {
         console.log({ur});
         if (ur.count === 0)
             throw new WsException('unban operation failed');
-
-        // let uc = await this._getUserRoom(user.id, user_room.rid);
-        // if (!uc)
-        //     throw new ForbiddenException('not a member');
-        // if (!uc.is_admin)
-        //     throw new ForbiddenException('not an admin');
-
-        // uc = await this._prismaS.userRoom.update({
-        //     where: { uid_rid: { ...user_room } },
-        //     data: { is_banned: false, }
-        // });
         return {success: true}
     }
 
@@ -357,8 +337,6 @@ export class ChatService {
         unmute_at.setTime(
             unmute_at.getTime() + this._toMillis(user_room.mute_period)
         );
-
-        console.log({unmute_at});
 
         const ur = await this._prismaS.userRoom.updateMany({
             data: {
@@ -370,6 +348,7 @@ export class ChatService {
                 rid: user_room.rid,
                 is_muted: false,
                 room: {
+                    is_channel: true,
                     user_rooms: {
                         some: {
                             uid: user.id,
@@ -380,128 +359,34 @@ export class ChatService {
                 }
             },
         });
-        console.log({ur});
         if (ur.count === 0)
             throw new WsException('mute operation failed');
 
         return {success: true}
     }
 
-    async addMessage(user: User, data: AddMessageDto)
+    async sendMessage(user: User, data: AddMessageDto)
     {
-        const ur = await this._prismaS.userRoom.findMany({
+        let dm_uid: string;
+        const dm = await this._prismaS.userRoom.findMany({
             where: {
-                uid: user.id,
                 rid: data.rid,
-                is_banned: false,
+                room: { id: data.rid, is_channel: false, }
             },
             select: {
-                user: {
-                    select: {
-                        sentReq: {
-                            where: {
-                                rcv_id: user.id,
-                                status: friend_status.BLOCKED
-                            }
-                        },
-                        recievedReq: {
-                            where: {
-                                rcv_id: user.id,
-                                status: friend_status.BLOCKED,
-                            }
-                        }
-                    }
-                },
-                room: {
-                    select: {
-                        is_channel: true,
-                    }
-                }
+                user: { select: { id: true} }
             }
         });
-        console.log({r: ur[0]});
-        if (ur.length === 0)
-            throw new WsException('you are banned from this room');
+        if (dm.length === 2)
+            dm_uid = dm[0].user.id === user.id ? dm[1].user.id : dm[0].user.id;
 
-        const r = await this._prismaS.room.update({
-            data: {
-                messages: {
-                    create : { uid: user.id, msg: data.msg, }
-                },
-                user_rooms: {
-                    updateMany: {
-                        data: {
-                            is_muted: false,
-                            unmute_at: null,
-                        },
-                        where: {
-                            uid: user.id,
-                            rid: data.rid,
-                            is_muted: true,
-                            unmute_at: { lte: new Date, }
-                        }
-                    }
-                }
-            },
-            where: { id: data.rid },
-            select: {
-                user_rooms: {
-                    where:{
-                        uid: user.id,
-                        rid: data.rid,
-                        OR: [
-                            {
-                                AND: [
-                                    { is_muted : true },
-                                    { unmute_at: { lte: new Date() } }
-                                ]
-                            },
-                            {
-                                is_muted: false,
-                            }
-                        ]
-                    },
-                    select: {
-                        uid: true,
-                        rid: true,
-                        is_muted: true,
-                        unmute_at: true,
-                    }
-                },
-                messages: {
-                    select: {
-                        id: true,
-                        msg: true,
-                        timestamp: true,
-                        user: {
-                            select: {
-                                id: true,
-                                username: true,
-                                imageUrl: true,
-                            },
-                        }
-                    } 
-                }
-            }
-        });
+        await this._isBlockedOrBanned(user.id, dm_uid, data.rid)
 
-        if (r.user_rooms.length === 0)
-            throw new WsException('you have been muted');
-
-        return r.messages[r.messages.length-1];
+        return await this._addMsgToDb(user.id, data);
     }
 
     async deleteMessage(user: User, msg: DeleteMessageDto)
     {
-        // if (!this._isMember(user.id, msg.rid))
-        //     throw new ForbiddenException('not a member');
-        // const old_msg = await this._prismaS.message.findUnique({
-        //     where: {id: msg.id}
-        // });
-        // if (!old_msg)
-        //     throw new ForbiddenException('message not found');
-        // if (old_msg.uid !== user.id)
-        //     throw new ForbiddenException('not your message');
         const del =  await this._prismaS.message.deleteMany({
             where: {
                 id: msg.id,
@@ -657,5 +542,119 @@ export class ChatService {
         if (id === 'H')
             ms *= 60;
         return ms;
+    }
+
+    private async _isBlockedOrBanned(uid1: string, uid2: string, rid: string)
+    {
+        const ur = await this._prismaS.userRoom.findMany({
+            where: {
+                uid: uid1, rid,
+                OR: [
+                    { is_banned: true, },
+                    {
+                        room: { id: rid, is_channel: false, },
+                        user: {
+                            id: uid1,
+                            OR: [
+                                {
+                                    recievedReq: {
+                                        some: {
+                                            snd_id: uid2, rcv_id: uid1,
+                                            status: friend_status.BLOCKED,
+                                        }
+                                    }
+                                },
+                                {
+                                    sentReq: {
+                                        some: {
+                                            snd_id: uid1, rcv_id: uid2,
+                                            status: friend_status.BLOCKED,
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }   
+                ]
+            },
+            select: {
+                is_banned: true,
+            }
+        });
+        if (ur.length === 1)
+        {
+            throw new WsException(ur[0].is_banned ? 'banned' : 'blocked');
+        }
+        return true;
+    }
+
+    private async _addMsgToDb(uid: string, data: AddMessageDto)
+    {
+        const r = await this._prismaS.room.update({
+            data: {
+                messages: {
+                    create : { uid, msg: data.msg, }
+                },
+                user_rooms: {
+                    updateMany: {
+                        data: {
+                            is_muted: false,
+                            unmute_at: null,
+                        },
+                        where: {
+                            uid,
+                            rid: data.rid,
+                            is_muted: true,
+                            unmute_at: { lte: new Date, }
+                        }
+                    }
+                }
+            },
+            where: { id: data.rid },
+            select: {
+                user_rooms: {
+                    where:{
+                        uid, rid: data.rid,
+                        OR: [
+                            {
+                                AND: [
+                                    { is_muted : true },
+                                    { unmute_at: { lte: new Date() } }
+                                ]
+                            },
+                            {
+                                is_muted: false,
+                            }
+                        ]
+                    },
+                    select: {
+                        uid: true,
+                        rid: true,
+                        is_muted: true,
+                        unmute_at: true,
+                    }
+                },
+                messages: {
+                    select: {
+                        id: true,
+                        msg: true,
+                        timestamp: true,
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                imageUrl: true,
+                            },
+                        }
+                    },
+                    orderBy: { timestamp: 'asc' }
+                }
+            }
+        });
+
+        if (r.user_rooms.length === 0)
+            throw new WsException('you are not a memeber or have been muted');
+            
+        return r.messages[r.messages.length-1];
     }
 }
