@@ -9,6 +9,7 @@
     width: 100%;
     .friendInfos {
         @include _flex(column, center, center);
+        width: 100%;
         .avatar {
             @include _flex(column, center, center);
             position: relative;
@@ -27,15 +28,17 @@
             }
         }
         > h6 {
+            @include _textOverflow(calc(80%));
             font-family: $MFont;
             text-transform: capitalize;
             color: $light2;
-            font-size: $fsize * 1.2;
+            font-size: $fsize * 1.11;
             margin: .25rem auto;
             margin-top: 1rem;
             line-height: 1,
         }
         > span {
+            @include _textOverflow(calc(75%));
             font-size: $fsize * .75;
             text-transform: lowercase;
             color: $light3;
