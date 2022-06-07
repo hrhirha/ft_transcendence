@@ -1,0 +1,32 @@
+section#friendsManager {
+    @include _flex(column, center, center);
+    nav.headerNav {
+        width: 100%;
+        padding: .5rem 0;
+        ul.navTabs {
+            @include _flex(row, space-between, center);
+            list-style: none;
+            li {
+                @include _flex(row, center, center);
+                @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $dark3, $bgcolor2: $dark3);
+                font-size: $fsize;
+                font-family: $MFont;
+                margin: 0 .25rem;
+                width: 100%;
+                svg {
+                    margin-right: .5rem;
+                }
+            }
+            li.active {
+                @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $light4, $bgcolor2: $light4);
+            }
+        }
+    }
+    .body {
+        width: 100%;
+        .grid {
+            @include _flex(row, flex-start, center);
+            flex-wrap: wrap;
+        }
+    }
+}

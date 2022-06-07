@@ -1,0 +1,67 @@
+.friendCard {
+    @include _flex(column, flex-start, center);
+    background-color: $light4;
+    margin: .25rem;
+    border-radius: 1rem;
+    padding: 1rem .5rem;
+    max-width: 15rem;
+    min-width: 12rem;
+    min-height: 15rem;
+    .friendInfos {
+        @include _flex(column, center, center);
+        .avatar {
+            @include _flex(column, center, center);
+            position: relative;
+            #circleAvatar {
+                border: .25rem solid $dark3;
+            }
+            .ranking {
+                @include _flex(column, center, center);
+                background-color: $dark3;
+                position: absolute;
+                bottom: -.25rem;
+                width: 3rem;
+                border-radius: 5rem;
+                font-size: $fsize * .75;
+                font-family: $BFont;
+            }
+        }
+        > h6 {
+            font-family: $MFont;
+            text-transform: capitalize;
+            color: $light2;
+            font-size: $fsize * 1.2;
+            margin: .25rem auto;
+            margin-top: 1rem;
+            line-height: 1,
+        }
+        > span {
+            font-size: $fsize * .75;
+            text-transform: lowercase;
+            color: $light3;
+        }
+    }
+    .buttons{
+        @include _flex(column, space-evenly, center);
+        margin-top: .75rem;
+        height: 100%;
+        .btnAccept {
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($purple, .5), $bgcolor2: $purple);
+        }
+        .btnDecline, .btnCancle, .btnPending, .btnUnfriend {
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($dark1, .5), $bgcolor2: $dark2);
+        }
+        .btnBlock, .btnUnblock {
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($red, .5), $bgcolor2: rgba($red, .65));
+        }
+        button {
+            min-width: 8rem;
+            margin: .25rem auto;
+            svg {
+                margin-right: .5rem;
+                font-size: $fsize;
+            }
+        }
+    }
+   
+}
