@@ -59,10 +59,10 @@ CREATE TABLE "user_rooms" (
     "joined_time" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "uid" TEXT NOT NULL,
     "rid" TEXT NOT NULL,
-    "is_owner" BOOLEAN NOT NULL,
-    "is_admin" BOOLEAN NOT NULL,
-    "is_banned" BOOLEAN NOT NULL,
-    "is_muted" BOOLEAN NOT NULL,
+    "is_owner" BOOLEAN NOT NULL DEFAULT false,
+    "is_admin" BOOLEAN NOT NULL DEFAULT false,
+    "is_banned" BOOLEAN NOT NULL DEFAULT false,
+    "is_muted" BOOLEAN NOT NULL DEFAULT false,
     "unmute_at" TIMESTAMP(3),
 
     CONSTRAINT "user_rooms_pkey" PRIMARY KEY ("id")

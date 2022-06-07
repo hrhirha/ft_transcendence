@@ -25,6 +25,7 @@ model User {
   tfaSecret     String? @default("")
 
   score         Int? @default(0)   // updated when a game is played
+  rank          Int?
   status        String?            // "online", "offline", "in a game" ...
 
   wins          Int? @default(0)
@@ -97,11 +98,11 @@ model UserRoom {
   rid           String
   room          Room @relation(fields: [rid], references: [id], onDelete: Cascade)
 
-  is_owner      Boolean
-  is_admin      Boolean
-  is_banned     Boolean
+  is_owner      Boolean @default(false)
+  is_admin      Boolean @default(false)
+  is_banned     Boolean @default(false)
   
-  is_muted      Boolean
+  is_muted      Boolean @default(false)
   unmute_at     DateTime?
 
   @@unique([uid, rid])

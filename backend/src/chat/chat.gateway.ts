@@ -51,8 +51,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     async handleConnection(@ConnectedSocket() client: Socket) {
         this._logger.log(`client connected: ${client.id}`);
 
-        let user = await this._joinOldRooms(client);
-        user = await this._userS.updateStatus(user.id, user_status.ONLINE);
+        try
+        {
+            let user = await this._joinOldRooms(client);
+            user = await this._userS.updateStatus(user.id, user_status.ONLINE);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to connect to server');
+        }
     }
 
     @SubscribeMessage('refresh')
@@ -62,24 +70,37 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         let user = await this._chat.getUserFromSocket(client);
         if (!user)
         {
-            client.disconnect(true);
-            return ;
+            throw new WsException('you must login first');
         }
-        const joined_rooms = await this._chat.getJoinedRooms(user);
-        for (let r of joined_rooms)
+        // for (let soc of client.rooms)
+        //     console.log({soc});
+        try
         {
-            client.join(r.id);
-            console.log({id: r.id, name: r.name, is_channel: r.is_channel});
+            const joined_rooms = await this._chat.getJoinedRooms(user);
+            for (let r of joined_rooms)
+            {
+                if (!client.rooms.has(r.id))
+                {
+                    client.join(r.id);
+                }
+                console.log({name: r.name, is_channel: r.is_channel});
+            }
+            return user;
         }
-        return user;
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to refresh joined room');
+        }
     }
 
-    async handleDisconnect(@ConnectedSocket() client: Socket) {
+    async handleDisconnect(@ConnectedSocket() client: Socket)
+    {
         this._logger.log(`client disconnected: ${client.id}`);
 
         let user = await this._chat.getUserFromSocket(client);
         if (!user)
-            return ;
+            throw new WsException('you must login first');
 
         const joined_rooms = await this._chat.getJoinedRooms(user);
         console.log('leaving old rooms');
@@ -93,13 +114,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('create_room')
-    async createRoom(@MessageBody() room: NewRoomDto, @ConnectedSocket() client: Socket)
+    async createRoom(@ConnectedSocket() client: Socket, @MessageBody() room: NewRoomDto)
     {
         let user = await this._chat.getUserFromSocket(client);
         if (!user)
-        {
             throw new WsException('you must login first');
-        }
         try
         {
             const r = await this._chat.createRoom(user, room);
@@ -114,7 +133,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('delete_room')
-    async deleteRoom(@MessageBody() room: OldRoomDto, @ConnectedSocket() client: Socket)
+    async deleteRoom(@ConnectedSocket() client: Socket, @MessageBody() room: OldRoomDto)
     {
         let user = await this._chat.getUserFromSocket(client);
         if (!user)
@@ -133,7 +152,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('start_dm')
-    async startDm(@MessageBody() u: UserIdDto, @ConnectedSocket() client: Socket)
+    async startDm(@ConnectedSocket() client: Socket,@MessageBody() u: UserIdDto)
     {
         let user = await this._chat.getUserFromSocket(client);
         if (!user)
@@ -142,7 +161,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         {
             const r = await this._chat.start_dm(user, u);
             this.server.emit('refresh');
-            client.emit('dm_started', r);
         }
         catch (e)
         {
@@ -151,8 +169,81 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
+    @SubscribeMessage('join_room')
+    async joinRoom(@ConnectedSocket() client: Socket, room: OldRoomDto)
+    {
+        let user = await this._chat.getUserFromSocket(client);
+        if (!user)
+            throw new WsException('you must login first');
+        try
+        {
+            const r = await this._chat.joinRoom(user, room);
+            client.join(room.id);
+            client.emit('joined_room', r);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to join room');
+        }
+    }
+    
+    @SubscribeMessage('leave_room')
+    async leaveRoom(@ConnectedSocket() client: Socket, room: OldRoomDto)
+    {
+        let user = await this._chat.getUserFromSocket(client);
+        if (!user)
+            throw new WsException('you must login first');
+        try
+        {
+            const r = await this._chat.leaveRoom(user, room);
+            client.leave(room.id);
+            client.emit('left_room', room);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to leave room');
+        }
+    }
+
+    @SubscribeMessage('add_member')
+    async addUser(@ConnectedSocket() client: Socket, @MessageBody() member: UserRoomDto)
+    {
+        let user = await this._chat.getUserFromSocket(client);
+        if (!user)
+            throw new WsException('you must login first');
+        try
+        {
+            await this._chat.addUser(user, member);
+            this.server.emit('refresh');
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to add user');
+        }
+    }
+    @SubscribeMessage('remove_member')
+    async removeUser(@ConnectedSocket() client: Socket, @MessageBody() member: UserRoomDto)
+    {
+        let user = await this._chat.getUserFromSocket(client);
+        if (!user)
+            throw new WsException('you must login first');
+        try
+        {
+            await this._chat.addUser(user, member);
+            this.server.emit('refresh');
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to add user');
+        }
+    }
+
     @SubscribeMessage('ban_user')
-    async banUser(@MessageBody() ur: UserRoomDto, @ConnectedSocket() client: Socket)
+    async banUser(@ConnectedSocket() client: Socket, @MessageBody() ur: UserRoomDto)
     {
         let u = await this._chat.getUserFromSocket(client);
         if (!u)
@@ -170,7 +261,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('unban_user')
-    async unbanUser(@MessageBody() ur: UserRoomDto, @ConnectedSocket() client: Socket)
+    async unbanUser(@ConnectedSocket() client: Socket, @MessageBody() ur: UserRoomDto)
     {
         let u = await this._chat.getUserFromSocket(client);
         if (!u)
@@ -188,7 +279,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('mute_user')
-    async muteUser(@MessageBody() mu: MuteUserDto, @ConnectedSocket() client: Socket)
+    async muteUser(@ConnectedSocket() client: Socket, @MessageBody() mu: MuteUserDto)
     {
         let u = await this._chat.getUserFromSocket(client);
         if (!u)
@@ -206,7 +297,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('unmute_user')
-    async unmuteUser(@MessageBody() mu: UserRoomDto, @ConnectedSocket() client: Socket)
+    async unmuteUser(@ConnectedSocket() client: Socket, @MessageBody() mu: UserRoomDto)
     {
         let u = await this._chat.getUserFromSocket(client);
         if (!u)
@@ -224,7 +315,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('send_message')
-    async sendMessage(@MessageBody() data: AddMessageDto, @ConnectedSocket() client: Socket) //WsResponse<string>
+    async sendMessage(@ConnectedSocket() client: Socket, @MessageBody() data: AddMessageDto) //WsResponse<string>
     {
         let u = await this._chat.getUserFromSocket(client);
         if (!u)
@@ -244,7 +335,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('delete_message')
-    async deleteMessage(@MessageBody() msg: DeleteMessageDto, @ConnectedSocket() client: Socket)
+    async deleteMessage(@ConnectedSocket() client: Socket, @MessageBody() msg: DeleteMessageDto)
     {
         let u = await this._chat.getUserFromSocket(client);
         if (!u)
@@ -259,20 +350,5 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             console.log({code: e.code, message:e.message});
             throw new WsException('failed to delete message');
         }
-    }
-
-    @SubscribeMessage('join_room')
-    handleJoinRoom(client: Socket, room: string)
-    {
-        console.log('join room');
-        client.join(room);
-        client.emit('joined_room', room);
-    }
-    
-    @SubscribeMessage('leave_room')
-    handleLeaveRoom(client: Socket, room: string)
-    {
-        client.leave(room);
-        client.emit('left_room', room);
     }
 }

@@ -38,8 +38,6 @@ export class ChatService {
                         uid: user.id,
                         is_owner: true,
                         is_admin: true,
-                        is_banned: false,
-                        is_muted: false,
                     }
                 }
             },
@@ -108,15 +106,11 @@ export class ChatService {
                                 uid: u1.id,
                                 is_owner: true,
                                 is_admin: true,
-                                is_banned: false,
-                                is_muted: false,
                             },
                             {
                                 uid: u2.id,
                                 is_owner: true,
                                 is_admin: true,
-                                is_banned: false,
-                                is_muted: false,
                             }
                         ]
                     }
@@ -134,28 +128,22 @@ export class ChatService {
     {
         let r = await this._getRoom(room.id);
         if (!r)
-            throw new ForbiddenException('room not found');
+            throw new WsException('room not found');
         if (r.type === room_type.PRIVATE)
-            throw new ForbiddenException('you can\'t join a private room');
+            throw new WsException('you can\'t join a private room');
         if (r.type === room_type.PROTECTED)
         {
             if (!room.password)
-                throw new ForbiddenException('protected room requires a password');
+                throw new WsException('protected room requires a password');
             if (!(await argon2.verify(r.password, room.password)))
-                throw new ForbiddenException('invalid password');
+                throw new WsException('invalid password');
         }
 
         return await this._prismaS.room.update({
             where: { id: room.id },
             data: {
                 user_rooms: {
-                    create: {
-                        uid: user.id,
-                        is_owner: false,
-                        is_admin: false,
-                        is_banned: false,
-                        is_muted: false,
-                    },
+                    create: { uid: user.id, },
                 }
             },
             select: {
@@ -190,58 +178,73 @@ export class ChatService {
 
     async addUser(user: User, member: UserRoomDto)
     {
-        let user_room = await this._getUserRoom(user.id, member.rid);
-        if (!user_room)
-            throw new ForbiddenException('not a member');
-        if (!user_room.is_owner)
-            throw new ForbiddenException('not the owner');
-        const u = await this._userS.findById(member.uid);
-        if (!u)
-            throw new ForbiddenException('user not found');
+        const our = await this._prismaS.userRoom.findMany({
+            where: {
+                uid: user.id,
+                rid: member.rid,
+                is_owner: true
+            },
+            select: {
+                uid: true,
+                rid: true,
+            }
+        });
+        if (our.length === 0)
+            throw new WsException('room not found | you are not the owner');
 
-        try
-        {
-            user_room = await this._prismaS.userRoom.create({
-                data: {
-                    uid: member.uid,
-                    rid: member.rid,
-                    is_owner: false,
-                    is_admin: false,
-                    is_banned: false,
-                    is_muted: false,
+        const ur = await this._prismaS.userRoom.create({
+            data: {
+                uid: member.uid,
+                rid: member.rid,
+                is_owner: false,
+                is_admin: false,
+                is_banned: false,
+                is_muted: false,
+            },
+            select: {
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        imageUrl: true,
+                    }
                 }
-            });
-            return this._userS.publicData(u);
-        }
-        catch (e)
-        {
-            throw new ForbiddenException('user already a member');
-        }
+            }
+        });
+        return ur.user;
     }
 
     async removeUser(user: User, member: UserRoomDto)
     {
-        let user_room = await this._getUserRoom(user.id, member.rid);
-        if (!user_room)
-            throw new ForbiddenException('not a member');
-        if (!user_room.is_owner)
-            throw new ForbiddenException('not the owner');
-        const u = await this._userS.findById(member.uid);
-        if (!u)
-            throw new ForbiddenException('user not found');
-        try
-        {
-            user_room = await this._prismaS.userRoom.delete({
-                where: {
-                    uid_rid: { ...member, }
+        const our = await this._prismaS.userRoom.findMany({
+            where: {
+                uid: user.id,
+                rid: member.rid,
+                is_owner: true
+            },
+            select: {
+                uid: true,
+                rid: true,
+            }
+        });
+        if (our.length === 0)
+            throw new WsException('room not found | you are not the owner');
+
+        const ur = await this._prismaS.userRoom.delete({
+            where: {
+                uid_rid: { ...member }
+            },
+            select: {
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        imageUrl: true,
+                    }
                 }
-            });
-            return this._userS.publicData(u);
-        }
-        catch
-        {
-            throw new ForbiddenException('user already removed from room');
-        }
+            }
+        });
+        return ur.user;
     }
 
     async addAdmin(user: User, user_room: UserRoomDto)
@@ -460,6 +463,21 @@ export class ChatService {
             rooms.push(room);
         }
         return rooms;
+    }
+
+    async connectToServer(user: User)
+    {
+        const rooms = await this._prismaS.room.findMany({
+            where: {
+                user_rooms: {
+                    some: { uid: user.id }
+                }
+            },
+             select: {
+                 id: true
+             }
+        });
+        console.log(rooms);
     }
 
     async getPublicRooms()
