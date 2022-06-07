@@ -10,10 +10,31 @@ import {
 } from '@nestjs/websockets';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
-import { UseGuards } from '@nestjs/common';
+import { ArgumentMetadata, BadRequestException, HttpException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
 
-@UseGuards(Jwt2FAAuthGuard)
+
+
+export class WsValidationPipe extends ValidationPipe
+{
+    async transform(value: any, metadata: ArgumentMetadata) {
+        try
+        {
+            return await super.transform(value, metadata);
+        }
+        catch (e)
+        {
+            if (e instanceof HttpException)
+            {
+                console.log({error: e.message});
+                throw new WsException(e.message);
+            }
+        }
+    }
+}
+
+
+@UsePipes(WsValidationPipe)
 @WebSocketGateway({ cors: true, namespace: 'game'})
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 {
