@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
-import { Room, User } from '@prisma/client';
+import { Room, User, UserRoom } from '@prisma/client';
 import * as argon2 from 'argon2'
 import { Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
@@ -246,32 +246,49 @@ export class ChatService {
 
     async addAdmin(user: User, user_room: UserRoomDto)
     {
-        let uc = await this._getUserRoom(user.id, user_room.rid);
-
-        if (!uc)
-            throw new ForbiddenException('not a member');
-        if (!uc.is_owner)
-            throw new ForbiddenException('not the owner');
-
-        uc = await this._prismaS.userRoom.update({
-            where: { uid_rid: { ...user_room } },
-            data: { is_admin: true, }
+        const ur = await this._prismaS.userRoom.updateMany({
+            data: { is_admin: true, },
+            where: {
+                uid: user_room.uid,
+                rid: user_room.rid,
+                is_admin: false,
+                room: {
+                    user_rooms: {
+                        some: {
+                            uid: user.id,
+                            rid: user_room.rid,
+                            is_owner: true,
+                        }
+                    }
+                }
+            },
         });
+        if (ur.count === 0)
+            throw new ForbiddenException('addAdmin failed');
         return {success: true}
     }
 
     async removeAdmin(user: User, user_room: UserRoomDto)
     {
-        let uc = await this._getUserRoom(user.id, user_room.rid);
-        if (!uc)
-            throw new ForbiddenException('not a member');
-        if (!uc.is_owner)
-            throw new ForbiddenException('not the owner');
-
-        uc = await this._prismaS.userRoom.update({
-            where: { uid_rid: { ...user_room } },
-            data: { is_admin: false, }
+        const ur = await this._prismaS.userRoom.updateMany({
+            data: { is_admin: false, },
+            where: {
+                uid: user_room.uid,
+                rid: user_room.rid,
+                is_admin: true,
+                room: {
+                    user_rooms: {
+                        some: {
+                            uid: user.id,
+                            rid: user_room.rid,
+                            is_owner: true,
+                        }
+                    }
+                }
+            },
         });
+        if (ur.count === 0)
+            throw new ForbiddenException('removeAdmin failed');
         return {success: true}
 }
 
@@ -297,7 +314,6 @@ export class ChatService {
                 }
             },
         });
-        console.log({ur});
         if (ur.count === 0)
             throw new WsException('ban operation failed');
         return {success: true}
@@ -325,7 +341,6 @@ export class ChatService {
                 }
             },
         });
-        console.log({ur});
         if (ur.count === 0)
             throw new WsException('unban operation failed');
         return {success: true}
@@ -347,6 +362,35 @@ export class ChatService {
                 uid: user_room.uid,
                 rid: user_room.rid,
                 is_muted: false,
+                room: {
+                    is_channel: true,
+                    user_rooms: {
+                        some: {
+                            uid: user.id,
+                            rid: user_room.rid,
+                            is_admin: true,
+                        }
+                    }
+                }
+            },
+        });
+        if (ur.count === 0)
+            throw new WsException('mute operation failed');
+
+        return {success: true}
+    }
+
+    async unmuteUser(user: User, user_room: UserRoomDto)
+    {
+        const ur = await this._prismaS.userRoom.updateMany({
+            data: {
+                is_muted: false,
+                unmute_at: null,
+            },
+            where: {
+                uid: user_room.uid,
+                rid: user_room.rid,
+                is_muted: true,
                 room: {
                     is_channel: true,
                     user_rooms: {

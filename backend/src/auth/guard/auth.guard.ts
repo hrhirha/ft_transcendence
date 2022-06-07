@@ -13,7 +13,7 @@ export class OAUth42Guard extends AuthGuard('42') {
 
     handleRequest<TUser = any>(err: any, user: any, info: any, context: any, status?: any): TUser {
         if (err || !user) {
-            throw new UnauthorizedException('you are not logged in');
+            throw new UnauthorizedException({auth_error: 'you are not logged in'});
         }
         return user;
     }

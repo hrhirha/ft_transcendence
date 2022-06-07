@@ -69,7 +69,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         for (let r of joined_rooms)
         {
             client.join(r.id);
-            console.log({id: r.id});
+            console.log({id: r.id, name: r.name, is_channel: r.is_channel});
         }
         return user;
     }
@@ -202,6 +202,24 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         {
             console.log({code: e.code, message: e.message});
             throw new WsException('failed to mute member');
+        }
+    }
+
+    @SubscribeMessage('unmute_user')
+    async unmuteUser(@MessageBody() mu: UserRoomDto, @ConnectedSocket() client: Socket)
+    {
+        let u = await this._chat.getUserFromSocket(client);
+        if (!u)
+            throw new WsException('you must login first');
+        try
+        {
+            const m = await this._chat.unmuteUser(u, mu);
+            client.emit('user_unmuted', m);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to unmute member');
         }
     }
 

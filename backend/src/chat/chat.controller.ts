@@ -127,7 +127,7 @@ export class ChatController
          * 
          * response:
          * {
-         *      "success": boolean
+         *      "success": true
          * }
          */
         try
@@ -136,13 +136,8 @@ export class ChatController
         }
         catch (e)
         {
-            console.log({e});
-            if (e instanceof PrismaClientKnownRequestError)
-            {
-                const err_msg = e.code === 'P2025' ? "user or room not found" : e.message;
-                throw new ForbiddenException(err_msg);
-            }
-            throw new InternalServerErrorException();
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('failed to add admin');
         }
     }
 
@@ -168,13 +163,8 @@ export class ChatController
         }
         catch (e)
         {
-            console.log({e});
-            if (e instanceof PrismaClientKnownRequestError)
-            {
-                const err_msg = e.code === 'P2025' ? "user or room not found" : e.message;
-                throw new ForbiddenException(err_msg);
-            }
-            throw new InternalServerErrorException();
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('failed to add admin');
         }
     }
 
