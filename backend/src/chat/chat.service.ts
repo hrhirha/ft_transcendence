@@ -31,14 +31,16 @@ export class ChatService {
         
         const r = await this._prismaS.room.create({
             data: {
-                ...room,
+                name: room.name,
+                type: room.type,
+                password: room.password,
                 is_channel: true,
                 user_rooms: {
                     create: {
                         uid: user.id,
                         is_owner: true,
                         is_admin: true,
-                    }
+                    },
                 }
             },
             select: {
@@ -48,6 +50,16 @@ export class ChatService {
                 type: true,
             }
         });
+
+        for (let uid of room.uids)
+        {
+            await this._prismaS.userRoom.create({
+                data: {
+                    uid,
+                    rid: r.id
+                }
+            });
+        }
         
         return r;
     }

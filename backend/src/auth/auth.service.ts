@@ -61,9 +61,17 @@ export class AuthService {
 
     async getUserFromToken(token: string)
     {
-        const payload = this._jwtS.verify(token, {
-            secret: this._configS.get('JWT_ACCESS_SECRET'),
-        });
+        let payload: any;
+        try
+        {
+            payload = this._jwtS.verify(token, {
+                secret: this._configS.get('JWT_ACCESS_SECRET'),
+            });
+        }
+        catch
+        {
+            return null;
+        }
 
         if (payload.sub) {
             const user =  await this._userS.findById(payload.sub);

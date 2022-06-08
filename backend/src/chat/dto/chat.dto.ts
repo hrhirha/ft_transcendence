@@ -1,27 +1,28 @@
-import { IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
+import { IsArray, IsDefined, isNotEmpty, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
 
 export class NewRoomDto
 {
     /* {
         name: string,
-        is_channel: boolean,
         type: string,
         password?: string }
     */
-    @IsString()
+    @IsDefined()
     @IsNotEmpty()
+    @IsString()
     name: string;
 
-    // @IsBoolean()
-    // is_channel: boolean;
-
-    @IsString()
     @IsOptional()
+    @IsString()
     type?: string;
 
     @IsString()
     @IsOptional()
     password?: string;
+
+    @IsDefined()
+    @IsArray()
+    uids: string[]
 }
 
 export class OldRoomDto
