@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { friend_status } from 'src/utils';
-import { EditUserDto } from './dto';
+import { EditFullNameDto, EditUsernameDto } from './dto';
 
 @Injectable()
 export class UserService {
@@ -25,13 +25,13 @@ export class UserService {
             select: {
                 username: true,
                 email: true,
-                firstName: true,
-                lastName: true,
+                fullName: true,
                 imageUrl: true,
-                status: true,
                 score: true,
+                rank: true,
                 wins: true,
-                loses: true
+                loses: true,
+                status: true,
             }
         });
         if (!user)
@@ -46,13 +46,13 @@ export class UserService {
             select: {
                 username: true,
                 email: true,
-                firstName: true,
-                lastName: true,
+                fullName: true,
                 imageUrl: true,
-                status: true,
                 score: true,
+                rank: true,
                 wins: true,
-                loses: true
+                loses: true,
+                status: true,
             }
         });
         if (!user)
@@ -109,11 +109,42 @@ export class UserService {
         return u;
     }
 
-    async edit(id: string, dto: EditUserDto) {
-        const user = await this._prismaS.updateUser(id, dto);
+    // Edit user
+    async editUsername(id: string, dto: EditUsernameDto)
+    {
+        const user = await this._prismaS.user.update({
+            where: { id },
+            data: {
+                username: dto.username
+            },
+        });
 
-        return user;
+        return {success: true};
     }
+
+    async editFullName(id: string, dto: EditFullNameDto)
+    {
+        const user = await this._prismaS.user.update({
+            where: { id },
+            data: {
+                fullName: dto.fullName
+            },
+        });
+
+        return {success: true};
+    }
+
+    async editAvatar(id: string, file: any)
+    {
+        const user = await this._prismaS.user.update({
+            where: { id },
+            data: {
+                imageUrl: file.path
+            },
+        });
+        return {success: true};
+    }
+
     // end User
 
     // friend Requests
@@ -173,7 +204,7 @@ export class UserService {
         return { success: true };
     }
 
-    async declineFriendReq(snd_id: string, rcv_id: string)
+    async cancelFriendReq(snd_id: string, rcv_id: string)
     {
         const del = await this._prismaS.friendReq.deleteMany({
             where: {
@@ -199,6 +230,7 @@ export class UserService {
                     select: {
                         id: true,
                         username: true,
+                        fullName: true,
                         imageUrl: true,
                     }
                 }
@@ -225,6 +257,7 @@ export class UserService {
                     select: {
                         id: true,
                         username: true,
+                        fullName: true,
                         imageUrl: true,
                     }
                 }
@@ -295,16 +328,17 @@ export class UserService {
     }
 
 
-    async list(id: string) {
+    async getFriends(id: string, status: string) {
         const freqs = await this._prismaS.friendReq.findMany({
             where: {
                 OR: [
                     {snd_id: id,},
                     {rcv_id: id},
                 ],
-                NOT: {
-                    status: friend_status.PENDING,
-                }
+                status
+            },
+            orderBy: {
+                updatedAt: 'desc'
             },
             select: {
                 status: true,
@@ -312,6 +346,7 @@ export class UserService {
                     select: {
                         id: true,
                         username: true,
+                        fullName: true,
                         imageUrl: true,
                     },
                 },
@@ -319,6 +354,7 @@ export class UserService {
                     select: {
                         id: true,
                         username: true,
+                        fullName: true,
                         imageUrl: true,
                     }
                 }
@@ -329,7 +365,7 @@ export class UserService {
         {
             const friend = req.sender.id === id ? req.receiver : req.sender;
             const status = req.status;
-            friends.push({friend, status});
+            friends.push(friend);
         }
         return friends;
     }

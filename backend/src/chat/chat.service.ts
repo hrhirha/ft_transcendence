@@ -206,6 +206,7 @@ export class ChatService {
                     select: {
                         id: true,
                         username: true,
+                        fullName: true,
                         imageUrl: true,
                     }
                 }
@@ -239,6 +240,7 @@ export class ChatService {
                     select: {
                         id: true,
                         username: true,
+                        fullName: true,
                         imageUrl: true,
                     }
                 }
@@ -450,18 +452,42 @@ export class ChatService {
 
     // get requests
 
-    async getJoinedRooms(user: User) {
-        const user_rooms = await this._getUserRoomsByUid(user.id);
-        if (!user_rooms)
-            throw new ForbiddenException('no joined rooms found');
-        const rooms: Room[] = [];
-        for (let user_room of user_rooms)
-        {
-            const room = await this._getRoom(user_room.rid);
-            if (!room)
-                throw new ForbiddenException('room not found');
-            rooms.push(room);
-        }
+    async getJoinedRooms(user: User)
+    {
+        const rooms = await this._prismaS.room.findMany({
+            where: {
+                // is_channel: true,
+                user_rooms: {
+                    some: {
+                        uid : user.id,
+                    }
+                }
+            },
+            select: {
+                id: true,
+                name: true,
+                type: true,
+                is_channel: true
+            },
+        });
+        return rooms;
+    }
+
+    async getDms(user: User)
+    {
+        const rooms = await this._prismaS.room.findMany({
+            where: {
+                is_channel: false,
+                user_rooms: {
+                    some: {
+                        uid : user.id,
+                    }
+                }
+            },
+            select: {
+                id: true,
+            },
+        });
         return rooms;
     }
 
@@ -533,10 +559,10 @@ export class ChatService {
 
     async getUserFromSocket(client: Socket)
     {
-        const cookie = client.handshake.headers.cookie;
-        if (!cookie)
+        const token = client?.handshake?.headers?.cookie?.split("=")[1];
+        if (!token)
             return null;
-        const token = cookie?.split("=")[1];
+        // const token = cookie?.split("=")[1];
         
         const user = await this._authS.getUserFromToken(token);
         return user;
@@ -705,6 +731,7 @@ export class ChatService {
                             select: {
                                 id: true,
                                 username: true,
+                                fullName: true,
                                 imageUrl: true,
                             },
                         }

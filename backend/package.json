@@ -8,7 +8,7 @@
   "scripts": {
     "db:dev:up": "docker-compose up -d db-dev",
     "db:dev:rm": "docker-compose rm -sfv db-dev",
-    "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up && sleep 2 && prisma migrate deploy",
+    "db:dev:restart": "npm run db:dev:rm && npm run db:dev:up && sleep 15 && prisma migrate deploy",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

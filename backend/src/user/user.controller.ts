@@ -1,13 +1,14 @@
-import { Body, Controller, ForbiddenException, Get, Param, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from './decorator';
-import { EditUserDto, UserDto, UserIdDto } from './dto';
+import { EditFullNameDto, EditUsernameDto, UserDto, UserIdDto } from './dto';
 import { UserService } from './user.service';
 import { Express } from 'express'
 import { diskStorage } from 'multer';
 import { User } from '@prisma/client';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
 import { ChatService } from 'src/chat/chat.service';
+import { friend_status } from 'src/utils';
 
 @UseGuards(Jwt2FAAuthGuard)
 @Controller('user')
@@ -24,17 +25,42 @@ export class UserController {
         return dto;
     }
     
-    @Post('edit')
-    edit(@GetUser('id') id: string, @Body() dto: EditUserDto) {
-        return this._userS.edit(id, dto);
+    @Patch('edit/username')
+    async editUsername(@GetUser('id') id: string, @Body() dto: EditUsernameDto)
+    {
+        try
+        {
+            return await this._userS.editUsername(id, dto);
+        }
+        catch (e)
+        {
+            console.log({error: e.message});
+            throw new ForbiddenException('username already taken');
+        }
     }
 
-    @Post('avatar/upload')
+    @Patch('edit/fullname')
+    async editFullName(@GetUser('id') id: string, @Body() dto: EditFullNameDto)
+    {
+        try
+        {
+            return await this._userS.editFullName(id, dto);
+        }
+        catch (e)
+        {
+            console.log({error: e.message});
+            throw new ForbiddenException('failed to change full name');
+        }
+    }
+
+    @Patch('edit/avatar')
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
             destination: './uploads',
             filename(req, file, callback) {
-               const name =  req.user['username'] + file.originalname.slice(file.originalname.lastIndexOf('.'));
+               const name =  req.user['username']
+                    + (new Date)
+                    + file.originalname.slice(file.originalname.lastIndexOf('.'));
                callback(null, name);
             },
         }),
@@ -44,14 +70,46 @@ export class UserController {
             return callback(null, true);
         },
     }))
-    changeAvatar(@UploadedFile() file: any) {
-        return file;
+    async editAvatar(@GetUser('id') id: string, @UploadedFile() file: any)
+    {
+        try
+        {
+            return await this._userS.editAvatar(id, file);
+        }
+        catch (e)
+        {
+            console.log({error: e.message});
+            throw new ForbiddenException('failed to change avatar');
+        }
     }
 
     @Get('chatrooms')
-    getJoinedChatRooms(@GetUser() user: User)
+    async getJoinedChatRooms(@GetUser() user: User)
     {
-        return this._chatS.getJoinedRooms(user);
+        try
+        {
+            // modified
+            return await this._chatS.getJoinedRooms(user);
+        }
+        catch (e)
+        {
+            console.log({error: e.message});
+            throw new ForbiddenException('failed to get chatrooms');
+        }
+    }
+
+    @Get('dms')
+    async getDms(@GetUser() user: User)
+    {
+        try
+        {
+            return await this._chatS.getDms(user);
+        }
+        catch (e)
+        {
+            console.log({error: e.message});
+            throw new ForbiddenException('failed to get dms');
+        }
     }
 
     // end of User
@@ -90,7 +148,7 @@ export class UserController {
     {
         try
         {
-            return await this._userS.declineFriendReq(snd.id, rcv.id);
+            return await this._userS.cancelFriendReq(snd.id, rcv.id);
         }
         catch (e)
         {
@@ -99,6 +157,19 @@ export class UserController {
         }
     }
 
+    @Post('friendreq/cancel')
+    async cancelFriendReq(@GetUser() snd: User, @Body() rcv: UserIdDto)
+    {
+        try
+        {
+            return await this._userS.cancelFriendReq(snd.id, rcv.id);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('could not decline friend request');
+        }
+    }
 
     @Get('friendreqs/sent')
     async sentReqs(@GetUser() user: User)
@@ -178,12 +249,26 @@ export class UserController {
     {
         try
         {
-            return await this._userS.list(user.id);
+            return await this._userS.getFriends(user.id, friend_status.ACCEPTED);
         }
         catch (e)
         {
             console.log({code: e.code, message: e.message});
             throw new ForbiddenException('could not get friends list');
+        }
+    }
+
+    @Get('friends/blocked')
+    async blockedFriends(@GetUser() user: User)
+    {
+        try
+        {
+            return await this._userS.getFriends(user.id, friend_status.BLOCKED);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('could not get blocked friends list');
         }
     }
     // end of Friend Relation

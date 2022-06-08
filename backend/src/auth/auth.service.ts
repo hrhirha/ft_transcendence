@@ -18,10 +18,25 @@ export class AuthService {
 
     async login(dto: UserDto, req: Request)
     {
-        let user = await this._prismaS.user.findUnique({ where: { email: dto.email, } });
-        if (!user) {
-            user = await this._prismaS.user.create({ data: { ...dto, } });
-        }
+        const user = await this._prismaS.user.upsert({
+            where: {email: dto.email, },
+            update: {},
+            create: {
+                ...dto
+            },
+            select: {
+                id: true,
+                username: true,
+                fullName: true,
+                email: true,
+                imageUrl: true,
+                score: true,
+                rank: true,
+                wins: true,
+                loses: true,
+                status: true,
+            }
+        });
 
         const referer = req.header("Referer") || "http://127.0.0.1:3000";
 
@@ -29,7 +44,7 @@ export class AuthService {
         req.res.setHeader('Set-Cookie', cookie)
             .setHeader('Location', referer)
             .status(HttpStatus.PERMANENT_REDIRECT);
-        return dto;
+        return user;
     }
 
     getCookieWithJwtAccessToken(id: string, is2fauthenticated = false) {
@@ -47,7 +62,7 @@ export class AuthService {
     async getUserFromToken(token: string)
     {
         const payload = this._jwtS.verify(token, {
-            secret: this._configS.get('JWT_ACCESS_SECRET')
+            secret: this._configS.get('JWT_ACCESS_SECRET'),
         });
 
         if (payload.sub) {

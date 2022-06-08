@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
-import { EditUserDto } from 'src/user/dto';
+import {  } from 'src/user/dto';
 import { friend_status } from 'src/utils';
 
 @Injectable()
@@ -19,19 +19,6 @@ export class PrismaService extends PrismaClient {
                 db: { url }// : process.env.DATABASE_URL},
             },
         });
-    }
-
-    // update user info [username, avatar]
-    async updateUser(id: string, dto: EditUserDto) {
-        const user = await this.user.update({
-            where: {
-                id,
-            },
-            data: {
-                ...dto,
-            }
-        });
-        return user;
     }
 
     // a friendReq is already sent by user with id 'snd_id'

@@ -7,8 +7,7 @@ export const GetUserProfile = createParamDecorator(
     const dto: UserDto = {
         username: request.user.username,
         email: request.user._json.email,
-        firstName: request.user.name.givenName,
-        lastName: request.user.name.familyName,
+        fullName: request.user.displayName,
         profileUrl: request.user.profileUrl,
         imageUrl: request.user._json.image_url,
     };
