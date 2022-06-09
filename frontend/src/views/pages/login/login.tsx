@@ -4,7 +4,7 @@ import { Logo1337, Logo42} from '../../../assets';
 import { useNavigate } from "react-router-dom";
 import { get_friendreq_send } from "../../../controller/user/friendreqs.sent";
 import { post_friend_accept } from "../../../controller/user/friendreq.accept";
-import { get_me } from "../../../controller/user/me";
+import { get_me } from "../../../controller/user/user";
 import { promises } from "stream";
 
 
