@@ -1,20 +1,17 @@
-import { IsArray, IsDefined, isNotEmpty, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
+import { ArrayMinSize, IsArray, IsDefined, isNotEmpty, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
 
 export class NewRoomDto
 {
     /* {
         name: string,
-        type: string,
-        password?: string }
+        password?: string
+        uids: ["uid1", "uid2", "uid3" , ...]
+    }
     */
     @IsDefined()
     @IsNotEmpty()
     @IsString()
     name: string;
-
-    @IsOptional()
-    @IsString()
-    type?: string;
 
     @IsString()
     @IsOptional()
@@ -22,6 +19,9 @@ export class NewRoomDto
 
     @IsDefined()
     @IsArray()
+    @ArrayMinSize(1)
+    @IsNotEmpty({each:true})
+    @IsString({each:true})
     uids: string[]
 }
 
@@ -44,11 +44,7 @@ export class OldRoomDto
 
 export class AddMessageDto
 {
-    // { uid: string, rid: string, msg: string }
-
-    // @IsString()
-    // @IsNotEmpty()
-    // uid: string;
+    // { rid: string, msg: string }
 
     @IsString()
     @IsNotEmpty()

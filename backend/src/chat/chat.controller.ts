@@ -3,6 +3,7 @@ import { User } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
 import { GetUser } from 'src/user/decorator';
+import { room_type } from 'src/utils';
 import { ChatService } from './chat.service';
 import { DeleteMessageDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
 
@@ -39,7 +40,6 @@ export class ChatController
             console.log({code: e.code, message: e.message});
             throw new ForbiddenException('failed to add user');
         }
-        
     }
 
     // remove user from chat room
@@ -125,43 +125,68 @@ export class ChatController
         }
     }
 
-    // delete message
-    @Post('delete_message') // { id: string, chat_id: string}
-    deleteMessage(@GetUser() user: User, @Body() msg: DeleteMessageDto)
-    {
-        return this._chatS.deleteMessage(user, msg);
-    }
-
     // clear ChatRoom
     @Post('clear_chat')
     clearRoom(@GetUser() user: User, @Body() chat: OldRoomDto) {}
 
 
     // list public chatRooms
-    @Get('all_public')
-    listPublicRooms()
+    @Get('public_rooms')
+    async listPublicRooms()
     {
-        return this._chatS.getPublicRooms();
+        try
+        {
+            return this._chatS.getRoomsByType(room_type.PUBLIC);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('failed to get public chatrooms');
+        }
     }
 
     // list protected chatRooms
-    @Get('all_protected')
-    listProtectedRooms()
+    @Get('protected_rooms')
+    async listProtectedRooms()
     {
-        return this._chatS.getProtectedRooms();
+        try
+        {
+            return this._chatS.getRoomsByType(room_type.PROTECTED);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('failed to get protected chatrooms');
+        }
     }
 
     // get ChatRoom members
     @Get('/:rid/members')
-    getAllMembers(@GetUser() me: User, @Param('rid') rid: string)
+    async getAllMembers(@GetUser() me: User, @Param('rid') rid: string)
     {
-        return this._chatS.getRoomMembers(me.id, rid);
+        try
+        {
+            return await this._chatS.getRoomMembers(me.id, rid);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('failed to retrieve room members');
+        }
     }
 
     // retreive old messages
     @Get('/:rid/messages')
-    getAllMessages(@GetUser() me: User, @Param('rid') rid: string)
+    async getAllMessages(@GetUser() me: User, @Param('rid') rid: string)
     {
-        return this._chatS.getRoomMessages(me.id, rid);
+        try
+        {
+            return await this._chatS.getRoomMessages(me.id, rid);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('failed to retrieve room messages');
+        }
     }
 }
