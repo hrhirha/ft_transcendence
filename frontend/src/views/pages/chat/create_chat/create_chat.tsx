@@ -75,7 +75,7 @@ const ProtectedChat:React.FC<{onClose: Function}> = ({onClose}) => {
     return (
     <form id="newProtectedChat" className="creatChatForm">
         <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
-        <h5><FontAwesomeIcon icon={faLockOpen}/>Protected Group</h5>
+        <h5><FontAwesomeIcon icon={faKey}/>Protected Group</h5>
         <input id="chatTitle" className="textInput" type="text" placeholder="group title" autoComplete="off"/>
         <input id="chatKey" className="textInput" type="password" placeholder="password" autoComplete="off"/>
         <UserSearchForm callback={(userSelected: any) => {

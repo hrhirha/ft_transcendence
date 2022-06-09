@@ -1,0 +1,145 @@
+section#profileInfos {
+    @include _flex(row, space-between, center);
+    @include _gradientBg($dark3, rgba($dark1, 0), 180);
+    position: relative;
+    padding: 1rem;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+    .profileData {
+        @include _flex(row, flex-start, flex-start);
+        position: relative;
+        .avatar {
+            position: relative;
+            @include _selectionOff();
+            @include _flex(row, center, center);
+            top: -2rem;
+            width: 120px;
+            height: 120px;
+            #circleAvatar {
+                border: .4rem solid $dark2;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 120px;
+                height: 120px;
+            }
+            .ranking {
+                @include _flex(row, center, center);
+                font-family: $XBFont;
+                background-color: $dark3;
+                border-radius: 5rem;
+                min-width: 4rem;
+                max-width: 4rem;
+                border: .25rem solid $dark2;
+                position: absolute;
+                left: 25%;
+                bottom: -20%;
+                z-index: 6;
+            }
+            .editAvatar {
+                @include _flex(row, center, center);
+                cursor: pointer;
+                position: absolute;
+                top: 0;
+                left: 0;
+                border-radius: 50%;
+                width: 120px;
+                height: 120px;
+                border: .4rem solid rgba($dark1, 0);
+                background-color: rgba($dark1, 0.5);
+                svg {
+                    font-size: $fsize * 2;
+                    path {
+                        color: rgba($light1, .9);
+                    }
+                }
+            }
+            z-index: 3;
+        }
+        .profileMoreData {
+            position: relative;
+            @include _flex(column, flex-start, flex-start);
+            cursor: default;
+            margin-left: .5rem;
+            input.fullName {
+                @include _textOverflow(15rem);
+                text-transform: capitalize;
+                border: none;
+                background: rgba($dark1, .5);
+                font-family: $BFont;
+                font-size: $fsize * 1.45;
+                padding: .2rem 1rem;
+                border-radius: 5rem;
+                margin: 0 .5rem;
+                outline: none;
+            }
+            input:disabled {
+                background: transparent;
+                max-width: auto;
+            }
+            span.userName {
+                text-transform: lowercase;
+                font-family: $LFont;
+                font-size: $fsize * 1.15;
+                padding: 0 1rem;
+                margin: 0 .5rem;
+                color: $light3;
+            }
+            .stats {
+                @include _flex(row, space-evenly, center);
+                @include _selectionOff();
+                margin-left: .5rem;
+                .stat {
+                    @include _flex(column, center, flex-start);
+                    padding: .25rem;
+                    margin: auto .25rem;
+                    .stat_title {
+                        @include _flex(row, center, center);
+                        text-transform: uppercase;
+                        margin: .25rem auto;
+                        font-family: $BFont;
+                        font-size: $fsize;
+                        line-height: 1;
+                        color: $light2;
+                        svg {
+                            width: 1rem;
+                            margin-right: .15rem;
+                            path {
+                                color: $gold;
+                            }
+                        }
+                    }
+                    .stat_value {
+                        @include _flex(row, center, center);
+                        line-height: 1;
+                        font-family: $BFont;
+                        font-size: $fsize * 1.5;
+                        color: $light2;
+                        margin-left: 1.25rem;
+                    }
+                }
+            }
+        }
+    }
+    button.edit {
+        @include _flex(column, center, center);
+        position: absolute;
+        top: -.5rem;
+        right: -.5rem;
+        cursor: pointer;
+        border: .25rem solid $dark1;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 50%;
+        padding: .25rem;
+        background-color: $light4;
+        transition: .3s ease all;
+        svg {
+            font-size: $fsize * .75;
+            path {
+                fill: $light2;
+            }
+        }
+        z-index: 5;
+    }
+}

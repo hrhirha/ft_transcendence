@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { frinds_data } from "../../../test_data/frinds_data";
 import { FriendCard } from "./friend_card/friend_card";
 import { FriendsManager } from "./friends_manager/friends_manager";
+import { ProfileInfos } from "./profile_infos/profile_infos";
 
 
 interface Props {
@@ -56,9 +57,8 @@ export const Profile:React.FC = () => {
         <NavBar />
         <div className="profil">
             <div className='container'>
-                <div className="row">
-                    <div className="col-sm-12 col-md-5 col-lg-4">
-                        <div className="profile_info">
+                    <div className="col col-md-10 col-lg-8">
+                        {/* <div className="profile_info">
                             <div className="image">
                                 <CircleAvatar avatarURL="https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg" dimensions={190}/>
                             </div>
@@ -81,13 +81,13 @@ export const Profile:React.FC = () => {
                                 </div>
                             </div>
                         </div>
-                        <Btns type={"user"}/>
+                        <Btns type={"user"}/> */}
+                        <ProfileInfos avatar="https://avatars.githubusercontent.com/u/74456446?v=4" fullName="Walid Ben Said" username="wben-sai" ranking={2} wins={10}/>
                     </div>
-                    <div className=" col-sm-12 col-md-7 col-lg-8">
+                    <div className="col col-md-10 col-lg-8">
                         <FriendsManager />
                     </div>
                 </div>
-            </div>
         </div>
     </main>
     );

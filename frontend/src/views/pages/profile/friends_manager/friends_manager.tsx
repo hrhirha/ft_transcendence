@@ -46,14 +46,16 @@ export const FriendsManager:React.FC = () => {
     const [activeTab, setActiveTab] = useState<tabs>(tabs.friends);
     const [friendsList, setFriendsList] = useState<Array<any>>([]);
     useEffect(() => {
-        setFriendsList([]);
         //fetch data from server
         // if (activeTab.valueOf() === tabs.friends.valueOf())
-            // return;
+        //     return;
         {frinds_data && frinds_data.forEach (({type, avatar, fullName,  username, ranking}, k ) => {
             if (type.valueOf() === activeTab.valueOf())
                 setFriendsList(prev => [...prev, {type, avatar, fullName, username, ranking}]);
         })}
+        return () => {
+            setFriendsList([]);
+        }
     }, [activeTab]);
     return (
         <section id="friendsManager">
@@ -70,9 +72,9 @@ export const FriendsManager:React.FC = () => {
                         {activeTab === tabs.requests && <img alt="empty" src={EmptyFriendsRequests}/>}
                         {activeTab === tabs.requests && <h5>You Have No Friend Requests</h5>}
                         {activeTab === tabs.blocking && <img alt="empty" src={EmptyBlocking}/>}
-                        {activeTab === tabs.blocking && <h5>No One Here</h5>}
+                        {activeTab === tabs.blocking && <h5>You Didn't Block Any One</h5>}
                         {activeTab === tabs.pending && <img alt="empty" src={EmptyPending}/>}
-                        {activeTab === tabs.pending && <h5>You Didn't Sent Any Request</h5>}
+                        {activeTab === tabs.pending && <h5>You Have No Pending Requests</h5>}
                     </div>}
                     {friendsList.length > 0
                     && friendsList.map((friend, k) => 

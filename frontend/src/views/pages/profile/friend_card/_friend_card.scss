@@ -25,6 +25,7 @@
                 border-radius: 5rem;
                 font-size: $fsize * .75;
                 font-family: $BFont;
+                border: 0.15rem solid $light4;
             }
         }
         > h6 {
@@ -51,11 +52,18 @@
         .btnAccept {
             @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($purple, .5), $bgcolor2: $purple);
         }
-        .btnDecline, .btnCancle, .btnPending, .btnUnfriend {
+        .btnDecline, .btnCancle, .btnPending {
             @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($dark1, .5), $bgcolor2: $dark2);
         }
-        .btnBlock, .btnUnblock {
-            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($red, .5), $bgcolor2: rgba($red, .65));
+        .btnBlock {
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($red, .45), $bgcolor2: rgba($red, .55));
+        }
+        .btnUnblock, .btnUnfriend {
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($light2, .85), $bgcolor2: rgba($light3, .75));
+            color: $dark3;
+            path {
+                color: $dark3;
+            }
         }
         button {
             min-width: 8rem;

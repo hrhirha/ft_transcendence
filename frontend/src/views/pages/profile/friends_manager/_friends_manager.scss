@@ -30,17 +30,10 @@ section#friendsManager {
     }
     .body {
         width: 100%;
-        min-height: calc(100vh * .75);
-        max-height: calc(100vh * .75);
-        overflow: hidden;
-        border-radius: 1rem;
-        background-color: $dark2;
         .grid {
             @include _flex(row, flex-start, flex-start);
             flex-wrap: wrap;
             height: 100%;
-            max-height: calc(100vh * .73);
-            overflow-y: auto;
             padding: .5rem;
             @media (max-width: $xs) {
                 justify-content: center;
@@ -64,13 +57,14 @@ section#friendsManager {
                     }
                 }
                 h5 {
+                    text-transform: capitalize;
                     position: relative;
                     bottom: 1.5rem;
                     font-family: $BFont;
                     font-size: $fsize * 1.75;
                     color: $light4;
                     margin-top: .5rem;
-                    max-width: 15rem;
+                    max-width: 18rem;
                     text-align: center;
                     line-height: 1.2;
                 }

@@ -24,37 +24,55 @@ export const FriendCard = (Props : Props) => {
 			type: friendCardType.request,
 			icon: faUserCheck,
 			text: 'Accept',
+			onClick: (username: string) => {
+				console.log('accept', username);
+			}
 		},
 		{
 			type: friendCardType.request,
 			icon: faUserXmark,
 			text: 'Decline',
+			onClick: (username: string) => {
+				console.log('decline', username);
+			}
 		},
 		{
 			type: friendCardType.friend,
-			icon: faUserXmark,
+			icon: faUserMinus,
 			text: 'Unfriend',
+			onClick: (username: string) => {
+				console.log('unfriend', username);
+			}
 		},
 		{
 			type: friendCardType.friend,
 			icon: faUserSlash,
 			text: 'Block',
+			onClick: (username: string) => {
+				console.log('block', username);
+			}
 		},
 		{
 			type: friendCardType.blocked,
 			icon: faUserMinus,
 			text: 'Unblock',
+			onClick: (username: string) => {
+				console.log('unblock', username);
+			}
 		},
 		{
 			type: friendCardType.pending,
 			icon: faUserXmark,
 			text: 'Cancle',
+			onClick: (username: string) => {
+				console.log('cancel', username);
+			}
 		}
 	];
 
 	return (
 		<div className="friendCard">
-			<div className="friendInfos">
+			<div className="friendInfos" onClick={() => {}}>
 				<div className='avatar'>
 					<CircleAvatar avatarURL={Props.avatar} dimensions={85}/>
 					<span className='ranking'>
@@ -68,7 +86,7 @@ export const FriendCard = (Props : Props) => {
 				{buttons.map((button, index) => {
 					if (button.type === Props.type) {
 						return (
-							<button key={index} className={`btn${button.text}`}>
+							<button key={index} className={`btn${button.text}`} onClick={() => button.onClick(Props.username)}>
 								<FontAwesomeIcon icon={button.icon} />
 								{button.text}
 							</button>

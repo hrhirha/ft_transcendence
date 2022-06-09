@@ -1,11 +1,13 @@
 @import "./item_match_history/item";
 @import "./friend_card/friend_card";
 @import "./friends_manager/friends_manager";
+@import "./profile_infos/profile_infos";
 
 
 .profil {
-    margin-top: 1.5rem;
+    margin: 2.5rem auto;
     .container {
+        @include _flex(column, center, center);
         width: auto;
     }
     .profile_info{
