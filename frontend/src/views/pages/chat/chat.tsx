@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CreateNewChat } from "./create_chat/create_chat";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChatHomeVector } from "../../../assets";
+import { ChatHomeVector, NoConversations } from "../../../assets";
 
 // interface Props {
 //     username: string,
@@ -40,7 +40,16 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
     {
         chats = [];
     }
-    return (<>{chats.length > 0 && chats.map((chat: any, index: any) => 
+    if (chats.length === 0)
+    {
+        return (
+            <div className="noConversations">
+                <img src={NoConversations} alt="empty chat"/>
+                <span>No Conversations Here</span>
+            </div>
+        );
+    }
+    return (<>{chats.map((chat: any, index: any) => 
             <ChatRoomItem
                 key={index}
                 avatar={chat.image}

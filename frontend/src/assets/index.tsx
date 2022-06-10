@@ -10,4 +10,5 @@ export {default as EmptyFriendsRequests} from "./images/friendsRequestsEmpty.svg
 export {default as EmptyBlocking} from "./images/emptyBlocking.svg"
 export {default as EmptyPending} from "./images/pendingRequests.svg"
 export {default as EmptyHistory} from "./images/noHistory.svg"
+export {default as NoConversations} from "./images/noConversations.svg"
 export {default as NotFound404} from "./images/404.svg"
