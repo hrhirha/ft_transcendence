@@ -1,11 +1,18 @@
 import api from "../../api/axois";
 
-export async function post_friend_accept(user_username : string, user_imageUrl:string) {
-    // "edit"
+export async function patch_edit_username(user_username : string) {
     try {
-        const res  = await api.post("contact", {username : user_username, imageUrl : user_imageUrl});
-        console.log(res);
-        return res;
+        const res  = await api.patch("user/edit/username", {username : user_username});
+        return res.data;
+    }catch (err) {
+        return new Error("error : " + err);
+    }
+}
+
+export async function patch_edit_fullname(user_fullName : string) {
+    try {
+        const res  = await api.patch("user/edit/fullname", {fullName : user_fullName});
+        return res.data;
     }catch (err) {
         return new Error("error : " + err);
     }
