@@ -1,11 +1,9 @@
 import { Body, Controller, ForbiddenException, Get, InternalServerErrorException, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
 import { GetUser } from 'src/user/decorator';
-import { room_type } from 'src/utils';
 import { ChatService } from './chat.service';
-import { DeleteMessageDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
+import { OldRoomDto, UserRoomDto } from './dto';
 
 @UseGuards(Jwt2FAAuthGuard)
 @Controller('chat')
@@ -100,7 +98,7 @@ export class ChatController
 
     // remove admin from chat room
     @Post('remove_admin') // { user_id: string, chat_id: string }
-    removeAdmin(@GetUser() user: User, @Body() user_chat: UserRoomDto)
+    async removeAdmin(@GetUser() user: User, @Body() user_chat: UserRoomDto)
     {
         /**
          * request:
@@ -116,7 +114,7 @@ export class ChatController
          */
         try
         {
-            return this._chatS.removeAdmin(user, user_chat);
+            return await this._chatS.removeAdmin(user, user_chat);
         }
         catch (e)
         {
@@ -127,36 +125,20 @@ export class ChatController
 
     // clear ChatRoom
     @Post('clear_chat')
-    clearRoom(@GetUser() user: User, @Body() chat: OldRoomDto) {}
+    clearRoom(@GetUser() user: User, @Body() room: OldRoomDto) {}
 
-
-    // list public chatRooms
-    @Get('public_rooms')
-    async listPublicRooms()
+    // list rooms
+    @Get('rooms')
+    async getRooms()
     {
         try
         {
-            return this._chatS.getRoomsByType(room_type.PUBLIC);
+            return await this._chatS.getRooms();
         }
         catch (e)
         {
             console.log({code: e.code, message: e.message});
-            throw new ForbiddenException('failed to get public chatrooms');
-        }
-    }
-
-    // list protected chatRooms
-    @Get('protected_rooms')
-    async listProtectedRooms()
-    {
-        try
-        {
-            return this._chatS.getRoomsByType(room_type.PROTECTED);
-        }
-        catch (e)
-        {
-            console.log({code: e.code, message: e.message});
-            throw new ForbiddenException('failed to get protected chatrooms');
+            throw new ForbiddenException('failed to get rooms');
         }
     }
 

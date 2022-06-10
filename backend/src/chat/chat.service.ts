@@ -7,7 +7,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserIdDto } from 'src/user/dto';
 import { UserService } from 'src/user/user.service';
-import { friend_status, room_type } from 'src/utils';
+import { friend_status, room_type, user_status } from 'src/utils';
 import { AddMessageDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
 
 @Injectable()
@@ -72,8 +72,6 @@ export class ChatService {
                 });
                 usernames.push(ur.user.username);
             }
-
-            console.log(usernames);
             return {room:r, usernames};
         });
         
@@ -330,14 +328,11 @@ export class ChatService {
 
     async banUser(user: User, user_room: UserRoomDto)
     {
-        const ur = await this._prismaS.userRoom.updateMany({
-            data: {
-                is_banned: true,
-            },
+        const ur0 = await this._prismaS.userRoom.findFirst({
             where: {
                 uid: user_room.uid,
                 rid: user_room.rid,
-                is_banned: false,
+                // is_banned: true,
                 room: {
                     is_channel: true,
                     user_rooms: {
@@ -348,23 +343,42 @@ export class ChatService {
                         }
                     }
                 }
+            }
+        });
+        if (!ur0)
+            throw new ForbiddenException('user not found | room not found | you are not an admin');
+        if (ur0.is_banned)
+            throw new ForbiddenException('user already banned');
+
+        const ur = await this._prismaS.userRoom.update({
+            data: {
+                is_banned: true,
+                bans: {
+                    create: {
+                        start: new Date,
+                    }
+                }
+            },
+            where: {
+                uid_rid: {
+                    uid: user_room.uid,
+                    rid: user_room.rid,
+                }
             },
         });
-        if (ur.count === 0)
+
+        if (!ur)
             throw new WsException('ban operation failed');
         return {success: true}
     }
 
     async unbanUser(user: User, user_room: UserRoomDto)
     {
-        const ur = await this._prismaS.userRoom.updateMany({
-            data: {
-                is_banned: false,
-            },
+        const ur0 = await this._prismaS.userRoom.findFirst({
             where: {
                 uid: user_room.uid,
                 rid: user_room.rid,
-                is_banned: true,
+                // is_banned: false,
                 room: {
                     is_channel: true,
                     user_rooms: {
@@ -376,8 +390,51 @@ export class ChatService {
                     }
                 }
             },
+            select: {
+                is_banned: true,
+                bans: {
+                    where: {
+                        uid: user_room.uid,
+                        rid: user_room.rid,
+                    },
+                    select: {
+                        id: true
+                    }
+                }
+            }
         });
-        if (ur.count === 0)
+        if (!ur0)
+            throw new ForbiddenException('user not found | room not found | you are not an admin');
+        if (!ur0.is_banned)
+            throw new ForbiddenException('user already unbanned');
+
+        const mid = ur0.bans[ur0.bans.length-1].id;
+        const ur = await this._prismaS.userRoom.update({
+            data: {
+                is_banned: false,
+                bans: {
+                    update: {
+                        where: {
+                            id_uid_rid: {
+                                id: mid,
+                                uid: user_room.uid,
+                                rid: user_room.rid,
+                            }
+                        },
+                        data: {
+                            end: new Date
+                        }
+                    }
+                }
+            },
+            where: {
+                uid_rid: {
+                    uid: user_room.uid,
+                    rid: user_room.rid,
+                }
+            },
+        });
+        if (!ur)
             throw new WsException('unban operation failed');
         return {success: true}
     }
@@ -480,14 +537,13 @@ export class ChatService {
         return {success: true}
     }
 
-
     // get requests
 
     async getJoinedRooms(user: User)
     {
         const rooms = await this._prismaS.room.findMany({
             where: {
-                // is_channel: true,
+                is_channel: true,
                 user_rooms: {
                     some: {
                         uid : user.id,
@@ -498,7 +554,6 @@ export class ChatService {
                 id: true,
                 name: true,
                 type: true,
-                is_channel: true
             },
         });
         return rooms;
@@ -522,30 +577,46 @@ export class ChatService {
         return rooms;
     }
 
-    // async connectToServer(user: User)
-    // {
-    //     const rooms = await this._prismaS.room.findMany({
-    //         where: {
-    //             user_rooms: {
-    //                 some: { uid: user.id }
-    //             }
-    //         },
-    //          select: {
-    //              id: true
-    //          }
-    //     });
-    //     console.log(rooms);
-    // }
+    async newConnection(user: User)
+    {
+        const u = await this._prismaS.user.update({
+            where: {
+                id: user.id
+            },
+            data: {
+                status: user_status.ONLINE,
+            },
+            select: {
+                user_rooms: {
+                    select: {
+                        room: {
+                            select: {
+                                id: true,
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        let room_ids = [];
+        for (let ur of u.user_rooms)
+        {
+            room_ids.push(ur.room.id);
+        }
+        return room_ids;
+    }
 
-    async getRoomsByType(type: string)
+    async getRooms()
     {
         return await this._prismaS.room.findMany({
             where: {
-                type
+                is_channel: true,
+                type: room_type.PUBLIC || room_type.PROTECTED
             },
             select: {
                 id: true,
                 name: true,
+                type: true,
             }
         });
     }
@@ -591,7 +662,7 @@ export class ChatService {
                 room: {
                     user_rooms: {
                         some: {
-                            uid, rid
+                            uid, rid,
                         }
                     }
                 }
@@ -606,6 +677,10 @@ export class ChatService {
                         username: true,
                         fullName: true,
                         imageUrl: true,
+                    }
+                },
+                room: {
+                    select: {
                         user_rooms: {
                             where: {
                                 uid, rid
@@ -613,6 +688,7 @@ export class ChatService {
                             select: {
                                 joined_time: true,
                                 is_banned: true,
+                                bans: true
                             }
                         }
                     }
@@ -622,11 +698,30 @@ export class ChatService {
         });
         if (messages.length === 0)
             throw new ForbiddenException('no messages were found');
-        return messages.filter((message) => {
-            const ur = message.user.user_rooms[0];
-            // flter banned periods
-            return message.timestamp > ur.joined_time;
+    
+        // filter messages sent before the user joined the room, or while he was banned
+        
+        const jt = messages[0].room.user_rooms[0].joined_time;
+        const bans = messages[0].room.user_rooms[0].bans;
+        const msgs = messages.filter((message) => {
+            let snd: Boolean = true;
+            const ts = message.timestamp;
+
+            for (let ban of bans)
+            {
+                if (ts >= ban.start && (!ban.end || ts < ban.end))
+                {
+                    snd = false;
+                    break ;
+                }
+            }
+
+            return ts > jt && snd;
         });
+
+        for (let msg of msgs)
+            delete msg.room;
+        return msgs;
     }
 
     // public helpers
@@ -636,7 +731,6 @@ export class ChatService {
         const token = client?.handshake?.headers?.cookie?.split("=")[1];
         if (!token)
             return null;
-        // const token = cookie?.split("=")[1];
         
         const user = await this._authS.getUserFromToken(token);
         return user;

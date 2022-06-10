@@ -57,12 +57,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             if (!user)
                 throw new WsException('login first');
             client.data.username = user.username;
-            const joined_rooms = await this._chat.getJoinedRooms(user);
-            for (let r of joined_rooms)
-            {
-                client.join(r.id);
-            }
-            await this._userS.updateStatus(user.id, user_status.ONLINE);
+            const rooms = await this._chat.newConnection(user);
+            client.join(rooms);
         }
         catch (e)
         {
@@ -92,14 +88,19 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const r = await this._chat.createRoom(user, room);
-            const sockets = (await this.server.fetchSockets()).filter((s)=>{ return r.usernames.indexOf(s.data.username) > 0 });
-            let room_users: string[]
+
+            const sockets = (await this.server.fetchSockets()).filter((s) => {
+                return r.usernames.indexOf(s.data.username) >= 0;
+            });
+
+            let room_users = []
             for (let s of sockets)
             {
-                console.log({uname: s.data.username});
+                console.log(s.data.username);
                 room_users.push(s.id);
             }
-            this.server.to(room_users).emit('join_invite', r);
+
+            this.server.to(room_users).emit('join_invite', {rid: r.room.id});
         }
         catch (e)
         {
@@ -116,8 +117,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('you must login first');
         try
         {
-            const r = await this._chat.deleteRoom(user, room);
-            client.to(room.id).emit('leave_call', r);
+            await this._chat.deleteRoom(user, room);
+            client.to(room.id).emit('leave_call', {rid: room.id});
         }
         catch (e)
         {
@@ -135,7 +136,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const r = await this._chat.start_dm(user, u);
-            this.server.to(u.id).emit('join_invite', r);
+            this.server.to(u.id).emit('join_invite', {rid: r.id});
         }
         catch (e)
         {
@@ -298,6 +299,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const m = await this._chat.sendMessage(u, data);
+
+            // if bnned_users.usernames[] caontains socket.data.username:
+            //      don't emit to socket
             const users = await this._chat.getRoomMembers(u.id, data.rid);
             const banned_usernames = [];
             for (let ur of users)
@@ -310,6 +314,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             let bans = [];
             for (let s of banned_sockets)
                 bans.push(s.id);
+
             this.server.except(bans).to(data.rid).emit('receive_message', m);
             return ;
         }
@@ -340,13 +345,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('join')
-    join(@ConnectedSocket() client: Socket, @MessageBody() r: OldRoomDto){
+    join(@ConnectedSocket() client: Socket, @MessageBody() r: OldRoomDto)
+    {
         client.join(r.id);
         this.server.to(r.id).emit('user_joined', `${client.data.username} joined`);
     }
 
     @SubscribeMessage('leave')
-    leave(@ConnectedSocket() client: Socket, @MessageBody() r: OldRoomDto){
+    leave(@ConnectedSocket() client: Socket, @MessageBody() r: OldRoomDto)
+    {
         this.server.to(r.id).emit('user_left', `${client.data.username} left`);
         client.leave(r.id);
     }

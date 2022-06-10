@@ -26,7 +26,7 @@ model User {
 
   score         Int? @default(0)   // updated when a game is played
   rank          Int?
-  status        String?            // "online", "offline", "in a game" ...
+  status        String? @default("OFFLINE")            // "online", "offline", "in a game" ...
 
   wins          Int? @default(0)
   loses         Int? @default(0)
@@ -101,6 +101,7 @@ model UserRoom {
   is_owner      Boolean @default(false)
   is_admin      Boolean @default(false)
   is_banned     Boolean @default(false)
+  bans          UserBan[]
   
   is_muted      Boolean @default(false)
   unmute_at     DateTime?
@@ -135,4 +136,17 @@ model UserGame {
 
   @@unique([uid, gid])
   @@map("user_games")
+}
+
+model UserBan {
+  id    String @id @default(cuid())
+  uid   String
+  rid   String
+  ur    UserRoom @relation(fields: [uid,rid], references: [uid, rid], onDelete: Cascade)
+  
+  start DateTime
+  end   DateTime?
+
+  @@unique([id, uid, rid])
+  @@map("user_bans")
 }

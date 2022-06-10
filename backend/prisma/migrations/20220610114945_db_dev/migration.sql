@@ -13,7 +13,7 @@ CREATE TABLE "users" (
     "tfaSecret" TEXT DEFAULT E'',
     "score" INTEGER DEFAULT 0,
     "rank" INTEGER,
-    "status" TEXT,
+    "status" TEXT DEFAULT E'OFFLINE',
     "wins" INTEGER DEFAULT 0,
     "loses" INTEGER DEFAULT 0,
 
@@ -89,6 +89,17 @@ CREATE TABLE "user_games" (
     CONSTRAINT "user_games_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "user_bans" (
+    "id" TEXT NOT NULL,
+    "uid" TEXT NOT NULL,
+    "rid" TEXT NOT NULL,
+    "start" TIMESTAMP(3) NOT NULL,
+    "end" TIMESTAMP(3),
+
+    CONSTRAINT "user_bans_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 
@@ -103,6 +114,9 @@ CREATE UNIQUE INDEX "user_rooms_uid_rid_key" ON "user_rooms"("uid", "rid");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_games_uid_gid_key" ON "user_games"("uid", "gid");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_bans_id_uid_rid_key" ON "user_bans"("id", "uid", "rid");
 
 -- AddForeignKey
 ALTER TABLE "friend_requests" ADD CONSTRAINT "friend_requests_snd_id_fkey" FOREIGN KEY ("snd_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -127,3 +141,6 @@ ALTER TABLE "user_games" ADD CONSTRAINT "user_games_uid_fkey" FOREIGN KEY ("uid"
 
 -- AddForeignKey
 ALTER TABLE "user_games" ADD CONSTRAINT "user_games_gid_fkey" FOREIGN KEY ("gid") REFERENCES "games"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "user_bans" ADD CONSTRAINT "user_bans_uid_rid_fkey" FOREIGN KEY ("uid", "rid") REFERENCES "user_rooms"("uid", "rid") ON DELETE CASCADE ON UPDATE CASCADE;
