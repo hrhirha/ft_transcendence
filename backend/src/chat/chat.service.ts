@@ -115,11 +115,29 @@ export class ChatService {
             },
             select: {
                 id: true,
-                is_channel: true,
+                user_rooms: {
+                    where: {
+                        uid: u2.id
+                    },
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                fullName: true,
+                                imageUrl: true,
+                            }
+                        }
+                    }
+                }
             }
         });
         if (re.length === 1)
-            return re[0];
+        {
+            const u = re[0].user_rooms[0].user;
+            delete re[0].user_rooms;
+            return {room: re[0], user: u};
+        }
 
         const r = await this._prismaS.room.create({
             data: {
@@ -145,10 +163,26 @@ export class ChatService {
             },
             select: {
                 id: true,
-                is_channel: true,
+                user_rooms: {
+                    where: {
+                        uid: u2.id
+                    },
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                fullName: true,
+                                imageUrl: true,
+                            }
+                        }
+                    }
+                }
             }
         });
-        return r;
+        const u = r.user_rooms[0].user;
+        delete r.user_rooms;
+        return {room: r, user: u};
     }
                 
     async joinRoom(user: User, room: OldRoomDto)
@@ -554,9 +588,24 @@ export class ChatService {
                 id: true,
                 name: true,
                 type: true,
+                messages: {
+                    select: {
+                        msg: true,
+                        timestamp: true,
+                    },orderBy: {
+                        timestamp: "asc"
+                    }
+                }
             },
         });
-        return rooms;
+        let joined = [];
+        for (let room of rooms)
+        {
+            const lst_msg = room.messages[room.messages.length-1];
+            delete room.messages;
+            joined.push({room, lst_msg});
+        }
+        return joined;
     }
 
     async getDms(user: User)
@@ -572,9 +621,41 @@ export class ChatService {
             },
             select: {
                 id: true,
+                messages: {
+                    select: {
+                        msg: true,
+                        timestamp: true,
+                    },orderBy: {
+                        timestamp: "asc"
+                    }
+                },
+                user_rooms: {
+                    where: {
+                        uid: { not: user.id }
+                    },
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                fullName: true,
+                                imageUrl: true,
+                            }
+                        }
+                    }
+                }
             },
         });
-        return rooms;
+        let joined = [];
+        for (let room of rooms)
+        {
+            const user = room.user_rooms[0].user;
+            const lst_msg = room.messages[room.messages.length-1];
+            delete room.messages;
+            delete room.user_rooms;
+            joined.push({room, user, lst_msg});
+        }
+        return joined;
     }
 
     async newConnection(user: User)

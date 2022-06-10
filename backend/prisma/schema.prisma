@@ -100,6 +100,7 @@ model UserRoom {
 
   is_owner      Boolean @default(false)
   is_admin      Boolean @default(false)
+
   is_banned     Boolean @default(false)
   bans          UserBan[]
   
