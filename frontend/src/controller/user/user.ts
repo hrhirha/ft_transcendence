@@ -10,7 +10,7 @@ interface me_info {
     profileUrl: string,
     imageUrl: string,
     refresh_token: string,
-    isTfaEnabled: false,
+    isTfaEnabled: boolean,
     tfaSecret: string,
     score: number,
     rank: number,
