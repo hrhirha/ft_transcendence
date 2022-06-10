@@ -5,7 +5,7 @@
     margin: .25rem;
     border-radius: 1rem;
     padding: 1rem .5rem;
-    min-width: 10rem;
+    min-width: 9rem;
     width: 100%;
     .friendInfos {
         @include _flex(column, center, center);

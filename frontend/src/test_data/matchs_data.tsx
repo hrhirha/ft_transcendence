@@ -1,153 +1,71 @@
 
 export const Match_data = [
     {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "win",
-        typegame: "normal",
-        time: "15/02/2022 15:54"
+        gameType: 1,
+        player1: {
+            username: 'player1',
+            avatar: 'https://i.imgur.com/XyqQZYb.jpg',
+            fullName: 'player1',
+            ranking: 15,
+            score: 10,
+        },
+        player2: {
+            username: 'player2',
+            avatar: 'https://i.imgur.com/XyqQZYb.jpg',
+            fullName: 'player2',
+            ranking: 21,
+            score: 7,
+        }
     },
     {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "lose",
-        typegame: "ultimate",
-        time: "15/02/2022 15:54"
+        gameType: 0,
+        player1: {
+            username: 'player1',
+            avatar: 'https://i.imgur.com/XyqQZYb.jpg',
+            fullName: 'player1',
+            ranking: 25,
+            score: 1,
+        },
+        player2: {
+            username: 'player2',
+            avatar: 'https://i.imgur.com/XyqQZYb.jpg',
+            fullName: 'player2',
+            ranking: 20,
+            score: 10,
+        }
     },
     {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "lose",
-        typegame: "ultimate",
-        time: "15/02/2022 15:54"
+        gameType: 1,
+        player1: {
+            username: 'player1',
+            avatar: 'https://i.imgur.com/XyqQZYb.jpg',
+            fullName: 'player1',
+            ranking: 11,
+            score: 10,
+        },
+        player2: {
+            username: 'player2',
+            avatar: 'https://i.imgur.com/XyqQZYb.jpg',
+            fullName: 'player2',
+            ranking: 8,
+            score: 9,
+        }
     },
     {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "lose",
-        typegame: "ultimate",
-        time: "15/02/2022 15:54"
-    },
-    {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "lose",
-        typegame: "ultimate",
-        time: "15/02/2022 15:54"
-    },
-    {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "lose",
-        typegame: "ultimate",
-        time: "15/02/2022 15:54"
-    },
-    {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "lose",
-        typegame: "ultimate",
-        time: "15/02/2022 15:54"
-    },
-    {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "win",
-        typegame: "normal",
-        time: "15/02/2022 15:54"
-    },
-    {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "lose",
-        typegame: "ultimate",
-        time: "15/02/2022 15:54"
-    },
-    {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "win",
-        typegame: "normal",
-        time: "15/02/2022 15:54"
-    },
-    {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "lose",
-        typegame: "ultimate",
-        time: "15/02/2022 15:54"
-    },
-    {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "win",
-        typegame: "normal",
-        time: "15/02/2022 15:54"
-    },
-    {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "lose",
-        typegame: "ultimate",
-        time: "15/02/2022 15:54"
-    },
-    {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "win",
-        typegame: "normal",
-        time: "15/02/2022 15:54"
-    },
-    {
-        user1: "Jhon AFds",
-        image_user1: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        user2: "Jhon AFds",
-        image_user2: "https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg",
-        score: "3 - 12",
-        status: "lose",
-        typegame: "ultimate",
-        time: "15/02/2022 15:54"
+        gameType: 0,
+        player1: {
+            username: 'player1',
+            avatar: 'https://i.imgur.com/XyqQZYb.jpg',
+            fullName: 'player1',
+            ranking: 3,
+            score: 10,
+        },
+        player2: {
+            username: 'player2',
+            avatar: 'https://i.imgur.com/XyqQZYb.jpg',
+            fullName: 'player2',
+            ranking: 7,
+            score: 5,
+        }
     },
 ];
