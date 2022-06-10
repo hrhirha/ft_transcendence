@@ -32,7 +32,7 @@ export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
             </button>
             <div className="profileData">
                 <div className="avatar">
-                    <CircleAvatar avatarURL={Props.avatar} dimensions={120} />
+                    <CircleAvatar avatarURL={Props.avatar} dimensions={120} showStatus={false}/>
                     <span className="ranking">{Props.ranking}</span>
                     {/* <span className="editAvatar" title="Change Your Avatar">
                         <FontAwesomeIcon icon={faCameraRotate}/>

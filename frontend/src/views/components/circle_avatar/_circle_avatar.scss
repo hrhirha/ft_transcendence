@@ -1,19 +1,23 @@
 
 span#circleAvatar {
+    position: relative;
     display: block;
     background-color: $light1;
     background-size: cover;
     border-radius: 10rem;
     background-position: center;
-    // i {
-    //     display: block;
-    //     min-width: 10px!important;
-    //     max-width: 10px!important;
-    //     min-height: 10px;
-    //     max-height: 10px;
-    //     border-radius: 100%;
-    // }
-    // .online {
-    //     background-color: $green;
-    // }
+    i {
+        position: absolute;
+        bottom: 1%;
+        right: 1%;
+        min-width: 15%!important;
+        max-width: 15%!important;
+        min-height: 15%;
+        max-height: 15%;
+        border-radius: 100%;
+        border: .15rem solid rgba($dark1, .75);
+    }
+    .online {
+        background-color: $green;
+    }
 }

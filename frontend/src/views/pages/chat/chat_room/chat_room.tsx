@@ -19,7 +19,7 @@ const ChatRoomHeader = (Props : HeaderProps) => {
     return (
     <div id="chatRoomHeader">
         <div className="userInfos">
-            <CircleAvatar avatarURL={Props.image} dimensions={45}/>
+            <CircleAvatar avatarURL={Props.image} dimensions={45} showStatus={true}/>
             <div className='dataRow'>
                 <span className='userName'>{Props.username}</span>
                 <span className='status'>{Props.status}</span>

@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition, faHouse, faRankingStar, faComments, faUserGroup} from "@fortawesome/free-solid-svg-icons";
 import { Brand } from "../brand/brand";
 import { NavLink, useLocation } from "react-router-dom";
+import { CircleAvatar } from "../circle_avatar/circle_avatar";
 
 interface NavButtonData {
     icon: IconDefinition,
@@ -46,8 +47,8 @@ const ProfileNavBtn:React.FC<{picture: string}> = ({picture}) => {
         <NavLink
             id="profileNavBtn"
             className={location.pathname === "/profile" ? "active" : undefined}
-            title="Profile" to="/profile"
-            style={{backgroundImage: `url(${picture})`}}>
+            title="Profile" to="/profile">
+                <CircleAvatar avatarURL={picture} dimensions={45} showStatus={true}/>
         </NavLink>
     );
 }

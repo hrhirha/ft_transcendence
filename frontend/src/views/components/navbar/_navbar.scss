@@ -70,12 +70,14 @@ header#navbar {
                     background-size: cover;
                     background-color: $light3;
                     border-radius: 100%;
-                    width: 2.2rem;
-                    height: 2.2rem;
-                    border: .15rem solid $light3;
-                    @media (max-width: 330px) {
-                        width: 2rem;
-                        height: 2rem;
+                    border: .2rem solid $light3;
+                    #circleAvatar {
+                        @media (max-width: 330px) {
+                            min-width: 2rem!important;
+                            min-height: 2rem!important;
+                            max-width: 2rem!important;
+                            max-height: 2rem!important;
+                        }
                     }
                 }
             }

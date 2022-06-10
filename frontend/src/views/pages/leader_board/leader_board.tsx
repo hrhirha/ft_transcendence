@@ -22,7 +22,7 @@ const BoardRow:React.FC<RowProps> = (RowProps) => {
             {RowProps.rank > 3 && <span>{RowProps.rank}</span>}
         </td>
         <td>
-            <CircleAvatar avatarURL={RowProps.avatar} dimensions={40}/>
+            <CircleAvatar avatarURL={RowProps.avatar} dimensions={40} showStatus={false}/>
             <span className="fullName">{RowProps.fullname}</span>
         </td>
         <td>

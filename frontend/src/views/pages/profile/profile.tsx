@@ -116,8 +116,6 @@ export const Profile:React.FC = () => {
                                         </>
                                     }
                                 })}
-                                {/* <FontAwesomeIcon icon={faHistory} />
-                                <span>Matches History</span> */}
                             </div>
                             <hr/>
                         </div>

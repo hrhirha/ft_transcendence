@@ -15,7 +15,7 @@ interface Props {
 export const ChatRoomItem = (Props : Props) => {
   return (
     <div id='chatRoomItem' onClick={() => Props.onClick()} className={Props.active ? 'active' : undefined}>
-      <CircleAvatar avatarURL={Props.avatar} dimensions={40}/>
+      <CircleAvatar avatarURL={Props.avatar} dimensions={40} showStatus={true}/>
       <div className='dataColumn'>
         <div className='dataRow'>
           <h6 className='userName'>{Props.fullName}</h6>

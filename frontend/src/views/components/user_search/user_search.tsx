@@ -18,7 +18,7 @@ const resulst = [
 
 const SuggestionCard:React.FC<{avatar: string, fullName: string, onClick: Function}> = ({avatar, fullName, onClick}) => {
     return <div className="suggestionCard" onClick={() => onClick()}>
-        <CircleAvatar dimensions={20} avatarURL={avatar} />
+        <CircleAvatar dimensions={20} avatarURL={avatar} showStatus={false}/>
         <h6>{fullName}</h6>
     </div>;
 }

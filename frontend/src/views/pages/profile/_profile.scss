@@ -89,7 +89,7 @@
             @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($dark1, .5), $bgcolor2: $dark2);
         }
         .btnBlock {
-            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($red, .45), $bgcolor2: rgba($red, .55));
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($red, .5), $bgcolor2: $red);
         }
         .btnUnblock {
             @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($light2, .85), $bgcolor2: rgba($light3, .75));
