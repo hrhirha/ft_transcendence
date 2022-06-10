@@ -9,6 +9,9 @@ section#profileInfos {
         flex-direction: column;
     }
     .actionButtons {
+        @media (min-width: $sm) {
+            margin-right: 1.5rem;
+        }
         @media (min-width: 472px) and (max-width: $sm) {
             flex-direction: row;
             width: 75%;
