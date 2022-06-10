@@ -1,17 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { CircleAvatar } from '../../../components/circle_avatar/circle_avatar'
-import {faUserSlash, faUserCheck, faUserMinus, faUserXmark} from "@fortawesome/free-solid-svg-icons";
-
-
-enum friendCardType {
-	friend = 1,
-	request = 2,
-	blocked = 3,
-	pending = 4
-}
+import { buttons, userType } from '../profile'
 
 interface Props {
-	type: friendCardType,
+	type: userType,
 	avatar: string,
 	fullName: string,
 	username: string,
@@ -19,57 +11,6 @@ interface Props {
 }
 
 export const FriendCard = (Props : Props) => {
-	const buttons = [
-		{
-			type: friendCardType.request,
-			icon: faUserCheck,
-			text: 'Accept',
-			onClick: (username: string) => {
-				console.log('accept', username);
-			}
-		},
-		{
-			type: friendCardType.request,
-			icon: faUserXmark,
-			text: 'Decline',
-			onClick: (username: string) => {
-				console.log('decline', username);
-			}
-		},
-		{
-			type: friendCardType.friend,
-			icon: faUserMinus,
-			text: 'Unfriend',
-			onClick: (username: string) => {
-				console.log('unfriend', username);
-			}
-		},
-		{
-			type: friendCardType.friend,
-			icon: faUserSlash,
-			text: 'Block',
-			onClick: (username: string) => {
-				console.log('block', username);
-			}
-		},
-		{
-			type: friendCardType.blocked,
-			icon: faUserMinus,
-			text: 'Unblock',
-			onClick: (username: string) => {
-				console.log('unblock', username);
-			}
-		},
-		{
-			type: friendCardType.pending,
-			icon: faUserXmark,
-			text: 'Cancle',
-			onClick: (username: string) => {
-				console.log('cancel', username);
-			}
-		}
-	];
-
 	return (
 		<div className="friendCard">
 			<div className="friendInfos" onClick={() => {}}>
@@ -82,7 +23,7 @@ export const FriendCard = (Props : Props) => {
 				<h6>{Props.fullName} </h6>
 				<span>@{Props.username} </span>
 			</div>
-			<div className="buttons">
+			<div className="actionButtons">
 				{buttons.map((button, index) => {
 					if (button.type === Props.type) {
 						return (

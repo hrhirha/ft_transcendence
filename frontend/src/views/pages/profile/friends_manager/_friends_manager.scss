@@ -6,7 +6,12 @@ section#friendsManager {
         padding: .5rem 0;
         margin-bottom: .5rem;
         @media (max-width: $md) {
-            zoom: .68;
+            zoom: .95;
+        }
+        @media (max-width: $sm) {
+            zoom: .9;
+            width: 100vw;
+            min-width: 300px;
         }
         ul.navTabs {
             @include _flex(row, space-between, center);
@@ -70,17 +75,13 @@ section#friendsManager {
                 }
             }
             .friendCard {
-                @media (max-width: $xs) {
+                @media (max-width: 475px) {
                     max-width: 15rem;
-                    min-width: calc(100% / 2)!important;
                 }
-                @media (min-width: $xs) {
-                    width: calc(100% / 2.21)!important;
+                @media (min-width: 476px) {
+                    width: calc(100% / 2.25)!important;
                 }
-                @media (min-width: $sm) {
-                    width: calc(100% / 2.3)!important;
-                }
-                @media (min-width: $md) {
+                @media (min-width: 680px) {
                     width: calc(100% / 3.41)!important;
                 }
                 @media (min-width: $lg) {

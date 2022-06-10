@@ -10,6 +10,7 @@
     .friendInfos {
         @include _flex(column, center, center);
         width: 100%;
+        margin-bottom: .75rem;
         .avatar {
             @include _flex(column, center, center);
             position: relative;
@@ -43,39 +44,6 @@
             font-size: $fsize * .75;
             text-transform: lowercase;
             color: $light3;
-        }
-    }
-    .buttons{
-        @include _flex(column, space-evenly, center);
-        margin-top: .75rem;
-        height: 100%;
-        .btnAccept {
-            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($purple, .5), $bgcolor2: $purple);
-        }
-        .btnDecline, .btnCancle, .btnPending {
-            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($dark1, .5), $bgcolor2: $dark2);
-        }
-        .btnBlock {
-            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($red, .45), $bgcolor2: rgba($red, .55));
-        }
-        .btnUnblock, .btnUnfriend {
-            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($light2, .85), $bgcolor2: rgba($light3, .75));
-            color: $dark3;
-            path {
-                color: $dark3;
-            }
-        }
-        button {
-            min-width: 8rem;
-            margin: .25rem auto;
-            transition: .3s ease all;
-            svg {
-                margin-right: .5rem;
-                font-size: $fsize * .9;
-            }
-        }
-        >:hover {
-            background-color: $dark1;
         }
     }
    

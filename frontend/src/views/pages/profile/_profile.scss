@@ -9,143 +9,42 @@
     .container {
         @include _flex(column, center, center);
         width: auto;
-    }
-    .profile_info{
-    background-color: $light4;
-    border-radius: 15px;
-    width: 100%;
-    height: auto;
-    @include _flex(column, center, center);
-        .image{
-            margin-top: 10px;
-            
-        }
-        .username {
-            font-size: $fsize * 1.4;
-            font-family: $MFont;
-            color: $light2;
-            margin-top: 1rem;
-        }
-        .path {
-            font-size: $fsize * 1.1;
-            font-family: $MFont;
-            color: $light5;
-            margin-bottom: 1rem;
-        }
-        .status{
-            @include _flex(row, center, center);
-
-            width: 100%;
-            margin-bottom: 1.5rem;
-            .item_stat{
+        @media (max-width: $sm) {
+                .col {
                 width: 100%;
-                .stat{
-                    font-size: $fsize * 0.7;
-                    font-family: $MFont;
-                    color: $light3;
-                }
-                .value {
-                    font-size: $fsize * 2.2;
-                    font-family: $MFont;
-                    color: $light3;
-                }
-            }
-            .vl{
-                border-left: 2px solid $light3;
-                height: 3rem;
-            }
-            .item_stat {
-                @include _flex(column, center, center);
             }
         }
-        
     }
-    .btns{
-        margin-top: 0.6rem;
-        width: 100%;
-        @include _flex(column, center, center);
-        button {
-            @include _gradientBg($light4, $light4, 20);
-            cursor: pointer;
-            padding: .6rem 1.5rem;
-            color: $light3;
-            border-radius: 0px 0px 10px 10px;
-            border: none;
-            margin: .1rem;
-            width: 100%;
-            svg {
-                margin-right: .45rem;
-                path{
-                    color: $light3;
-                }
-            }
-            zoom: 1.25;
-            
+    .actionButtons{
+        @include _flex(column, space-evenly, center);
+        height: 100%;
+        .btnAccept, .btnMessage, .btnAdd {
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($purple, .5), $bgcolor2: $purple);
         }
-        :first-child{
-            border-radius: 10px 10px 0px 0px;
+        .btnDecline, .btnCancle, .btnPending {
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($dark1, .5), $bgcolor2: $dark2);
         }
-        .btn_block{
-            margin-top: .5rem;
-            border-radius: 10px;
+        .btnBlock {
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($red, .45), $bgcolor2: rgba($red, .55));
         }
-
-        button.btn_block{
-            color: rgba(153, 17, 17, 0.828);
-            svg path{
-                color: rgba(153, 17, 17, 0.828);
-            }
-        }
-        button:active{
+        .btnUnblock {
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($light2, .85), $bgcolor2: rgba($light3, .75));
             color: $dark3;
-            svg path{
+            path {
                 color: $dark3;
             }
         }
-    }
-    
-    .match_history{
-        .matchs{
-            background-color: $light4;
-            border-radius: 15px;
-            width: 100%;
-            height: auto;
-            max-height: calc(100vh - 18rem);
-            padding-top: 0.8rem;
-            padding-bottom: 0.8rem;
-            .items_match{
-                overflow: auto;
-                height: auto;
-                max-height: calc(100vh - 18rem);
-                @include _flex(column, top, center);
+        button {
+            min-width: 8rem;
+            margin: .25rem auto;
+            transition: .3s ease all;
+            svg {
+                margin-right: .5rem;
+                font-size: $fsize * .9;
             }
         }
-        .Titile {
-            @include _flex(row, center, center);
-            margin-bottom: 0.6rem;
-            padding-top: 1rem;
-            padding-bottom: 1rem;
-            background-color: $light4;
-            border-radius: 15px;
-            svg {
-                font-size: $fsize * 3.3;
-                path {
-                    color: $light5;
-                }
-            }
-            h2 {
-                margin-left: .5rem;
-                font-family: $XBFont;
-                color: $light5;
-                text-transform: uppercase;
-                font-size: $fsize * 2.2;
-                line-height: .8;
-                width: min-content;
-            }
-            @media (max-width: $sm) {
-                margin-bottom: .5rem;
-                zoom: .75;
-            }
+        >:hover {
+            background-color: $dark1;
         }
     }
 }

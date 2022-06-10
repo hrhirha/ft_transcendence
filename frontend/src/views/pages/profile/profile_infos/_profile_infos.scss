@@ -5,9 +5,30 @@ section#profileInfos {
     padding: 1rem;
     border-radius: 1rem;
     margin-bottom: 1rem;
+    @media (max-width: $sm) {
+        flex-direction: column;
+    }
+    .actionButtons {
+        @media (min-width: 472px) and (max-width: $sm) {
+            flex-direction: row;
+            width: 75%;
+        }
+        @media (max-width: 471px) {
+            flex-direction: column;
+            width: 100%;
+        }
+    }
     .profileData {
         @include _flex(row, flex-start, flex-start);
         position: relative;
+        @media (max-width: $sm) {
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+        @media (max-width: 471px) {
+            @include _flex(column, center, center);
+            width: 100%;
+        }
         .avatar {
             position: relative;
             @include _selectionOff();
@@ -19,7 +40,6 @@ section#profileInfos {
                 border: .4rem solid $dark2;
                 position: absolute;
                 top: 0;
-                left: 0;
                 width: 120px;
                 height: 120px;
             }
@@ -32,7 +52,6 @@ section#profileInfos {
                 max-width: 4rem;
                 border: .25rem solid $dark2;
                 position: absolute;
-                left: 25%;
                 bottom: -20%;
                 z-index: 6;
             }
@@ -41,7 +60,6 @@ section#profileInfos {
                 cursor: pointer;
                 position: absolute;
                 top: 0;
-                left: 0;
                 border-radius: 50%;
                 width: 120px;
                 height: 120px;
@@ -61,6 +79,11 @@ section#profileInfos {
             @include _flex(column, flex-start, flex-start);
             cursor: default;
             margin-left: .5rem;
+            @media (max-width: 471px) {
+                @include _flex(column, center, center);
+                width: 100%;
+                margin: 0;
+            }
             input.fullName {
                 @include _textOverflow(15rem);
                 text-transform: capitalize;
@@ -70,8 +93,10 @@ section#profileInfos {
                 font-size: $fsize * 1.45;
                 padding: .2rem 1rem;
                 border-radius: 5rem;
-                margin: 0 .5rem;
                 outline: none;
+                @media (max-width: 471px) {
+                    text-align: center;
+                }
             }
             input:disabled {
                 background: transparent;
@@ -82,17 +107,17 @@ section#profileInfos {
                 font-family: $LFont;
                 font-size: $fsize * 1.15;
                 padding: 0 1rem;
-                margin: 0 .5rem;
                 color: $light3;
             }
             .stats {
                 @include _flex(row, space-evenly, center);
                 @include _selectionOff();
-                margin-left: .5rem;
+                @media (max-width: 471px) {
+                    margin-top: .5rem;
+                }
                 .stat {
                     @include _flex(column, center, flex-start);
                     padding: .25rem;
-                    margin: auto .25rem;
                     .stat_title {
                         @include _flex(row, center, center);
                         text-transform: uppercase;

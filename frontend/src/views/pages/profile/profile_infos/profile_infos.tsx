@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
 import { faCameraRotate, faPen, faPercent, faStar, faTableTennisPaddleBall, faThumbsDown, faTrophy } from "@fortawesome/free-solid-svg-icons";
+import { buttons, userType } from "../profile";
 
 
 const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, stat: number}) => {
@@ -41,14 +42,23 @@ export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
                     <input type="text" disabled className="fullName" placeholder="Full Name" onChange={() => {}} value={Props.fullName}/>
                     <span className="userName">@{Props.username}</span>
                     <div className="stats">
-                        <StatCard icon={faTableTennisPaddleBall} title="Games" stat={10}/>
-                        <StatCard icon={faTrophy} title="Wins" stat={0}/>
-                        <StatCard icon={faPercent} title="Ratio" stat={150}/>
+                        <StatCard icon={faTableTennisPaddleBall} title="Games" stat={32}/>
+                        <StatCard icon={faTrophy} title="Wins" stat={7}/>
+                        <StatCard icon={faPercent} title="Ratio" stat={21.8}/>
                     </div>
                 </div>
             </div>
             <div className="actionButtons">
-                
+                {buttons.map((button, index) => {
+                    if (button.type === userType.none) {
+                        return (
+                            <button key={index} className={`btn${button.text}`} onClick={() => button.onClick(Props.username)}>
+                                <FontAwesomeIcon icon={button.icon} />
+                                {button.text}
+                            </button>
+                        );
+                    }
+                })}
             </div>
         </section>
     );
