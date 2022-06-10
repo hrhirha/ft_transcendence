@@ -5,6 +5,7 @@ import { FriendsManager } from "./friends_manager/friends_manager";
 import { ProfileInfos } from "./profile_infos/profile_infos";
 import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faComment, faUsersGear, faHistory} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { MatchesHistory } from "./matches_history/matches_history";
 
 
 export enum userType {
@@ -120,6 +121,7 @@ export const Profile:React.FC = () => {
                             </div>
                             <hr/>
                         </div>
+                        {switchTab === 0 && <MatchesHistory />}
                         {switchTab === 1 && <FriendsManager />}
                     </div>
                 </div>
