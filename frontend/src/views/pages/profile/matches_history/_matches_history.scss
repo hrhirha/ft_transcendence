@@ -1,0 +1,36 @@
+section#matchesHistory {
+    @include _flex(column, center, center);
+    @include _selectionOff();
+    .noHistory {
+        @include _flex(column, center, center);
+        img {
+            width: 55%;
+            @media (max-width: $sm) {
+                width: 80%;
+            }
+            @media (max-width: $xs) {
+                width: 95%;
+            }
+        }
+        p {
+            position: relative;
+            text-transform: capitalize;
+            bottom: .75rem;
+            text-align: center;
+            line-height: 1;
+            font-size: $fsize * 1.5;
+            font-family: $BFont;
+            color: $light4;
+            @media (max-width: $sm) {
+                max-width: 12rem;
+            }
+        }
+        button.playGame {
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $purple, $bgcolor2: $light4);
+            font-size: $fsize;
+            svg {
+                margin-right: .5rem;
+            }
+        }
+    }
+}

@@ -136,7 +136,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const r = await this._chat.start_dm(user, u);
-            this.server.to(u.id).emit('join_invite', {rid: r.id});
+            const participants = [user.username, r.user.username];
+
+            const sockets = (await this.server.fetchSockets()).filter((s) => {
+                return participants.indexOf(s.data.username) >= 0;
+            });
+
+            let room_users = []
+            for (let s of sockets)
+               room_users.push(s.id);
+
+            this.server.to(room_users).emit('join_invite', r);
         }
         catch (e)
         {

@@ -9,7 +9,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // for chat dev
-  app.useStaticAssets(join(__dirname, "..", "static"));
+  app.useStaticAssets(join(__dirname, "..", "uploads"));
 
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,

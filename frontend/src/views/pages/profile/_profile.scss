@@ -1,7 +1,7 @@
-@import "./item_match_history/item";
 @import "./friend_card/friend_card";
 @import "./friends_manager/friends_manager";
 @import "./profile_infos/profile_infos";
+@import "./matches_history/matches_history";
 
 
 .profil {
@@ -15,8 +15,72 @@
             }
         }
     }
+    nav.profileTabs {
+        @include _flex(row, center, center);
+        @include _selectionOff();
+        @media (max-width: $xs) {
+            zoom: .85;
+        }
+        ul.tabs {
+            @include _flex(row, center, center);
+            margin: 1rem auto;
+            list-style: none;
+            background-color: $dark2;
+            border-radius: 5rem;
+            padding: .2rem;
+            li.tabTitle {
+                transition: .4s ease all;
+                cursor: pointer;
+                text-transform: capitalize;
+                font-size: $fsize * .8;
+                padding: .5rem 1rem;
+                border-radius: 5rem;
+                color: $light3;
+                font-family: $BFont;
+            }
+            li.tabTitle.active {
+                background-color: $purple;
+                color: $light1;
+            }
+        }
+    }
+
+    .tabHeader {
+        @include _flex(row, center, center);
+        @include _selectionOff();
+        margin: 1rem auto;
+        hr {
+            width: 5rem;
+            height: .25rem;
+            margin: 0 .5rem;
+            border: none;
+            border-radius: 1rem;
+            background-color: $dark3;
+        }
+        .title {
+            @include _flex(row, center, center);
+            margin: auto 1rem;
+            svg {
+                font-size: $fsize * 2.2;
+                margin-right: .5rem;
+                path {
+                    color: rgba($light3, .7);
+                }
+            }
+            span {
+                display:table-caption;
+                text-transform: uppercase;
+                line-height: 1;
+                max-width: 7rem;
+                font-family: $XBFont;
+                font-size: $fsize * 1.25;
+                color: rgba($light3, .7);
+            }
+        }
+    }
     .actionButtons{
         @include _flex(column, space-evenly, center);
+        @include _selectionOff();
         height: 100%;
         .btnAccept, .btnMessage, .btnAdd {
             @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($purple, .5), $bgcolor2: $purple);

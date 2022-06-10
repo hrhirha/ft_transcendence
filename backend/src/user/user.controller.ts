@@ -58,8 +58,8 @@ export class UserController {
         storage: diskStorage({
             destination: './uploads',
             filename(req, file, callback) {
-               const name =  req.user['username']
-                    + (new Date)
+               const name =  req.user['username'] + "_"
+                    + (new Date).toISOString()
                     + file.originalname.slice(file.originalname.lastIndexOf('.'));
                callback(null, name);
             },
