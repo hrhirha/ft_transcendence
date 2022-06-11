@@ -64,6 +64,9 @@ CREATE TABLE "user_rooms" (
     "is_banned" BOOLEAN NOT NULL DEFAULT false,
     "is_muted" BOOLEAN NOT NULL DEFAULT false,
     "unmute_at" TIMESTAMP(3),
+    "lst_msg" TEXT,
+    "lst_msg_ts" TIMESTAMP(3),
+    "unread" INTEGER DEFAULT 0,
 
     CONSTRAINT "user_rooms_pkey" PRIMARY KEY ("id")
 );

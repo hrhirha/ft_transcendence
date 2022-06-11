@@ -11,64 +11,6 @@ export class ChatController
 {
     constructor (private _chatS: ChatService) {} 
 
-    // add user to chat room
-    @Post('add_user')
-    async addUser(@GetUser() user: User, @Body() member: UserRoomDto)
-    {
-        /**
-         * request:
-         * {
-         *      uid: string,
-         *      rid: string
-         * }
-         * 
-         * response:
-         * {
-         *      "id": string,
-         *      "username": string,
-         *      "imageUrl": string,
-         * }
-         */
-        try
-        {
-            return await this._chatS.addUser(user, member);
-        }
-        catch (e)
-        {
-            console.log({code: e.code, message: e.message});
-            throw new ForbiddenException('failed to add user');
-        }
-    }
-
-    // remove user from chat room
-    @Post('remove_user')
-    async removeUser(@GetUser() user: User, @Body() member: UserRoomDto)
-    {
-        /**
-         * request:
-         * {
-         *      uid: string,
-         *      rid: string
-         * }
-         * 
-         * response:
-         * {
-         *      "id": string,
-         *      "username": string,
-         *      "imageUrl": string,
-         * }
-         */
-        try
-        {
-            return await this._chatS.removeUser(user, member);
-        }
-        catch (e)
-        {
-            console.log({code: e.code, message: e.message});
-            throw new ForbiddenException('failed to remove user');
-        }
-    }
-
     // add admin to chat room
     @Post('add_admin') // { user_id: string, chat_id: string }
     async addAdmin(@GetUser() user: User, @Body() user_chat: UserRoomDto)
@@ -148,7 +90,9 @@ export class ChatController
     {
         try
         {
-            return await this._chatS.getRoomMembers(me.id, rid);
+            const rm = await this._chatS.getRoomMembers(me.id, rid);
+            for (let m of rm.members) delete m.is_banned
+            return rm.members;
         }
         catch (e)
         {

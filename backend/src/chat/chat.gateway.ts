@@ -5,7 +5,7 @@ import { Server, Socket } from 'socket.io';
 import { AddMessageDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
 import { ChatService } from './chat.service';
 import { UserService } from 'src/user/user.service';
-import { user_status } from 'src/utils';
+import { friend_status, user_status } from 'src/utils';
 import { UserIdDto } from 'src/user/dto';
 
 export class WsValidationPipe extends ValidationPipe
@@ -118,7 +118,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             await this._chat.deleteRoom(user, room);
-            client.to(room.id).emit('leave_call', {rid: room.id});
+            client.to(room.id).emit('leave_call', {id: room.id});
         }
         catch (e)
         {
@@ -136,6 +136,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const r = await this._chat.start_dm(user, u);
+
             const participants = [user.username, r.user.username];
 
             const sockets = (await this.server.fetchSockets()).filter((s) => {
@@ -145,7 +146,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             let room_users = []
             for (let s of sockets)
                room_users.push(s.id);
-
+            
             this.server.to(room_users).emit('join_invite', r);
         }
         catch (e)
@@ -201,8 +202,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('you must login first');
         try
         {
-            await this._chat.addUser(user, member);
-            this.server.emit('refresh');
+            const ur = await this._chat.addUser(user, member);
+            const sockets = (await this.server.fetchSockets()).filter((s) => {
+                return ur.user.username === s.data.username;
+            });
+
+            sockets[0] && this.server.to(sockets[0].id).emit('join_invite', ur);
         }
         catch (e)
         {
@@ -218,8 +223,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('you must login first');
         try
         {
-            await this._chat.addUser(user, member);
-            this.server.emit('refresh');
+            const ur = await this._chat.removeUser(user, member);
+            const sockets = (await this.server.fetchSockets()).filter((s) => {
+                return ur.user.username === s.data.username;
+            });
+
+            sockets[0] && this.server.to(sockets[0].id).emit('leave_call', {id: ur.room.id});
         }
         catch (e)
         {
@@ -310,22 +319,24 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         {
             const m = await this._chat.sendMessage(u, data);
 
-            // if bnned_users.usernames[] caontains socket.data.username:
-            //      don't emit to socket
-            const users = await this._chat.getRoomMembers(u.id, data.rid);
-            const banned_usernames = [];
-            for (let ur of users)
+            // filter banned users and blocked friends
+            const urs = await this._chat.getRoomMembers(u.id, data.rid);
+            const uname_blk_lst = [];
+            for (let ur of urs.members)
+                ur.is_banned && uname_blk_lst.push(ur.username);
+            if (!urs.is_channel)
             {
-                if (ur.is_banned)
-                    banned_usernames.push(ur.user.username);
+                const blocks = await this._userS.getFriends(u.id, friend_status.BLOCKED);
+                for (let b of blocks)
+                    uname_blk_lst.push(b.username);
             }
 
-            const banned_sockets = (await this.server.fetchSockets()).filter((s)=>{ return banned_usernames.indexOf(s.data.username) > 0 });
-            let bans = [];
-            for (let s of banned_sockets)
-                bans.push(s.id);
+            const sockets = (await this.server.fetchSockets()).filter((s)=>{ return uname_blk_lst.indexOf(s.data.username) > 0 });
+            let blk_lst = [];
+            for (let s of sockets)
+                blk_lst.push(s.id);
 
-            this.server.except(bans).to(data.rid).emit('receive_message', m);
+            this.server.except(blk_lst).to(data.rid).emit('receive_message', m);
             return ;
         }
         catch (e)
@@ -333,7 +344,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             console.log({code: e.code, message: e.message});
             throw new WsException('failed to send message');
         }
-        // return {event: 'msgToClient', data}
     }
 
     @SubscribeMessage('delete_message')

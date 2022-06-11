@@ -1,14 +1,18 @@
-import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from './decorator';
 import { EditFullNameDto, EditUsernameDto, UserDto, UserIdDto } from './dto';
 import { UserService } from './user.service';
-import { Express } from 'express'
+import { Express, Response } from 'express'
 import { diskStorage } from 'multer';
 import { User } from '@prisma/client';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
 import { ChatService } from 'src/chat/chat.service';
 import { friend_status } from 'src/utils';
+import { randomUUID } from 'crypto';
+import { createReadStream } from 'fs';
+import { join } from 'path';
+import { pathToFileURL } from 'url';
 
 @UseGuards(Jwt2FAAuthGuard)
 @Controller('user')
@@ -59,7 +63,7 @@ export class UserController {
             destination: './uploads',
             filename(req, file, callback) {
                const name =  req.user['username'] + "_"
-                    + (new Date).toISOString()
+                    + randomUUID()
                     + file.originalname.slice(file.originalname.lastIndexOf('.'));
                callback(null, name);
             },
@@ -70,11 +74,16 @@ export class UserController {
             return callback(null, true);
         },
     }))
-    async editAvatar(@GetUser('id') id: string, @UploadedFile() file: any)
+    async editAvatar(@GetUser('id') id: string, @UploadedFile() file: any, @Res() res: Response)
     {
         try
         {
-            return await this._userS.editAvatar(id, file);
+            await this._userS.editAvatar(id, file);
+            const f = createReadStream(join(file.path));
+            // const url = pathToFileURL(file.path)
+            console.log({file});
+            res.setHeader("Content-Type", file.mimetype)
+            return new StreamableFile(f);
         }
         catch (e)
         {
@@ -88,7 +97,6 @@ export class UserController {
     {
         try
         {
-            // modified
             return await this._chatS.getJoinedRooms(user);
         }
         catch (e)

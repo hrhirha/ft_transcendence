@@ -307,6 +307,22 @@ export class UserService {
         });
         if (bl.count === 0)
             throw new ForbiddenException('record not found');
+
+        const ur = await this._prismaS.user.update({
+            data: {
+                user_rooms: {
+                    updateMany: {
+                        where: {
+                            uid: rcv_id,
+                        },
+                        data: {}
+                    }
+                }
+            },
+            where: {
+                id: rcv_id
+            }
+        });
         return { success: true }
     }
 
