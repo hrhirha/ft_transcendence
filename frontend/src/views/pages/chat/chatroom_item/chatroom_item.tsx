@@ -1,6 +1,10 @@
-import React from 'react'
-import TimeAgo from 'timeago-react'
 import { CircleAvatar } from '../../../components/circle_avatar/circle_avatar'
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en.json'
+import ReactTimeAgo from 'react-time-ago';
+
+TimeAgo.addDefaultLocale(en);
+TimeAgo.addLocale(en);
 
 interface Props {
     avatar: string,
@@ -19,12 +23,7 @@ export const ChatRoomItem = (Props : Props) => {
       <div className='dataColumn'>
         <div className='dataRow'>
           <h6 className='userName'>{Props.fullName}</h6>
-          <TimeAgo
-            className='time'
-            datetime={Props.timeLastMsg}
-            live={false}
-            locale='en'
-          />
+          <ReactTimeAgo className='time' date={Props.timeLastMsg} locale="en-US"/>
         </div>
         <div className='dataRow'>
           <p className='lastMsg'>{Props.lastMsg}</p>

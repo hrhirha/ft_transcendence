@@ -71,7 +71,7 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
 
 export const Chat:React.FC = () => {
     const [showNewChatForm, setShowNewChatForm] = useState<boolean>(false);
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState<chatTabs>(chatTabs.chats);
     return (
     <main id="chatPage">

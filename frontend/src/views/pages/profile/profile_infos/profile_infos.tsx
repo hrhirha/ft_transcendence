@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
-import { faCameraRotate, faPen, faPercent, faStar, faTableTennisPaddleBall, faThumbsDown, faTrophy } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faPercent, faTableTennisPaddleBall, faTrophy } from "@fortawesome/free-solid-svg-icons";
 import { buttons, userType } from "../profile";
 
 
@@ -58,6 +58,7 @@ export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
                             </button>
                         );
                     }
+                    return (<></>);
                 })}
             </div>
         </section>

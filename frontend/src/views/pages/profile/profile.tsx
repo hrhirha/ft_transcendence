@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { NavBar } from "../../components/navbar/navbar";
 import { FriendsManager } from "./friends_manager/friends_manager";
 import { ProfileInfos } from "./profile_infos/profile_infos";
@@ -76,7 +75,6 @@ export const buttons = [
 ];
 
 export const Profile:React.FC = () => {
-    const navigate = useNavigate();
     const [switchTab, setSwitchTab] = React.useState<number>(0);
 
     const tabs = [
@@ -115,6 +113,7 @@ export const Profile:React.FC = () => {
                                             <span>{tab.title}</span>
                                         </>
                                     }
+                                    return (<></>);
                                 })}
                             </div>
                             <hr/>

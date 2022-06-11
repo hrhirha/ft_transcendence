@@ -1,10 +1,3 @@
-interface Props {
-    username: string,
-    image: string,
-    last_msg: string,
-    time_last_msg: string,
-    nbr_msg_not_read: number,
-}
 export const Chats = [
     {
         id: "asd4df4dsfa",

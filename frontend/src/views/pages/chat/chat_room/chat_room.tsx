@@ -5,7 +5,6 @@ import { faClose, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
 import { chat_data } from "../../../../test_data/chat_data";
 import { Chat_msg } from "../chat_msg/chat_msg";
 import { BgVectors } from "../../../../assets";
-import { useEffect, useState } from "react";
 
 
 interface HeaderProps {
@@ -34,7 +33,7 @@ const ChatRoomHeader = (Props : HeaderProps) => {
 
 const ChatRoomBody:React.FC = () => {
     return <div id="chatRoomBody" style={{backgroundImage: `url(${BgVectors})`}}>
-        { chat_data && chat_data.map (({sender_user, image, msg, time}, k ) => (
+        { chat_data && chat_data.map (({sender_user, image, msg, time}, k ) => 
             <Chat_msg
                 key={k}
                 display_image={(chat_data[k - 1] && chat_data[k].sender_user === chat_data[k - 1].sender_user) ? true : false }
@@ -43,7 +42,7 @@ const ChatRoomBody:React.FC = () => {
                 msg={msg}
                 time={time}
             />
-        ))}
+        )}
     </div>;
 }
 

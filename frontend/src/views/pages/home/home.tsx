@@ -1,12 +1,10 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { NavBar } from "../../components/navbar/navbar";
 import { DefaultGame, LiveGames, UltimateGame } from '../../../assets';
 import { GameCard } from "./game_card/game_card";
 import { LiveGamesCard } from "./live_games_card/live_games_card";
 
 export const Home:React.FC = () => {
-    const navigate = useNavigate();
     return (
     <main id="homePage">
         <NavBar />

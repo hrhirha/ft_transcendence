@@ -1,6 +1,5 @@
 import { faUsers, faUsersBetweenLines, faUsersRays, faUsersSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { type } from "os";
 import { useEffect, useState } from "react";
 import { EmptyBlocking, EmptyFriends, EmptyFriendsRequests, EmptyPending } from "../../../../assets";
 import { frinds_data } from "../../../../test_data/frinds_data";
@@ -49,10 +48,10 @@ export const FriendsManager:React.FC = () => {
         //fetch data from server
         // if (activeTab.valueOf() === tabs.friends.valueOf())
         //     return;
-        {frinds_data && frinds_data.forEach (({type, avatar, fullName,  username, ranking}, k ) => {
+        frinds_data && frinds_data.forEach (({type, avatar, fullName,  username, ranking}, k ) => {
             if (type.valueOf() === activeTab.valueOf())
                 setFriendsList(prev => [...prev, {type, avatar, fullName, username, ranking}]);
-        })}
+        })
         return () => {
             setFriendsList([]);
         }

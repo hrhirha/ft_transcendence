@@ -1,6 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconDefinition, faHouse, faRankingStar, faComments, faUserGroup} from "@fortawesome/free-solid-svg-icons";
+import { IconDefinition, faHouse, faRankingStar, faComments } from "@fortawesome/free-solid-svg-icons";
 import { Brand } from "../brand/brand";
 import { NavLink, useLocation } from "react-router-dom";
 import { CircleAvatar } from "../circle_avatar/circle_avatar";

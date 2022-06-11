@@ -1,6 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { NavBar } from "../../components/navbar/navbar";
 import {faMedal, faRankingStar, faTrophy } from "@fortawesome/free-solid-svg-icons";
 import { CircleAvatar } from "../../components/circle_avatar/circle_avatar";
@@ -16,9 +15,9 @@ const BoardRow:React.FC<RowProps> = (RowProps) => {
     return(
     <tr id={"_"+RowProps.rank} className="col-sm-12 col-8">
         <td className="rank">
-            {RowProps.rank == 1 && <span><FontAwesomeIcon icon={faTrophy}/></span>}
-            {RowProps.rank == 2 && <span><FontAwesomeIcon icon={faMedal}/></span>}
-            {RowProps.rank == 3 && <span><FontAwesomeIcon icon={faMedal}/></span>}
+            {RowProps.rank === 1 && <span><FontAwesomeIcon icon={faTrophy}/></span>}
+            {RowProps.rank === 2 && <span><FontAwesomeIcon icon={faMedal}/></span>}
+            {RowProps.rank === 3 && <span><FontAwesomeIcon icon={faMedal}/></span>}
             {RowProps.rank > 3 && <span>{RowProps.rank}</span>}
         </td>
         <td>
@@ -32,7 +31,6 @@ const BoardRow:React.FC<RowProps> = (RowProps) => {
 }
 
 export const LeaderBoard:React.FC = () => {
-    const navigate = useNavigate();
     let users = [];
 
     for (let i = 0; i < 100; i++)

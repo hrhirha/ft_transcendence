@@ -33,6 +33,7 @@ export const FriendCard = (Props : Props) => {
 							</button>
 						);
 					}
+					return (<></>);
 				})}
 			</div>
 		</div>)
