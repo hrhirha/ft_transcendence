@@ -10,10 +10,7 @@ import {
 } from '@nestjs/websockets';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
-import { ArgumentMetadata, BadRequestException, HttpException, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
-import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
-
-
+import { ArgumentMetadata, HttpException, UsePipes, ValidationPipe } from '@nestjs/common';
 
 export class WsValidationPipe extends ValidationPipe
 {
@@ -43,10 +40,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
  
     roomCreated: number = 0;
     connection: any;
-    obj: any = {
-        paddleY: 0,
-        enemyY: 0,
-    };
  
     constructor(private prisma: PrismaService, private jwt: ChatService){}
      handleDisconnect(client: Socket) {
@@ -66,12 +59,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     
     }
 
-    @SubscribeMessage('update')
+    @SubscribeMessage('move')
     checkConnection(client: Socket, data: any): void
     {
         try
         {
-            this.server.to(data.roomid).emit('recv', data);
+            client.broadcast.to(data.roomid).emit('recv', data);
         }
         catch(e)
         {
