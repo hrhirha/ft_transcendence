@@ -344,14 +344,53 @@ export class UserService {
     }
 
 
-    async getFriends(id: string, status: string) {
+    async getFriends(id: string) {
         const freqs = await this._prismaS.friendReq.findMany({
             where: {
                 OR: [
                     {snd_id: id,},
                     {rcv_id: id},
                 ],
-                status
+                status: friend_status.ACCEPTED
+            },
+            orderBy: {
+                updatedAt: 'desc'
+            },
+            select: {
+                status: true,
+                sender: {
+                    select: {
+                        id: true,
+                        username: true,
+                        fullName: true,
+                        imageUrl: true,
+                    },
+                },
+                receiver: {
+                    select: {
+                        id: true,
+                        username: true,
+                        fullName: true,
+                        imageUrl: true,
+                    }
+                }
+            }
+        });
+        let friends = [];
+        for (let req of freqs)
+        {
+            const friend = req.sender.id === id ? req.receiver : req.sender;
+            const status = req.status;
+            friends.push(friend);
+        }
+        return friends;
+    }
+
+    async getBlockedFriends(id: string) {
+        const freqs = await this._prismaS.friendReq.findMany({
+            where: {
+                snd_id: id,
+                status: friend_status.BLOCKED,
             },
             orderBy: {
                 updatedAt: 'desc'

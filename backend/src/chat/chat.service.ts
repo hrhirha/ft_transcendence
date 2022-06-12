@@ -98,6 +98,14 @@ export class ChatService {
         return {success: true};
     }
 
+    async editRoom(user: User, room: OldRoomDto)
+    {
+        // if protectd:
+        //      if password: check old password bfore updating it
+        //      else: make it public
+        // if public, set password and make it protected
+    }
+
     async start_dm(u1: User, u2: UserIdDto)
     {
         const dm = await this._dm_exists(u1.id, u2.id);
@@ -392,6 +400,7 @@ export class ChatService {
                 uid: user_room.uid,
                 rid: user_room.rid,
                 is_muted: false,
+                is_banned: false,
                 room: {
                     is_channel: true,
                     user_rooms: {
@@ -421,6 +430,7 @@ export class ChatService {
                 uid: user_room.uid,
                 rid: user_room.rid,
                 is_muted: true,
+                is_banned: false,
                 room: {
                     is_channel: true,
                     user_rooms: {
@@ -491,24 +501,20 @@ export class ChatService {
                 id: true,
                 name: true,
                 type: true,
+                user_rooms: {
+                    where: {
+                        uid: user.id,
+                    },
+                    select: {
+                        joined_time: true,
+                        is_banned: true,
+                        bans: true
+                    }
+                },
                 messages: {
                     select: {
                         msg: true,
                         timestamp: true,
-                        room: {
-                            select: {
-                                user_rooms: {
-                                    where: {
-                                        uid: user.id,
-                                    },
-                                    select: {
-                                        joined_time: true,
-                                        is_banned: true,
-                                        bans: true
-                                    }
-                                }
-                            }
-                        }
                     },
                     orderBy: {
                         timestamp: "desc"
@@ -520,8 +526,8 @@ export class ChatService {
         let joined = [];
         for (let room of rooms)
         {
-            const jt = room.messages[0].room.user_rooms[0].joined_time;
-            const bans = room.messages[0].room.user_rooms[0].bans;
+            const jt = room.user_rooms[0].joined_time;
+            const bans = room.user_rooms[0].bans;
             const msgs = room.messages.filter((message) => {
                 let snd: Boolean = true;
                 const ts = message.timestamp;
@@ -537,13 +543,33 @@ export class ChatService {
 
                 return ts > jt && snd;
             });
-
-            delete msgs[0].room;
             const lst_msg = msgs[0];
             delete room.messages;
+            delete room.user_rooms;
             joined.push({room, lst_msg});
         }
         return joined;
+    }
+
+    async ownedRooms(user: User)
+    {
+        const rooms = await this._prismaS.room.findMany({
+            where: {
+                is_channel: true,
+                user_rooms: {
+                    some: {
+                        uid: user.id,
+                        is_owner: true,
+                    }
+                }
+            },
+            select: {
+                id: true,
+                name: true,
+                type: true,
+            }
+        });
+        return rooms;
     }
 
     async getDms(user: User)
@@ -789,7 +815,9 @@ export class ChatService {
             where: {
                 uid: uid1, rid,
                 OR: [
-                    { is_banned: false, room: { is_channel: true } },
+                    {
+                        is_banned: false,
+                        room: { is_channel: true } },
                     {
                         room: { is_channel: false, },
                         user: {
@@ -890,55 +918,20 @@ export class ChatService {
 
         const msg = r.messages[0];
 
-        // const lst_msg = await this._prismaS.userRoom.updateMany({
-        //     data: {
-        //         unread: { increment: 1 },
-        //         lst_msg: msg.msg,
-        //         lst_msg_ts: msg.timestamp,
-        //     },
-        //     where: {
-        //         rid: data.rid,
-        //         uid: { not: uid },
-        //         OR: [
-        //             {
-        //                 // not banned from room
-        //                 is_banned: false,
-        //                 room: { is_channel: true, }
-        //             },
-        //             {
-        //                 // not blocked by friend
-        //                 room: {
-        //                     is_channel: false,
-        //                     user_rooms: {
-        //                         some: {
-        //                             user: {
-        //                                 id : { not: uid },
-        //                                 OR: [
-        //                                     {
-        //                                         sentReq: {
-        //                                             some: {
-        //                                                 rcv_id: uid,
-        //                                                 status: friend_status.ACCEPTED,
-        //                                             }
-        //                                         }
-        //                                     },
-        //                                     {
-        //                                         recievedReq: {
-        //                                             some: {
-        //                                                 snd_id: uid,
-        //                                                 status: friend_status.ACCEPTED,
-        //                                             }
-        //                                         }
-        //                                     }
-        //                                 ]
-        //                             }
-        //                         }
-        //                     }
-        //                 },
-        //             },
-        //         ]
-        //     },
-        // });
+        await this._prismaS.userRoom.updateMany({
+            data: {
+                unread: { increment: 1 },
+            },
+            where: {
+                rid: data.rid,
+                uid: { not: uid },
+                is_banned: false,
+                is_muted: false,
+                room: { is_channel: true, }
+            },
+        });
+
+        // last message should be updated even if the user is muted
 
         if (r.user_rooms[0].is_muted)
             throw new WsException('you have been muted')

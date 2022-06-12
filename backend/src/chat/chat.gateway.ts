@@ -323,15 +323,17 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const urs = await this._chat.getRoomMembers(u.id, data.rid);
             const uname_blk_lst = [];
             for (let ur of urs.members)
+            {
                 ur.is_banned && uname_blk_lst.push(ur.username);
+            }
             if (!urs.is_channel)
             {
-                const blocks = await this._userS.getFriends(u.id, friend_status.BLOCKED);
+                const blocks = await this._userS.getBlockedFriends(u.id);
                 for (let b of blocks)
                     uname_blk_lst.push(b.username);
             }
 
-            const sockets = (await this.server.fetchSockets()).filter((s)=>{ return uname_blk_lst.indexOf(s.data.username) > 0 });
+            const sockets = (await this.server.fetchSockets()).filter((s)=>{ return uname_blk_lst.indexOf(s.data.username) >= 0 });
             let blk_lst = [];
             for (let s of sockets)
                 blk_lst.push(s.id);

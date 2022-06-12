@@ -107,8 +107,6 @@ model UserRoom {
   is_muted      Boolean @default(false)
   unmute_at     DateTime?
 
-  lst_msg       String?
-  lst_msg_ts    DateTime?
   unread        Int? @default(0)
 
   @@unique([uid, rid])

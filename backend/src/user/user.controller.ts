@@ -92,7 +92,7 @@ export class UserController {
         }
     }
 
-    @Get('chatrooms')
+    @Get('joined_rooms')
     async getJoinedChatRooms(@GetUser() user: User)
     {
         try
@@ -103,6 +103,20 @@ export class UserController {
         {
             console.log({error: e.message});
             throw new ForbiddenException('failed to get chatrooms');
+        }
+    }
+
+    @Get('owned_rooms')
+    async ownedRooms(@GetUser() user: User)
+    {
+        try
+        {
+            return await this._chatS.ownedRooms(user);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('failed to get created rooms');
         }
     }
 
@@ -257,7 +271,7 @@ export class UserController {
     {
         try
         {
-            return await this._userS.getFriends(user.id, friend_status.ACCEPTED);
+            return await this._userS.getFriends(user.id);
         }
         catch (e)
         {
@@ -271,7 +285,7 @@ export class UserController {
     {
         try
         {
-            return await this._userS.getFriends(user.id, friend_status.BLOCKED);
+            return await this._userS.getBlockedFriends(user.id);
         }
         catch (e)
         {
