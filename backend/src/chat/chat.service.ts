@@ -464,7 +464,7 @@ export class ChatService {
         if (dm.length === 2)
             dm_uid = dm[0].user.id === user.id ? dm[1].user.id : dm[0].user.id;
 
-        await this._is_blocked_banned(user.id, dm_uid, data.rid)
+        await this._can_send_msg(user.id, dm_uid, data.rid)
 
         return await this._add_msg_to_db(user.id, data);
     }
@@ -651,12 +651,17 @@ export class ChatService {
         return room_ids;
     }
 
-    async getRooms()
+    async getRooms(u: User)
     {
         return await this._prismaS.room.findMany({
             where: {
                 is_channel: true,
-                type: room_type.PUBLIC || room_type.PROTECTED
+                type: room_type.PUBLIC || room_type.PROTECTED,
+                user_rooms: {
+                    none: {
+                        uid: u.id,
+                    }
+                }
             },
             select: {
                 id: true,
@@ -809,16 +814,27 @@ export class ChatService {
         return ms;
     }
 
-    private async _is_blocked_banned(uid1: string, uid2: string, rid: string)
+    private async _can_send_msg(uid1: string, uid2: string, rid: string)
     {
         const ur = await this._prismaS.userRoom.findMany({
             where: {
                 uid: uid1, rid,
                 OR: [
                     {
+                        // case of channel
                         is_banned: false,
-                        room: { is_channel: true } },
+                        OR: [
+                            {
+                                is_muted: false,
+                            },
+                            {
+                                is_muted: true,
+                                unmute_at: { lte: new Date, },
+                            }
+                        ],
+                    },
                     {
+                        // case of dm
                         room: { is_channel: false, },
                         user: {
                             id: uid1,
@@ -846,15 +862,21 @@ export class ChatService {
             },
             select: {
                 is_banned: true,
+                room: {
+                    select: {
+                        is_channel: true,
+                    }
+                }
             }
         });
+    
         if (ur.length === 0)
-            throw new WsException('you are not a member | banned | blocked');
-        // if (ur.length === 1)
-        // {
-        //     throw new WsException(ur[0].is_banned ? 'banned' : 'blocked');
-        // }
+            throw new WsException({
+                message: 'you can not send messages in this room at this moment',
+                reason: 'not a member, banned or muted, blocked'
+            });
         return true;
+
     }
 
     private async _add_msg_to_db(uid: string, data: AddMessageDto)
@@ -927,14 +949,9 @@ export class ChatService {
                 uid: { not: uid },
                 is_banned: false,
                 is_muted: false,
-                room: { is_channel: true, }
+                // room: { is_channel: true, }
             },
         });
-
-        // last message should be updated even if the user is muted
-
-        if (r.user_rooms[0].is_muted)
-            throw new WsException('you have been muted')
 
         return msg;
     }

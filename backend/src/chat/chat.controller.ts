@@ -70,49 +70,49 @@ export class ChatController
     clearRoom(@GetUser() user: User, @Body() room: OldRoomDto) {}
 
     // list rooms
-    @Get('rooms')
-    async getRooms()
-    {
-        try
-        {
-            return await this._chatS.getRooms();
-        }
-        catch (e)
-        {
-            console.log({code: e.code, message: e.message});
-            throw new ForbiddenException('failed to get rooms');
-        }
-    }
+    // @Get('rooms')
+    // async getRooms()
+    // {
+    //     try
+    //     {
+    //         return await this._chatS.getRooms();
+    //     }
+    //     catch (e)
+    //     {
+    //         console.log({code: e.code, message: e.message});
+    //         throw new ForbiddenException('failed to get rooms');
+    //     }
+    // }
 
     // get ChatRoom members
-    @Get('/:rid/members')
-    async getAllMembers(@GetUser() me: User, @Param('rid') rid: string)
-    {
-        try
-        {
-            const rm = await this._chatS.getRoomMembers(me.id, rid);
-            for (let m of rm.members) delete m.is_banned
-            return rm.members;
-        }
-        catch (e)
-        {
-            console.log({code: e.code, message: e.message});
-            throw new ForbiddenException('failed to retrieve room members');
-        }
-    }
+    // @Get('/:rid/members')
+    // async getAllMembers(@GetUser() me: User, @Param('rid') rid: string)
+    // {
+    //     try
+    //     {
+    //         const rm = await this._chatS.getRoomMembers(me.id, rid);
+    //         for (let m of rm.members) delete m.is_banned
+    //         return rm.members;
+    //     }
+    //     catch (e)
+    //     {
+    //         console.log({code: e.code, message: e.message});
+    //         throw new ForbiddenException('failed to retrieve room members');
+    //     }
+    // }
 
-    // retreive old messages
-    @Get('/:rid/messages')
-    async getAllMessages(@GetUser() me: User, @Param('rid') rid: string)
-    {
-        try
-        {
-            return await this._chatS.getRoomMessages(me.id, rid);
-        }
-        catch (e)
-        {
-            console.log({code: e.code, message: e.message});
-            throw new ForbiddenException('failed to retrieve room messages');
-        }
-    }
+    // // retreive old messages
+    // @Get('/:rid/messages')
+    // async getAllMessages(@GetUser() me: User, @Param('rid') rid: string)
+    // {
+    //     try
+    //     {
+    //         return await this._chatS.getRoomMessages(me.id, rid);
+    //     }
+    //     catch (e)
+    //     {
+    //         console.log({code: e.code, message: e.message});
+    //         throw new ForbiddenException('failed to retrieve room messages');
+    //     }
+    // }
 }

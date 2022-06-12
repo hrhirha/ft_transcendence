@@ -92,48 +92,6 @@ export class UserController {
         }
     }
 
-    @Get('joined_rooms')
-    async getJoinedChatRooms(@GetUser() user: User)
-    {
-        try
-        {
-            return await this._chatS.getJoinedRooms(user);
-        }
-        catch (e)
-        {
-            console.log({error: e.message});
-            throw new ForbiddenException('failed to get chatrooms');
-        }
-    }
-
-    @Get('owned_rooms')
-    async ownedRooms(@GetUser() user: User)
-    {
-        try
-        {
-            return await this._chatS.ownedRooms(user);
-        }
-        catch (e)
-        {
-            console.log({code: e.code, message: e.message});
-            throw new ForbiddenException('failed to get created rooms');
-        }
-    }
-
-    @Get('dms')
-    async getDms(@GetUser() user: User)
-    {
-        try
-        {
-            return await this._chatS.getDms(user);
-        }
-        catch (e)
-        {
-            console.log({error: e.message});
-            throw new ForbiddenException('failed to get dms');
-        }
-    }
-
     // end of User
 
     // Friend Requests

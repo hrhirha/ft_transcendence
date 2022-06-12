@@ -1,11 +1,11 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, WsResponse, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, ConnectedSocket, WsException } from '@nestjs/websockets'
+import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, ConnectedSocket, WsException } from '@nestjs/websockets'
 import {  } from '@nestjs/platform-socket.io'
-import { ArgumentMetadata, Catch, HttpException, Logger, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ArgumentMetadata, HttpException, Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { AddMessageDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
 import { ChatService } from './chat.service';
 import { UserService } from 'src/user/user.service';
-import { friend_status, user_status } from 'src/utils';
+import { user_status } from 'src/utils';
 import { UserIdDto } from 'src/user/dto';
 
 export class WsValidationPipe extends ValidationPipe
@@ -379,4 +379,78 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.server.to(r.id).emit('user_left', `${client.data.username} left`);
         client.leave(r.id);
     }
+
+    @SubscribeMessage('get_chats')
+    async getJoinedChatRooms(@ConnectedSocket() client: Socket)
+    {
+        let u = await this._chat.getUserFromSocket(client);
+        if (!u)
+            throw new WsException('you must login first');
+        try
+        {
+            const dms = await this._chat.getDms(u);
+            const rooms = await this._chat.getJoinedRooms(u);
+            const others = await this._chat.getRooms(u);
+            client.emit('chats', { dms, rooms, others });
+        }
+        catch (e)
+        {
+            console.log({error: e.message});
+            throw new WsException('failed to get chatrooms');
+        }
+    }
+
+    @SubscribeMessage('get_members')
+    async getRoomMembers(@ConnectedSocket() client: Socket, @MessageBody() room: OldRoomDto)
+    {
+        let u = await this._chat.getUserFromSocket(client);
+        if (!u)
+            throw new WsException('you must login first');
+        try
+        {
+            const members = (await this._chat.getRoomMembers(u.id, room.id)).members;
+            for (let m of members) delete m.is_banned
+            client.emit('members', members);
+        }
+        catch (e)
+        {
+            console.log({error: e.message});
+            throw new WsException('failed to get chatrooms');
+        }
+    }
+
+    @SubscribeMessage('get_messages')
+    async getRoomMessages(@ConnectedSocket() client: Socket, @MessageBody() room: OldRoomDto)
+    {
+        let u = await this._chat.getUserFromSocket(client);
+        if (!u)
+            throw new WsException('you must login first');
+        try
+        {
+            const msgs = await this._chat.getRoomMessages(u.id, room.id);
+            client.emit('messages', msgs);
+        }
+        catch (e)
+        {
+            console.log({error: e.message});
+            throw new WsException('failed to get chatrooms');
+        }
+    }
+
+    // @SubscribeMessage('owned_rooms')
+    // async ownedRooms(@ConnectedSocket() client: Socket)
+    // {
+    //     let u = await this._chat.getUserFromSocket(client);
+    //     if (!u)
+    //         throw new WsException('you must login first');
+    //     try
+    //     {
+    //         return await this._chat.ownedRooms(u);
+    //     }
+    //     catch (e)
+    //     {
+    //         console.log({code: e.code, message: e.message});
+    //         throw new WsException('failed to get created rooms');
+    //     }
+    // }
 }
