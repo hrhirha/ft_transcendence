@@ -14,7 +14,7 @@ import io from "socket.io-client";
  */
  
      //--------------------
-     
+
 interface info_create_room {
     name:  string,
     is_private? : boolean,
@@ -22,10 +22,16 @@ interface info_create_room {
     uids: string[],
 }
 
-interface info_delete_room {
+interface info_delete_join_leave_room {
     id:  string,
     password? : string,
 }
+
+interface info_add_member {
+    uid:  string,
+    rid : string,
+}
+
 
 export class Socket {
     socket :any;
@@ -47,7 +53,7 @@ export class Socket {
         this.socket.emit("create_room", info_room);
     }
 
-    delete_room(info_room : info_delete_room) {
+    delete_room(info_room : info_delete_join_leave_room) {
         if(info_room.id.length == 0)
             return new Error("error : id must not be empty");
         this.socket.emit("delete_room", info_room);
@@ -57,16 +63,24 @@ export class Socket {
         this.socket.emit("start_dm", id);
     }
 
-    join_room() {
-        this.socket.emit("join_room");
+    join_room(info_room : info_delete_join_leave_room) {
+        if(info_room.id.length == 0)
+            return new Error("error : id must not be empty");
+        this.socket.emit("join_room", info_room);
     }
 
-    leave_room() {
-        this.socket.emit("leave_room");
+    leave_room(info_room : info_delete_join_leave_room) {
+        if(info_room.id.length == 0)
+            return new Error("error : id must not be empty");
+        this.socket.emit("leave_room", info_room);
     }
 
-    add_member() {
-        this.socket.emit("add_member");
+    add_member(member :info_add_member) {
+        if(member.rid.length == 0)
+            return new Error("error : rid must not be empty");
+        if(member.uid.length == 0)
+            return new Error("error : uid must not be empty");
+        this.socket.emit("add_member", member);
     }
 
     remove_member() {
