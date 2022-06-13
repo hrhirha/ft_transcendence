@@ -6,7 +6,6 @@ import {
     WebSocketGateway,
     WebSocketServer,
     WsException,
-    WsResponse 
 } from '@nestjs/websockets';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
@@ -48,15 +47,38 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
     async handleConnection(client: Socket, ...args: any[]) {
         console.log('Client Connected with ID: ' + client.id);
-        try
-        {
-            this.beforeStart(client);
-        }
-        catch(e)
-        {
-            throw new WsException("before start exception !!! ");
-        }
+        if (!this.beforeStart(client))
+            client.disconnect();
     
+    }
+
+    @SubscribeMessage('restart')
+    restart(client: Socket, data: any): void
+    {
+        if (client.data.is_player)
+        {
+            console.log("client want to restart !!");
+            // this.server.to(client.id).emit('restart');
+        }
+        else
+        {
+
+        }
+    }
+
+    @SubscribeMessage('endGame')
+    EndGame(client: Socket, data: any): void
+    {
+        if (client.data.is_player)
+        {
+            console.log(data);
+            console.log('End game ');
+            this.server.to(client.id).emit('restart');
+        }
+        else
+        {
+
+        }
     }
 
     @SubscribeMessage('move')
@@ -76,7 +98,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     {
         const user =  (await this.jwt.getUserFromSocket(client));
         if (!user)
-            throw new WsException("User not found !! ");
+        return null
         if (!this.roomCreated)
         {
             this.connection =  await this.prisma.game.create({
@@ -98,7 +120,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             });
             this.roomCreated += 1;
             client.join(this.connection.id);
-            client.emit("flag");
+            client.data.is_player = true;
+
+            client.emit("saveData", {
+                player: "player1",
+                is_player: true,
+                roomId: this.connection.id
+            });
             return false;
         }
         await this.prisma.userGame.create({
@@ -110,6 +138,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             },
         });
         client.join(this.connection.id);
+        client.data.is_player = true;
+        client.emit("saveData", {
+            player: "player2",
+            is_player: true,
+            roomId: this.connection.id
+        });
         this.server.to(this.connection.id).emit('startGame', this.connection.id);
         this.roomCreated = 0;
         return true;
