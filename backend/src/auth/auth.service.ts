@@ -67,16 +67,14 @@ export class AuthService {
             payload = this._jwtS.verify(token, {
                 secret: this._configS.get('JWT_ACCESS_SECRET'),
             });
+            if (payload.sub) {
+                const user =  await this._userS.findById(payload.sub);
+                return user;
+            }
         }
         catch
         {
             return null;
         }
-
-        if (payload.sub) {
-            const user =  await this._userS.findById(payload.sub);
-            return user;
-        }
-        return null;
     }
 }

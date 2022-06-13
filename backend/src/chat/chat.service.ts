@@ -26,11 +26,13 @@ export class ChatService {
         if (room.password)
             room.password = await argon2.hash(room.password);
 
+        const type = room.password ? room_type.PROTECTED : (room.is_private ? room_type.PRIVATE: room_type.PUBLIC);
+
         return await this._prismaS.$transaction(async (prisma) => {
             const r = await prisma.room.create({
                 data: {
                     name: room.name,
-                    type: room.password ? room_type.PROTECTED: room_type.PUBLIC,
+                    type,
                     password: room.password,
                     is_channel: true,
                     user_rooms: {
@@ -111,9 +113,10 @@ export class ChatService {
         const dm = await this._dm_exists(u1.id, u2.id);
         if (dm.length === 1)
         {
-            const u = dm[0].user_rooms[0].user;
+            const user1 = dm[0].user_rooms[0].user;
+            const user2 = dm[0].user_rooms[1].user;
             delete dm[0].user_rooms;
-            return {room: dm[0], user: u};
+            return { room: dm[0], user1, user2 };
         }
 
         const r = await this._prismaS.room.create({
@@ -141,9 +144,9 @@ export class ChatService {
             select: {
                 id: true,
                 user_rooms: {
-                    where: {
-                        uid: u2.id
-                    },
+                    // where: {
+                    //     uid: u2.id
+                    // },
                     select: {
                         user: {
                             select: {
@@ -157,9 +160,10 @@ export class ChatService {
                 }
             }
         });
-        const u = r.user_rooms[0].user;
+        const user1 = r.user_rooms[0].user;
+        const user2 = r.user_rooms[1].user;
         delete r.user_rooms;
-        return {room: r, user: u};
+        return { room: r, user1, user2 };
     }
                 
     async joinRoom(user: User, room: OldRoomDto)
@@ -839,6 +843,7 @@ export class ChatService {
                         user: {
                             id: uid1,
                             OR: [
+                                // blocked if friends
                                 {
                                     recievedReq: {
                                         some: {
@@ -896,7 +901,7 @@ export class ChatService {
                             uid,
                             rid: data.rid,
                             is_muted: true,
-                            unmute_at: { lte: new Date, }
+                            // unmute_at: { lte: new Date, }
                         },
                     },
                 },
@@ -948,7 +953,7 @@ export class ChatService {
                 rid: data.rid,
                 uid: { not: uid },
                 is_banned: false,
-                is_muted: false,
+                // is_muted: false,
                 // room: { is_channel: true, }
             },
         });
@@ -1028,9 +1033,9 @@ export class ChatService {
             select: {
                 id: true,
                 user_rooms: {
-                    where: {
-                        uid: id2
-                    },
+                    // where: {
+                    //     uid: id2
+                    // },
                     select: {
                         user: {
                             select: {

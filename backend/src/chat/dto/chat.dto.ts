@@ -1,4 +1,4 @@
-import { ArrayMinSize, IsArray, IsDefined, isNotEmpty, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
+import { ArrayMinSize, IsArray, IsBoolean, IsDefined, isNotEmpty, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
 
 export class NewRoomDto
 {
@@ -12,6 +12,10 @@ export class NewRoomDto
     @IsNotEmpty()
     @IsString()
     name: string;
+
+    @IsBoolean()
+    @IsOptional()
+    is_private? : boolean;
 
     @IsString()
     @IsOptional()

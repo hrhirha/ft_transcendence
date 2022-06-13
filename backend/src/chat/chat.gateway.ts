@@ -95,12 +95,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
             let room_users = []
             for (let s of sockets)
-            {
-                console.log(s.data.username);
                 room_users.push(s.id);
-            }
 
-            this.server.to(room_users).emit('join_invite', {rid: r.room.id});
+            this.server.to(room_users).emit('join_invite', r.room);
         }
         catch (e)
         {
@@ -137,17 +134,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         {
             const r = await this._chat.start_dm(user, u);
 
-            const participants = [user.username, r.user.username];
+            const participant = r.user1.username !== user.username ? r.user1 : r.user2;
 
             const sockets = (await this.server.fetchSockets()).filter((s) => {
-                return participants.indexOf(s.data.username) >= 0;
+                return participant.username === s.data.username;
             });
-
-            let room_users = []
-            for (let s of sockets)
-               room_users.push(s.id);
             
-            this.server.to(room_users).emit('join_invite', r);
+            client.join(r.room.id);
+            if (sockets.length === 1)
+                this.server.to(sockets[0].id).emit('join_invite', { room: r.room, user: participant });
         }
         catch (e)
         {
