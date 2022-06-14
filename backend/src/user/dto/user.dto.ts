@@ -1,4 +1,4 @@
-import { IsDefined, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, NotContains } from "class-validator";
+import { IsDefined, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from "class-validator";
 
 export class UserDto {
     @IsNotEmpty()
@@ -11,15 +11,7 @@ export class UserDto {
 
     @IsNotEmpty()
     @IsEmail()
-    fullName: string;
-
-    // @IsString()
-    // @IsOptional()
-    // firstName?: string;
-
-    // @IsString()
-    // @IsOptional()
-    // lastName?: string;
+    fullName: string; 
 
     @IsString()
     @IsOptional()
@@ -51,19 +43,20 @@ export class UserIdDto
     @IsDefined()
     @IsString()
     // @IsNotEmpty()
+    @Matches(/^c[a-z0-9]{20,}$/)
     id: string;
 }
 
 export class EditUsernameDto {
     @IsDefined()
     @IsString()
-    @Matches('^[a-zA-Z0-9\_]{4,20}$')
+    @Matches(/^[\w-]{4,20}$/g)
     username: string;
 }
 
 export class EditFullNameDto {
     @IsDefined()
     @IsString()
-    @Matches('^[a-zA-Z\-]{4,20} [a-zA-Z\-]{4,20}$')
+    @Matches(/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(\-[a-zA-Z]+)*\.?))+$/)
     fullName: string;
 }

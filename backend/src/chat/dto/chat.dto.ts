@@ -11,6 +11,7 @@ export class NewRoomDto
     @IsDefined()
     @IsNotEmpty()
     @IsString()
+    @Matches(/^([\w]+ ?(\-?[\w]+)*\.?)+$/)
     name: string;
 
     @IsBoolean()
@@ -19,6 +20,10 @@ export class NewRoomDto
 
     @IsString()
     @IsOptional()
+    @Matches(/\w+/)
+    @Matches(/[A-Z]+/)
+    @Matches(/\d+/)
+    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/)
     password?: string;
 
     @IsDefined()
@@ -26,6 +31,7 @@ export class NewRoomDto
     @ArrayMinSize(1)
     @IsNotEmpty({each:true})
     @IsString({each:true})
+    @Matches(/^c[a-z0-9]{20,}$/, {each: true})
     uids: string[]
 }
 
@@ -39,10 +45,15 @@ export class OldRoomDto
 
     @IsString()
     @IsNotEmpty()
+    @Matches(/^c[a-z0-9]{20,}$/)
     id: string;
 
     @IsString()
     @IsOptional()
+    @Matches(/\w+/)
+    @Matches(/[A-Z]+/)
+    @Matches(/\d+/)
+    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/)
     password?: string;
 }
 
@@ -52,6 +63,7 @@ export class AddMessageDto
 
     @IsString()
     @IsNotEmpty()
+    @Matches(/^c[a-z0-9]{20,}$/)
     rid: string;
 
     @IsString()
@@ -65,10 +77,12 @@ export class DeleteMessageDto
 
     @IsString()
     @IsNotEmpty()
+    @Matches(/^c[a-z0-9]{20,}$/)
     id: string;
 
     @IsString()
     @IsNotEmpty()
+    @Matches(/^c[a-z0-9]{20,}$/)
     rid: string;
 }
 
@@ -78,10 +92,12 @@ export class UserRoomDto
 
     @IsString()
     @IsNotEmpty()
+    @Matches(/^c[a-z0-9]{20,}$/)
     uid: string;
 
     @IsString()
     @IsNotEmpty()
+    @Matches(/^c[a-z0-9]{20,}$/)
     rid: string;
 }
 
@@ -89,14 +105,17 @@ export class MuteUserDto
 {
     @IsString()
     @IsNotEmpty()
+    @Matches(/^c[a-z0-9]{20,}$/)
     uid: string;
 
     @IsString()
     @IsNotEmpty()
+    @Matches(/^c[a-z0-9]{20,}$/)
     rid: string;
 
-    @IsString()
+    @IsDefined()
     @IsNotEmpty()
+    @IsString()
     @Matches('^15M$|^1H$|^3H$|^8H$|^24H$|^inf$')
     mute_period: string; // 15M, 1H, 3H, 8H, 24H, inf
 }
