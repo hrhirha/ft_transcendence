@@ -6,9 +6,10 @@ import  {ChatRoomItem }  from "./chatroom_item/chatroom_item";
 import {faCommentMedical, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CreateNewChat } from "./create_chat/create_chat";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChatHomeVector, NoConversations } from "../../../assets";
+import { Socket } from "../../../socket";
 
 // interface Props {
 //     username: string,
@@ -68,14 +69,40 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
             />)}</>);
 }
 
+const class_socket =new Socket(); //test
 
 export const Chat:React.FC = () => {
     const [showNewChatForm, setShowNewChatForm] = useState<boolean>(false);
     const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState<chatTabs>(chatTabs.chats);
+
+
+    //test -----
+    useEffect(() => {
+        class_socket.socket.on("chats", (data : any)=>{
+            console.log(data)
+        })
+        class_socket.socket.on("receive_message", (data : any)=>{
+            console.log(data)
+        })
+    },[class_socket.socket])
+    //test -----
+
     return (
     <main id="chatPage">
         <NavBar />
+
+        <button onClick={() =>{
+            class_socket.start_dm("cl4e272rk1733czu1nkcmuvgu");
+        }}>start_dm</button>
+        <button onClick={() =>{
+            class_socket.get_chats();
+        }}>get_chats</button>
+        <button onClick={() =>{
+            class_socket.send_message({rid : "cl4e2vfzr2995czu1eo655ltn", msg :"aloooooo"});
+        }}>send_message</button>
+
+        
         <div className='container'>
             <div className="row chat">
                 <div className="col-sm-12 col-md-5 col-lg-4">

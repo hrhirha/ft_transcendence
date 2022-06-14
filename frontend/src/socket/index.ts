@@ -27,9 +27,20 @@ interface info_delete_join_leave_room {
     password? : string,
 }
 
-interface info_add_member {
+interface info_management_member {
     uid:  string,
     rid : string,
+}
+
+interface info_send_msg {
+    rid:  string,
+    msg : string,
+}
+
+interface info_mute_user {
+    uid:  string,
+    rid : string,
+    mute_period: string,
 }
 
 
@@ -60,7 +71,7 @@ export class Socket {
     }
 
     start_dm(id: string) {
-        this.socket.emit("start_dm", id);
+        this.socket.emit("start_dm", {id});
     }
 
     join_room(info_room : info_delete_join_leave_room) {
@@ -75,7 +86,7 @@ export class Socket {
         this.socket.emit("leave_room", info_room);
     }
 
-    add_member(member :info_add_member) {
+    add_member(member :info_management_member) {
         if(member.rid.length == 0)
             return new Error("error : rid must not be empty");
         if(member.uid.length == 0)
@@ -83,28 +94,54 @@ export class Socket {
         this.socket.emit("add_member", member);
     }
 
-    remove_member() {
-        this.socket.emit("remove_member");
+    remove_member(member :info_management_member) {
+        if(member.rid.length == 0)
+            return new Error("error : rid must not be empty");
+        if(member.uid.length == 0)
+            return new Error("error : uid must not be empty");
+        this.socket.emit("remove_member", member);
     }
 
-    ban_user() {
-        this.socket.emit("ban_user");
+    ban_user(member :info_management_member) {
+        if(member.rid.length == 0)
+            return new Error("error : rid must not be empty");
+        if(member.uid.length == 0)
+            return new Error("error : uid must not be empty");
+        this.socket.emit("ban_user", member);
     }
 
-    unban_user() {
-        this.socket.emit("unban_user");
+    unban_user(member :info_management_member) {
+        if(member.rid.length == 0)
+            return new Error("error : rid must not be empty");
+        if(member.uid.length == 0)
+            return new Error("error : uid must not be empty");
+        this.socket.emit("unban_user", member);
     }
 
-    mute_user() {
-        this.socket.emit("mute_user");
+    mute_user(member : info_mute_user) {
+        if(member.rid.length == 0)
+            return new Error("error : rid must not be empty");
+        if(member.uid.length == 0)
+            return new Error("error : uid must not be empty");
+        if(member.mute_period != "15M" && member.mute_period  != "1H" &&
+           member.mute_period != "24H" && member.mute_period  != "3H" &&
+           member.mute_period != "inf" && member.mute_period  != "8H")
+            return new Error("error : mute_period inco");
+        this.socket.emit("mute_user", member);
     }
 
-    unmute_user() {
+    unmute_user(member :info_management_member) {
+        if(member.rid.length == 0)
+            return new Error("error : rid must not be empty");
+        if(member.uid.length == 0)
+            return new Error("error : uid must not be empty");
         this.socket.emit("unmute_user");
     }
 
-    send_message() {
-        this.socket.emit("send_message");
+    send_message(msg :info_send_msg) {
+        if(msg.rid.length == 0)
+            return new Error("error : rid must not be empty");
+        this.socket.emit("send_message", msg);
     }
 
     delete_message() {
