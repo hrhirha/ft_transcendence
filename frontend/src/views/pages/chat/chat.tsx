@@ -54,6 +54,8 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
     return (<>{chats.map((chat: any, index: any) => 
             <ChatRoomItem
                 key={index}
+                isChannel={chatTabs.chats !== tab}
+                joined={chatTabs.chats === tab}
                 avatar={chat.image}
                 fullName={chat.username}
                 lastMsg={chat.last_msg}

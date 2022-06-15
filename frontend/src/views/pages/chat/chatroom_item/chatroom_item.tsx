@@ -12,6 +12,8 @@ interface Props {
     lastMsg: string,
     timeLastMsg: Date,
     nbNotifs: number,
+    isChannel: boolean,
+    joined: boolean,
     active: boolean,
     onClick: Function,
 }
@@ -19,16 +21,17 @@ interface Props {
 export const ChatRoomItem = (Props : Props) => {
   return (
     <div id='chatRoomItem' onClick={() => Props.onClick()} className={Props.active ? 'active' : undefined}>
-      <CircleAvatar avatarURL={Props.avatar} dimensions={40} showStatus={true}/>
+      <CircleAvatar avatarURL={Props.avatar} dimensions={40} showStatus={!Props.isChannel}/>
       <div className='dataColumn'>
         <div className='dataRow'>
           <h6 className='userName'>{Props.fullName}</h6>
-          <ReactTimeAgo className='time' date={Props.timeLastMsg} locale="en-US"/>
+          {Props.joined && <ReactTimeAgo className='time' date={Props.timeLastMsg} locale="en-US"/>}
+          {!Props.joined && <button className='joinChannel'>Join</button>}
         </div>
-        <div className='dataRow'>
+        {Props.joined && <div className='dataRow'>
           <p className='lastMsg'>{Props.lastMsg}</p>
           {Props.nbNotifs > 0 && <span className='nbNotifs'>{Props.nbNotifs}</span>}
-        </div>
+        </div>}
       </div>
     </div>
   )

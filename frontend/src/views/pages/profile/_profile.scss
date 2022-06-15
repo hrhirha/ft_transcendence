@@ -57,7 +57,7 @@
             border-radius: 1rem;
             background-color: $dark3;
         }
-        .title {
+        .title > div {
             @include _flex(row, center, center);
             margin: auto 1rem;
             svg {
@@ -82,7 +82,7 @@
         @include _flex(column, space-evenly, center);
         @include _selectionOff();
         height: 100%;
-        .btnAccept, .btnMessage, .btnAdd {
+        .btnAccept, .btnMessage, .btnAddFriend {
             @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($purple, .5), $bgcolor2: $purple);
         }
         .btnDecline, .btnCancle, .btnPending {

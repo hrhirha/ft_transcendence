@@ -52,13 +52,13 @@ export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
                 {buttons.map((button, index) => {
                     if (button.type === userType.none) {
                         return (
-                            <button key={index} className={`btn${button.text}`} onClick={() => button.onClick(Props.username)}>
+                            <button key={`${button.text.replace(' ', '')}`} className={`btn${button.text.replace(' ', '')}`} onClick={() => button.onClick(Props.username)}>
                                 <FontAwesomeIcon icon={button.icon} />
                                 {button.text}
                             </button>
                         );
                     }
-                    return (<></>);
+                    return null;
                 })}
             </div>
         </section>

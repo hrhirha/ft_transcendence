@@ -76,9 +76,9 @@ export const FriendsManager:React.FC = () => {
                         {activeTab === tabs.pending && <h5>You Have No Pending Requests</h5>}
                     </div>}
                     {friendsList.length > 0
-                    && friendsList.map((friend, k) => 
+                    && friendsList.map((friend, index) => 
                     <FriendCard
-                        key={k}
+                        key={`${friend.username}_${index}`}
                         type = {friend.type}
                         avatar = {friend.avatar}
                         fullName= {friend.fullName}

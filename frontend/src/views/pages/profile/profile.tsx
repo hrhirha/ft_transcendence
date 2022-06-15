@@ -99,7 +99,7 @@ export const Profile:React.FC = () => {
                         <nav className="profileTabs">
                             <ul className="tabs">
                                 {tabs.map((tab, index) => (
-                                    <li className={"tabTitle "+(switchTab === index ? "active" : "")} onClick={() =>  setSwitchTab(index)}>{tab.title}</li>
+                                    <li key={`${tab.title.replace(' ', '_')}`} className={"tabTitle "+(switchTab === index ? "active" : "")} onClick={() =>  setSwitchTab(index)}>{tab.title}</li>
                                 ))}
                             </ul>
                         </nav>
@@ -108,12 +108,12 @@ export const Profile:React.FC = () => {
                             <div className="title">
                                 {tabs.map((tab, index) => {
                                     if (index === switchTab) {
-                                        return <>
+                                        return <div key={`${tab.title.replace(' ', '')}`}>
                                             <FontAwesomeIcon icon={tab.icon} />
                                             <span>{tab.title}</span>
-                                        </>
+                                        </div>
                                     }
-                                    return (<></>);
+                                    return null;
                                 })}
                             </div>
                             <hr/>
