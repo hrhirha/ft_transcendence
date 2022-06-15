@@ -68,7 +68,9 @@ export class AuthService {
                 secret: this._configS.get('JWT_ACCESS_SECRET'),
             });
             if (payload.sub) {
-                const user =  await this._userS.findById(payload.sub);
+                const user = await this._prismaS.user.findUnique({
+                    where: { id: payload.sub, },
+                });
                 return user;
             }
         }

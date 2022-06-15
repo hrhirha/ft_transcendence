@@ -10,13 +10,6 @@ export class UserService {
     constructor(private _prismaS: PrismaService) {}
 
     // User
-    async findById(id:string)
-    {
-        const user = await this._prismaS.user.findUnique({
-            where: { id, },
-        });
-        return user;
-    }
 
     async getUserById(id: string)
     {
@@ -58,13 +51,7 @@ export class UserService {
         if (!user)
             throw new ForbiddenException('user not found');
         return user;
-    }
-
-    publicData(user: User)
-    {
-        const {createdAt, updatedAt, refresh_token, isTfaEnabled, tfaSecret, ...dto} = user;
-        return dto;    
-    }
+    } 
 
     async updateStatus(id:string, status: string)
     {
@@ -144,8 +131,6 @@ export class UserService {
         });
         return {success: true};
     }
-
-    // end User
 
     // friend Requests
     async sendFriendReq(snd_id: string, rcv_id: string)
@@ -270,7 +255,6 @@ export class UserService {
         }
         return users;
     }
-    // end Friend Requests
 
     // Friends
     async unfriend(snd_id: string, rcv_id: string)
@@ -424,5 +408,4 @@ export class UserService {
         }
         return friends;
     }
-    // end Friends
 }

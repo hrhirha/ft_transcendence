@@ -8,7 +8,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserIdDto } from 'src/user/dto';
 import { UserService } from 'src/user/user.service';
 import { friend_status, room_type, user_status } from 'src/utils';
-import { AddMessageDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
+import { AddMessageDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, UpdateRoomDto, UserRoomDto } from './dto';
 
 @Injectable()
 export class ChatService {
@@ -100,7 +100,7 @@ export class ChatService {
         return {success: true};
     }
 
-    async editRoom(user: User, room: OldRoomDto)
+    async editRoom(user: User, room: UpdateRoomDto)
     {
         // if protectd:
         //      if password: check old password bfore updating it
