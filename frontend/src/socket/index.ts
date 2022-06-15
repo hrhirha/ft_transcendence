@@ -22,7 +22,7 @@ interface info_create_room {
     uids: string[],
 }
 
-interface info_delete_join_leave_room {
+interface info_management_room {
     id:  string,
     password? : string,
 }
@@ -41,6 +41,11 @@ interface info_mute_user {
     uid:  string,
     rid : string,
     mute_period: string,
+}
+
+interface info_delete_msg {
+    id:  string,
+    rid : string,
 }
 
 
@@ -64,7 +69,7 @@ export class Socket {
         this.socket.emit("create_room", info_room);
     }
 
-    delete_room(info_room : info_delete_join_leave_room) {
+    delete_room(info_room : info_management_room) {
         if(info_room.id.length == 0)
             return new Error("error : id must not be empty");
         this.socket.emit("delete_room", info_room);
@@ -74,13 +79,13 @@ export class Socket {
         this.socket.emit("start_dm", {id});
     }
 
-    join_room(info_room : info_delete_join_leave_room) {
+    join_room(info_room : info_management_room) {
         if(info_room.id.length == 0)
             return new Error("error : id must not be empty");
         this.socket.emit("join_room", info_room);
     }
 
-    leave_room(info_room : info_delete_join_leave_room) {
+    leave_room(info_room : info_management_room) {
         if(info_room.id.length == 0)
             return new Error("error : id must not be empty");
         this.socket.emit("leave_room", info_room);
@@ -135,7 +140,7 @@ export class Socket {
             return new Error("error : rid must not be empty");
         if(member.uid.length == 0)
             return new Error("error : uid must not be empty");
-        this.socket.emit("unmute_user");
+        this.socket.emit("unmute_user", member);
     }
 
     send_message(msg :info_send_msg) {
@@ -144,23 +149,36 @@ export class Socket {
         this.socket.emit("send_message", msg);
     }
 
-    delete_message() {
-        this.socket.emit("delete_message");
+    delete_message(info_msg : info_delete_msg) {
+        if(info_msg.id.length == 0)
+            return new Error("error : id must not be empty");
+        if(info_msg.rid.length == 0)
+            return new Error("error : rid must not be empty");
+        this.socket.emit("delete_message", info_msg);
     }
 
-    join() {
-        this.socket.emit("join");
+    join(info_room : info_management_room) {
+        if(info_room.id.length == 0)
+            return new Error("error : id must not be empty");
+        this.socket.emit("join", info_room);
     }
 
-    leave() {
-        this.socket.emit("leave");
+    leave(info_room : info_management_room) {
+        if(info_room.id.length == 0)
+            return new Error("error : id must not be empty");
+        this.socket.emit("leave", info_room);
     }
 
-    get_members() {
-        this.socket.emit("get_members");
+    get_members(info_room : info_management_room) {
+        if(info_room.id.length == 0)
+            return new Error("error : id must not be empty");
+        this.socket.emit("get_members", info_room);
+        
     }
 
-    get_messages() {
+    get_messages(info_room : info_management_room) {
+        if(info_room.id.length == 0)
+            return new Error("error : id must not be empty");
         this.socket.emit("get_messages");
     }
 
