@@ -84,8 +84,7 @@ CREATE TABLE "user_games" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "uid" TEXT NOT NULL,
     "gid" TEXT NOT NULL,
-    "is_player" BOOLEAN NOT NULL,
-    "score" INTEGER NOT NULL,
+    "score" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "user_games_pkey" PRIMARY KEY ("id")
 );

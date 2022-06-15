@@ -134,8 +134,7 @@ model UserGame {
   gid       String
   room      Game @relation(fields: [gid], references: [id], onDelete: Cascade)
 
-  is_player Boolean
-  score     Int
+  score     Int @default(0)
 
   @@unique([uid, gid])
   @@map("user_games")
