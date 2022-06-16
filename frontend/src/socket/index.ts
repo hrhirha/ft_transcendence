@@ -1,20 +1,5 @@
 import io from "socket.io-client";
 
-
-    //test socket connection
-
-/*
-    useEffect(() => {
-        class_socket.socket.on("chats", (data : any)=>{
-            console.log(data)
-        })
-        
-    },[class_socket.socket])
- 
- */
- 
-     //--------------------
-
 interface info_create_room {
     name:  string,
     is_private? : boolean,

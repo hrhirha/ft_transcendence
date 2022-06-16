@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChatHomeVector, NoConversations } from "../../../assets";
 import { Socket } from "../../../socket";
+import { join_invite, leave_call, receive_message } from "../../../socket/interface";
 
 // interface Props {
 //     username: string,
@@ -71,6 +72,7 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
 
 const class_socket =new Socket(); //test
 
+
 export const Chat:React.FC = () => {
     const [showNewChatForm, setShowNewChatForm] = useState<boolean>(false);
     const [searchParams] = useSearchParams();
@@ -82,7 +84,19 @@ export const Chat:React.FC = () => {
         class_socket.socket.on("chats", (data : any)=>{
             console.log(data)
         })
-        class_socket.socket.on("receive_message", (data : any)=>{
+        class_socket.socket.on("receive_message", (data : receive_message)=>{
+            console.log(data.user.username)
+        })
+        class_socket.socket.on("join_invite", (data : join_invite)=>{
+            console.log(data)
+        })
+        class_socket.socket.on("leave_call", (data : leave_call)=>{
+            console.log(data.id)
+        })
+        class_socket.socket.on("user_joined", (data : string)=>{
+            console.log(data)
+        })
+        class_socket.socket.on("user_left", (data : string)=>{
             console.log(data)
         })
     },[class_socket.socket])
@@ -93,15 +107,32 @@ export const Chat:React.FC = () => {
         <NavBar />
 
         <button onClick={() =>{
-            class_socket.start_dm("cl4e272rk1733czu1nkcmuvgu");
+            class_socket.start_dm("cl4h09o9e0208edsndp62jcyk");
         }}>start_dm</button>
         <button onClick={() =>{
             class_socket.get_chats();
         }}>get_chats</button>
         <button onClick={() =>{
-            class_socket.send_message({rid : "cl4e2vfzr2995czu1eo655ltn", msg :"aloooooo"});
+            class_socket.send_message({rid : "cl4h2oyfy0372edsnq475xaz5", msg :"aloooooo"});
         }}>send_message</button>
-
+        <button onClick={() =>{
+            class_socket.create_room({name : "walidroom",is_private:false, uids :["cl4h09o9e0208edsndp62jcyk"]});
+        }}>create room</button>
+        <button onClick={() =>{
+            class_socket.delete_room({id : "cl4h891gg32944wsna1fxffb6"});
+        }}>delete_room</button>
+        <button onClick={() =>{
+            class_socket.remove_member({uid : "cl4h09o9e0208edsndp62jcyk", rid : "cl4h8byh336374wsn1uelai1h"});
+        }}>remove_member</button>
+        <button onClick={() =>{
+            class_socket.join_room({id : "cl4hbgqpq85214wsnjmq4w368"});
+        }}>join_room</button>
+        <button onClick={() =>{
+            class_socket.leave_room({id : "cl4hbgqpq85214wsnjmq4w368"});
+        }}>leave_room</button>
+        <button onClick={() =>{
+            class_socket.add_member({uid : "cl4h09o9e0208edsndp62jcyk", rid : "cl4h8byh336374wsn1uelai1h"});
+        }}>add_member</button>
         
         <div className='container'>
             <div className="row chat">
