@@ -52,6 +52,7 @@ export class ChatService {
                         select: {
                             user: {
                                 select: {
+                                    id: true,
                                     username: true
                                 }
                             }
@@ -76,8 +77,9 @@ export class ChatService {
                 });
                 usernames.push(ur.user.username);
             }
+            r["owner"] = r?.user_rooms[0]?.user?.id;
             delete r.user_rooms;
-            return {room:r, usernames};
+            return {room: r, usernames};
         });
     }
     
@@ -86,6 +88,7 @@ export class ChatService {
         const del = await this._prismaS.room.deleteMany({
             where: {
                 id: room.id,
+                is_channel: true,
                 user_rooms: {
                     some: {
                         uid: user.id,
@@ -97,7 +100,7 @@ export class ChatService {
         });
         if (del.count === 0)
             throw new WsException('could not delete room');
-        return {success: true};
+        return { id: room.id };
     }
 
     // async editRoom(user: User, room)
@@ -143,6 +146,7 @@ export class ChatService {
             },
             select: {
                 id: true,
+                is_channel: true,
                 user_rooms: {
                     // where: {
                     //     uid: u2.id
@@ -231,7 +235,7 @@ export class ChatService {
             },
             select: {
                 room: {
-                    select: { id: true, }
+                    select: { id: true, is_channel: true, }
                 },
                 user: {
                     select: {
@@ -256,7 +260,7 @@ export class ChatService {
             },
             select: {
                 room: {
-                    select: { id: true, }
+                    select: { id: true, is_channel: true, }
                 },
                 user: {
                     select: {
@@ -936,6 +940,11 @@ export class ChatService {
                                 imageUrl: true,
                             },
                         },
+                        room: {
+                            select: {
+                                id: true,
+                            }
+                        }
                     },
                     orderBy: { timestamp: 'desc' },
                     take: 1,

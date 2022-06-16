@@ -97,6 +97,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             for (let s of sockets)
                 room_users.push(s.id);
 
+            console.log("jksdhjkdshjkdhsjkdsh");
             this.server.to(room_users).emit('join_invite', r.room);
         }
         catch (e)
@@ -115,7 +116,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             await this._chat.deleteRoom(user, room);
-            client.to(room.id).emit('leave_call', {id: room.id});
+            client.to(room.id).emit('leave_call', { id: room.id });
         }
         catch (e)
         {
@@ -142,7 +143,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             
             client.join(r.room.id);
             if (sockets.length === 1)
-                this.server.to(sockets[0].id).emit('join_invite', { room: r.room, user: participant });
+                this.server.to(sockets[0].id).emit('user_join_invite', { room: r.room, user: participant });
         }
         catch (e)
         {
@@ -202,7 +203,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 return ur.user.username === s.data.username;
             });
 
-            sockets[0] && this.server.to(sockets[0].id).emit('join_invite', ur);
+            sockets[0] && this.server.to(sockets[0].id).emit('user_join_invite', ur);
         }
         catch (e)
         {
@@ -223,7 +224,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 return ur.user.username === s.data.username;
             });
 
-            sockets[0] && this.server.to(sockets[0].id).emit('leave_call', {id: ur.room.id});
+            sockets[0] && this.server.to(sockets[0].id).emit('user_leave_call', {
+                uid: ur.user.id,
+                rid: ur.room.id
+            });
         }
         catch (e)
         {
