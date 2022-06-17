@@ -1,3 +1,55 @@
 section.matchCard {
-   
+    @include _flex(row, space-between, center);
+    width: 95%;
+    padding: 1rem;
+    margin: .5rem auto;
+    border-radius: 1rem;
+    background-color: $dark2;
+   .player {
+    @include _flex(row, center, center);
+
+        .avatar {
+            @include _flex(column, center, center);
+            position: relative;
+            #circleAvatar {
+                border: .25rem solid $dark3;
+            }
+            .ranking {
+                @include _flex(column, center, center);
+                background-color: $dark3;
+                position: absolute;
+                bottom: -.25rem;
+                width: 2.5rem;
+                border-radius: 5rem;
+                font-size: $fsize * .75;
+                font-family: $BFont;
+                border: 0.2rem solid $light4;
+            }
+        }
+        .fullName {
+            font-size: $fsize * 1.2;
+            @include _textOverflow(10rem);
+            margin: 0 .5rem;
+            color: $light3;
+        }
+    }
+    .scoreBoard {
+        @include _flex(row, center, center);
+        background-color: $dark3;
+        border-radius: 5rem;
+        height: 2.5rem;
+        .gameType {
+            width: 4rem;
+            background-color: $dark3;
+            padding: .5rem;
+            border-radius: 50%;
+        }
+        .score {
+            font-size: $fsize * 1.75;
+            font-family: $BFont;
+            margin: auto 1rem;
+            width: 2rem;
+            text-align: center;
+        }
+    }
 }

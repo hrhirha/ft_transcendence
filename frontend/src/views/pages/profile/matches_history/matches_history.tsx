@@ -27,7 +27,7 @@ export const MatchesHistory:React.FC = () => {
                 player1={
                     {
                         "avatar": "https://i.pravatar.cc/300?img=11",
-                        "fullName": "Player 1",
+                        "fullName": "Player1 Full Name",
                         "ranking": 1,
                         "score": 10
                     }
@@ -35,9 +35,72 @@ export const MatchesHistory:React.FC = () => {
                 player2={
                     {
                         "avatar": "https://i.pravatar.cc/300?img=18",
-                        "fullName": "Player 2",
+                        "fullName": "Player2 FulName",
                         "ranking": 2,
                         "score": 8
+                    }
+                }
+                onClick={() => {}}
+                />
+            <MatchCard
+                matchId="MATCH002"
+                gameModePro={false}
+                player1={
+                    {
+                        "avatar": "https://i.pravatar.cc/300?img=21",
+                        "fullName": "Player1",
+                        "ranking": 12,
+                        "score": 2
+                    }
+                }
+                player2={
+                    {
+                        "avatar": "https://i.pravatar.cc/300?img=38",
+                        "fullName": "Player2",
+                        "ranking": 5,
+                        "score": 10
+                    }
+                }
+                onClick={() => {}}
+                />
+            <MatchCard
+                matchId="MATCH001"
+                gameModePro={true}
+                player1={
+                    {
+                        "avatar": "https://i.pravatar.cc/300?img=11",
+                        "fullName": "Player1 Full Name",
+                        "ranking": 1,
+                        "score": 10
+                    }
+                }
+                player2={
+                    {
+                        "avatar": "https://i.pravatar.cc/300?img=18",
+                        "fullName": "Player2 FulName",
+                        "ranking": 2,
+                        "score": 8
+                    }
+                }
+                onClick={() => {}}
+                />
+            <MatchCard
+                matchId="MATCH002"
+                gameModePro={false}
+                player1={
+                    {
+                        "avatar": "https://i.pravatar.cc/300?img=21",
+                        "fullName": "Player1",
+                        "ranking": 12,
+                        "score": 2
+                    }
+                }
+                player2={
+                    {
+                        "avatar": "https://i.pravatar.cc/300?img=38",
+                        "fullName": "Player2",
+                        "ranking": 5,
+                        "score": 10
                     }
                 }
                 onClick={() => {}}
