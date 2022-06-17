@@ -252,9 +252,6 @@ export class ChatService {
                 id: true,
                 is_channel: true,
                 user_rooms: {
-                    // where: {
-                    //     uid: u2.id
-                    // },
                     select: {
                         user: {
                             select: {
@@ -271,6 +268,7 @@ export class ChatService {
         const user1 = r.user_rooms[0].user;
         const user2 = r.user_rooms[1].user;
         delete r.user_rooms;
+        console.log(r);
         return { room: r, user1, user2 };
     }
                 
@@ -291,7 +289,7 @@ export class ChatService {
                 throw new WsException('invalid password');
         }
 
-        return await this._prismaS.room.update({
+        const up_r = await this._prismaS.room.update({
             where: { id: room.id },
             data: {
                 user_rooms: {
@@ -302,8 +300,29 @@ export class ChatService {
                 id: true,
                 name: true,
                 type: true,
+                is_channel: true,
+                user_rooms: {
+                    where: {
+                        uid: user.id,
+                    },
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                fullName: true,
+                                imageUrl: true
+                            }
+                        }
+                    }
+                }
             }
         });
+        if (!up_r)
+            throw new WsException('unable to join room');
+        const u = up_r.user_rooms[0].user;
+        delete up_r.user_rooms;
+        return { room: r, user: u };
     }
 
     async leaveRoom(user: User, room: OldRoomDto)
@@ -321,9 +340,7 @@ export class ChatService {
                 }
             },
             select: {
-                id: true,
-                name: true,
-                type: true,
+                id: true,   
             }
         });
     }
@@ -339,7 +356,12 @@ export class ChatService {
             },
             select: {
                 room: {
-                    select: { id: true, is_channel: true, }
+                    select: {
+                        id: true,
+                        name: true,
+                        type: true,
+                        is_channel: true,
+                    }
                 },
                 user: {
                     select: {
@@ -450,11 +472,22 @@ export class ChatService {
                     rid: user_room.rid,
                 }
             },
+            select: {
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                    }
+                },
+                room: {
+                    select: { id: true, is_channel: true },
+                }
+            }
         });
 
         if (!ur)
             throw new WsException('ban operation failed');
-        return {success: true}
+        return ur.user
     }
 
     async unbanUser(user: User, user_room: UserRoomDto)
@@ -490,10 +523,26 @@ export class ChatService {
                     rid: user_room.rid,
                 }
             },
+            select: {
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                    }
+                },
+                room: {
+                    select: {
+                        id: true,
+                        name: true,
+                        type: true,
+                        is_channel: true
+                    },
+                }
+            }
         });
         if (!ur)
             throw new WsException('unban operation failed');
-        return {success: true}
+        return ur;
     }
 
     async muteUser(user: User, user_room: MuteUserDto)
@@ -843,6 +892,7 @@ export class ChatService {
                     user_rooms: {
                         some: {
                             uid, rid,
+                            is_banned: false,
                         },
                     },
                 },
@@ -1154,10 +1204,8 @@ export class ChatService {
             },
             select: {
                 id: true,
+                is_channel: true,
                 user_rooms: {
-                    // where: {
-                    //     uid: id2
-                    // },
                     select: {
                         user: {
                             select: {
