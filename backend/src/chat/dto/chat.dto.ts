@@ -37,14 +37,8 @@ export class NewRoomDto
 
 export class OldRoomDto
 {
-    /* {
-        id: string,
-        password?: string
-        }
-    */
-
-    @IsString()
     @IsNotEmpty()
+    @IsString()
     @Matches(/^c[a-z0-9]{20,}$/)
     id: string;
 
@@ -57,10 +51,64 @@ export class OldRoomDto
     password?: string;
 }
 
+export class SetPasswordDto
+{
+    @IsNotEmpty()
+    @IsString()
+    @Matches(/^c[a-z0-9]{20,}$/)
+    id: string;
+
+    @IsString()
+    @IsOptional()
+    @Matches(/\w+/)
+    @Matches(/[A-Z]+/)
+    @Matches(/\d+/)
+    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/)
+    new_password: string;
+}
+
+export class ChangePasswordDto
+{
+    @IsNotEmpty()
+    @IsString()
+    @Matches(/^c[a-z0-9]{20,}$/)
+    id: string;
+
+    @IsString()
+    @IsOptional()
+    @Matches(/\w+/)
+    @Matches(/[A-Z]+/)
+    @Matches(/\d+/)
+    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/)
+    new_password: string;
+
+    @IsString()
+    @IsOptional()
+    @Matches(/\w+/)
+    @Matches(/[A-Z]+/)
+    @Matches(/\d+/)
+    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/)
+    old_password: string;
+}
+
+export class RemovePasswordDto
+{
+    @IsNotEmpty()
+    @IsString()
+    @Matches(/^c[a-z0-9]{20,}$/)
+    id: string;
+
+    @IsString()
+    @IsOptional()
+    @Matches(/\w+/)
+    @Matches(/[A-Z]+/)
+    @Matches(/\d+/)
+    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/)
+    old_password: string;
+}
+
 export class AddMessageDto
 {
-    // { rid: string, msg: string }
-
     @IsString()
     @IsNotEmpty()
     @Matches(/^c[a-z0-9]{20,}$/)
@@ -73,8 +121,6 @@ export class AddMessageDto
 
 export class DeleteMessageDto
 {
-    // { id: string, rid: string}
-
     @IsString()
     @IsNotEmpty()
     @Matches(/^c[a-z0-9]{20,}$/)
@@ -88,8 +134,6 @@ export class DeleteMessageDto
 
 export class UserRoomDto
 {
-    // { uid: string, rid: string }
-
     @IsString()
     @IsNotEmpty()
     @Matches(/^c[a-z0-9]{20,}$/)

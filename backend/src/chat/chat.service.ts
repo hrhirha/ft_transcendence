@@ -8,7 +8,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserIdDto } from 'src/user/dto';
 import { UserService } from 'src/user/user.service';
 import { friend_status, room_type, user_status } from 'src/utils';
-import { AddMessageDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
+import { AddMessageDto, ChangePasswordDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, RemovePasswordDto, SetPasswordDto, UserRoomDto } from './dto';
 
 @Injectable()
 export class ChatService {
@@ -103,13 +103,119 @@ export class ChatService {
         return { id: room.id };
     }
 
-    // async editRoom(user: User, room)
-    // {
-    //     // if protectd:
-    //     //      if password: check old password bfore updating it
-    //     //      else: make it public
-    //     // if public, set password and make it protected
-    // }
+    async setPassword(user: User, dto: SetPasswordDto)
+    {
+        // public --> protected
+        dto.new_password = await argon2.hash(dto.new_password);
+        const r = await this._prismaS.room.updateMany({
+            data: {
+                password: dto.new_password,
+                type: room_type.PROTECTED,
+            },
+            where: {
+                id: dto.id,
+                type: room_type.PUBLIC,
+                user_rooms: {
+                    some: {
+                        uid: user.id,
+                        is_owner: true,
+                    },
+                },
+            },
+        });
+        if (r.count === 0)
+            throw new WsException({
+                error: 'FORBIDDEN',
+                message: 'unable to set password, if the room exist and you are the owner, this might already be protected'
+            });
+        return {
+            id: dto.id,
+            type: room_type.PROTECTED,
+        }
+    }
+
+    async changePassword(user: User, dto: ChangePasswordDto)
+    {
+        // protected --> protected
+        const room = await this._prismaS.room.findFirst({
+            where: {
+                id: dto.id,
+                type: room_type.PROTECTED,
+                user_rooms: {
+                    some: {
+                        uid: user.id,
+                        is_owner: true,
+                    },
+                }
+            },
+        });
+        if (!room)
+            throw new WsException('room not found');
+        if (!(await argon2.verify(room.password, dto.old_password)))
+            throw new WsException('invalid old_password');
+
+        dto.new_password = await argon2.hash(dto.new_password);
+        const r = await this._prismaS.room.update({
+            data: {
+                password: dto.new_password,
+            },
+            where: {
+                id: dto.id,
+            },
+            select: {
+                id: true,
+            }
+        });
+        if (!r)
+            throw new WsException({
+                error: 'FORBIDDEN',
+                message: 'unable to set password, if the room exist and you are the owner, this might already be protected'
+            });
+        return {
+            id: dto.id,
+            type: room_type.PROTECTED,
+        }
+    }
+
+    async removePassword(user: User, dto: RemovePasswordDto)
+    {
+        // protected --> public
+        const room = await this._prismaS.room.findFirst({
+            where: {
+                id: dto.id,
+                type: room_type.PROTECTED,
+                user_rooms: {
+                    some: {
+                        uid: user.id,
+                        is_owner: true,
+                    },
+                }
+            },
+        });
+        if (!room)
+            throw new WsException('room not found');
+        if (!(await argon2.verify(room.password, dto.old_password)))
+            throw new WsException('invalid old_password');
+
+        const r = await this._prismaS.room.update({
+            data: {
+                password: null,
+                type: room_type.PUBLIC,
+            },
+            where: {
+                id: dto.id,
+            },
+        });
+        if (!r)
+            throw new WsException({
+                error: 'FORBIDDEN',
+                message: 'unable to set password, if the room exist and you are the owner, this might already be protected'
+            });
+        return {
+            id: dto.id,
+            type: room_type.PUBLIC,
+        }
+    }
 
     async start_dm(u1: User, u2: UserIdDto)
     {

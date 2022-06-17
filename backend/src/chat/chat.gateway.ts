@@ -2,7 +2,7 @@ import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, OnGatew
 import {  } from '@nestjs/platform-socket.io'
 import { ArgumentMetadata, HttpException, Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { AddMessageDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, UserRoomDto } from './dto';
+import { AddMessageDto, ChangePasswordDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, SetPasswordDto, UserRoomDto } from './dto';
 import { ChatService } from './chat.service';
 import { UserService } from 'src/user/user.service';
 import { user_status } from 'src/utils';
@@ -79,7 +79,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('create_room')
-    async createRoom(@ConnectedSocket() client: Socket, @MessageBody() room: NewRoomDto)
+    async  createRoom(@ConnectedSocket() client: Socket, @MessageBody() room: NewRoomDto)
     {
         let user = await this._chat.getUserFromSocket(client);
         if (!user)
@@ -97,7 +97,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             for (let s of sockets)
                 room_users.push(s.id);
 
-            console.log("jksdhjkdshjkdhsjkdsh");
             this.server.to(room_users).emit('join_invite', r.room);
         }
         catch (e)
@@ -122,6 +121,60 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         {
             console.log({code: e.code, message: e.message});
             throw new WsException('failed to delete room');
+        }
+    }
+
+    @SubscribeMessage('set_password')
+    async setPassword(@ConnectedSocket() client: Socket, @MessageBody() dto: SetPasswordDto)
+    {
+        let user = await this._chat.getUserFromSocket(client);
+        if (!user)
+            throw new WsException('you must login first');
+        try
+        {
+            await this._chat.setPassword(user, dto);
+            client.emit('password_set', { success: true, });
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to set password');
+        }
+    }
+
+    @SubscribeMessage('change_password')
+    async changePassword(@ConnectedSocket() client: Socket, @MessageBody() dto: ChangePasswordDto)
+    {
+        let user = await this._chat.getUserFromSocket(client);
+        if (!user)
+            throw new WsException('you must login first');
+        try
+        {
+            await this._chat.changePassword(user, dto);
+            client.emit('password_changed', { success: true, });
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to change password');
+        }
+    }
+
+    @SubscribeMessage('remove_password')
+    async removePassword(@ConnectedSocket() client: Socket, @MessageBody() dto: ChangePasswordDto)
+    {
+        let user = await this._chat.getUserFromSocket(client);
+        if (!user)
+            throw new WsException('you must login first');
+        try
+        {
+            await this._chat.removePassword(user, dto);
+            client.emit('password_removed', { success: true, });
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to remove password');
         }
     }
 
