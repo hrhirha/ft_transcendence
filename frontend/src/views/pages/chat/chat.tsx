@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChatHomeVector, NoConversations } from "../../../assets";
 import { Socket } from "../../../socket";
-import { join_invite, leave_call, receive_message } from "../../../socket/interface";
+import { chats, dm_started, leave_call, receive_message, room_created } from "../../../socket/interface";
 
 // interface Props {
 //     username: string,
@@ -83,22 +83,85 @@ export const Chat:React.FC = () => {
 
     //test -----
     useEffect(() => {
-        class_socket.socket.on("chats", (data : any)=>{
+        class_socket.socket.on("chats", (data : chats)=>{ //done
+            console.log("chats : ");
             console.log(data)
         })
-        class_socket.socket.on("receive_message", (data : receive_message)=>{
-            console.log(data.user.username)
-        })
-        class_socket.socket.on("join_invite", (data : join_invite)=>{
+        class_socket.socket.on("receive_message", (data : receive_message)=>{ //dane
+            console.log("receive_message");
             console.log(data)
         })
+
         class_socket.socket.on("leave_call", (data : leave_call)=>{
+            console.log("leave_call");
             console.log(data.id)
         })
-        class_socket.socket.on("user_joined", (data : string)=>{
+        class_socket.socket.on("user_joined", (data : any)=>{
+            console.log("user_joined");
             console.log(data)
         })
-        class_socket.socket.on("user_left", (data : string)=>{
+        class_socket.socket.on("user_left", (data : any)=>{
+            console.log("user_left");
+            console.log(data)
+        })
+        class_socket.socket.on("user_leave_call", (data : any)=>{
+            console.log("user_leave_call");
+            console.log(data)
+        })
+        class_socket.socket.on("room_created", (data : room_created)=>{
+            console.log("room_created");
+            console.log(data)
+        })
+        class_socket.socket.on("room_deleted", (data : any)=>{
+            console.log("room_deleted");
+            console.log(data)
+        })
+        class_socket.socket.on("password_set", (data : any)=>{
+            console.log("password_set");
+            console.log(data)
+        })
+        class_socket.socket.on("password_changed", (data : any)=>{
+            console.log("password_changed");
+            console.log(data)
+        })
+        class_socket.socket.on("password_removed", (data : any)=>{
+            console.log("password_removed");
+            console.log(data)
+        })
+        class_socket.socket.on("dm_started", (data : dm_started)=>{
+            console.log("dm_started");
+            console.log(data)
+        })
+        class_socket.socket.on("admin_added", (data : any)=>{
+            console.log("admin_added");
+            console.log(data)
+        })
+        class_socket.socket.on("admin_removed", (data : any)=>{
+            console.log("admin_removed");
+            console.log(data)
+        })
+        class_socket.socket.on("user_banned", (data : any)=>{
+            console.log("user_banned");
+            console.log(data)
+        })
+        class_socket.socket.on("user_unbanned", (data : any)=>{
+            console.log("user_unbanned");
+            console.log(data)
+        })
+        class_socket.socket.on("user_muted", (data : any)=>{
+            console.log("user_muted");
+            console.log(data)
+        })
+        class_socket.socket.on("user_unmuted", (data : any)=>{
+            console.log("user_unmuted");
+            console.log(data)
+        })
+        class_socket.socket.on("message_deleted", (data : any)=>{
+            console.log("message_deleted");
+            console.log(data)
+        })
+        class_socket.socket.on("messages", (data : any)=>{
+            console.log("messages");
             console.log(data)
         })
     },[class_socket.socket])
@@ -108,33 +171,36 @@ export const Chat:React.FC = () => {
     <main id="chatPage">
         <NavBar />
 
-        <button onClick={() =>{
-            class_socket.start_dm("cl4h09o9e0208edsndp62jcyk");
+        <button style={{color: `black`}}onClick={() =>{
+            class_socket.start_dm("cl4ijebhq00120xsrfeiy6bkb");
         }}>start_dm</button>
-        <button onClick={() =>{
+        <button style={{color: `black`}} onClick={() =>{
             class_socket.get_chats();
         }}>get_chats</button>
-        <button onClick={() =>{
-            class_socket.send_message({rid : "cl4h2oyfy0372edsnq475xaz5", msg :"aloooooo"});
+        <button style={{color: `black`}} onClick={() =>{
+            class_socket.send_message({rid : "cl4imx8c60085bhsrpmxavy94", msg :"test"});
         }}>send_message</button>
-        <button onClick={() =>{
-            class_socket.create_room({name : "walidroom",is_private:false, uids :["cl4h09o9e0208edsndp62jcyk"]});
+        <button style={{color: `black`}} onClick={() =>{
+            class_socket.create_room({name : "walidroom",is_private:false, uids :["cl4ijebhq00120xsrfeiy6bkb"]});
         }}>create room</button>
-        <button onClick={() =>{
-            class_socket.delete_room({id : "cl4h891gg32944wsna1fxffb6"});
+        <button style={{color: `black`}} onClick={() =>{
+            class_socket.delete_room({id : "cl4imx8960036bhsrjccw1ec6"});
         }}>delete_room</button>
-        <button onClick={() =>{
-            class_socket.remove_member({uid : "cl4h09o9e0208edsndp62jcyk", rid : "cl4h8byh336374wsn1uelai1h"});
+        <button style={{color: `black`}} onClick={() =>{
+            class_socket.remove_member({uid : "cl4ijebhq00120xsrfeiy6bkb", rid : "cl4ilpr2k1101o4srutqwwkld"});
         }}>remove_member</button>
-        <button onClick={() =>{
-            class_socket.join_room({id : "cl4hbgqpq85214wsnjmq4w368"});
+        <button style={{color: `black`}} onClick={() =>{
+            class_socket.join_room({id : "cl4ijk9br06800xsrtkrgyzvr"});
         }}>join_room</button>
-        <button onClick={() =>{
-            class_socket.leave_room({id : "cl4hbgqpq85214wsnjmq4w368"});
+        <button style={{color: `black`}} onClick={() =>{
+            class_socket.leave_room({id : "cl4ijk9br06800xsrtkrgyzvr"});
         }}>leave_room</button>
-        <button onClick={() =>{
-            class_socket.add_member({uid : "cl4h09o9e0208edsndp62jcyk", rid : "cl4h8byh336374wsn1uelai1h"});
+        <button style={{color: `black`}} onClick={() =>{
+            class_socket.add_member({uid : "cl4ijebhq00120xsrfeiy6bkb", rid : "cl4ilpr2k1101o4srutqwwkld"});
         }}>add_member</button>
+
+
+
         
         <div className='container'>
             <div className="row chat">

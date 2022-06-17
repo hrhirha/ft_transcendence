@@ -1,5 +1,4 @@
 
-//------------------- receive_message -------------------
 interface user_info {
     id:  string,
     username : string,
@@ -8,7 +7,10 @@ interface user_info {
 }
 interface room {
     id:  string,
+    is_channel:  boolean,
 }
+
+//------------------- receive_message -------------------
 
 export interface receive_message {
     id:  string,
@@ -18,17 +20,65 @@ export interface receive_message {
     room : room,
 }
 //------------------------------------------------------
-//------------------- join_invite -------------------
-
-export interface join_invite {
-    id:  string,
-    name : string,
-    type : string,
-}
-//-----------------------------------------------------
 //------------------- leave_call -------------------
 
 export interface leave_call {
     id:  string,
 }
 //-----------------------------------------------------
+//------------------- dm_started ---------------
+
+export interface dm_started {
+    room : room,
+    user : user_info,
+}
+//-----------------------------------------------------
+
+//------------------- room_created ---------------
+
+export interface room_created {
+    id: string,
+    name: string,
+    owner: string,
+    type: string,
+}
+//-----------------------------------------------------
+
+//--------------------- chats -------------------------
+
+interface lst_msg {
+    msg:  string,
+    timestamp:  boolean,
+}
+
+interface room_dm {
+    id:  string,
+}
+
+interface dms {
+    lst_msg: lst_msg,
+    room : room_dm,
+    user : user_info,
+}
+
+interface others {
+    id: string,
+    name : string,
+    type : string,
+}
+
+interface info_room {
+    id:  string,
+    name:  string,
+    type : string,
+    unread : number,
+
+}
+
+export interface chats {
+    dms: dms[],
+    others: others[],
+    rooms: info_room[],
+}
+//-----------------------------------------------------
+
