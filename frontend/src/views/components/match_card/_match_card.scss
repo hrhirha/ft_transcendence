@@ -1,5 +1,6 @@
 section.matchCard {
     @include _flex(row, space-between, center);
+    cursor: pointer;
     width: 95%;
     padding: 1rem;
     margin: .5rem auto;

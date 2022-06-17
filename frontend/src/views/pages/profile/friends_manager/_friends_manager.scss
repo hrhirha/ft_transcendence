@@ -40,9 +40,6 @@ section#friendsManager {
             flex-wrap: wrap;
             height: 100%;
             padding: .5rem;
-            @media (max-width: $xs) {
-                justify-content: center;
-            }
             .empty {
                 @include _flex(column, center, center);
                 @include _selectionOff();
@@ -76,13 +73,20 @@ section#friendsManager {
             }
             .friendCard {
                 @media (max-width: 475px) {
-                    max-width: 15rem;
+                    width: calc(100% / 2.25)!important;
+                    zoom: .7;
+                }
+                @media (max-width: 347px) {
+                    width: calc(100% / 2.35)!important;
+                    zoom: .7;
                 }
                 @media (min-width: 476px) {
-                    width: calc(100% / 2.25)!important;
+                    width: calc(100% / 3.5)!important;
+                    zoom: .8;
                 }
                 @media (min-width: 680px) {
                     width: calc(100% / 3.5)!important;
+                    zoom: 1;
                 }
                 @media (min-width: $lg) {
                     width: calc(100% / 3.33)!important;

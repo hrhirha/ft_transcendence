@@ -33,4 +33,22 @@ section#matchesHistory {
             }
         }
     }
+    .matchCard {
+        cursor: default;
+        @media (max-width: $lg) {
+            zoom: .85;
+        }
+        @media (max-width: $sm) {
+            zoom: .7;
+        }
+        @media (max-width: $xs) {
+            zoom: .6;
+        }
+        @media (max-width: 478px) {
+            zoom: .5;
+        }
+        @media (max-width: 410px) {
+            zoom: .35;
+        }
+    }
 }
