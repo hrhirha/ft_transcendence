@@ -48,7 +48,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this._logger.log("initialized..");
     }
         
-    async handleConnection(@ConnectedSocket() client: Socket) {
+    async handleConnection(@ConnectedSocket() client: Socket)
+    {
         this._logger.log(`client connected: ${client.id}`);
 
         try

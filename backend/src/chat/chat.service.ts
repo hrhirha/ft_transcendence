@@ -6,7 +6,6 @@ import { Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserIdDto } from 'src/user/dto';
-import { UserService } from 'src/user/user.service';
 import { friend_status, room_type, user_status } from 'src/utils';
 import { AddMessageDto, ChangePasswordDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, RemovePasswordDto, SetPasswordDto, UserRoomDto } from './dto';
 
@@ -14,7 +13,6 @@ import { AddMessageDto, ChangePasswordDto, DeleteMessageDto, MuteUserDto, NewRoo
 export class ChatService {
     constructor (
         private _prismaS: PrismaService,
-        private _userS: UserService,
         private _authS: AuthService
         ) {}
 
@@ -150,7 +148,7 @@ export class ChatService {
             },
         });
         if (!room)
-            throw new WsException('room not found');
+            throw new WsException('room not found or not protected');
         if (!(await argon2.verify(room.password, dto.old_password)))
             throw new WsException('invalid old_password');
 
@@ -193,7 +191,7 @@ export class ChatService {
             },
         });
         if (!room)
-            throw new WsException('room not found');
+            throw new WsException('room not found or not protected');
         if (!(await argon2.verify(room.password, dto.old_password)))
             throw new WsException('invalid old_password');
 

@@ -10,7 +10,7 @@ import { Jwt2FAAuthGuard } from './guard/jwt-2fa-auth.guard';
 export class AuthController {
     
     constructor (private _authS: AuthService) {}
-    
+
     @UseGuards(OAUth42Guard)
     @Get('login')
     async login(@GetUserProfile() dto: UserDto, @Req() req: Request)

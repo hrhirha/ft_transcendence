@@ -20,7 +20,7 @@ async function bootstrap() {
   }));
   app.use(cookieParser());
   app.enableCors({
-    origin: 'http://127.0.0.1:3000',
+    origin: `http://127.0.0.1:3000`,
     credentials: true,
   });
   await app.listen(3001);

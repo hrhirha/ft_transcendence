@@ -7,7 +7,6 @@ import { Express, Response } from 'express'
 import { diskStorage } from 'multer';
 import { User } from '@prisma/client';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
-import { ChatService } from 'src/chat/chat.service';
 import { randomUUID } from 'crypto';
 import { createReadStream } from 'fs';
 import { join } from 'path';
@@ -17,8 +16,7 @@ import { join } from 'path';
 export class UserController {
 
     constructor(
-        private _userS: UserService,
-        private _chatS: ChatService) {}
+        private _userS: UserService) {}
 
     // User
     @Get('me')

@@ -6,7 +6,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [forwardRef(()=>AuthModule), forwardRef(() => UserModule)],
+  imports: [AuthModule, UserModule],
   providers: [ChatGateway, ChatService],
   controllers: [ChatController],
   exports: [ChatService]

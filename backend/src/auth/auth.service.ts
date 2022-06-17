@@ -4,7 +4,6 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserDto } from 'src/user/dto';
-import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +12,6 @@ export class AuthService {
         private _configS: ConfigService,
         private _jwtS: JwtService,
         private _prismaS: PrismaService,
-        private _userS: UserService
     ){}
 
     async login(dto: UserDto, req: Request)
