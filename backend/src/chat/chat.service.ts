@@ -425,7 +425,7 @@ export class ChatService {
         if (ur.count === 0)
             throw new ForbiddenException('removeAdmin failed');
         return {success: true}
-}
+    }
 
     async banUser(user: User, user_room: UserRoomDto)
     {
@@ -606,6 +606,7 @@ export class ChatService {
                 user_rooms: {
                     some: {
                         uid : user.id,
+                        is_banned: false,
                     }
                 }
             },
@@ -620,7 +621,8 @@ export class ChatService {
                     select: {
                         joined_time: true,
                         is_banned: true,
-                        bans: true
+                        bans: true,
+                        unread: true,
                     }
                 },
                 messages: {
@@ -656,6 +658,15 @@ export class ChatService {
                 return ts > jt && snd;
             });
             const lst_msg = msgs[0];
+            room["unread"] = room.user_rooms[0].unread;
+            this._prismaS.userRoom.findFirst({
+                where: {
+                    rid: room.id,
+                    is_owner: true,
+                }
+            }).then((ur)=>{
+                room['owner'] = ur.id;
+            });
             delete room.messages;
             delete room.user_rooms;
             joined.push({room, lst_msg});
@@ -1066,8 +1077,6 @@ export class ChatService {
                 rid: data.rid,
                 uid: { not: uid },
                 is_banned: false,
-                // is_muted: false,
-                // room: { is_channel: true, }
             },
         });
 

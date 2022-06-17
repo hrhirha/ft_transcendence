@@ -290,6 +290,42 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
+    @SubscribeMessage('add_admin') // { uid: string, rid: string }
+    async addAdmin(@ConnectedSocket() client: Socket, @MessageBody() ur: UserRoomDto)
+    {
+        let user = await this._chat.getUserFromSocket(client);
+        if (!user)
+            throw new WsException('you must login first');
+        try
+        {
+            await this._chat.addAdmin(user, ur);
+            this.server.to(ur.rid).emit('admin_added', ur);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to add admin');
+        }
+    }
+
+    @SubscribeMessage('remove_admin') // { uid: string, rid: string }
+    async removeAdmin(@ConnectedSocket() client: Socket, @MessageBody() ur: UserRoomDto)
+    {
+        let user = await this._chat.getUserFromSocket(client);
+        if (!user)
+            throw new WsException('you must login first');
+        try
+        {
+            await this._chat.removeAdmin(user, ur);
+            this.server.to(ur.rid).emit('admin_removed', ur);
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new WsException('failed to remove admin');
+        }
+    }
+
     @SubscribeMessage('ban_user')
     async banUser(@ConnectedSocket() client: Socket, @MessageBody() ur: UserRoomDto)
     {
@@ -298,8 +334,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('you must login first');
         try
         {
-            const b = await this._chat.banUser(u, ur);
-            this.server.emit('user_banned', b);
+            await this._chat.banUser(u, ur);
+            this.server.to(ur.rid).emit('user_banned', ur);
         }
         catch (e)
         {
@@ -316,8 +352,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('you must login first');
         try
         {
-            const b = await this._chat.unbanUser(u, ur);
-            this.server.emit('user_unbanned', b);
+            await this._chat.unbanUser(u, ur);
+            this.server.to(ur.rid).emit('user_unbanned', ur);
         }
         catch (e)
         {
@@ -334,8 +370,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('you must login first');
         try
         {
-            const m = await this._chat.muteUser(u, mu);
-            client.emit('user_muted', m);
+            await this._chat.muteUser(u, mu);
+            client.to(mu.rid).emit('user_muted', mu);
         }
         catch (e)
         {
@@ -353,7 +389,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const m = await this._chat.unmuteUser(u, mu);
-            client.emit('user_unmuted', m);
+            client.to(mu.rid).emit('user_unmuted', mu);
         }
         catch (e)
         {
