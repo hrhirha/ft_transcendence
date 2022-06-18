@@ -16,9 +16,6 @@ export const FriendCard = (Props : Props) => {
 			<div className="friendInfos" onClick={() => {}}>
 				<div className='avatar'>
 					<CircleAvatar avatarURL={Props.avatar} dimensions={85} showStatus={false}/>
-					<span className='ranking'>
-						{Props.ranking}
-					</span>
 				</div>
 				<h6>{Props.fullName} </h6>
 				<span>@{Props.username} </span>

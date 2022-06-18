@@ -117,10 +117,13 @@
                 }
                 :nth-child(3) {
                     min-width: 7rem;
+                    @include _flex(row, flex-end, center);
                     span.score {
+                        @include _flex(row, center, center);
+                        width: 2.5rem;
                         color: $light2;
                         background: $light4;
-                        padding: 0.15rem 0.75rem;
+                        padding: 0.15rem 0.25rem;
                         border-radius: 1rem;
                     }
                 }

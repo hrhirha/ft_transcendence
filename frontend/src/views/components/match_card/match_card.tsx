@@ -23,7 +23,6 @@ export const MatchCard:React.FC<Props> = (Props) => {
         <div className="player">
             <div className="avatar">
                 <CircleAvatar avatarURL={Props.player1.avatar} dimensions={60} showStatus={false}/>
-                <span className="ranking">{Props.player1.ranking}</span>
             </div>
             <h6 className="fullName">{Props.player1.fullName}</h6>
         </div>
@@ -36,7 +35,6 @@ export const MatchCard:React.FC<Props> = (Props) => {
             <h6 className="fullName">{Props.player2.fullName}</h6>
             <div className="avatar">
                 <CircleAvatar avatarURL={Props.player2.avatar} dimensions={60} showStatus={false}/>
-                <span className="ranking">{Props.player2.ranking}</span>
             </div>
         </div>
     </section>

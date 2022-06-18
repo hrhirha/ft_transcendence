@@ -1,8 +1,9 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
-import { faPen, faPercent, faTableTennisPaddleBall, faTrophy } from "@fortawesome/free-solid-svg-icons";
+import { faCameraRotate, faPen, faPercent, faTableTennisPaddleBall, faTrophy } from "@fortawesome/free-solid-svg-icons";
 import { buttons, userType } from "../profile";
+import { Numeral } from "../../../components/numeral/numeral";
 
 
 const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, stat: number}) => {
@@ -11,7 +12,7 @@ const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, sta
             <FontAwesomeIcon icon={icon}/>
             {title}
         </span>
-        <span className="stat_value">{stat}</span>
+        <span className="stat_value"><Numeral value={stat}/></span>
     </span>;
 }
 
@@ -33,10 +34,10 @@ export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
             <div className="profileData">
                 <div className="avatar">
                     <CircleAvatar avatarURL={Props.avatar} dimensions={120} showStatus={false}/>
-                    <span className="ranking">{Props.ranking}</span>
-                    {/* <span className="editAvatar" title="Change Your Avatar">
+                    <span className="ranking"><Numeral value={Props.ranking}/></span>
+                    <span className="editAvatar" title="Change Your Avatar">
                         <FontAwesomeIcon icon={faCameraRotate}/>
-                    </span> */}
+                    </span>
                 </div>
                 <div className="profileMoreData">
                     <input type="text" disabled className="fullName" placeholder="Full Name" onChange={() => {}} value={Props.fullName}/>
@@ -49,7 +50,7 @@ export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
                 </div>
             </div>
             <div className="actionButtons">
-                {buttons.map((button, index) => {
+                {buttons.map((button) => {
                     if (button.type === userType.none) {
                         return (
                             <button key={`${button.text.replace(' ', '')}`} className={`btn${button.text.replace(' ', '')}`} onClick={() => button.onClick(Props.username)}>

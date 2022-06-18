@@ -17,17 +17,6 @@
             #circleAvatar {
                 border: .25rem solid $dark3;
             }
-            .ranking {
-                @include _flex(column, center, center);
-                background-color: $dark3;
-                position: absolute;
-                bottom: -.25rem;
-                width: 3rem;
-                border-radius: 5rem;
-                font-size: $fsize * .75;
-                font-family: $BFont;
-                border: 0.15rem solid $light4;
-            }
         }
         > h6 {
             @include _textOverflow(calc(80%));

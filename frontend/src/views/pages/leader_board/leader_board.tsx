@@ -3,6 +3,7 @@ import React from "react";
 import { NavBar } from "../../components/navbar/navbar";
 import {faMedal, faRankingStar, faTrophy } from "@fortawesome/free-solid-svg-icons";
 import { CircleAvatar } from "../../components/circle_avatar/circle_avatar";
+import { Numeral } from "../../components/numeral/numeral";
 
 interface RowProps {
     rank: number,
@@ -18,14 +19,14 @@ const BoardRow:React.FC<RowProps> = (RowProps) => {
             {RowProps.rank === 1 && <span><FontAwesomeIcon icon={faTrophy}/></span>}
             {RowProps.rank === 2 && <span><FontAwesomeIcon icon={faMedal}/></span>}
             {RowProps.rank === 3 && <span><FontAwesomeIcon icon={faMedal}/></span>}
-            {RowProps.rank > 3 && <span>{RowProps.rank}</span>}
+            {RowProps.rank > 3 && <span><Numeral value={RowProps.rank} /></span>}
         </td>
         <td>
             <CircleAvatar avatarURL={RowProps.avatar} dimensions={40} showStatus={false}/>
             <span className="fullName">{RowProps.fullname}</span>
         </td>
         <td>
-            <span className="score">{RowProps.score}</span>
+            <span className="score"><Numeral value={RowProps.score}/></span>
         </td>
     </tr>);
 }

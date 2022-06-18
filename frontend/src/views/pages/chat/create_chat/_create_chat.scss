@@ -18,7 +18,7 @@ section#createNewChat {
                 @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $purple, $bgcolor2: $light6, $font: $MFont, $bradius: 5rem);
                 min-width: 15rem;
                 max-width: 15rem;
-                font-size: $fsize * .9;
+                font-size: $fsize * .8;
                 font-family: $BFont;
                 text-transform: uppercase;
                 padding: .6rem 1rem ;
@@ -37,6 +37,7 @@ section#createNewChat {
         min-width: 15rem;
         max-width: 15rem;
         > h5 {
+            text-transform: capitalize;
             font-size: $fsize * 1.15;
             padding: .5rem;
             margin-bottom: .75rem;
