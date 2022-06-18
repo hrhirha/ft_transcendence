@@ -1,5 +1,5 @@
 
-interface user_info {
+export interface user_info {
     id:  string,
     username : string,
     fullName : string,
@@ -20,10 +20,18 @@ export interface receive_message {
     room : room,
 }
 //------------------------------------------------------
-//------------------- leave_call -------------------
+//------------------- user_joined -------------------
 
-export interface leave_call {
+interface room_uj {
     id:  string,
+    is_channel:  boolean,
+    name: string,
+    type: string,
+}
+
+export interface user_joined {
+    room : room_uj,
+    user : user_info,
 }
 //-----------------------------------------------------
 //------------------- dm_started ---------------
@@ -51,13 +59,13 @@ interface lst_msg {
     timestamp:  boolean,
 }
 
-interface room_dm {
+interface room_id {
     id:  string,
 }
 
 interface dms {
     lst_msg: lst_msg,
-    room : room_dm,
+    room : room_id,
     user : user_info,
 }
 
@@ -81,4 +89,61 @@ export interface chats {
     rooms: info_room[],
 }
 //-----------------------------------------------------
+//----------------------- user_left -------------------
+
+export interface user_left {
+    room : room,
+    user : user_info,
+}
+//-----------------------------------------------------
+//----------password_removed - password_set -----------
+
+export interface management_password {
+    id : string,
+    type : string,
+}
+//-----------------------------------------------------
+
+//------user_banned - admin_added - admin_removed - unmute_user -----
+
+export interface management_memeber {
+    uid : string,
+    rid : string,
+}
+//-----------------------------------------------------
+//----------------------- user_unbanned ------------
+
+export interface user_unbanned {
+    room : room_uj,
+    user : user_info,
+}
+//-----------------------------------------------------
+
+//----------------------- user_muted ------------
+
+export interface user_muted {
+    uid : string,
+    rid : string,
+    mute_period : string,
+}
+//----------------------------------------------------- 
+
+//----------------------- message_deleted ------------
+
+export interface message_deleted {
+    id : string,
+    rid : string,
+}
+//----------------------------------------------------- 
+
+//----------------------- messages ------------
+
+export interface messages {
+    id : string,
+    msg : string,
+    timestamp : string,
+    user : user_info,
+}
+//-----------------------------------------------------
+
 

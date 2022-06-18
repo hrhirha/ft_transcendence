@@ -215,6 +215,26 @@ export class ChatService {
         }
     }
 
+    async getUnjoinedUsers(rid: string)
+    {
+        const usrs = await this._prismaS.user.findMany({
+            where: {
+                user_rooms: {
+                    none: { rid, }
+                }
+            },
+            select: {
+                username: true,
+            }
+        });
+
+        const usernames = [];
+        usrs.forEach((usr) => {
+            usernames.push(usr.username);
+        });
+        return usernames;
+    }
+
     async start_dm(u1: User, u2: UserIdDto)
     {
         const dm = await this._dm_exists(u1.id, u2.id);
@@ -528,6 +548,8 @@ export class ChatService {
                     select: {
                         id: true,
                         username: true,
+                        fullName: true,
+                        imageUrl: true,
                     }
                 },
                 room: {

@@ -33,6 +33,21 @@ interface info_delete_msg {
     rid : string,
 }
 
+interface set_password {
+    id:  string,
+    new_password : string,
+}
+
+interface change_password {
+    id:  string,
+    new_password : string,
+    old_password : string,
+}
+
+interface remove_password {
+    id:  string,
+    old_password : string,
+}
 
 export class Socket {
     socket :any;
@@ -142,17 +157,6 @@ export class Socket {
         this.socket.emit("delete_message", info_msg);
     }
 
-    join(info_room : info_management_room) {
-        if(info_room.id.length == 0)
-            return new Error("error : id must not be empty");
-        this.socket.emit("join", info_room);
-    }
-
-    leave(info_room : info_management_room) {
-        if(info_room.id.length == 0)
-            return new Error("error : id must not be empty");
-        this.socket.emit("leave", info_room);
-    }
 
     get_members(info_room : info_management_room) {
         if(info_room.id.length == 0)
@@ -164,7 +168,48 @@ export class Socket {
     get_messages(info_room : info_management_room) {
         if(info_room.id.length == 0)
             return new Error("error : id must not be empty");
-        this.socket.emit("get_messages");
+        this.socket.emit("get_messages", info_room);
     }
 
+    set_password(set_password : set_password) {
+        if(set_password.id.length == 0)
+            return new Error("error : id must not be empty");
+        if(set_password.new_password.length < 8 )
+            return new Error("error : new_password must not be empty");
+        this.socket.emit("set_password", set_password);
+    }
+
+    change_password(change_password : change_password) {
+        if(change_password.id.length == 0)
+            return new Error("error : id must not be empty");
+        if(change_password.new_password.length < 8 )
+            return new Error("error : new_password must not be empty");
+        if(change_password.old_password.length < 8 )
+            return new Error("error : new_password must not be empty");
+        this.socket.emit("change_password", change_password);
+    }
+    
+    remove_password(remove_password : remove_password) {
+        if(remove_password.id.length == 0)
+            return new Error("error : id must not be empty");
+        if(remove_password.old_password.length < 8 )
+            return new Error("error : new_password must not be empty");
+        this.socket.emit("remove_password", remove_password);
+    }
+
+    add_admin(add_admin : info_management_member) {
+        if(add_admin.rid.length == 0)
+            return new Error("error : rid must not be empty");
+        if(add_admin.uid.length == 0 )
+            return new Error("error : id must not be empty");
+        this.socket.emit("add_admin", add_admin);
+    }
+    
+    remove_admin(remove_admin : info_management_member) {
+        if(remove_admin.rid.length == 0)
+            return new Error("error : rid must not be empty");
+        if(remove_admin.uid.length == 0 )
+            return new Error("error : id must not be empty");
+        this.socket.emit("remove_admin", remove_admin);
+    }
   }
