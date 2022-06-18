@@ -20,9 +20,10 @@ export class UserController {
 
     // User
     @Get('me')
-    me(@GetUser() dto: UserDto)
+    me(@GetUser() dto: User)
     {
-        return dto;
+        const { refresh_token, tfaSecret, ...new_dto } = dto;
+        return new_dto;
     }
     
     @Patch('edit/username')

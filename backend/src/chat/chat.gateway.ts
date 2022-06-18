@@ -82,23 +82,19 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('create_room')
     async  createRoom(@ConnectedSocket() client: Socket, @MessageBody() room: NewRoomDto)
     {
-        let user = await this._chat.getUserFromSocket(client);
+        const user = await this._chat.getUserFromSocket(client);
         if (!user)
-            throw new WsException('you must login first');
-
+        throw new WsException('you must login first');
+        
         try
         {
             const r = await this._chat.createRoom(user, room);
+            const sockets = await this.server.fetchSockets();
 
-            const sockets = (await this.server.fetchSockets()).filter((s) => {
-                return r.usernames.indexOf(s.data.username) >= 0;
+            sockets.forEach((s)=> {
+                console.log(`${s.data.username} joined`);
+                r.usernames.includes(s.data.username) && s.join(r.room.id);
             });
-
-            // let room_users = []
-            client.join(r.room.id);
-            for (let s of sockets)
-                s.join(r.room.id);
-                // room_users.push(s.id);
 
             this.server.to(r.room.id).emit('room_created', r.room);
         }
@@ -191,22 +187,21 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const r = await this._chat.start_dm(user, u);
+            const sockets = (await this.server.fetchSockets());
 
             const me = r.user1.username === user.username ? r.user1 : r.user2;
             const other = r.user1.username !== user.username ? r.user1 : r.user2;
 
-            const sockets = (await this.server.fetchSockets()).filter((s) => {
-                return other.username === s.data.username;
-            });
-            
             client.join(r.room.id);
             client.emit('dm_started', { room: r.room, user: other });
 
-            if (sockets.length === 1)
-            {
-                sockets[0].join(r.room.id);
-                this.server.to(sockets[0].id).emit('dm_started', { room: r.room, user: me });
-            }
+            sockets.forEach((s)=> {
+                if (s.data.username === other.username)
+                {
+                    s.join(r.room.id);
+                    this.server.to(s.id).emit('dm_started', { room: r.room, user: me });
+                }
+            });
         }
         catch (e)
         {
@@ -262,11 +257,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const ur = await this._chat.addUser(user, member);
-            const sockets = (await this.server.fetchSockets()).filter((s) => {
-                return ur.user.username === s.data.username;
-            });
+            const sockets = await this.server.fetchSockets();
 
-            sockets[0] && sockets[0].join(member.rid);
+            sockets.forEach((s) => {
+                s.data.username === ur.user.username && s.join(member.rid);
+            });
             this.server.to(member.rid).emit('user_joined', ur);
         }
         catch (e)
@@ -284,12 +279,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const ur = await this._chat.removeUser(user, member);
-            const sockets = (await this.server.fetchSockets()).filter((s) => {
-                return ur.user.username === s.data.username;
-            });
+            const sockets = await this.server.fetchSockets();
 
-            sockets[0] && sockets[0].leave(member.rid);
-            this.server.to(member.rid).emit('user_left', { rid: ur.room.id, uid: ur.user.id, });
+            sockets.forEach((s) => {
+                s.data.username === ur.user.username && s.join(member.rid);
+            });
+            this.server.to(member.rid).emit('user_left', ur);
         }
         catch (e)
         {
@@ -343,14 +338,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const u0 = await this._chat.banUser(u, ur);
-            const sockets = (await this.server.fetchSockets()).filter((s) => {
-                return u0.username === s.data.username;
-            });
+            const sockets = await this.server.fetchSockets();
+            
             this.server.to(ur.rid).emit('user_banned', ur);
-            if (sockets[0])
-            {
-                sockets[0].leave(ur.rid);
-            }
+            sockets.forEach((s) => {
+                u0.username === s.data.username && s.leave(ur.rid);
+            });
         }
         catch (e)
         {
@@ -368,10 +361,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const ur0 = await this._chat.unbanUser(u, ur);
-            const sockets = (await this.server.fetchSockets()).filter((s) => {
-                return ur0.user.username === s.data.username;
+            const sockets = await this.server.fetchSockets();
+            
+            sockets.forEach((s) => {
+                ur0.user.username === s.data.username && s.join(ur.rid);
             });
-            sockets[0] && sockets[0].join(ur.rid);
             this.server.to(ur.rid).emit('user_unbanned', ur0);
         }
         catch (e)
@@ -472,20 +466,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             console.log({code: e.code, message:e.message});
             throw new WsException('failed to delete message');
         }
-    }
-
-    @SubscribeMessage('join')
-    join(@ConnectedSocket() client: Socket, @MessageBody() r: OldRoomDto)
-    {
-        client.join(r.id);
-        this.server.to(r.id).emit('user_joined', `${client.data.username} joined`);
-    }
-
-    @SubscribeMessage('leave')
-    leave(@ConnectedSocket() client: Socket, @MessageBody() r: OldRoomDto)
-    {
-        this.server.to(r.id).emit('user_left', `${client.data.username} left`);
-        client.leave(r.id);
     }
 
     @SubscribeMessage('get_chats')

@@ -1070,7 +1070,6 @@ export class ChatService {
                             uid,
                             rid: data.rid,
                             is_muted: true,
-                            // unmute_at: { lte: new Date, }
                         },
                     },
                 },
@@ -1108,6 +1107,7 @@ export class ChatService {
                         room: {
                             select: {
                                 id: true,
+                                is_channel: true,
                             }
                         }
                     },
@@ -1119,16 +1119,36 @@ export class ChatService {
 
         const msg = r.messages[0];
 
-        await this._prismaS.userRoom.updateMany({
+        await this._prismaS.room.update({
             data: {
-                unread: { increment: 1 },
+                // lst_msg: msg.msg
+                // lst_msg_ts: msg.timestamp
+                user_rooms: {
+                    updateMany: {
+                        data: {
+                            unread: { increment: 1, }
+                        },
+                        where: {
+                            uid: { not: uid }
+                        },
+                    }
+                }
             },
             where: {
-                rid: data.rid,
-                uid: { not: uid },
-                is_banned: false,
+                id: msg.room.id,
             },
         });
+
+        // await this._prismaS.userRoom.updateMany({
+        //     data: {
+        //         unread: { increment: 1 },
+        //     },
+        //     where: {
+        //         rid: data.rid,
+        //         uid: { not: uid },
+        //         is_banned: false,
+        //     },
+        // });
 
         return msg;
     }
