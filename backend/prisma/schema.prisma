@@ -65,6 +65,9 @@ model Room {
   type        String? @default("PUBLIC") // PRIVATE, PUBLIC, PROTECTED
   password    String?
 
+  lst_msg     String? @default("")
+  lst_msg_ts  DateTime?
+
   messages    Message[]
   user_rooms  UserRoom[]
 
@@ -82,6 +85,7 @@ model Message {
   room      Room @relation(fields: [rid], references: [id], onDelete: Cascade)
 
   msg       String
+  type      String
 
   // is_deleted Boolean @default(false)
 

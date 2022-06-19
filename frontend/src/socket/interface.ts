@@ -4,6 +4,7 @@ export interface user_info {
     username : string,
     fullName : string,
     imageUrl :string,
+    status: string, // 'ONLINE', 'OFFLINE', 'INGAME'
 }
 interface room {
     id:  string,
@@ -16,6 +17,7 @@ export interface receive_message {
     id:  string,
     msg : string,
     timestamp : string,
+    type: string,
     user : user_info,
     room : room,
 }
@@ -54,17 +56,14 @@ export interface room_created {
 
 //--------------------- chats -------------------------
 
-interface lst_msg {
-    msg:  string,
-    timestamp:  boolean,
-}
-
 interface room_id {
     id:  string,
+    lst_msg: string,
+    lst_msg_ts: string,
+    unread: number,
 }
 
 interface dms {
-    lst_msg: lst_msg,
     room : room_id,
     user : user_info,
 }
@@ -79,8 +78,12 @@ interface info_room {
     id:  string,
     name:  string,
     type : string,
+    owner: string,
     unread : number,
-
+    is_banned: false,
+    is_muted: false,
+    lst_msg: string,
+    lst_msg_ts: string,
 }
 
 export interface chats {

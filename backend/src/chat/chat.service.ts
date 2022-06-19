@@ -6,7 +6,7 @@ import { Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserIdDto } from 'src/user/dto';
-import { friend_status, room_type, user_status } from 'src/utils';
+import { friend_status, msg_type, room_type, user_status } from 'src/utils';
 import { AddMessageDto, ChangePasswordDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, RemovePasswordDto, SetPasswordDto, UserRoomDto } from './dto';
 
 @Injectable()
@@ -26,7 +26,7 @@ export class ChatService {
 
         const type = room.password ? room_type.PROTECTED : (room.is_private ? room_type.PRIVATE: room_type.PUBLIC);
 
-        return await this._prismaS.$transaction(async (prisma) => {
+        const ret =  await this._prismaS.$transaction(async (prisma) => {
             const r = await prisma.room.create({
                 data: {
                     name: room.name,
@@ -79,6 +79,8 @@ export class ChatService {
             delete r.user_rooms;
             return {room: r, usernames};
         });
+        await this._add_msg_to_db(user.id, {rid: ret.room.id, msg: `${user.username} created this room`}, msg_type.NOTIF);
+        return ret;
     }
     
     async deleteRoom(user: User, room: OldRoomDto)
@@ -279,6 +281,7 @@ export class ChatService {
                                 username: true,
                                 fullName: true,
                                 imageUrl: true,
+                                status: true,
                             }
                         }
                     }
@@ -288,7 +291,6 @@ export class ChatService {
         const user1 = r.user_rooms[0].user;
         const user2 = r.user_rooms[1].user;
         delete r.user_rooms;
-        console.log(r);
         return { room: r, user1, user2 };
     }
                 
@@ -331,7 +333,8 @@ export class ChatService {
                                 id: true,
                                 username: true,
                                 fullName: true,
-                                imageUrl: true
+                                imageUrl: true,
+                                status: true,
                             }
                         }
                     }
@@ -340,14 +343,16 @@ export class ChatService {
         });
         if (!up_r)
             throw new WsException('unable to join room');
+        const msg = await this._add_msg_to_db(user.id, {rid: r.id, msg: `${user.username} joined`}, msg_type.NOTIF);
         const u = up_r.user_rooms[0].user;
         delete up_r.user_rooms;
-        return { room: r, user: u };
+        return { room: r, user: u , msg};
     }
 
     async leaveRoom(user: User, room: OldRoomDto)
     {
-        return await this._prismaS.room.update({
+        console.log({room});
+        const r = await this._prismaS.room.update({
             where: { id: room.id },
             data: {
                 user_rooms: {
@@ -363,6 +368,8 @@ export class ChatService {
                 id: true,   
             }
         });
+        const msg = await this._add_msg_to_db(user.id, {rid: r.id, msg: `${user.username} left`}, msg_type.NOTIF);
+        return {room: r, msg};
     }
 
     async addUser(user: User, member: UserRoomDto)
@@ -389,11 +396,13 @@ export class ChatService {
                         username: true,
                         fullName: true,
                         imageUrl: true,
+                        status: true,
                     }
                 }
             }
         });
-        return ur;
+        const msg = await this._add_msg_to_db(user.id, {rid: ur.room.id, msg: `${user.username} added ${ur.user.username}`}, msg_type.NOTIF);
+        return {ur, msg};
     }
 
     async removeUser(user: User, member: UserRoomDto)
@@ -414,11 +423,13 @@ export class ChatService {
                         username: true,
                         fullName: true,
                         imageUrl: true,
+                        status: true,
                     }
                 }
             }
         });
-        return ur;
+        const msg = await this._add_msg_to_db(user.id, {rid: ur.room.id, msg: `${user.username} removed ${ur.user.username}`}, msg_type.NOTIF);
+        return {ur, msg};
     }
 
     async addAdmin(user: User, user_room: UserRoomDto)
@@ -497,17 +508,28 @@ export class ChatService {
                     select: {
                         id: true,
                         username: true,
+                        fullName: true,
+                        imageUrl: true,
+                        status: true,
                     }
                 },
                 room: {
-                    select: { id: true, is_channel: true },
+                    select: {
+                        id: true,
+                        name: true,
+                        type: true,
+                        is_channel: true,
+                        lst_msg: true,
+                        lst_msg_ts: true,
+                    },
                 }
             }
         });
 
         if (!ur)
             throw new WsException('ban operation failed');
-        return ur.user
+        await this._add_msg_to_db(user.id, {rid: user_room.rid, msg: `${ur.user.username} is banned`}, msg_type.NOTIF);
+        return ur
     }
 
     async unbanUser(user: User, user_room: UserRoomDto)
@@ -550,6 +572,7 @@ export class ChatService {
                         username: true,
                         fullName: true,
                         imageUrl: true,
+                        status: true,
                     }
                 },
                 room: {
@@ -557,13 +580,16 @@ export class ChatService {
                         id: true,
                         name: true,
                         type: true,
-                        is_channel: true
+                        is_channel: true,
+                        lst_msg: true,
+                        lst_msg_ts: true,
                     },
                 }
             }
         });
         if (!ur)
             throw new WsException('unban operation failed');
+        await this._add_msg_to_db(user.id, {rid: user_room.rid, msg: `${ur.user.username} is unbanned`}, msg_type.NOTIF);
         return ur;
     }
 
@@ -598,7 +624,6 @@ export class ChatService {
         });
         if (ur.count === 0)
             throw new WsException('mute operation failed');
-
         return {success: true}
     }
 
@@ -628,7 +653,6 @@ export class ChatService {
         });
         if (ur.count === 0)
             throw new WsException('mute operation failed');
-
         return {success: true}
     }
 
@@ -654,7 +678,11 @@ export class ChatService {
 
     async deleteMessage(user: User, msg: DeleteMessageDto)
     {
-        const del =  await this._prismaS.message.deleteMany({
+        const del =  await this._prismaS.message.updateMany({
+            data: {
+                msg: 'deleted',
+                type: msg_type.DEL,
+            },
             where: {
                 id: msg.id,
                 uid: user.id,
@@ -663,7 +691,6 @@ export class ChatService {
         });
         if (del.count === 0)
             throw new WsException('unable to delete message');
-        console.log(del)
         return {success: true}
     }
 
@@ -677,7 +704,6 @@ export class ChatService {
                 user_rooms: {
                     some: {
                         uid : user.id,
-                        is_banned: false,
                     }
                 }
             },
@@ -685,63 +711,41 @@ export class ChatService {
                 id: true,
                 name: true,
                 type: true,
+                lst_msg: true,
+                lst_msg_ts: true,
                 user_rooms: {
-                    where: {
-                        uid: user.id,
-                    },
                     select: {
+                        uid: true,
+                        is_owner: true,
                         joined_time: true,
                         is_banned: true,
-                        bans: true,
+                        is_muted: true,
                         unread: true,
                     }
                 },
-                messages: {
-                    select: {
-                        msg: true,
-                        timestamp: true,
-                    },
-                    orderBy: {
-                        timestamp: "desc"
-                    },
-                }
             },
         });
 
         let joined = [];
-        for (let room of rooms)
-        {
-            const jt = room.user_rooms[0].joined_time;
-            const bans = room.user_rooms[0].bans;
-            const msgs = room.messages.filter((message) => {
-                let snd: Boolean = true;
-                const ts = message.timestamp;
-
-                for (let ban of bans)
-                {
-                    if (ts >= ban.start && (!ban.end || ts < ban.end))
-                    {
-                        snd = false;
-                        break ;
-                    }
-                }
-
-                return ts > jt && snd;
+        rooms.forEach((room) => {
+            let owner, me;
+            room.user_rooms.forEach((ur) => {
+                ur.is_owner && (owner = ur);
+                ur.uid === user.id && (me = ur);
             });
-            const lst_msg = msgs[0];
-            room["unread"] = room.user_rooms[0].unread;
-            this._prismaS.userRoom.findFirst({
-                where: {
-                    rid: room.id,
-                    is_owner: true,
-                }
-            }).then((ur)=>{
-                room['owner'] = ur.id;
-            });
-            delete room.messages;
+            const jt = me.joined_time;
+ 
+            console.log({room});
+            room.lst_msg_ts < jt && (room.lst_msg = "") && (room.lst_msg_ts = null);
+            me.is_banned && (room.lst_msg = 'you are banned') && (room.lst_msg_ts = null);
+
+            room["unread"] = me.unread;
+            room['owner'] = owner.uid;
+            room["is_banned"] = me.is_banned,
+            room["is_muted"] = me.is_muted,
             delete room.user_rooms;
-            joined.push({room, lst_msg});
-        }
+            joined.push(room);
+        });
         return joined;
     }
 
@@ -779,25 +783,21 @@ export class ChatService {
             },
             select: {
                 id: true,
-                messages: {
-                    select: {
-                        msg: true,
-                        timestamp: true,
-                    },orderBy: {
-                        timestamp: "asc"
-                    }
-                },
+                lst_msg: true,
+                lst_msg_ts: true,
                 user_rooms: {
                     where: {
                         uid: { not: user.id }
                     },
                     select: {
+                        unread: true,
                         user: {
                             select: {
                                 id: true,
                                 username: true,
                                 fullName: true,
                                 imageUrl: true,
+                                status: true,
                             }
                         }
                     }
@@ -808,10 +808,9 @@ export class ChatService {
         for (let room of rooms)
         {
             const user = room.user_rooms[0].user;
-            const lst_msg = room.messages[room.messages.length-1];
-            delete room.messages;
+            room['unread'] = room.user_rooms[0].unread;
             delete room.user_rooms;
-            joined.push({room, user, lst_msg});
+            joined.push({room, user});
         }
         return joined;
     }
@@ -827,6 +826,9 @@ export class ChatService {
             },
             select: {
                 user_rooms: {
+                    where: {
+                        is_banned: false,
+                    },
                     select: {
                         room: {
                             select: {
@@ -887,6 +889,7 @@ export class ChatService {
                                 username: true,
                                 fullName: true,
                                 imageUrl: true,
+                                status: true,
                             }
                         }
                     }
@@ -923,12 +926,14 @@ export class ChatService {
                 id: true,
                 msg: true,
                 timestamp: true,
+                type: true,
                 user: {
                     select: {
                         id: true,
                         username: true,
                         fullName: true,
                         imageUrl: true,
+                        status: true,
                     }
                 },
                 room: {
@@ -1075,33 +1080,27 @@ export class ChatService {
 
     }
 
-    private async _add_msg_to_db(uid: string, data: AddMessageDto)
+    private async _add_msg_to_db(uid: string, data: AddMessageDto, type: string = msg_type.TXT)
     {
+        const ts = new Date;
         const r = await this._prismaS.room.update({
             data: {
+                lst_msg: data.msg,
+                lst_msg_ts: ts,
                 messages: {
-                    create : { uid, msg: data.msg, }
+                    create : { uid, msg: data.msg, timestamp: ts, type }
                 },
                 user_rooms: {
                     updateMany: {
-                        data: {
-                            is_muted: false,
-                            unmute_at: null,
-                        },
-                        where: {
-                            uid,
-                            rid: data.rid,
-                            is_muted: true,
-                        },
-                    },
+                        data: { unread: { increment: 1, } },
+                        where: { uid: { not: uid } },
+                    }
                 },
             },
             where: { id: data.rid },
             select: {
                 user_rooms: {
-                    where: {
-                        uid, rid: data.rid,
-                    },
+                    where: { uid, rid: data.rid, },
                     select: {
                         uid: true,
                         rid: true,
@@ -1111,12 +1110,11 @@ export class ChatService {
                     }
                 },
                 messages: {
-                    where: {
-                        uid, rid: data.rid
-                    },
+                    where: { uid, rid: data.rid},
                     select: {
                         id: true,
                         msg: true,
+                        type: true,
                         timestamp: true,
                         user: {
                             select: {
@@ -1139,40 +1137,27 @@ export class ChatService {
             }
         });
 
-        const msg = r.messages[0];
-
         await this._prismaS.room.update({
             data: {
-                // lst_msg: msg.msg
-                // lst_msg_ts: msg.timestamp
                 user_rooms: {
                     updateMany: {
                         data: {
-                            unread: { increment: 1, }
+                            is_muted: false,
+                            unmute_at: null,
                         },
                         where: {
-                            uid: { not: uid }
+                            uid,
+                            rid: data.rid,
+                            is_muted: true,
                         },
-                    }
-                }
+                    },
+                },
             },
             where: {
-                id: msg.room.id,
+                id: data.rid,
             },
         });
-
-        // await this._prismaS.userRoom.updateMany({
-        //     data: {
-        //         unread: { increment: 1 },
-        //     },
-        //     where: {
-        //         rid: data.rid,
-        //         uid: { not: uid },
-        //         is_banned: false,
-        //     },
-        // });
-
-        return msg;
+        return r.messages[0];
     }
 
     private async _is_owner(uid: string, rid: string)
@@ -1205,6 +1190,7 @@ export class ChatService {
                             uid: u.id,
                             rid: ur.rid,
                             is_admin: true,
+                            is_banned: false,
                         }
                     }
                 }

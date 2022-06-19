@@ -15,3 +15,9 @@ export const friend_status = {
     ACCEPTED: 'ACCEPTED',
     BLOCKED: 'BLOCKED'
 };
+
+export const msg_type = {
+    TXT: "TEXT",
+    NOTIF: "NOTIFICATION",
+    DEL: "MSG_DELETED"
+};

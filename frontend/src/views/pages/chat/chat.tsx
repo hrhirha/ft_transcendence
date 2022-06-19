@@ -158,6 +158,7 @@ export const Chat:React.FC = () => {
             console.log("members");
             console.log(data)
         })
+        return () => class_socket.socket.removeAllListeners();
     },[class_socket.socket])
     //test -----
 
@@ -166,31 +167,31 @@ export const Chat:React.FC = () => {
         <NavBar />
 
         <button style={{color: `black`}}onClick={() =>{
-            class_socket.start_dm("cl4jsuwd500332tsm3kb2eyyb");
+            class_socket.start_dm("cl4lebw5j0133yrsms9le0c75");
         }}>start_dm</button>
         <button style={{color: `black`}} onClick={() =>{
             class_socket.get_chats();
         }}>get_chats</button>
         <button style={{color: `black`}} onClick={() =>{
-            class_socket.send_message({rid : "cl4k0xa1f66734xsmzhxz40gh", msg :"test"});
+            class_socket.send_message({rid : "cl4ljjtvr06966hsmu48sm885", msg :"Hello1"});
         }}>send_message</button>
         <button style={{color: `black`}} onClick={() =>{
-            class_socket.create_room({name : "walidroom",is_private:false, uids :["cl4jsuwd500332tsm3kb2eyyb"]});
+            class_socket.create_room({name : "walidroom",is_private:false, uids :["cl4lebw5j0133yrsms9le0c75"]});
         }}>create room</button>
         <button style={{color: `black`}} onClick={() =>{
             class_socket.delete_room({id : "cl4jv5f3d0369ohsmoae83lyo"});
         }}>delete_room</button>
         <button style={{color: `black`}} onClick={() =>{
-            class_socket.remove_member({uid : "cl4jsuwd500332tsm3kb2eyyb", rid : "cl4juxk0d0176ohsm1x6d39sn"});
+            class_socket.remove_member({uid : "cl4lebw5j0133yrsms9le0c75", rid : "cl4lidmy50103ojsm2ftzgyw4"});
         }}>remove_member</button>
         <button style={{color: `black`}} onClick={() =>{
-            class_socket.join_room({id : "cl4ijk9br06800xsrtkrgyzvr"});
+            class_socket.join_room({id : "cl4lidmy50103ojsm2ftzgyw4"});
         }}>join_room</button>
         <button style={{color: `black`}} onClick={() =>{
-            class_socket.leave_room({id : "cl4ijk9br06800xsrtkrgyzvr"});
+            class_socket.leave_room({id : "cl4lidmy50103ojsm2ftzgyw4"});
         }}>leave_room</button>
         <button style={{color: `black`}} onClick={() =>{
-            class_socket.add_member({uid : "cl4jsuwd500332tsm3kb2eyyb", rid : "cl4juxk0d0176ohsm1x6d39sn"});
+            class_socket.add_member({uid : "cl4lebw5j0133yrsms9le0c75", rid : "cl4lidmy50103ojsm2ftzgyw4"});
         }}>add_member</button>
 
         <button style={{color: `black`}} onClick={() =>{
@@ -210,16 +211,16 @@ export const Chat:React.FC = () => {
             class_socket.remove_admin({uid : "cl4jsuwd500332tsm3kb2eyyb",  rid : "cl4k0xa1f66734xsmzhxz40gh"});
         }}>remove_admin</button>
         <button style={{color: `black`}} onClick={() =>{
-            class_socket.ban_user({uid : "cl4jsuwd500332tsm3kb2eyyb",  rid : "cl4k0xa1f66734xsmzhxz40gh"});
+            class_socket.ban_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4"});
         }}>ban_user</button>
         <button style={{color: `black`}} onClick={() =>{
-            class_socket.unban_user({uid : "cl4jsuwd500332tsm3kb2eyyb",  rid : "cl4k0xa1f66734xsmzhxz40gh"});
+            class_socket.unban_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4"});
         }}>unban_user</button>
         <button style={{color: `black`}} onClick={() =>{
-            class_socket.mute_user({uid : "cl4jsuwd500332tsm3kb2eyyb",  rid : "cl4k0xa1f66734xsmzhxz40gh", mute_period:"1H"});
+            class_socket.mute_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4", mute_period:"15M"});
         }}>mute_user</button>
         <button style={{color: `black`}} onClick={() =>{
-            class_socket.unmute_user({uid : "cl4jsuwd500332tsm3kb2eyyb",  rid : "cl4k0xa1f66734xsmzhxz40gh"});
+            class_socket.unmute_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4"});
         }}>unmute_user</button>
          <button style={{color: `black`}} onClick={() =>{
             class_socket.delete_message({id : "cl4k23j4s0738ydsm45l5at7g",  rid : "cl4k0xa1f66734xsmzhxz40gh"});
@@ -230,7 +231,7 @@ export const Chat:React.FC = () => {
         }}>get_members</button>
 
         <button style={{color: `black`}} onClick={() =>{
-            class_socket.get_messages({id : "cl4jtlov200862tsmzhczxiq5"});
+            class_socket.get_messages({id : "cl4lidmy50103ojsm2ftzgyw4"});
         }}>get_messages</button>
      
 

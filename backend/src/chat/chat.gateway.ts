@@ -79,7 +79,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         await this._userS.updateStatus(user.id, user_status.OFFLINE);
     }
 
-    @SubscribeMessage('create_room')
+    @SubscribeMessage('create_room') // _add_msg_to_db(msg_type.NOTIF);
     async  createRoom(@ConnectedSocket() client: Socket, @MessageBody() room: NewRoomDto)
     {
         const user = await this._chat.getUserFromSocket(client);
@@ -165,7 +165,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('failed to change password');
         }
     }
-
+ 
     @SubscribeMessage('remove_password')
     async removePassword(@ConnectedSocket() client: Socket, @MessageBody() dto: RemovePasswordDto)
     {
@@ -223,7 +223,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    @SubscribeMessage('join_room')
+    @SubscribeMessage('join_room') // _add_msg_to_db(msg_type.NOTIF);
     async joinRoom(@ConnectedSocket() client: Socket, @MessageBody() room: OldRoomDto)
     {
         let user = await this._chat.getUserFromSocket(client);
@@ -234,6 +234,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const r = await this._chat.joinRoom(user, room);
             client.join(room.id);
             this.server.to(r.room.id).emit('user_joined', r);
+            this.server.to(r.room.id).emit('receive_message', r.msg);
         }
         catch (e)
         {
@@ -242,7 +243,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
     
-    @SubscribeMessage('leave_room')
+    @SubscribeMessage('leave_room') // _add_msg_to_db(msg_type.NOTIF);
     async leaveRoom(@ConnectedSocket() client: Socket, @MessageBody() room: OldRoomDto)
     {
         let user = await this._chat.getUserFromSocket(client);
@@ -251,7 +252,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const r = await this._chat.leaveRoom(user, room);
-            this.server.to(room.id).emit('user_left', { rid: r.id, uid: user.id });
+            this.server.to(room.id).emit('user_left', { rid: r.room.id, uid: user.id });
+            this.server.to(room.id).emit('receive_message', r.msg);
             client.leave(room.id);
         }
         catch (e)
@@ -261,7 +263,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    @SubscribeMessage('add_member')
+    @SubscribeMessage('add_member') // _add_msg_to_db(msg_type.NOTIF);
     async addUser(@ConnectedSocket() client: Socket, @MessageBody() member: UserRoomDto)
     {
         let user = await this._chat.getUserFromSocket(client);
@@ -273,9 +275,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const sockets = await this.server.fetchSockets();
 
             sockets.forEach((s) => {
-                s.data.username === ur.user.username && s.join(member.rid);
+                s.data.username === ur.ur.user.username && s.join(member.rid);
             });
-            this.server.to(member.rid).emit('user_joined', ur);
+            this.server.to(member.rid).emit('user_joined', ur.ur);
+            this.server.to(member.rid).emit('receive_message', ur.msg);
         }
         catch (e)
         {
@@ -283,7 +286,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('failed to add user');
         }
     }
-    @SubscribeMessage('remove_member')
+    @SubscribeMessage('remove_member') // _add_msg_to_db(msg_type.NOTIF);
     async removeUser(@ConnectedSocket() client: Socket, @MessageBody() member: UserRoomDto)
     {
         let user = await this._chat.getUserFromSocket(client);
@@ -295,9 +298,10 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const sockets = await this.server.fetchSockets();
 
             sockets.forEach((s) => {
-                s.data.username === ur.user.username && s.join(member.rid);
+                s.data.username === ur.ur.user.username && s.join(member.rid);
             });
-            this.server.to(member.rid).emit('user_left', ur);
+            this.server.to(member.rid).emit('user_left', ur.ur);
+            this.server.to(member.rid).emit('receive_message', ur.msg);
         }
         catch (e)
         {
@@ -306,7 +310,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    @SubscribeMessage('add_admin') // { uid: string, rid: string }
+    @SubscribeMessage('add_admin')
     async addAdmin(@ConnectedSocket() client: Socket, @MessageBody() ur: UserRoomDto)
     {
         let user = await this._chat.getUserFromSocket(client);
@@ -324,7 +328,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    @SubscribeMessage('remove_admin') // { uid: string, rid: string }
+    @SubscribeMessage('remove_admin')
     async removeAdmin(@ConnectedSocket() client: Socket, @MessageBody() ur: UserRoomDto)
     {
         let user = await this._chat.getUserFromSocket(client);
@@ -342,7 +346,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    @SubscribeMessage('ban_user')
+    @SubscribeMessage('ban_user') // _add_msg_to_db(msg_type.NOTIF);
     async banUser(@ConnectedSocket() client: Socket, @MessageBody() ur: UserRoomDto)
     {
         let u = await this._chat.getUserFromSocket(client);
@@ -350,12 +354,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('you must login first');
         try
         {
-            const u0 = await this._chat.banUser(u, ur);
+            const ur0 = await this._chat.banUser(u, ur);
             const sockets = await this.server.fetchSockets();
             
             this.server.to(ur.rid).emit('user_banned', ur);
             sockets.forEach((s) => {
-                u0.username === s.data.username && s.leave(ur.rid);
+                ur0.user.username === s.data.username && s.leave(ur.rid);
             });
         }
         catch (e)
@@ -365,7 +369,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    @SubscribeMessage('unban_user')
+    @SubscribeMessage('unban_user') // _add_msg_to_db(msg_type.NOTIF);
     async unbanUser(@ConnectedSocket() client: Socket, @MessageBody() ur: UserRoomDto)
     {
         let u = await this._chat.getUserFromSocket(client);
@@ -388,7 +392,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    @SubscribeMessage('mute_user')
+    @SubscribeMessage('mute_user') // _add_msg_to_db(msg_type.NOTIF);
     async muteUser(@ConnectedSocket() client: Socket, @MessageBody() mu: MuteUserDto)
     {
         let u = await this._chat.getUserFromSocket(client);
@@ -397,7 +401,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             await this._chat.muteUser(u, mu);
-            this.server.to(mu.rid).emit('user_muted', mu);
+            this.server.to(mu.rid).emit('user_muted', { uid: mu.uid, rid: mu.rid });
         }
         catch (e)
         {
@@ -406,7 +410,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    @SubscribeMessage('unmute_user')
+    @SubscribeMessage('unmute_user') // _add_msg_to_db(msg_type.NOTIF);
     async unmuteUser(@ConnectedSocket() client: Socket, @MessageBody() mu: UserRoomDto)
     {
         let u = await this._chat.getUserFromSocket(client);
@@ -424,7 +428,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    @SubscribeMessage('send_message')
+    @SubscribeMessage('send_message') // _add_msg_to_db(msg_type.TXT);
     async sendMessage(@ConnectedSocket() client: Socket, @MessageBody() data: AddMessageDto) //WsResponse<string>
     {
         let u = await this._chat.getUserFromSocket(client);
@@ -463,7 +467,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    @SubscribeMessage('delete_message')
+    @SubscribeMessage('delete_message') // _add_msg_to_db(msg_type.DEL);
     async deleteMessage(@ConnectedSocket() client: Socket, @MessageBody() msg: DeleteMessageDto)
     {
         let u = await this._chat.getUserFromSocket(client);

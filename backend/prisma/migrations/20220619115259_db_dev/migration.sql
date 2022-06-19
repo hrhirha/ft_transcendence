@@ -38,6 +38,8 @@ CREATE TABLE "rooms" (
     "is_channel" BOOLEAN NOT NULL,
     "type" TEXT DEFAULT E'PUBLIC',
     "password" TEXT,
+    "lst_msg" TEXT DEFAULT E'',
+    "lst_msg_ts" TIMESTAMP(3),
 
     CONSTRAINT "rooms_pkey" PRIMARY KEY ("id")
 );
@@ -49,6 +51,7 @@ CREATE TABLE "messages" (
     "uid" TEXT NOT NULL,
     "rid" TEXT NOT NULL,
     "msg" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
 
     CONSTRAINT "messages_pkey" PRIMARY KEY ("id")
 );
