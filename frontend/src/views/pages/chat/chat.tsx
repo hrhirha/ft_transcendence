@@ -167,13 +167,13 @@ export const Chat:React.FC = () => {
         <NavBar />
 
         <button style={{color: `black`}}onClick={() =>{
-            class_socket.start_dm("cl4lebw5j0133yrsms9le0c75");
+            class_socket.start_dm("cl4motzn00033r8sleqn0c4a8");
         }}>start_dm</button>
         <button style={{color: `black`}} onClick={() =>{
             class_socket.get_chats();
         }}>get_chats</button>
         <button style={{color: `black`}} onClick={() =>{
-            class_socket.send_message({rid : "cl4ljjtvr06966hsmu48sm885", msg :"Hello1"});
+            class_socket.send_message({rid : "cl4mowo080112r8sl1ydozsbf", msg :"Hello1"});
         }}>send_message</button>
         <button style={{color: `black`}} onClick={() =>{
             class_socket.create_room({name : "walidroom",is_private:false, uids :["cl4lebw5j0133yrsms9le0c75"]});

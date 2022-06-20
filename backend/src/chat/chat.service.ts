@@ -310,12 +310,12 @@ export class ChatService {
         const user2 = dm.user_rooms[1].user;
         const req = user1.sentReq.length === 1 ? user1.sentReq[0]
                     : (user1.recievedReq.length === 1 ? user1.recievedReq[0] : null);
-        user1['is_blocked'] = (req && req.status === friend_status.BLOCKED) ? true : false;
-        user2['is_blocked'] = (req && req.status === friend_status.BLOCKED) ? true : false;
+        const is_blocked = (req && req.status === friend_status.BLOCKED) ? true : false;
+        // user2['is_blocked'] = (req && req.status === friend_status.BLOCKED) ? true : false;
         delete user1.sentReq && delete user1.recievedReq;
         delete user2.sentReq && delete user2.recievedReq;
         delete dm.user_rooms;
-        return { room: dm, user1, user2 };
+        return { room: dm, user1, user2, is_blocked };
     }
                 
     async joinRoom(user: User, room: OldRoomDto)
@@ -850,10 +850,10 @@ export class ChatService {
             const user = room.user_rooms[0].user;
             const req = user.sentReq.length === 1 ? user.sentReq[0] : (user.recievedReq.length === 1 ? user.recievedReq[0] : null);
             room['unread'] = room.user_rooms[0].unread;
-            user['is_blocked'] = (req && req.status === friend_status.BLOCKED) ? true : false;
+            const is_blocked = (req && req.status === friend_status.BLOCKED) ? true : false;
             delete user.sentReq && delete user.recievedReq;
             delete room.user_rooms;
-            joined.push({room, user});
+            joined.push({room, user, is_blocked});
         }
         return joined;
     }

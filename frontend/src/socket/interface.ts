@@ -36,11 +36,12 @@ export interface user_joined {
     user : user_info,
 }
 //-----------------------------------------------------
-//------------------- dm_started ---------------
+//------------------- dm_started --------------- 
 
 export interface dm_started {
     room : room,
     user : user_info,
+    is_blocked : boolean,
 }
 //-----------------------------------------------------
 
@@ -66,6 +67,7 @@ interface room_id {
 interface dms {
     room : room_id,
     user : user_info,
+    is_blocked : boolean,
 }
 
 interface others {
@@ -86,7 +88,7 @@ interface info_room {
     lst_msg_ts: string,
 }
 
-export interface chats {
+export interface chats { 
     dms: dms[],
     others: others[],
     rooms: info_room[],

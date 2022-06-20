@@ -206,13 +206,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const other = r.user1.username !== user.username ? r.user1 : r.user2;
 
             client.join(r.room.id);
-            client.emit('dm_started', { room: r.room, user: other });
+            client.emit('dm_started', { room: r.room, user: other, is_blocked: r.is_blocked });
 
             sockets.forEach((s)=> {
                 if (s.data.username === other.username)
                 {
                     s.join(r.room.id);
-                    this.server.to(s.id).emit('dm_started', { room: r.room, user: me });
+                    this.server.to(s.id).emit('dm_started', { room: r.room, user: me, is_blocked: r.is_blocked  });
                 }
             });
         }
