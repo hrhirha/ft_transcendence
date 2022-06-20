@@ -237,61 +237,85 @@ export class ChatService {
         return usernames;
     }
 
+    // added is_blocked to user
     async start_dm(u1: User, u2: UserIdDto)
     {
-        const dm = await this._dm_exists(u1.id, u2.id);
-        if (dm.length === 1)
+        let dm = await this._dm_exists(u1.id, u2.id);
+        if (!dm)
         {
-            const user1 = dm[0].user_rooms[0].user;
-            const user2 = dm[0].user_rooms[1].user;
-            delete dm[0].user_rooms;
-            return { room: dm[0], user1, user2 };
-        }
-
-        const r = await this._prismaS.room.create({
-            data: {
-                name: '',
-                type: room_type.PRIVATE,
-                is_channel: false,
-                user_rooms: {
-                    createMany: {
-                        data: [
-                            {
-                                uid: u1.id,
-                                is_owner: true,
-                                is_admin: true,
-                            },
-                            {
-                                uid: u2.id,
-                                is_owner: true,
-                                is_admin: true,
-                            }
-                        ]
-                    },
-                }
-            },
-            select: {
-                id: true,
-                is_channel: true,
-                user_rooms: {
-                    select: {
-                        user: {
-                            select: {
-                                id: true,
-                                username: true,
-                                fullName: true,
-                                imageUrl: true,
-                                status: true,
+            dm = await this._prismaS.room.create({
+                data: {
+                    name: '',
+                    type: room_type.PRIVATE,
+                    is_channel: false,
+                    user_rooms: {
+                        createMany: {
+                            data: [
+                                {
+                                    uid: u1.id,
+                                    is_owner: true,
+                                    is_admin: true,
+                                },
+                                {
+                                    uid: u2.id,
+                                    is_owner: true,
+                                    is_admin: true,
+                                }
+                            ]
+                        },
+                    }
+                },
+                select: {
+                    id: true,
+                    is_channel: true,
+                    user_rooms: {
+                        select: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    username: true,
+                                    fullName: true,
+                                    imageUrl: true,
+                                    status: true,
+                                    sentReq: {
+                                        where: {
+                                            OR: [
+                                                {
+                                                    snd_id: u1.id,
+                                                    rcv_id: u2.id,
+                                                },
+                                                {
+                                                    snd_id: u2.id,
+                                                    rcv_id: u1.id,
+                                                }
+                                            ]
+                                        }
+                                    },recievedReq: {
+                                        where: {
+                                            OR: [
+                                                { snd_id: u1.id, },
+                                                { rcv_id: u1.id, }
+                                            ]
+                                        }
+                                    },
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
-        const user1 = r.user_rooms[0].user;
-        const user2 = r.user_rooms[1].user;
-        delete r.user_rooms;
-        return { room: r, user1, user2 };
+            });
+        }
+
+        const user1 = dm.user_rooms[0].user;
+        const user2 = dm.user_rooms[1].user;
+        const req = user1.sentReq.length === 1 ? user1.sentReq[0]
+                    : (user1.recievedReq.length === 1 ? user1.recievedReq[0] : null);
+        user1['is_blocked'] = (req && req.status === friend_status.BLOCKED) ? true : false;
+        user2['is_blocked'] = (req && req.status === friend_status.BLOCKED) ? true : false;
+        delete user1.sentReq && delete user1.recievedReq;
+        delete user2.sentReq && delete user2.recievedReq;
+        delete dm.user_rooms;
+        return { room: dm, user1, user2 };
     }
                 
     async joinRoom(user: User, room: OldRoomDto)
@@ -770,6 +794,7 @@ export class ChatService {
         return rooms;
     }
 
+    // added is_blocked to user
     async getDms(user: User)
     {
         const rooms = await this._prismaS.room.findMany({
@@ -798,6 +823,21 @@ export class ChatService {
                                 fullName: true,
                                 imageUrl: true,
                                 status: true,
+                                sentReq: {
+                                    where: {
+                                        OR: [
+                                            { snd_id: user.id, },
+                                            { rcv_id: user.id, }
+                                        ]
+                                    }
+                                },recievedReq: {
+                                    where: {
+                                        OR: [
+                                            { snd_id: user.id, },
+                                            { rcv_id: user.id, }
+                                        ]
+                                    }
+                                },
                             }
                         }
                     }
@@ -808,7 +848,10 @@ export class ChatService {
         for (let room of rooms)
         {
             const user = room.user_rooms[0].user;
+            const req = user.sentReq.length === 1 ? user.sentReq[0] : (user.recievedReq.length === 1 ? user.recievedReq[0] : null);
             room['unread'] = room.user_rooms[0].unread;
+            user['is_blocked'] = (req && req.status === friend_status.BLOCKED) ? true : false;
+            delete user.sentReq && delete user.recievedReq;
             delete room.user_rooms;
             joined.push({room, user});
         }
@@ -1214,7 +1257,7 @@ export class ChatService {
 
     private async _dm_exists(id1: string, id2: string)
     {
-        return await this._prismaS.room.findMany({
+        const dms = await this._prismaS.room.findMany({
             where: {
                 is_channel: false,
                 AND: [
@@ -1241,11 +1284,29 @@ export class ChatService {
                                 username: true,
                                 fullName: true,
                                 imageUrl: true,
+                                sentReq: {
+                                    where: {
+                                        OR: [
+                                            { snd_id: id1, },
+                                            { rcv_id: id1, }
+                                        ]
+                                    }
+                                },recievedReq: {
+                                    where: {
+                                        OR: [
+                                            { snd_id: id1, },
+                                            { rcv_id: id1, }
+                                        ]
+                                    }
+                                },
                             }
                         }
                     },
                 }
             }
         });
+        if (dms.length === 0)
+            return null;
+        return dms[0];
     }
 }
