@@ -28,10 +28,10 @@ export const ChatRoomItem = (Props : Props) => {
           {Props.joined && <ReactTimeAgo className='time' date={Props.timeLastMsg} locale="en-US"/>}
           {!Props.joined && <button className='joinChannel'>Join</button>}
         </div>
-        {Props.joined && <div className='dataRow'>
+        <div className='dataRow'>
           <p className='lastMsg'>{Props.lastMsg}</p>
-          {Props.nbNotifs > 0 && <span className='nbNotifs'>{Props.nbNotifs}</span>}
-        </div>}
+          {Props.joined && Props.nbNotifs > 0 && <span className='nbNotifs'>{Props.nbNotifs}</span>}
+        </div>
       </div>
     </div>
   )

@@ -58,7 +58,7 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
                 joined={chatTabs.chats === tab}
                 avatar={chat.image}
                 fullName={chat.username}
-                lastMsg={chat.last_msg}
+                lastMsg={chatTabs.chats !== tab ? `${(index + 2) * 5} members` :  chat.last_msg}
                 nbNotifs={chat.nbr_msg_not_read}
                 timeLastMsg={chat.time_last_msg}
                 active={chat.id === activeChat}

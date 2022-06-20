@@ -5,19 +5,22 @@ import { faClose, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
 import { chat_data } from "../../../../test_data/chat_data";
 import { Chat_msg } from "../chat_msg/chat_msg";
 import { BgVectors } from "../../../../assets";
+import { useState } from "react";
+import { ChatRoomSettings } from "../chat_room_settings/chat_room_settings";
 
 
 interface HeaderProps {
     username: string,
     image: string,
     status: string,
-    onClose: Function
+    showSettings: Function,
+    onClose: Function,
 }
 
 const ChatRoomHeader = (Props : HeaderProps) => {
     return (
     <div id="chatRoomHeader">
-        <div className="userInfos">
+        <div className="userInfos" onClick={() => Props.showSettings()}>
             <CircleAvatar avatarURL={Props.image} dimensions={45} showStatus={true}/>
             <div className='dataRow'>
                 <span className='userName'>{Props.username}</span>
@@ -60,17 +63,23 @@ const ChatRoomFooter:React.FC = () => {
 }
 
 export const ChatRoom:React.FC<{roomId: string}> = ({roomId}) => {
+    const [showSettings, setShowSettings] = useState(false);
     const navigate = useNavigate();
+
     return (
-    <section id="chatRoom">
-        <ChatRoomHeader
-            username="Jhon don"
-            image="https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg"
-            status="last seen yesterday 2.30 PM"
-            onClose={() => navigate("/chat")}
-        />
-        <ChatRoomBody/>
-        <ChatRoomFooter/>
-    </section>
+        <>
+        {showSettings && <ChatRoomSettings roomId={roomId} onClose={() => setShowSettings(false)}/>}
+        {!showSettings && <section id="chatRoom">
+            <ChatRoomHeader
+                username="Jhon don"
+                image="https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg"
+                status="last seen yesterday 2.30 PM"
+                onClose={() => navigate("/chat")}
+                showSettings={() => setShowSettings(true)}
+            />
+            <ChatRoomBody/>
+            <ChatRoomFooter/>
+        </section>}
+    </>
     );
 }
