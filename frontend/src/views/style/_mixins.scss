@@ -49,3 +49,10 @@
     white-space: nowrap;
     text-overflow: ellipsis;
 }
+
+@mixin _square($width: auto) {
+    min-width: $width!important;
+    min-height: $width!important;
+    max-width: $width!important;
+    max-height: $width!important;
+}

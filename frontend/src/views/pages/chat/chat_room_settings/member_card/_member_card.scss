@@ -1,0 +1,6 @@
+div#memberCard {
+    @include _flex(row, space-between, center);
+    @include _selectionOff();
+    cursor: pointer;
+    
+}

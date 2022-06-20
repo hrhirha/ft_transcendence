@@ -38,21 +38,21 @@
         }
         @media (max-width: $sm) {
             margin-bottom: .5rem;
-            zoom: .75;
+            h2 {
+                font-size: $fsize * 1.5;
+            }
+            svg {
+                font-size: $fsize * 2.25;
+            }
         }
     }
     table {
         @media (max-width: $sm) {
             padding: 1rem;
         }
-        @media (max-width: $xs) {
-            zoom: .85;
-        }
-        @media (max-width: 380px) {
-            zoom: .75;
-        }
-        @media (max-width: 320px) {
-            zoom: .65;
+        @media (max-width: 365px) {
+            width: auto!important;
+            padding: .5rem;
         }
         overflow: hidden;
         margin: 1rem auto;
@@ -67,9 +67,19 @@
                 padding: 1rem;
                 margin: .25rem 0;
                 background-color:$light4;
+                @media (max-width: $xs) {
+                    padding: .5rem;
+                }
                 th {
                     font-family: $BFont;
                     font-size: $fsize * 1.07;
+                    @media (max-width: $xs) {
+                        font-size: $fsize * .85;
+                    }
+                    @media (max-width: 365px) {
+                        font-size: $fsize * .6;
+                        width: 5rem!important;
+                    }
                 }
                 :nth-child(1) {
                     min-width: 5rem;
@@ -92,6 +102,9 @@
                 background-color:$dark3;
                 font-size: $fsize;
                 width: auto;
+                @media (max-width: $xs) {
+                    padding: .25rem .5rem;
+                }
                 .rank span {
                     color: $light3;
                 }
@@ -100,6 +113,14 @@
                     max-width: 7rem;
                     font-size: $fsize * 1.25;
                     font-family: $BFont;
+                    @media (max-width: $xs) {
+                        font-size: $fsize * .95;
+                        min-width: 4rem;
+                    }
+                    @media (max-width: 365px) {
+                        font-size: $fsize * .85;
+                        min-width: 3rem;
+                    }
                 }
                 :nth-child(2) {
                     width: 100%;
@@ -107,12 +128,25 @@
                     @include _flex(row, flex-start, center);
                     #circleAvatar {
                         border: .185rem solid $light3;
+                        @media (max-width: $xs) {
+                            @include _square(2rem);
+                        }
+                        @media (max-width: 365px) {
+                            @include _square(1.25rem);
+                            border-width: .1rem;
+                        }
                     }
                     .fullName {
                         @include _textOverflow(10rem);
                         font-family: $BFont;
                         font-size: $fsize * 1.05;
                         margin-left: .75rem;
+                        @media (max-width: $xs) {
+                            font-size: $fsize * .85;
+                        }
+                        @media (max-width: 365px) {
+                            font-size: $fsize * .7;
+                        }
                     }
                 }
                 :nth-child(3) {
@@ -125,6 +159,15 @@
                         background: $light4;
                         padding: 0.15rem 0.25rem;
                         border-radius: 1rem;
+                        @media (max-width: $xs) {
+                            font-size: $fsize * .85;
+                        }
+                        @media (max-width: 365px) {
+                            font-size: $fsize * .7;
+                        }
+                    }
+                    @media (max-width: 365px) {
+                        min-width: auto!important;
                     }
                 }
             }

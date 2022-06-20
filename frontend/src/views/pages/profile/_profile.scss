@@ -18,9 +18,6 @@
     nav.profileTabs {
         @include _flex(row, center, center);
         @include _selectionOff();
-        @media (max-width: $xs) {
-            zoom: .85;
-        }
         ul.tabs {
             @include _flex(row, center, center);
             margin: 1rem auto;
@@ -37,6 +34,10 @@
                 border-radius: 5rem;
                 color: $light3;
                 font-family: $BFont;
+                @media (max-width: $xs) {
+                    font-size: $fsize * .6;
+                    padding: .2rem .7rem;
+                }
             }
             li.tabTitle.active {
                 background-color: $purple;

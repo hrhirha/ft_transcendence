@@ -5,11 +5,7 @@ section#friendsManager {
         overflow-x: auto;
         padding: .5rem 0;
         margin-bottom: .5rem;
-        @media (max-width: $md) {
-            zoom: .95;
-        }
         @media (max-width: $sm) {
-            zoom: .9;
             width: 100%;
             min-width: 300px;
         }
@@ -71,22 +67,20 @@ section#friendsManager {
                     line-height: 1.2;
                 }
             }
+
+            @media (max-width: 475px) {
+                justify-content: center;
+            }
             .friendCard {
                 @media (max-width: 475px) {
-                    width: calc(100% / 2.25)!important;
-                    zoom: .7;
-                }
-                @media (max-width: 347px) {
-                    width: calc(100% / 2.35)!important;
-                    zoom: .7;
+                    width: 100%!important;
+                    max-width: 12rem;
                 }
                 @media (min-width: 476px) {
-                    width: calc(100% / 3.5)!important;
-                    zoom: .8;
+                    width: calc(100% / 2.4)!important;
                 }
                 @media (min-width: 680px) {
                     width: calc(100% / 3.5)!important;
-                    zoom: 1;
                 }
                 @media (min-width: $lg) {
                     width: calc(100% / 3.33)!important;

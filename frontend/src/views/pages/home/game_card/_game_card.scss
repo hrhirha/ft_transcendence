@@ -28,7 +28,7 @@ div#gameCard {
             svg {
                 margin-right: .45rem;
             }
-            zoom: 1.25;
+            //@include _zoom(1.25);
         }
         h6 {
             font-size: $fsize ;

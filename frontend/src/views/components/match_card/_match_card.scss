@@ -6,18 +6,34 @@ section.matchCard {
     margin: .5rem auto;
     border-radius: 1rem;
     background-color: $light4;
+    @media (max-width: $lg)
+    {
+        padding: .5rem;
+    }
    .player {
-    @include _flex(row, center, center);
-
+        @include _flex(row, center, center);
         .avatar {
             @include _flex(column, center, center);
             position: relative;
             #circleAvatar {
                 border: .25rem solid $dark3;
+                @media (max-width: $lg)
+                {
+                    @include _square(3rem);
+                }
+                @media (max-width: $md)
+                {
+                    @include _square(2.25rem);
+                }
+                @media (max-width: 520px)
+                {
+                    @include _square(1.5rem);
+                    border-width: 0.15rem;
+                }
             }
         }
         .fullName {
-            font-size: $fsize * 1.2;
+            font-size: $fsize * 1.1;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -28,6 +44,20 @@ section.matchCard {
             max-width: 10rem;
             margin: 0 .5rem;
             color: $light2;
+            @media (max-width: $lg)
+            {
+                font-size: $fsize * .9;
+            }
+            @media (max-width: $md)
+            {
+                font-size: $fsize * .65;
+                width: 7rem;
+            }
+            @media (max-width: 520px)
+            {
+                font-size: $fsize * .5;
+                width: auto;
+            }
         }
     }
     .scoreBoard {
@@ -35,11 +65,37 @@ section.matchCard {
         background-color: $dark3;
         border-radius: 5rem;
         height: 2.5rem;
+        @media (max-width: $lg)
+        {
+            height: 2rem;
+        }
+        @media (max-width: $md)
+        {
+            height: 1.75rem;
+        }
+        @media (max-width: 520px)
+        {
+            height: 1.15rem;
+        }
         .gameType {
             width: 4rem;
             background-color: $dark3;
             padding: .5rem;
             border-radius: 50%;
+            @media (max-width: $lg)
+            {
+                @include _square(2.5rem);
+            }
+            @media (max-width: $md)
+            {
+                @include _square(2rem);
+            }
+            @media (max-width: 520px)
+            {
+                @include _square(1.5rem);
+                padding: .15rem;
+                width: 2rem;
+            }
         }
         .score {
             font-size: $fsize * 1.75;
@@ -47,6 +103,22 @@ section.matchCard {
             margin: auto 1rem;
             width: 2rem;
             text-align: center;
+            @media (max-width: $lg)
+            {
+                font-size: $fsize * 1.25;
+                margin: auto .5rem;
+            }
+            @media (max-width: $md)
+            {
+                font-size: $fsize;
+                margin: auto .25rem;
+            }
+            @media (max-width: 520px)
+            {
+                font-size: $fsize * .75;
+                margin: 0;
+                width: 1.5rem;
+            }
         }
     }
 }
