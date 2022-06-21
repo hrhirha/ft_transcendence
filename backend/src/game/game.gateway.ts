@@ -81,7 +81,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                         id: true
                     }
                 });
-                this.server.to(d.roomId).emit("join", newid.id);
+                this.server.to(d.roomId).emit("newRoom", newid.id);
             }
         }
         else
@@ -107,7 +107,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 }
             });
             /// emit restart 
-            client.emit('restart');
+            client.emit('restart', d.status);
         }
         else
         {
