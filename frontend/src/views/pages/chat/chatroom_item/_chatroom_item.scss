@@ -5,10 +5,19 @@ div#chatRoomItem {
     padding: 0.25rem;
     margin: .2rem;
     border-radius: 0.5rem;
+    #circleAvatar {
+        @media (max-width: $xs) {
+            @include _square(2.25rem);
+        }
+    }
     div.dataColumn {
         width: 100%;
         margin: .3rem;
         margin-left: .75rem;
+        @media (max-width: $xs) {
+            margin: .2rem;
+            margin-left: .5rem;
+        }
         @include _flex(column, space-between, space-between);
         .dataRow {
             @include _flex(row, space-between, center);
@@ -17,6 +26,9 @@ div#chatRoomItem {
                 font-family: $BFont;
                 color: $light1;
                 font-size: $fsize * .85;
+                @media (max-width: $xs) {
+                    font-size: $fsize * .7;
+                }
             }
             .time {
                 color: $light2;
@@ -28,6 +40,9 @@ div#chatRoomItem {
                 @include _textOverflow(10rem);
                 color: $light2;
                 font-size: $fsize * .7;
+                @media (max-width: $xs) {
+                    font-size: $fsize * .6;
+                }
             }
             button.joinChannel {
                 @include _roundedButtonStyle($bgcolor1: $purple, $bgcolor2: $light6,);

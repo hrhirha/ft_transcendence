@@ -28,7 +28,6 @@ main#chatPage {
             margin: 0;
             max-height: 100%!important;
             min-height: 100%!important;
-            //@include _zoom(.85);
         }
 
         min-height: calc(100vh - 10rem);
@@ -108,14 +107,18 @@ main#chatPage {
                 @include _textOverflow(29%);
                 color: $light3;
                 font-size: $fsize * .65;
-                @media (max-width: $sm) {
-                    font-size: $fsize * .75;
-                }
                 padding: .25rem .5rem;
                 border-radius: 50rem;
                 cursor: pointer;
                 width: 29%;
                 font-family: $MFont;
+                @media (max-width: $sm) {
+                    font-size: $fsize * .75;
+                }
+                @media (max-width: $xs) {
+                    font-size: $fsize * .55;
+                    padding: .25rem;
+                }
             }
             
             li.active {
