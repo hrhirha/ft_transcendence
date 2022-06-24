@@ -22,7 +22,9 @@ main#chatPage {
             width: 85%;
             margin: 2rem auto;
         }
-
+        @media (min-width: $xs) and (max-width: $sm) {
+            margin: 2rem auto;
+        }
         @media (max-width: $xs) {
             border-radius: 0;
             margin: 0;
@@ -37,11 +39,12 @@ main#chatPage {
         margin-top: 2rem;
         overflow: hidden;
 
-        .col {
+        .room {
             padding: 0;
             border-left: .5px solid $dark3;
         }
-
+        .chats {
+        }
         .chatOptions {
             @include _flex(row, space-between, center);
             padding: 1rem 0;

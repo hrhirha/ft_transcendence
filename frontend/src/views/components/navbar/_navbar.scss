@@ -84,3 +84,10 @@ header#navbar {
         }
     }
 }
+.fixed {
+    position: fixed;
+    top: 0;
+    width: 100%!important;
+    padding-left: .5rem;
+    z-index: 5;
+}

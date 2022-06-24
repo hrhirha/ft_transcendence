@@ -76,6 +76,7 @@ const class_socket =new Socket(); //test
 
 
 export const Chat:React.FC = () => {
+    const [screenWidth, setScreenWidth] = useState<number>(window.innerWidth);
     const [showNewChatForm, setShowNewChatForm] = useState<boolean>(false);
     const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState<chatTabs>(chatTabs.chats);
@@ -162,9 +163,15 @@ export const Chat:React.FC = () => {
     },[class_socket.socket])
     //test -----
 
+
+    useEffect(() => {
+        //on mount
+        window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
+    }, []);
+
     return (
     <main id="chatPage">
-        <NavBar />
+        <NavBar fixedTop={screenWidth < 575.98}/>
 
         {/* <button style={{color: `black`}}onClick={() =>{
             class_socket.start_dm("cl4motzn00033r8sleqn0c4a8");
@@ -240,7 +247,8 @@ export const Chat:React.FC = () => {
         
         <div className='container'>
             <div className="row chat">
-                <div className="col-sm-12 col-md-5 col-lg-4">
+                {((screenWidth < 767.98 && searchParams.get("id") === null)
+                    || screenWidth >= 767.98) && <div className="col-sm-12 col-md-5 col-lg-4 chats">
                     <div className="chatOptions">
                         <form id="chatSearch">
                             <input type="text" placeholder="Search for chat"/>
@@ -273,12 +281,13 @@ export const Chat:React.FC = () => {
                             onSelectItem={() => setShowNewChatForm(false)}
                             activeChat={searchParams.get("id")}/>
                     </div>
-                </div>
-                <div className="col">
+                </div>}
+                {((screenWidth < 767.98 && searchParams.get("id") !== null)
+                    || screenWidth >= 767.98) && <div className="col room">
                     {!showNewChatForm && searchParams.get("id") === null && <ChatHome onClick={() => setShowNewChatForm(true)}/>}
                     {!showNewChatForm && searchParams.get("id") !== null && <ChatRoom roomId={searchParams.get("id")!}/>}
                     {showNewChatForm && <CreateNewChat onClose={() => setShowNewChatForm(false)}/>}
-                </div>
+                </div>}
             </div>
         </div>
     </main>

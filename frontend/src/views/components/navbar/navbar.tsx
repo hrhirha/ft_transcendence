@@ -64,9 +64,9 @@ const Menu:React.FC = () => {
     );
 }
 
-export const NavBar:React.FC = () => {
+export const NavBar:React.FC<{fixedTop?: boolean}> = ({fixedTop}) => {
     return (
-        <header id="navbar" className="container-fluid">
+        <header id="navbar" className={`container-fluid ${fixedTop ? 'fixed' : ''}`}>
             <div className="container">
                 <div className="row">
                     <span id="brand" className='col col-md-3'>
