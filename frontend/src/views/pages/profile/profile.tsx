@@ -5,6 +5,7 @@ import { ProfileInfos } from "./profile_infos/profile_infos";
 import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faComment, faUsersGear, faHistory} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { MatchesHistory } from "./matches_history/matches_history";
+import { AuthChecker } from "../../components/check_auth/auth_checker";
 
 
 export enum userType {
@@ -88,41 +89,44 @@ export const Profile:React.FC = () => {
         }
     ];
     return (
-    <main id="profilePage">
-        <NavBar />
-        <div className="profil">
-            <div className='container'>
-                    <div className="col col-md-11 col-lg-9 col-xl-8">
-                        <ProfileInfos avatar="https://avatars.githubusercontent.com/u/74456446?v=4" fullName="Walid Ben Said" username="wben-sai" ranking={2} wins={10}/>
-                    </div>
-                    <div className="col col-md-11 col-lg-9 col-xl-8">
-                        <nav className="profileTabs">
-                            <ul className="tabs">
-                                {tabs.map((tab, index) => (
-                                    <li key={`${tab.title.replace(' ', '_')}`} className={"tabTitle "+(switchTab === index ? "active" : "")} onClick={() =>  setSwitchTab(index)}>{tab.title}</li>
-                                ))}
-                            </ul>
-                        </nav>
-                        <div className="tabHeader">
-                            <hr/>
-                            <div className="title">
-                                {tabs.map((tab, index) => {
-                                    if (index === switchTab) {
-                                        return <div key={`${tab.title.replace(' ', '')}`}>
-                                            <FontAwesomeIcon icon={tab.icon} />
-                                            <span>{tab.title}</span>
-                                        </div>
-                                    }
-                                    return null;
-                                })}
-                            </div>
-                            <hr/>
+    <AuthChecker
+        redirect="/leader_board"
+        wrappedContent={
+        <main id="profilePage">
+            <NavBar />
+            <div className="profil">
+                <div className='container'>
+                        <div className="col col-md-11 col-lg-9 col-xl-8">
+                            <ProfileInfos avatar="https://avatars.githubusercontent.com/u/74456446?v=4" fullName="Walid Ben Said" username="wben-sai" ranking={2} wins={10}/>
                         </div>
-                        {switchTab === 0 && <MatchesHistory />}
-                        {switchTab === 1 && <FriendsManager />}
+                        <div className="col col-md-11 col-lg-9 col-xl-8">
+                            <nav className="profileTabs">
+                                <ul className="tabs">
+                                    {tabs.map((tab, index) => (
+                                        <li key={`${tab.title.replace(' ', '_')}`} className={"tabTitle "+(switchTab === index ? "active" : "")} onClick={() =>  setSwitchTab(index)}>{tab.title}</li>
+                                    ))}
+                                </ul>
+                            </nav>
+                            <div className="tabHeader">
+                                <hr/>
+                                <div className="title">
+                                    {tabs.map((tab, index) => {
+                                        if (index === switchTab) {
+                                            return <div key={`${tab.title.replace(' ', '')}`}>
+                                                <FontAwesomeIcon icon={tab.icon} />
+                                                <span>{tab.title}</span>
+                                            </div>
+                                        }
+                                        return null;
+                                    })}
+                                </div>
+                                <hr/>
+                            </div>
+                            {switchTab === 0 && <MatchesHistory />}
+                            {switchTab === 1 && <FriendsManager />}
+                        </div>
                     </div>
-                </div>
-        </div>
-    </main>
-    );
+            </div>
+        </main>}
+    />);
 }

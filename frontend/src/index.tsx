@@ -14,8 +14,6 @@ import { NotFound } from './views/pages/not_found/not_found';
 
 library.add(faPuzzlePiece);
 
-
-
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );

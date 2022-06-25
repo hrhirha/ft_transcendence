@@ -11,6 +11,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChatHomeVector, NoConversations } from "../../../assets";
 import { Socket } from "../../../socket";
 import { management_memeber, chats, dm_started, management_password, receive_message, room_created, user_joined, user_left, user_unbanned, user_muted, message_deleted, user_info, messages } from "../../../socket/interface";
+import { AuthChecker } from "../../components/check_auth/auth_checker";
 
 // interface Props {
 //     username: string,
@@ -170,126 +171,129 @@ export const Chat:React.FC = () => {
     }, []);
 
     return (
-    <main id="chatPage">
-        <NavBar fixedTop={screenWidth < 575.98}/>
+        <AuthChecker
+            redirect="/chat"
+            wrappedContent={
+            <main id="chatPage">
+                <NavBar fixedTop={screenWidth < 575.98}/>
 
-        {/* <button style={{color: `black`}}onClick={() =>{
-            class_socket.start_dm("cl4motzn00033r8sleqn0c4a8");
-        }}>start_dm</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.get_chats();
-        }}>get_chats</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.send_message({rid : "cl4mowo080112r8sl1ydozsbf", msg :"Hello1"});
-        }}>send_message</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.create_room({name : "walidroom",is_private:false, uids :["cl4lebw5j0133yrsms9le0c75"]});
-        }}>create room</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.delete_room({id : "cl4jv5f3d0369ohsmoae83lyo"});
-        }}>delete_room</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.remove_member({uid : "cl4lebw5j0133yrsms9le0c75", rid : "cl4lidmy50103ojsm2ftzgyw4"});
-        }}>remove_member</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.join_room({id : "cl4lidmy50103ojsm2ftzgyw4"});
-        }}>join_room</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.leave_room({id : "cl4lidmy50103ojsm2ftzgyw4"});
-        }}>leave_room</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.add_member({uid : "cl4lebw5j0133yrsms9le0c75", rid : "cl4lidmy50103ojsm2ftzgyw4"});
-        }}>add_member</button>
+                {/* <button style={{color: `black`}}onClick={() =>{
+                    class_socket.start_dm("cl4motzn00033r8sleqn0c4a8");
+                }}>start_dm</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.get_chats();
+                }}>get_chats</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.send_message({rid : "cl4mowo080112r8sl1ydozsbf", msg :"Hello1"});
+                }}>send_message</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.create_room({name : "walidroom",is_private:false, uids :["cl4lebw5j0133yrsms9le0c75"]});
+                }}>create room</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.delete_room({id : "cl4jv5f3d0369ohsmoae83lyo"});
+                }}>delete_room</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.remove_member({uid : "cl4lebw5j0133yrsms9le0c75", rid : "cl4lidmy50103ojsm2ftzgyw4"});
+                }}>remove_member</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.join_room({id : "cl4lidmy50103ojsm2ftzgyw4"});
+                }}>join_room</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.leave_room({id : "cl4lidmy50103ojsm2ftzgyw4"});
+                }}>leave_room</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.add_member({uid : "cl4lebw5j0133yrsms9le0c75", rid : "cl4lidmy50103ojsm2ftzgyw4"});
+                }}>add_member</button>
 
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.set_password({id : "cl4juxk0d0176ohsm1x6d39sn", new_password : "Walidbensaid123$"});
-        }}>set_password</button>
-        <br/>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.change_password({id : "cl4juxk0d0176ohsm1x6d39sn", new_password : "Awedfdffddfg2123$", old_password : "Walidbensaid123$"});
-        }}>change_password</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.remove_password({id : "cl4juxk0d0176ohsm1x6d39sn",  old_password : "Awedfdffddfg2123$"});
-        }}>remove_password</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.add_admin({uid : "cl4jsuwd500332tsm3kb2eyyb",  rid : "cl4k0xa1f66734xsmzhxz40gh"});
-        }}>add_admin</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.remove_admin({uid : "cl4jsuwd500332tsm3kb2eyyb",  rid : "cl4k0xa1f66734xsmzhxz40gh"});
-        }}>remove_admin</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.ban_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4"});
-        }}>ban_user</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.unban_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4"});
-        }}>unban_user</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.mute_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4", mute_period:"15M"});
-        }}>mute_user</button>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.unmute_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4"});
-        }}>unmute_user</button>
-         <button style={{color: `black`}} onClick={() =>{
-            class_socket.delete_message({id : "cl4k23j4s0738ydsm45l5at7g",  rid : "cl4k0xa1f66734xsmzhxz40gh"});
-        }}>delete_message</button>
-        <br/>
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.get_members({id : "cl4jtlov200862tsmzhczxiq5"});
-        }}>get_members</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.set_password({id : "cl4juxk0d0176ohsm1x6d39sn", new_password : "Walidbensaid123$"});
+                }}>set_password</button>
+                <br/>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.change_password({id : "cl4juxk0d0176ohsm1x6d39sn", new_password : "Awedfdffddfg2123$", old_password : "Walidbensaid123$"});
+                }}>change_password</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.remove_password({id : "cl4juxk0d0176ohsm1x6d39sn",  old_password : "Awedfdffddfg2123$"});
+                }}>remove_password</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.add_admin({uid : "cl4jsuwd500332tsm3kb2eyyb",  rid : "cl4k0xa1f66734xsmzhxz40gh"});
+                }}>add_admin</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.remove_admin({uid : "cl4jsuwd500332tsm3kb2eyyb",  rid : "cl4k0xa1f66734xsmzhxz40gh"});
+                }}>remove_admin</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.ban_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4"});
+                }}>ban_user</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.unban_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4"});
+                }}>unban_user</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.mute_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4", mute_period:"15M"});
+                }}>mute_user</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.unmute_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4"});
+                }}>unmute_user</button>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.delete_message({id : "cl4k23j4s0738ydsm45l5at7g",  rid : "cl4k0xa1f66734xsmzhxz40gh"});
+                }}>delete_message</button>
+                <br/>
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.get_members({id : "cl4jtlov200862tsmzhczxiq5"});
+                }}>get_members</button>
 
-        <button style={{color: `black`}} onClick={() =>{
-            class_socket.get_messages({id : "cl4lidmy50103ojsm2ftzgyw4"});
-        }}>get_messages</button> */}
-     
+                <button style={{color: `black`}} onClick={() =>{
+                    class_socket.get_messages({id : "cl4lidmy50103ojsm2ftzgyw4"});
+                }}>get_messages</button> */}
+            
 
 
 
-        
-        <div className='container'>
-            <div className="row chat">
-                {((screenWidth < 767.98 && !showNewChatForm && searchParams.get("id") === null)
-                    || screenWidth >= 767.98) && <div className="col-sm-12 col-md-5 col-lg-4 chats">
-                    <div className="chatOptions">
-                        <form id="chatSearch">
-                            <input type="text" placeholder="Search for chat"/>
-                            <FontAwesomeIcon icon={faSearch}/>
-                        </form>
-                        <button id="newMessage" title="New chat" onClick={() => setShowNewChatForm(true)}>
-                            <FontAwesomeIcon icon={faCommentMedical}/>
-                        </button>
+                
+                <div className='container'>
+                    <div className="row chat">
+                        {((screenWidth < 767.98 && !showNewChatForm && searchParams.get("id") === null)
+                            || screenWidth >= 767.98) && <div className="col-sm-12 col-md-5 col-lg-4 chats">
+                            <div className="chatOptions">
+                                <form id="chatSearch">
+                                    <input type="text" placeholder="Search for chat"/>
+                                    <FontAwesomeIcon icon={faSearch}/>
+                                </form>
+                                <button id="newMessage" title="New chat" onClick={() => setShowNewChatForm(true)}>
+                                    <FontAwesomeIcon icon={faCommentMedical}/>
+                                </button>
+                            </div>
+                            <ul id="chatTabs">
+                                <li id="chats"
+                                    onClick={() => setActiveTab(chatTabs.chats)}
+                                    className={activeTab === chatTabs.chats ? "active" : undefined}>
+                                        Chats
+                                </li>
+                                <li id="joinedGroups"
+                                    onClick={() => setActiveTab(chatTabs.joinedGroups)}
+                                    className={activeTab === chatTabs.joinedGroups ? "active" : undefined}>
+                                        Joined Groups
+                                </li>
+                                <li id="groups"
+                                    onClick={() => setActiveTab(chatTabs.otherGroups)}
+                                    className={activeTab === chatTabs.otherGroups ? "active" : undefined}>
+                                        Other Groups
+                                </li>
+                            </ul>
+                            <div className="chatRooms">
+                                <ListChats
+                                    tab={activeTab}
+                                    onSelectItem={() => setShowNewChatForm(false)}
+                                    activeChat={searchParams.get("id")}/>
+                            </div>
+                        </div>}
+                        {((screenWidth < 767.98 && (showNewChatForm || searchParams.get("id") !== null))
+                            || screenWidth >= 767.98) && <div className="col room">
+                            {!showNewChatForm && searchParams.get("id") === null && <ChatHome onClick={() => setShowNewChatForm(true)}/>}
+                            {!showNewChatForm && searchParams.get("id") !== null && <ChatRoom roomId={searchParams.get("id")!}/>}
+                            {showNewChatForm && <CreateNewChat onClose={() => setShowNewChatForm(false)}/>}
+                        </div>}
                     </div>
-                    <ul id="chatTabs">
-                        <li id="chats"
-                            onClick={() => setActiveTab(chatTabs.chats)}
-                            className={activeTab === chatTabs.chats ? "active" : undefined}>
-                                Chats
-                        </li>
-                        <li id="joinedGroups"
-                            onClick={() => setActiveTab(chatTabs.joinedGroups)}
-                            className={activeTab === chatTabs.joinedGroups ? "active" : undefined}>
-                                Joined Groups
-                        </li>
-                        <li id="groups"
-                            onClick={() => setActiveTab(chatTabs.otherGroups)}
-                            className={activeTab === chatTabs.otherGroups ? "active" : undefined}>
-                                Other Groups
-                        </li>
-                    </ul>
-                    <div className="chatRooms">
-                        <ListChats
-                            tab={activeTab}
-                            onSelectItem={() => setShowNewChatForm(false)}
-                            activeChat={searchParams.get("id")}/>
-                    </div>
-                </div>}
-                {((screenWidth < 767.98 && (showNewChatForm || searchParams.get("id") !== null))
-                    || screenWidth >= 767.98) && <div className="col room">
-                    {!showNewChatForm && searchParams.get("id") === null && <ChatHome onClick={() => setShowNewChatForm(true)}/>}
-                    {!showNewChatForm && searchParams.get("id") !== null && <ChatRoom roomId={searchParams.get("id")!}/>}
-                    {showNewChatForm && <CreateNewChat onClose={() => setShowNewChatForm(false)}/>}
-                </div>}
-            </div>
-        </div>
-    </main>
-    );
+                </div>
+            </main>}
+    />);
 }
