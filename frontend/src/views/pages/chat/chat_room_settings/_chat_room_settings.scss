@@ -1,3 +1,6 @@
+@import './settings_option/settings_option';
+@import './member_card/member_card';
+
 section#chatRoomSettings {
     @include _flex(column, center, center);
     width: 100%;
@@ -12,6 +15,7 @@ section#chatRoomSettings {
         border-radius: 1rem;
         min-width: 18rem;
         max-width: 20rem;
+        max-height: 30rem;
         span.closeSettings {
             @include _flex(column, center, center);
             position: absolute;
@@ -61,7 +65,19 @@ section#chatRoomSettings {
         .options {
             @include _flex(row, space-evenly, center);
             padding: 1rem;
+            padding-top: 0;
             width: 75%;
+        }
+        h6 {
+            font-size: $fsize * .85;
+            margin-bottom: .5rem;
+            svg {
+                margin-right: .5rem;
+            }
+        }
+        .members {
+            overflow-y: auto;
+            width: 100%;
         }
     }
 }

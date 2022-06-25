@@ -1,18 +1,20 @@
-button.settingsOption {
-    @include _flex(column, center, center);
+div.settingsOption {
     position: relative;
-    cursor: pointer;
-    border: none;
-    width: 3rem;
-    height: 3rem;
-    padding: .5rem;
-    border-radius: 100%;
-    background-color: $light4;
-    font-size: $fsize * 1.25;
-    color: $light2;
-    &:hover {
-        background-color: $light5;
+    button {
+        @include _flex(column, center, center);
+        cursor: pointer;
+        border: none;
+        width: 3rem;
+        height: 3rem;
+        padding: .5rem;
+        border-radius: 100%;
+        background-color: $light4;
+        font-size: $fsize * 1.25;
         color: $light2;
+        &:hover {
+            background-color: $light5;
+            color: $light2;
+        }
     }
     .subOptions {
         @include _flex(column, center, flex-start);

@@ -247,7 +247,7 @@ export const Chat:React.FC = () => {
         
         <div className='container'>
             <div className="row chat">
-                {((screenWidth < 767.98 && searchParams.get("id") === null)
+                {((screenWidth < 767.98 && !showNewChatForm && searchParams.get("id") === null)
                     || screenWidth >= 767.98) && <div className="col-sm-12 col-md-5 col-lg-4 chats">
                     <div className="chatOptions">
                         <form id="chatSearch">
@@ -282,7 +282,7 @@ export const Chat:React.FC = () => {
                             activeChat={searchParams.get("id")}/>
                     </div>
                 </div>}
-                {((screenWidth < 767.98 && searchParams.get("id") !== null)
+                {((screenWidth < 767.98 && (showNewChatForm || searchParams.get("id") !== null))
                     || screenWidth >= 767.98) && <div className="col room">
                     {!showNewChatForm && searchParams.get("id") === null && <ChatHome onClick={() => setShowNewChatForm(true)}/>}
                     {!showNewChatForm && searchParams.get("id") !== null && <ChatRoom roomId={searchParams.get("id")!}/>}

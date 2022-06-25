@@ -26,10 +26,13 @@ export const ChatRoomSettings:React.FC<{roomId: string, onClose: Function}> = ({
                     <SettingsOption icon={faTrash} title="Delete Channel" onClick={() => alert("DELETE CHANNEL")}/>
                     <SettingsOption icon={faArrowRightFromBracket} title="Leave Channel" onClick={() => alert("LEAVE CHANNEL")}/>
                 </div>
-                {
-                    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((member, k) => <MemeberCard key={k} avatar="https://i.pravatar.cc/100" username={`username${k}`} fullName={`Full Name ${k}`} onClick={() => alert(`Go To ${k} Profile`)}/>)
-                }
-                <div className="DMOptions options">
+                <h6><FontAwesomeIcon icon={faUsers} />Group Memebers</h6>
+                <div className="members">
+                    {
+                        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((member, k) => <MemeberCard key={k} avatar="https://i.pravatar.cc/100" admin={Math.round(Math.random()) == 1} username={`username${k}`} fullName={`Full Name ${k}`} onClick={() => alert(`Go To ${k} Profile`)}/>)
+                    }
+                </div>
+                {/* <div className="DMOptions options">
                     <SettingsOption icon={faGamepad} title="Play Match"
                         subOptions={[
                             <div onClick={() => alert("Play Normal Game")} title="Play Normal Game" >
@@ -43,7 +46,7 @@ export const ChatRoomSettings:React.FC<{roomId: string, onClose: Function}> = ({
                         ]}/>
                     <SettingsOption icon={faUser} title="Profile" onClick={() => alert("Go To User Profile")}/>
                     <SettingsOption icon={faUserSlash} title="Block" onClick={() => alert("Block User")}/>
-                </div>
+                </div> */}
             </div>
         </section>
     );
