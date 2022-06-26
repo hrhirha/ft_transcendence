@@ -23,7 +23,7 @@ export const buttons = [
         type: userType.none,
         icon: faUserPlus,
         text: 'Add Friend',
-        onClick: async (userId: string) => {
+        onClick: async (userId: string, action?: Function) => {
             try {
                 await post_friendreq_send(userId);
             } catch(err) {
@@ -35,9 +35,10 @@ export const buttons = [
         type: userType.request,
         icon: faUserCheck,
         text: 'Accept',
-        onClick: async (userId: string) => {
+        onClick: async (userId: string, action?: Function) => {
             try {
                 await post_friendreq_accept(userId);
+                action && action(userId);
             } catch(err) {
 
             } 
@@ -47,11 +48,11 @@ export const buttons = [
         type: userType.request,
         icon: faUserXmark,
         text: 'Decline',
-        onClick: async (userId: string) => {
+        onClick: async (userId: string, action?: Function) => {
             try {
                 await post_friendreq_decline(userId);
+                action && action(userId);
             } catch(err) {
-
             }
         }
     },
@@ -59,11 +60,11 @@ export const buttons = [
         type: userType.friend,
         icon: faUserMinus,
         text: 'Unfriend',
-        onClick: async (userId: string) => {
+        onClick: async (userId: string, action?: Function) => {
             try {
                 await post_friend_unfriend(userId);
+                action && action(userId);
             } catch(err) {
-
             }
         }
     },
@@ -71,9 +72,10 @@ export const buttons = [
         type: userType.friend,
         icon: faUserSlash,
         text: 'Block',
-        onClick: async (userId: string) => {
+        onClick: async (userId: string, action?: Function) => {
             try {
                 await post_friend_block(userId);
+                action && action(userId);
             } catch(err) {
 
             }
@@ -83,9 +85,10 @@ export const buttons = [
         type: userType.blocked,
         icon: faUserMinus,
         text: 'Unblock',
-        onClick: async (userId: string) => {
+        onClick: async (userId: string, action?: Function) => {
             try {
                 await post_friend_unblock(userId);
+                action && action(userId);
             } catch(err) {
 
             }
@@ -95,9 +98,10 @@ export const buttons = [
         type: userType.pending,
         icon: faUserXmark,
         text: 'Cancle',
-        onClick: async (userId: string) => {
+        onClick: async (userId: string, action?: Function) => {
             try {
                 await post_friendreq_cancel(userId);
+                action && action(userId);
             } catch(err) {
 
             }
@@ -138,7 +142,14 @@ export const Profile:React.FC = () => {
             <div className="profil">
                 <div className='container'>
                         <div className="col col-md-11 col-lg-9 col-xl-8">
-                            <ProfileInfos avatar={userInfos?.imageUrl} fullName={userInfos?.fullName} username={userInfos?.username}  ranking={userInfos?.rank || 0} wins={userInfos?.wins} loses={userInfos?.loses}/>
+                            <ProfileInfos
+                                id={userInfos?.id}
+                                avatar={userInfos?.imageUrl}
+                                fullName={userInfos?.fullName}
+                                username={userInfos?.username}
+                                ranking={userInfos?.rank || 0}
+                                wins={userInfos?.wins}
+                                loses={userInfos?.loses}/>
                         </div>
                         <div className="col col-md-11 col-lg-9 col-xl-8">
                             <nav className="profileTabs">

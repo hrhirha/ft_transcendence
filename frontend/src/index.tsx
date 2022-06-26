@@ -24,8 +24,9 @@ root.render(
           <Route path="/login" element={<Login/>} />
           <Route path="/" element={<Home/>} />
           <Route path="/leader_board" element={<LeaderBoard/>} />
-          { <Route path="/chat" element={<Chat/>} /> }
-          <Route path="/profile" element={<Profile/>} />
+          <Route path="/chat" element={<Chat/>} />
+          <Route path="/profile/[:id]" element={<Profile/>} />
+          <Route path="/profile/" element={<Profile/>} />
           <Route path="*" element={<NotFound/>} />
 
       </Routes>

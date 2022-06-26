@@ -7,7 +7,8 @@ interface Props {
 	id: string,
 	avatar: string,
 	fullName: string,
-	username: string
+	username: string,
+	action: Function
 }
 
 export const FriendCard = (Props : Props) => {
@@ -24,7 +25,12 @@ export const FriendCard = (Props : Props) => {
 				{buttons.map((button) => {
 					if (button.type === Props.type) {
 						return (
-							<button key={`${button.text.replace(' ', '')}`} className={`btn${button.text.replace(' ', '')}`} onClick={() => button.onClick(Props.id)}>
+							<button
+								key={`${button.text.replace(' ', '')}`}
+								className={`btn${button.text.replace(' ', '')}`}
+								onClick={() => {
+									button.onClick(Props.id, Props.action);
+								}}>
 								<FontAwesomeIcon icon={button.icon} />
 								{button.text}
 							</button>

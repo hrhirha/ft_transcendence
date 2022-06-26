@@ -102,6 +102,7 @@ export const FriendsManager:React.FC = () => {
                         avatar = {friend.imageUrl}
                         fullName= {friend.fullName}
                         username = {friend.username}
+                        action={(id: string) => {setFriendsList(friendsList.filter((u) => u.id !== id))}}
                     />)}
                 </div>
             </div>

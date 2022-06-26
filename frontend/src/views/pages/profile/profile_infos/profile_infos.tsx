@@ -4,6 +4,8 @@ import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
 import { faCameraRotate, faPen, faPercent, faTableTennisPaddleBall, faTrophy } from "@fortawesome/free-solid-svg-icons";
 import { buttons, userType } from "../profile";
 import { Numeral } from "../../../components/numeral/numeral";
+import { patch_avatar_upload } from "../../../../controller/user/edit";
+import { useNavigate } from "react-router-dom";
 
 
 const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, stat: number}) => {
@@ -17,6 +19,7 @@ const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, sta
 }
 
 interface ProfileInfosProps {
+    id: string,
     avatar: string;
     username: string;
     fullName: string;
@@ -26,7 +29,20 @@ interface ProfileInfosProps {
 }
 
 export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
-    
+    const navigate = useNavigate();
+    const updateAvatar = () => {
+        var f = document.createElement('input');
+        f.style.display='none';
+        f.type='file';
+        f.name='file';
+        f.accept='.jpg,.jpeg,.png,.gif';
+        f.addEventListener("change", async (e : any) => {
+            const [file] = e.target.files;
+            await patch_avatar_upload(file);
+            window.location.reload();
+        });
+        f.click();
+    }
     return (
         <section id="profileInfos">
             <button className="edit" title="Edit Profile">
@@ -36,7 +52,7 @@ export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
                 <div className="avatar">
                     <CircleAvatar avatarURL={Props.avatar} dimensions={120} showStatus={false}/>
                     <span className="ranking"><Numeral value={Props.ranking}/></span>
-                    <span className="editAvatar" title="Change Your Avatar">
+                    <span className="editAvatar" title="Change Your Avatar" onClick={updateAvatar}>
                         <FontAwesomeIcon icon={faCameraRotate}/>
                     </span>
                 </div>
@@ -54,7 +70,7 @@ export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
                 {buttons.map((button) => {
                     if (button.type === userType.none) {
                         return (
-                            <button key={`${button.text.replace(' ', '')}`} className={`btn${button.text.replace(' ', '')}`} onClick={() => button.onClick(Props.username)}>
+                            <button key={`${button.text.replace(' ', '')}`} className={`btn${button.text.replace(' ', '')}`} onClick={() => button.onClick(Props.id)}>
                                 <FontAwesomeIcon icon={button.icon} />
                                 {button.text}
                             </button>
@@ -66,3 +82,4 @@ export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
         </section>
     );
 }
+
