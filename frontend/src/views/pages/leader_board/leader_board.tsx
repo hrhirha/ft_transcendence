@@ -1,6 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import { NavBar } from "../../components/navbar/navbar";
 import {faMedal, faRankingStar, faTrophy } from "@fortawesome/free-solid-svg-icons";
 import { CircleAvatar } from "../../components/circle_avatar/circle_avatar";
 import { Numeral } from "../../components/numeral/numeral";
@@ -42,7 +41,6 @@ export const LeaderBoard:React.FC = () => {
             redirect="/leader_board"
             wrappedContent={
             <main id="leaderBoardPage">
-                <NavBar />
                 <div className='container'>
                     <div className="sectionTitle">
                         <FontAwesomeIcon icon={faRankingStar}/>

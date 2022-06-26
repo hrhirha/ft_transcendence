@@ -22,6 +22,7 @@ interface ProfileInfosProps {
     fullName: string;
     ranking: number;
     wins: number;
+    loses: number;
 }
 
 export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
@@ -43,9 +44,9 @@ export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
                     <input type="text" disabled className="fullName" placeholder="Full Name" onChange={() => {}} value={Props.fullName}/>
                     <span className="userName">@{Props.username}</span>
                     <div className="stats">
-                        <StatCard icon={faTableTennisPaddleBall} title="Games" stat={32}/>
-                        <StatCard icon={faTrophy} title="Wins" stat={7}/>
-                        <StatCard icon={faPercent} title="Ratio" stat={21.8}/>
+                        <StatCard icon={faTableTennisPaddleBall} title="Games" stat={Number(Props.wins + Props.loses)}/>
+                        <StatCard icon={faTrophy} title="Wins" stat={Number(Props.wins)}/>
+                        <StatCard icon={faPercent} title="Ratio" stat={Number(Number((Props.wins) / (Props.wins + Props.loses) * 100).toFixed(1)) || 0}/>
                     </div>
                 </div>
             </div>

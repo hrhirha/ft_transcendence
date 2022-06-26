@@ -83,7 +83,7 @@
         @include _flex(column, space-evenly, center);
         @include _selectionOff();
         height: 100%;
-        .btnAccept, .btnMessage, .btnAddFriend {
+        .btnAccept, .btnAddFriend {
             @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($purple, .5), $bgcolor2: $purple);
         }
         .btnDecline, .btnCancle, .btnPending {
@@ -92,7 +92,7 @@
         .btnBlock {
             @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($red, .5), $bgcolor2: $red);
         }
-        .btnUnblock {
+        .btnUnblock, .btnUnfriend {
             @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($light2, .85), $bgcolor2: rgba($light3, .75));
             color: $dark3;
             path {

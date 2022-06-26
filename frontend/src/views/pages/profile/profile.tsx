@@ -1,11 +1,13 @@
-import React from "react";
-import { NavBar } from "../../components/navbar/navbar";
+import React, { useEffect, useState } from "react";
 import { FriendsManager } from "./friends_manager/friends_manager";
 import { ProfileInfos } from "./profile_infos/profile_infos";
 import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faComment, faUsersGear, faHistory} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { MatchesHistory } from "./matches_history/matches_history";
 import { AuthChecker } from "../../components/check_auth/auth_checker";
+import { get_me } from "../../../controller/user/user";
+import { post_friendreq_accept, post_friendreq_cancel, post_friendreq_decline, post_friendreq_send } from "../../../controller/user/friendreq";
+import { post_friend_block, post_friend_unblock, post_friend_unfriend } from "../../../controller/user/friends";
 
 
 export enum userType {
@@ -21,62 +23,92 @@ export const buttons = [
         type: userType.none,
         icon: faUserPlus,
         text: 'Add Friend',
-        onClick: (username: string) => {
-            console.log('Add Friend', username);
+        onClick: async (userId: string) => {
+            try {
+                await post_friendreq_send(userId);
+            } catch(err) {
+
+            } 
         }
     },
     {
         type: userType.request,
         icon: faUserCheck,
         text: 'Accept',
-        onClick: (username: string) => {
-            console.log('accept', username);
+        onClick: async (userId: string) => {
+            try {
+                await post_friendreq_accept(userId);
+            } catch(err) {
+
+            } 
         }
     },
     {
         type: userType.request,
         icon: faUserXmark,
         text: 'Decline',
-        onClick: (username: string) => {
-            console.log('decline', username);
+        onClick: async (userId: string) => {
+            try {
+                await post_friendreq_decline(userId);
+            } catch(err) {
+
+            }
         }
     },
     {
         type: userType.friend,
-        icon: faComment,
-        text: 'Message',
-        onClick: (username: string) => {
-            console.log('sent message', username);
+        icon: faUserMinus,
+        text: 'Unfriend',
+        onClick: async (userId: string) => {
+            try {
+                await post_friend_unfriend(userId);
+            } catch(err) {
+
+            }
         }
     },
     {
         type: userType.friend,
         icon: faUserSlash,
         text: 'Block',
-        onClick: (username: string) => {
-            console.log('block', username);
+        onClick: async (userId: string) => {
+            try {
+                await post_friend_block(userId);
+            } catch(err) {
+
+            }
         }
     },
     {
         type: userType.blocked,
         icon: faUserMinus,
         text: 'Unblock',
-        onClick: (username: string) => {
-            console.log('unblock', username);
+        onClick: async (userId: string) => {
+            try {
+                await post_friend_unblock(userId);
+            } catch(err) {
+
+            }
         }
     },
     {
         type: userType.pending,
         icon: faUserXmark,
         text: 'Cancle',
-        onClick: (username: string) => {
-            console.log('cancel', username);
+        onClick: async (userId: string) => {
+            try {
+                await post_friendreq_cancel(userId);
+            } catch(err) {
+
+            }
         }
     }
 ];
 
 export const Profile:React.FC = () => {
-    const [switchTab, setSwitchTab] = React.useState<number>(0);
+    const [switchTab, setSwitchTab] = useState<number>(0);
+    const [editable, setEditable] = useState<boolean>(false);
+    const [userInfos, setUserInfos] = useState<any>(null);
 
     const tabs = [
         {
@@ -88,16 +120,25 @@ export const Profile:React.FC = () => {
             icon: faUsersGear,
         }
     ];
+    useEffect(() => {
+        (async function() {
+            try {
+                const me = await get_me();
+                setUserInfos(me);
+            } catch (err) {
+                //error
+            }
+        })();
+    },[]);
     return (
     <AuthChecker
-        redirect="/leader_board"
+        redirect="/profile"
         wrappedContent={
         <main id="profilePage">
-            <NavBar />
             <div className="profil">
                 <div className='container'>
                         <div className="col col-md-11 col-lg-9 col-xl-8">
-                            <ProfileInfos avatar="https://avatars.githubusercontent.com/u/74456446?v=4" fullName="Walid Ben Said" username="wben-sai" ranking={2} wins={10}/>
+                            <ProfileInfos avatar={userInfos?.imageUrl} fullName={userInfos?.fullName} username={userInfos?.username}  ranking={userInfos?.rank || 0} wins={userInfos?.wins} loses={userInfos?.loses}/>
                         </div>
                         <div className="col col-md-11 col-lg-9 col-xl-8">
                             <nav className="profileTabs">

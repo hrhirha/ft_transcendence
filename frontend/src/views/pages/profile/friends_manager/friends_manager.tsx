@@ -2,7 +2,8 @@ import { faUsers, faUsersBetweenLines, faUsersRays, faUsersSlash } from "@fortaw
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { EmptyBlocking, EmptyFriends, EmptyFriendsRequests, EmptyPending } from "../../../../assets";
-import { frinds_data } from "../../../../test_data/frinds_data";
+import { get_friendreqs_received, get_friendreqs_sent } from "../../../../controller/user/friendreq";
+import { get_friends, get_friends_blocked, user_info } from "../../../../controller/user/friends";
 import { FriendCard } from "../friend_card/friend_card";
 
 
@@ -43,15 +44,32 @@ const NavBar:React.FC<{activeTab: tabs, onChange: Function}> = ({activeTab, onCh
 
 export const FriendsManager:React.FC = () => {
     const [activeTab, setActiveTab] = useState<tabs>(tabs.friends);
-    const [friendsList, setFriendsList] = useState<Array<any>>([]);
+    const [friendsList, setFriendsList] = useState<Array<user_info>>([]);
     useEffect(() => {
-        //fetch data from server
-        // if (activeTab.valueOf() === tabs.friends.valueOf())
-        //     return;
-        frinds_data && frinds_data.forEach (({type, avatar, fullName,  username, ranking}, k ) => {
-            if (type.valueOf() === activeTab.valueOf())
-                setFriendsList(prev => [...prev, {type, avatar, fullName, username, ranking}]);
-        })
+        (async () => {
+            try {
+                switch(activeTab)
+                {
+                    case tabs.pending:
+                        const pending: user_info[] = await get_friendreqs_sent();
+                        setFriendsList(pending);
+                    break;
+                    case tabs.blocking:
+                        const blocked: user_info[] = await get_friends_blocked();
+                        setFriendsList(blocked);
+                    break;
+                    case tabs.requests:
+                        const reqFriends: user_info[] = await get_friendreqs_received();
+                        setFriendsList(reqFriends);
+                    break;
+                    default:
+                        const friends: user_info[] = await get_friends();
+                        setFriendsList(friends);
+                }
+            } catch(err) {
+
+            }
+        })();
         return () => {
             setFriendsList([]);
         }
@@ -76,14 +94,14 @@ export const FriendsManager:React.FC = () => {
                         {activeTab === tabs.pending && <h5>You Have No Pending Requests</h5>}
                     </div>}
                     {friendsList.length > 0
-                    && friendsList.map((friend, index) => 
+                    && friendsList.map((friend: user_info) => 
                     <FriendCard
-                        key={`${friend.username}_${index}`}
-                        type = {friend.type}
-                        avatar = {friend.avatar}
+                        key={`${friend.id}`}
+                        id={friend.id}
+                        type = {activeTab.valueOf()}
+                        avatar = {friend.imageUrl}
                         fullName= {friend.fullName}
                         username = {friend.username}
-                        ranking= {friend.ranking}
                     />)}
                 </div>
             </div>

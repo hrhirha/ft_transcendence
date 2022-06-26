@@ -1,16 +1,19 @@
 import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { get_me } from "../../../controller/user/user";
+import { get_me, user_infos } from "../../../controller/user/user";
+import { NavBar } from "../navbar/navbar";
 
 export const AuthChecker:React.FC<{wrappedContent: React.ReactNode, redirect: string}> = ({wrappedContent, redirect}) => {
     const navigator = useNavigate();
     const location = useLocation();
-    const [go, setGo] = useState(false);
+    const [go, setGo] = useState<boolean>(false);
+    const [user, setUser] = useState<any>(null);
     useEffect(() =>  {
         (async function anyNameFunction() {
             try {
-                const me = await get_me();
+                const me: user_infos = await get_me();
+                setUser(me);
                 if (location.pathname != redirect)
                     navigator(redirect);
             }
@@ -23,6 +26,7 @@ export const AuthChecker:React.FC<{wrappedContent: React.ReactNode, redirect: st
     }, []);
 
     return (<>
+        {go && (location.pathname != "/login") && <NavBar user={user}/>}
         {go && wrappedContent}
     </>);
 }

@@ -1,5 +1,4 @@
 import React from "react";
-import { NavBar } from "../../components/navbar/navbar";
 import { DefaultGame, LiveGames, UltimateGame } from '../../../assets';
 import { GameCard } from "./game_card/game_card";
 import { LiveGamesCard } from "./live_games_card/live_games_card";
@@ -11,7 +10,6 @@ export const Home:React.FC = () => {
      redirect="/"
      wrappedContent={
         <main id="homePage">
-            <NavBar />
             <div className='container'>
                 <div className='row center' >
                     <div className='col col-lg-8'>

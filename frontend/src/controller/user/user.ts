@@ -19,7 +19,7 @@ interface me_info {
     loses: number
 }
 
-interface user_info {
+export interface user_infos {
     username:  string,
     email:  string,
     fullName:  string,
@@ -29,6 +29,7 @@ interface user_info {
     wins: number,
     loses: number,
     status: string,
+    relation?: string //relation between me and user (profile) [none | friend | request | blocked | pending]
 }
 
 export async function get_me() {
@@ -37,11 +38,11 @@ export async function get_me() {
 }
 
 export async function get_user_by_id(user_id : string) {
-    const res  : user_info = (await api.get("user/id/"+ user_id )).data;
+    const res  : user_infos = (await api.get("user/id/"+ user_id )).data;
     return res;
 }
 
 export async function get_user_by_username(username : string) {
-    const res  : user_info = (await api.get("user/u/"+ username )).data;
+    const res  : user_infos = (await api.get("user/u/"+ username )).data;
     return res;
 }

@@ -1,6 +1,5 @@
 // import { useNavigate } from "react-router-dom";
 import { Chats, joinedGroups } from "../../../test_data/roomchatdata";
-import { NavBar } from "../../components/navbar/navbar";
 import { ChatRoom } from "./chat_room/chat_room";
 import  {ChatRoomItem }  from "./chatroom_item/chatroom_item";
 import {faCommentMedical, faSearch } from "@fortawesome/free-solid-svg-icons";
@@ -175,8 +174,6 @@ export const Chat:React.FC = () => {
             redirect="/chat"
             wrappedContent={
             <main id="chatPage">
-                <NavBar fixedTop={screenWidth < 575.98}/>
-
                 {/* <button style={{color: `black`}}onClick={() =>{
                     class_socket.start_dm("cl4motzn00033r8sleqn0c4a8");
                 }}>start_dm</button>

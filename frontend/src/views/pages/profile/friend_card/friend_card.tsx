@@ -4,10 +4,10 @@ import { buttons, userType } from '../profile'
 
 interface Props {
 	type: userType,
+	id: string,
 	avatar: string,
 	fullName: string,
-	username: string,
-	ranking: number
+	username: string
 }
 
 export const FriendCard = (Props : Props) => {
@@ -21,16 +21,16 @@ export const FriendCard = (Props : Props) => {
 				<span>@{Props.username} </span>
 			</div>
 			<div className="actionButtons">
-				{buttons.map((button, index) => {
+				{buttons.map((button) => {
 					if (button.type === Props.type) {
 						return (
-							<button key={`${button.text.replace(' ', '')}`} className={`btn${button.text.replace(' ', '')}`} onClick={() => button.onClick(Props.username)}>
+							<button key={`${button.text.replace(' ', '')}`} className={`btn${button.text.replace(' ', '')}`} onClick={() => button.onClick(Props.id)}>
 								<FontAwesomeIcon icon={button.icon} />
 								{button.text}
 							</button>
 						);
 					}
-					return (<></>);
+					return null;
 				})}
 			</div>
 		</div>)
