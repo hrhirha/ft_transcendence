@@ -10,7 +10,7 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
 import { ArgumentMetadata, HttpException, UsePipes, ValidationPipe } from '@nestjs/common';
-import { setTimeout } from 'timers/promises';
+import { User } from '@prisma/client';
 
 export class WsValidationPipe extends ValidationPipe
 {
@@ -40,9 +40,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     tab = new Map;
     roomCreated: number = 0;
     connection: any;
+    que: {
+        user: {
+            Socket: Socket,
+            userId: string,
+        }
+    } = null;
  
     constructor(private prisma: PrismaService, private jwt: ChatService){}
-     handleDisconnect(client: Socket) {
+    handleDisconnect(client: Socket) {
        console.log('Client Disconnect with ID: ' + client.id);
     }
 
@@ -121,20 +127,33 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         client.leave(d.oldData.roomId);
         client.join(d.newRoom);
         client.emit("restartGame");
-        // client.emit("startGame");
+    }
+
+    @SubscribeMessage('watcher')
+    newWatcher(client: Socket, roomid: string)
+    {
+        
+    }
+
+    insertSocketData(client: Socket, usrId: string, player: string)
+    {
+        client.join(this.connection.id);
+        client.data.obj = {
+            roomId: this.connection.id,
+            isPlayer: true,
+        };
+        client.emit("saveData", {
+            player,
+            is_player: true,
+            roomId: this.connection.id,
+            userId: usrId
+        });
     }
 
     @SubscribeMessage('move')
     checkConnection(client: Socket, data: any): void
     {
-        try
-        {
-            client.broadcast.to(data.roomid).emit('recv', data);
-        }
-        catch(e)
-        {
-            throw new WsException("Check Connection expection!! ");
-        }
+        client.broadcast.to(data.roomid).emit('recv', data);
     }
 
     async beforeStart(client: Socket)
@@ -142,55 +161,39 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)  
             return null
-        if (!this.roomCreated)
+
+        //  user1 save info /////////////////////
+        if (!this.que)
         {
-            this.connection =  await this.prisma.game.create({
-                data: {
-                    map: "map_url",
-                    user_game:
-                    {
-                        create: {
-                            uid: user.id,
-                        }
-                    }
-                },
-                select: {
-                    _count: true,
-                    id: true,
-                }
-            });
-
-            
-            this.roomCreated += 1;
-            client.join(this.connection.id);
-            client.data.is_player = true;
-
-            client.emit("saveData", {
-                player: "player1",
-                is_player: true,
-                roomId: this.connection.id,
+            this.que.user = {
+                Socket: client,
                 userId: user.id
-            });
-            return false;
+            };
+            return ;
         }
-        await this.prisma.userGame.create({
+        /////////////////////////////////////////
+
+        this.connection =  await this.prisma.game.create({
             data: {
-                uid: user.id,
-                gid: this.connection.id,
+                map: "map_url",
+                user_game:
+                {
+                    createMany: {
+                        data:
+                        [
+                            { uid: user.id              },
+                            { uid: this.que.user.userId }
+                        ]
+                    }
+                }
             },
+            select: {
+                id: true,
+            }
         });
-
-
-        client.join(this.connection.id);
-        client.data.is_player = true;
-        client.emit("saveData", {
-            player: "player2",
-            is_player: true,
-            roomId: this.connection.id,
-            userId: user.id
-        });
+        this.insertSocketData(this.que.user.Socket, this.que.user.userId, "player1");
+        this.insertSocketData(client, user.id, "player2");
         this.server.to(this.connection.id).emit('startGame');
-        this.roomCreated = 0;
         return true;
     }
 }
