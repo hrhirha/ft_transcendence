@@ -5,7 +5,7 @@ import { Server, Socket } from 'socket.io';
 import { AddMessageDto, ChangePasswordDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, RemovePasswordDto, SetPasswordDto, UserRoomDto } from './dto';
 import { ChatService } from './chat.service';
 import { UserService } from 'src/user/user.service';
-import { user_status } from 'src/utils';
+import { HOST, user_status } from 'src/utils';
 import { UserIdDto } from 'src/user/dto';
 
 export class WsValidationPipe extends ValidationPipe
@@ -30,7 +30,7 @@ export class WsValidationPipe extends ValidationPipe
 @WebSocketGateway({
     namespace: '/chat',
     cors : {
-        origin: "http://127.0.0.1:3000",
+        origin: `http://${HOST}:3000`,
         credentials: true,
     }
 })

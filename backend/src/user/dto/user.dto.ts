@@ -42,7 +42,7 @@ export class UserIdDto
 {
     @IsDefined()
     @IsString()
-    // @IsNotEmpty()
+    @IsNotEmpty()
     @Matches(/^c[a-z0-9]{20,}$/)
     id: string;
 }
@@ -50,13 +50,15 @@ export class UserIdDto
 export class EditUsernameDto {
     @IsDefined()
     @IsString()
-    @Matches(/^[\w-]{4,20}$/g)
+    @IsNotEmpty()
+    @Matches(/^[\w-]{4,20}$/m, { message: "username can only contain a-z A-Z 0-9 -" })
     username: string;
 }
 
 export class EditFullNameDto {
     @IsDefined()
     @IsString()
-    @Matches(/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(\-[a-zA-Z]+)*\.?))+$/)
+    @IsNotEmpty()
+    @Matches(/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(\-[a-zA-Z]+)*\.?))+$/, { message: "fullName can only contain a-z A-Z 0-9 - . SP" })
     fullName: string;
 }

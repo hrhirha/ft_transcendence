@@ -11,7 +11,7 @@ export class NewRoomDto
     @IsDefined()
     @IsNotEmpty()
     @IsString()
-    @Matches(/^([\w]+ ?(\-?[\w]+)*\.?)+$/)
+    @Matches(/^([\w]+ ?(\-?[\w]+)*\.?)+$/, { message: "channel name can only contain a-z A-Z 0-9 - . SP" })
     name: string;
 
     @IsBoolean()
@@ -20,10 +20,10 @@ export class NewRoomDto
 
     @IsString()
     @IsOptional()
-    @Matches(/\w+/)
-    @Matches(/[A-Z]+/)
-    @Matches(/\d+/)
-    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/)
+    @Matches(/\w{5,}/, { message: "password should be at least 8 characters long" })
+    @Matches(/[A-Z]+/, { message: "password should contain at least one UPPERCASE" })
+    @Matches(/\d+/, { message: "password should contain at least one number" })
+    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/, { message: "password should contain at least one special character !@#$&*?-=+" })
     password?: string;
 
     @IsDefined()
@@ -44,10 +44,10 @@ export class OldRoomDto
 
     @IsString()
     @IsOptional()
-    @Matches(/\w+/)
-    @Matches(/[A-Z]+/)
-    @Matches(/\d+/)
-    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/)
+    @Matches(/\w{5,}/, { message: "password should be at least 8 characters long" })
+    @Matches(/[A-Z]+/, { message: "password should contain at least one UPPERCASE" })
+    @Matches(/\d+/, { message: "password should contain at least one number" })
+    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/, { message: "password should contain at least one special character !@#$&*?-=+" })
     password?: string;
 }
 
@@ -60,10 +60,10 @@ export class SetPasswordDto
 
     @IsString()
     @IsOptional()
-    @Matches(/\w+/)
-    @Matches(/[A-Z]+/)
-    @Matches(/\d+/)
-    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/)
+    @Matches(/\w{5,}/, { message: "password should be at least 8 characters long" })
+    @Matches(/[A-Z]+/, { message: "password should contain at least one UPPERCASE" })
+    @Matches(/\d+/, { message: "password should contain at least one number" })
+    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/, { message: "password should contain at least one special character !@#$&*?-=+" })
     new_password: string;
 }
 
@@ -76,18 +76,18 @@ export class ChangePasswordDto
 
     @IsString()
     @IsOptional()
-    @Matches(/\w+/)
-    @Matches(/[A-Z]+/)
-    @Matches(/\d+/)
-    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/)
+    @Matches(/\w{5,}/, { message: "password should be at least 8 characters long" })
+    @Matches(/[A-Z]+/, { message: "password should contain at least one UPPERCASE" })
+    @Matches(/\d+/, { message: "password should contain at least one number" })
+    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/, { message: "password should contain at least one special character !@#$&*?-=+" })
     new_password: string;
 
     @IsString()
     @IsOptional()
-    @Matches(/\w+/)
-    @Matches(/[A-Z]+/)
-    @Matches(/\d+/)
-    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/)
+    @Matches(/\w{5,}/, { message: "password should be at least 8 characters long" })
+    @Matches(/[A-Z]+/, { message: "password should contain at least one UPPERCASE" })
+    @Matches(/\d+/, { message: "password should contain at least one number" })
+    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/, { message: "password should contain at least one special character !@#$&*?-=+" })
     old_password: string;
 }
 
@@ -100,10 +100,10 @@ export class RemovePasswordDto
 
     @IsString()
     @IsOptional()
-    @Matches(/\w+/)
-    @Matches(/[A-Z]+/)
-    @Matches(/\d+/)
-    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/)
+    @Matches(/\w{5,}/, { message: "password should be at least 8 characters long" })
+    @Matches(/[A-Z]+/, { message: "password should contain at least one UPPERCASE" })
+    @Matches(/\d+/, { message: "password should contain at least one number" })
+    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/, { message: "password should contain at least one special character !@#$&*?-=+" })
     old_password: string;
 }
 
@@ -160,6 +160,6 @@ export class MuteUserDto
     @IsDefined()
     @IsNotEmpty()
     @IsString()
-    @Matches('^15M$|^1H$|^3H$|^8H$|^24H$|^inf$')
+    @Matches(/^15M$|^1H$|^3H$|^8H$|^24H$|^inf$/, { message: "allowed values: 15M,1H,3H,8H,24H,inf" })
     mute_period: string; // 15M, 1H, 3H, 8H, 24H, inf
 }
