@@ -1,9 +1,9 @@
-import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, Req, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from './decorator';
 import { EditFullNameDto, EditUsernameDto, UserDto, UserIdDto } from './dto';
 import { UserService } from './user.service';
-import { Express, Response } from 'express'
+import { Express, Request, Response } from 'express'
 import { diskStorage } from 'multer';
 import { User } from '@prisma/client';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
@@ -71,15 +71,13 @@ export class UserController {
             return callback(null, true);
         },
     }))
-    async editAvatar(@GetUser('id') id: string, @UploadedFile() file: any, @Res() res: Response)
+    async editAvatar(@GetUser('id') id: string, @UploadedFile() file: any, @Req() req: Request)
     {
         try
         {
             await this._userS.editAvatar(id, file);
             const f = createReadStream(join(file.path));
-            // const url = pathToFileURL(file.path)
-            console.log({file});
-            res.setHeader("Content-Type", file.mimetype)
+            req.res.setHeader("Content-Type", file.mimetype)
             return new StreamableFile(f);
         }
         catch (e)
@@ -260,7 +258,7 @@ export class UserController {
     {
         try
         {
-            return await this._userS.getUserById(uid);
+            return await this._userS.getUserById(user, uid);
         }
         catch (e)
         {
@@ -274,7 +272,7 @@ export class UserController {
     {
         try
         {
-            return await this._userS.getUserByUsername(username);
+            return await this._userS.getUserByUsername(user, username);
         }
         catch (e)
         {

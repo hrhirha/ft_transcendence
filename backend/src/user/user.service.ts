@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { friend_status } from 'src/utils';
+import { friend_status, HOST } from 'src/utils';
 import { EditFullNameDto, EditUsernameDto } from './dto';
 
 @Injectable()
@@ -11,9 +11,9 @@ export class UserService {
 
     // User
 
-    async getUserById(id: string)
+    async getUserById(user: User, id: string)
     {
-        const user = await this._prismaS.user.findUnique({
+        const u = await this._prismaS.user.findUnique({
             where: { id, },
             select: {
                 username: true,
@@ -25,16 +25,30 @@ export class UserService {
                 wins: true,
                 loses: true,
                 status: true,
+                sentReq: {
+                    where: {
+                        OR: [{ snd_id: user.id }, { rcv_id: user.id }]
+                    },
+                    select: { status: true, }
+                },
+                recievedReq: {
+                    where: {
+                        OR: [{ snd_id: user.id }, { rcv_id: user.id }]
+                    },
+                    select: { status: true, }
+                },
             }
         });
-        if (!user)
+        if (!u)
             throw new ForbiddenException('user not found');
-        return user;
+        const req = u.sentReq.length === 1 ? u.sentReq[0] : (u.recievedReq.length === 1 ? u.recievedReq[0] : null);
+        delete u.sentReq && delete u.recievedReq;
+        return { user: u, friendship_status: req ? req.status : null };
     }
 
-    async getUserByUsername(username: string)
+    async getUserByUsername(user: User, username: string)
     {
-        const user = await this._prismaS.user.findUnique({
+        const u = await this._prismaS.user.findUnique({
             where: { username, },
             select: {
                 username: true,
@@ -46,11 +60,25 @@ export class UserService {
                 wins: true,
                 loses: true,
                 status: true,
+                sentReq: {
+                    where: {
+                        OR: [{ snd_id: user.id }, { rcv_id: user.id }]
+                    },
+                    select: { status: true, }
+                },
+                recievedReq: {
+                    where: {
+                        OR: [{ snd_id: user.id }, { rcv_id: user.id }]
+                    },
+                    select: { status: true, }
+                },
             }
         });
-        if (!user)
+        if (!u)
             throw new ForbiddenException('user not found');
-        return user;
+        const req = u.sentReq.length === 1 ? u.sentReq[0] : (u.recievedReq.length === 1 ? u.recievedReq[0] : null);
+        delete u.sentReq && delete u.recievedReq;
+        return { user: u, friendship_status: req ? req.status : null };
     } 
 
     async updateStatus(id:string, status: string)
@@ -126,7 +154,7 @@ export class UserService {
         const user = await this._prismaS.user.update({
             where: { id },
             data: {
-                imageUrl: file.path
+                imageUrl: `http://${HOST}/${file.path}`
             },
         });
         return {success: true};
@@ -185,7 +213,6 @@ export class UserService {
         });
         if (u.recievedReq.length === 0)
             throw new ForbiddenException('request not found');
-        console.log(u.recievedReq);
         return { success: true };
     }
 

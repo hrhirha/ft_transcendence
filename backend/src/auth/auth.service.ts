@@ -36,7 +36,7 @@ export class AuthService {
             }
         });
 
-        const referer = req.header("Referer") || "http://127.0.0.1:3000";
+        const referer = req.header("Referer") || `http://${process.env.HOST}:3000`;
 
         const cookie = this.getCookieWithJwtAccessToken(user.id);
         req.res.setHeader('Set-Cookie', cookie)

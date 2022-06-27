@@ -5,6 +5,7 @@ import * as cookieParser from 'cookie-parser';
 import { Request, Response } from 'express';
 import { join } from 'path';
 import { AppModule } from './app.module';
+import { HOST, PORT } from './utils';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -42,10 +43,11 @@ async function bootstrap() {
   }));
   app.use(cookieParser());
   app.enableCors({
-    origin: `http://127.0.0.1:3000`,
+    origin: `http://${HOST}:3000`,
     credentials: true,
   });
   app.useGlobalFilters(new HttpExceptionFilter);
-  await app.listen(3001);
+  await app.listen(PORT);
+  console.log(`server is listening on: ${HOST}:${PORT}`);
 }
 bootstrap();
