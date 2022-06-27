@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { FriendsManager } from "./friends_manager/friends_manager";
 import { ProfileInfos } from "./profile_infos/profile_infos";
-import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faComment, faUsersGear, faHistory} from "@fortawesome/free-solid-svg-icons";
+import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faUsersGear, faHistory, faBan} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { MatchesHistory } from "./matches_history/matches_history";
-import { AuthChecker } from "../../components/check_auth/auth_checker";
 import { get_me } from "../../../controller/user/user";
 import { post_friendreq_accept, post_friendreq_cancel, post_friendreq_decline, post_friendreq_send } from "../../../controller/user/friendreq";
 import { post_friend_block, post_friend_unblock, post_friend_unfriend } from "../../../controller/user/friends";
+import { useNotif } from "../../components/notif/notif";
 
 
 export enum userType {
@@ -113,6 +113,7 @@ export const Profile:React.FC = () => {
     const [switchTab, setSwitchTab] = useState<number>(0);
     const [editable, setEditable] = useState<boolean>(false);
     const [userInfos, setUserInfos] = useState<any>(null);
+    const setNotifs = useNotif();
 
     const tabs = [
         {
@@ -129,15 +130,14 @@ export const Profile:React.FC = () => {
             try {
                 const me = await get_me();
                 setUserInfos(me);
+                // setNotifs && setNotifs([{type: "error", title: "Error", icon:<FontAwesomeIcon icon={faBan}/>, description: "ORRY! You don't have access to this bullshit hhh "}]);
             } catch (err) {
                 //error
             }
         })();
     },[]);
+
     return (
-    <AuthChecker
-        redirect="/profile"
-        wrappedContent={
         <main id="profilePage">
             <div className="profil">
                 <div className='container'>
@@ -179,6 +179,5 @@ export const Profile:React.FC = () => {
                         </div>
                     </div>
             </div>
-        </main>}
-    />);
+        </main>);
 }

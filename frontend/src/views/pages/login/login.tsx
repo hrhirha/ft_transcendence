@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Brand } from "../../components/brand/brand";
 import { Logo1337, Logo42} from '../../../assets';
-import { AuthChecker } from "../../components/check_auth/auth_checker";
 
 
 export const Login:React.FC = () =>  {
@@ -12,9 +11,6 @@ export const Login:React.FC = () =>  {
     }
     
     return (
-        <AuthChecker
-        redirect="/"
-        wrappedContent={
         <main id="loginPage">
             <div>
                 <Brand/>
@@ -28,7 +24,6 @@ export const Login:React.FC = () =>  {
                 <img src={Logo1337} alt="1337"/>
                 <p>{con}</p>
             </div>
-        </main>}
-    />
+        </main>
     );
 }

@@ -10,6 +10,7 @@ import { Chat } from './views/pages/chat/chat';
 import { LeaderBoard } from './views/pages/leader_board/leader_board';
 import { Profile } from './views/pages/profile/profile';
 import { NotFound } from './views/pages/not_found/not_found';
+import { AuthChecker } from './views/components/check_auth/auth_checker';
 
 
 library.add(faPuzzlePiece);
@@ -21,14 +22,12 @@ root.render(
   <React.StrictMode>
   <BrowserRouter>
       <Routes>
-          <Route path="/login" element={<Login/>} />
-          <Route path="/" element={<Home/>} />
-          <Route path="/leader_board" element={<LeaderBoard/>} />
-          <Route path="/chat" element={<Chat/>} />
-          <Route path="/profile/[:id]" element={<Profile/>} />
-          <Route path="/profile/" element={<Profile/>} />
-          <Route path="*" element={<NotFound/>} />
-
+          <Route path="/login" element={<AuthChecker redirect="/login" wrappedContent={<Login/>}/>}/>
+          <Route path="/" element={<AuthChecker redirect="/" wrappedContent={<Home/>} />} />
+          <Route path="/leader_board" element={<AuthChecker redirect="/leader_board" wrappedContent={<LeaderBoard/>} />} />
+          <Route path="/chat" element={<AuthChecker redirect="/chat" wrappedContent={<Chat/>}/>} />
+          <Route path="/profile" element={<AuthChecker redirect="/profile" wrappedContent={<Profile/>}/>} />
+          <Route path="*" element={<AuthChecker redirect="/" wrappedContent={<NotFound/>}/>} />
       </Routes>
   </BrowserRouter>
   </React.StrictMode>

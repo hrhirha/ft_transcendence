@@ -1,16 +1,21 @@
+import { faBan } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { get_me, user_infos } from "../../../controller/user/user";
+import { Loading } from "../loading/loading";
 import { NavBar } from "../navbar/navbar";
+import { Notif } from "../notif/notif";
 
 export const AuthChecker:React.FC<{wrappedContent: React.ReactNode, redirect: string}> = ({wrappedContent, redirect}) => {
+    const [loading, setLoading] = useState<boolean>(true);
+    const [user, setUser] = useState<any>(null);
     const navigator = useNavigate();
     const location = useLocation();
-    const [go, setGo] = useState<boolean>(false);
-    const [user, setUser] = useState<any>(null);
+
     useEffect(() =>  {
-        (async function anyNameFunction() {
+        (async () => {
             try {
                 const me: user_infos = await get_me();
                 setUser(me);
@@ -21,12 +26,12 @@ export const AuthChecker:React.FC<{wrappedContent: React.ReactNode, redirect: st
                 if (location.pathname != "/login")
                     navigator("/login");
             }
-            setGo(true);
+            setLoading(false);
         })();
     }, []);
-
-    return (<>
-        {go && (location.pathname != "/login") && <NavBar user={user}/>}
-        {go && wrappedContent}
-    </>);
+    return (<Notif>
+        {loading && <Loading width="100vw" height="100vh"/>}
+        {!loading && (location.pathname != "/login") && <NavBar user={user}/>}
+        {!loading && wrappedContent}
+    </Notif>);
 }

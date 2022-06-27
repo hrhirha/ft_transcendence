@@ -2,13 +2,9 @@ import React from "react";
 import { DefaultGame, LiveGames, UltimateGame } from '../../../assets';
 import { GameCard } from "./game_card/game_card";
 import { LiveGamesCard } from "./live_games_card/live_games_card";
-import { AuthChecker } from "../../components/check_auth/auth_checker";
 
 export const Home:React.FC = () => {
     return (
-    <AuthChecker
-     redirect="/"
-     wrappedContent={
         <main id="homePage">
             <div className='container'>
                 <div className='row center' >
@@ -25,7 +21,6 @@ export const Home:React.FC = () => {
                     </div>
                 </div>
             </div>
-        </main>}
-    />
+        </main>
     );
 }
