@@ -10,7 +10,6 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
 import { ArgumentMetadata, HttpException, UsePipes, ValidationPipe } from '@nestjs/common';
-import { User } from '@prisma/client';
 
 export class WsValidationPipe extends ValidationPipe
 {
@@ -37,19 +36,56 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 {
     @WebSocketServer()
     server : Server;
-    tab = new Map;
     roomCreated: number = 0;
     connection: any;
     que: {
-        user: {
-            Socket: Socket,
-            userId: string,
-        }
+        Socket: Socket,
+        userId: string,
     } = null;
- 
+    
+    tab = new Map;
+    // {
+    //     user1: {
+    //         usrId: string,
+    //         restart: boolean,
+    //         disconected: boolean
+    //     },
+    //     user2: {
+    //         usrId: string,
+    //         restart: boolean,
+    //         disconected: boolean
+    //     },
+    //     endGame: boolean,
+    // }
+    
     constructor(private prisma: PrismaService, private jwt: ChatService){}
-    handleDisconnect(client: Socket) {
-       console.log('Client Disconnect with ID: ' + client.id);
+    async handleDisconnect(client: Socket)
+    {
+        console.log('Client Disconnect with ID: ' + client.id);
+        
+        if (client.data.obj == undefined)
+        {
+            this.que = (client == this.que.Socket) ? null : this.que;
+            return ;
+        }
+
+        if (client.data.obj.isPlayer)
+        {
+            await this.prisma.userGame.update({
+                data: {
+                    score: (client.data.obj.player == "player1") ? 10 : 10,
+                },
+                where: {
+                    uid_gid: {
+                        uid: client.data.obj.usrId,
+                        gid: client.data.obj.roomId
+                    }
+                }
+            });
+            this.server.to(client.data.obj.roomId).emit("leave");
+        }
+        else
+            client.leave(client.data.obj.roomId); /// a watcher leave the room 
     }
 
     async handleConnection(client: Socket, ...args: any[]) {
@@ -61,13 +97,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     @SubscribeMessage('restart')
     async restart(client: Socket, d: any)
     {
-        if (client.data.is_player)
+        if (client.data.obj.isPlayer)
         {
-            this.tab[d.roomId] = {
-                player1: (d.player === "player1") ? d.userId : this.tab[d.roomId]?.player1,
-                player2: (d.player === "player2") ? d.userId : this.tab[d.roomId]?.player2,
-            }
-            if (this.tab[d.roomId]?.player1 && this.tab[d.roomId]?.player2)
+            this.tab[d.roomId].user1.restart = (d.player === "player1") ? 
+            true: this.tab[d.roomId].user1.restart;
+            this.tab[d.roomId].user2.restart = (d.player === "player2") ?
+            true: this.tab[d.roomId].user2.restart;
+
+            if (this.tab[d.roomId].user1.restart && this.tab[d.roomId].user2.restart)
             {
                 const newid  = await this.prisma.game.create({
                     data: {
@@ -77,8 +114,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                             createMany: {
                                 data:
                                 [
-                                    { uid: this.tab[d.roomId].player1 },
-                                    { uid: this.tab[d.roomId].player2 }
+                                    { uid: this.tab[d.roomId].user1.usrId },
+                                    { uid: this.tab[d.roomId].user2.usrId }
                                 ]
                             }
                         }
@@ -87,7 +124,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                         id: true
                     }
                 });
+                
+                this.tab[d.roomId].user1.restart = false;
+                this.tab[d.roomId].user2.restart = false;
+                this.tab[d.roomId].endGame = false;
+
+                this.tab[newid.id] = this.tab[d.roomId];
                 this.server.to(d.roomId).emit("newRoom", newid.id);
+
             }
         }
         else
@@ -99,8 +143,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     @SubscribeMessage('endGame')
     async EndGame(client: Socket, d: any)
     {
-        if (client.data.is_player)
+        if (client.data.obj.isPlayer)
         {
+            this.tab[d.roomId].endGame = true;
             await this.prisma.userGame.update({
                 data: {
                     score: (d.player == "player1") ? d.rscore :  d.lscore,
@@ -124,6 +169,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     @SubscribeMessage('join')
     joinNewRoom(client: Socket, d: any)
     {
+        client.data.obj.roomId = d.newRoom;
         client.leave(d.oldData.roomId);
         client.join(d.newRoom);
         client.emit("restartGame");
@@ -137,8 +183,30 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
     insertSocketData(client: Socket, usrId: string, player: string)
     {
+        if (player == "player1")
+        {
+            this.tab[this.connection.id] = {
+                user1:
+                {
+                    usrId,
+                    restart: false,
+                    disconected: false
+                },
+                user2:
+                {
+                    usrId: undefined,
+                    restart: false,
+                    disconected: false
+                },
+                endGame: false
+            }
+        }
+        else
+            this.tab[this.connection.id].user2.usrId = usrId;
         client.join(this.connection.id);
         client.data.obj = {
+            player,
+            usrId,
             roomId: this.connection.id,
             isPlayer: true,
         };
@@ -165,7 +233,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         //  user1 save info /////////////////////
         if (!this.que)
         {
-            this.que.user = {
+            this.que = {
                 Socket: client,
                 userId: user.id
             };
@@ -182,7 +250,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                         data:
                         [
                             { uid: user.id              },
-                            { uid: this.que.user.userId }
+                            { uid: this.que.userId }
                         ]
                     }
                 }
@@ -191,8 +259,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 id: true,
             }
         });
-        this.insertSocketData(this.que.user.Socket, this.que.user.userId, "player1");
+        this.insertSocketData(this.que.Socket, this.que.userId, "player1");
         this.insertSocketData(client, user.id, "player2");
+        this.que = null;
         this.server.to(this.connection.id).emit('startGame');
         return true;
     }
