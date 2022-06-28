@@ -136,7 +136,7 @@ model UserGame {
   user      User @relation(fields: [uid], references: [id], onDelete: Cascade)
 
   gid       String
-  room      Game @relation(fields: [gid], references: [id], onDelete: Cascade)
+  game      Game @relation(fields: [gid], references: [id], onDelete: Cascade)
 
   score     Int @default(0)
 
