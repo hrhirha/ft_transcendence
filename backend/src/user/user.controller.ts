@@ -93,6 +93,8 @@ export class UserController {
     @Post('friendreq/send')
     async sendFriendReq(@GetUser() snd: User, @Body() rcv: UserIdDto)
     {
+        if(snd.id === rcv.id)
+            throw new ForbiddenException('sender and receiver can not be the same');
         try
         {
             return await this._userS.sendFriendReq(snd.id, rcv.id);
@@ -107,6 +109,8 @@ export class UserController {
     @Post('friendreq/accept')
     async acceptFriendReq(@GetUser() rcv: User, @Body() snd: UserIdDto)
     {
+        if(snd.id === rcv.id)
+            throw new ForbiddenException('sender and receiver can not be the same');
         try
         {
             return await this._userS.acceptFriendReq(snd.id, rcv.id);
@@ -121,6 +125,8 @@ export class UserController {
     @Post('friendreq/decline')
     async declineFriendReq(@GetUser() rcv: User, @Body() snd: UserIdDto)
     {
+        if(snd.id === rcv.id)
+            throw new ForbiddenException('sender and receiver can not be the same');
         try
         {
             return await this._userS.cancelFriendReq(snd.id, rcv.id);
@@ -135,6 +141,8 @@ export class UserController {
     @Post('friendreq/cancel')
     async cancelFriendReq(@GetUser() snd: User, @Body() rcv: UserIdDto)
     {
+        if(snd.id === rcv.id)
+            throw new ForbiddenException('sender and receiver can not be the same');
         try
         {
             return await this._userS.cancelFriendReq(snd.id, rcv.id);
@@ -179,6 +187,8 @@ export class UserController {
     @Post('friend/unfriend')
     async unfriend(@GetUser() snd: User, @Body() rcv: UserIdDto)
     {
+        if(snd.id === rcv.id)
+            throw new ForbiddenException('sender and receiver can not be the same');
         try
         {
             return await this._userS.unfriend(snd.id, rcv.id);
@@ -193,6 +203,8 @@ export class UserController {
     @Post('friend/block')
     async block(@GetUser() snd: User, @Body() rcv: UserIdDto)
     {
+        if(snd.id === rcv.id)
+            throw new ForbiddenException('sender and receiver can not be the same');
         try
         {
             return await this._userS.block(snd.id, rcv.id);
@@ -207,6 +219,8 @@ export class UserController {
     @Post('friend/unblock')
     async unblock(@GetUser() snd: User, @Body() rcv: UserIdDto)
     {
+        if(snd.id === rcv.id)
+            throw new ForbiddenException('sender and receiver can not be the same');
         try
         {
             return await this._userS.unblock(snd.id, rcv.id);
@@ -247,11 +261,6 @@ export class UserController {
         }
     }
     // end of Friend Relation
-
-    @Get('match/history')
-    matchHistory() {
-        return 'match history';
-    }
 
     @Get('id/:id')
     async getUserById(@GetUser() user: User, @Param('id') uid: string)
