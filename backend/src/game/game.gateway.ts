@@ -76,7 +76,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         {
             if (!this.tab[client.data.obj.roomId].endGame)
             {
-                console.log("save data");
                 await this.prisma.userGame.update({
                     data: {
                         score: (client.data.obj.player == "player1") ? client.data.obj.rScore : client.data.obj.lScore,
@@ -142,12 +141,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 
                 this.tab[newid.id] = this.tab[d.roomId];
                 this.server.to(d.roomId).emit("newRoom", newid.id);
-
             }
-        }
-        else
-        {
-
         }
     }
 
@@ -174,10 +168,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             /// emit restart 
             client.emit('restart', d.status);
         }
-        else
-        {
-            // watcher !! 
-        }
+        // else
+        // {
+        //     client.leave(client.data.obj.roomId); /// a watcher leave the room 
+        // }
+    }
+    @SubscribeMessage('')
+    async brod(client: Socket, d: any)
+    {
+        const user =(await this.jwt.getUserFromSocket(client));
+        if (!user)  
+            return null
+        
     }
 
     @SubscribeMessage('join')
@@ -203,7 +205,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             isPlayer: false,
         };
         client.join(roomid);
-
+        client.emit("saveData", {
+            roomid,
+            player: "",
+            is_player: false,
+            userId: user.id
+        });
     }
 
     insertSocketData(client: Socket, usrId: string, player: string)
