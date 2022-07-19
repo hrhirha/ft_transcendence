@@ -162,15 +162,10 @@ export const Profile:React.FC = () => {
                             <div className="tabHeader">
                                 <hr/>
                                 <div className="title">
-                                    {tabs.map((tab, index) => {
-                                        if (index === switchTab) {
-                                            return <div key={`${tab.title.replace(' ', '')}`}>
-                                                <FontAwesomeIcon icon={tab.icon} />
-                                                <span>{tab.title}</span>
-                                            </div>
-                                        }
-                                        return null;
-                                    })}
+                                    {<div key={`${tabs[switchTab].title.replace(' ', '')}`}>
+                                        <FontAwesomeIcon icon={tabs[switchTab].icon} />
+                                        <span>{tabs[switchTab].title}</span>
+                                    </div>}
                                 </div>
                                 <hr/>
                             </div>

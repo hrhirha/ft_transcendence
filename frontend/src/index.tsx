@@ -22,7 +22,7 @@ root.render(
   <React.StrictMode>
   <BrowserRouter>
       <Routes>
-          <Route path="/login" element={<AuthChecker redirect="/login" wrappedContent={<Login/>}/>}/>
+          <Route path="/login" element={<AuthChecker redirect="/" wrappedContent={<Login/>}/>}/>
           <Route path="/" element={<AuthChecker redirect="/" wrappedContent={<Home/>} />} />
           <Route path="/leader_board" element={<AuthChecker redirect="/leader_board" wrappedContent={<LeaderBoard/>} />} />
           <Route path="/chat" element={<AuthChecker redirect="/chat" wrappedContent={<Chat/>}/>} />
