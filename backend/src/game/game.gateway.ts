@@ -59,12 +59,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     // }
     
     constructor(private prisma: PrismaService, private jwt: ChatService){}
+    
     async handleDisconnect(client: Socket)
     {
+        console.log('Client Disconnect with ID: ' + client.id);
+
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)  
-            return null
-        console.log('Client Disconnect with ID: ' + client.id);
+            return user;
         
         if (client.data.obj == undefined)
         {
@@ -96,16 +98,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
     async handleConnection(client: Socket, ...args: any[]) {
         console.log('Client Connected with ID: ' + client.id);
-        if (!this.beforeStart(client))
-            client.disconnect();
+        this.beforeStart(client);
     }
 
     @SubscribeMessage('restart')
     async restart(client: Socket, d: any)
     {
         const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)  
-            return null
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
         
         if (client.data.obj.isPlayer)
         {
@@ -149,8 +153,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     async EndGame(client: Socket, d: any)
     {
         const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)  
-            return null
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
         if (client.data.obj.isPlayer)
         {
             this.tab[d.roomId].endGame = true;
@@ -173,12 +180,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         //     client.leave(client.data.obj.roomId); /// a watcher leave the room 
         // }
     }
+
     @SubscribeMessage('')
     async brod(client: Socket, d: any)
     {
         const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)  
-            return null
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
         
     }
 
@@ -186,8 +197,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     async joinNewRoom(client: Socket, d: any)
     {
         const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)  
-            return null
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
         client.data.obj.roomId = d.newRoom;
         client.leave(d.oldData.roomId);
         client.join(d.newRoom);
@@ -198,8 +212,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     async newWatcher(client: Socket, roomid: string)
     {
         const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)  
-            return null
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
         client.data.obj = {
             roomId: roomid,
             isPlayer: false,
@@ -256,8 +273,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     async checkConnection(client: Socket, data: any)
     {
         const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)  
-            return null
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
         client.data.obj.lScore = data.lScore;
         client.data.obj.rScore = data.rScore;
         client.broadcast.to(data.roomid).emit('recv', data);
@@ -266,8 +286,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     async beforeStart(client: Socket)
     {
         const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)  
-            return null
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
 
         //  user1 save info /////////////////////
         if (!this.que)
@@ -302,6 +325,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         this.insertSocketData(client, user.id, "player2");
         this.que = null;
         this.server.to(this.connection.id).emit('startGame');
-        return true;
+        return user;
     }
 }
