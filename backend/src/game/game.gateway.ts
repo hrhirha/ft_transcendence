@@ -35,6 +35,7 @@ export class WsValidationPipe extends ValidationPipe
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 {
     @WebSocketServer()
+
     server : Server;
     roomCreated: number = 0;
     connection: any;
@@ -98,6 +99,31 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
     async handleConnection(client: Socket, ...args: any[]) {
         console.log('Client Connected with ID: ' + client.id);
+        const user =(await this.jwt.getUserFromSocket(client));
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
+        //////////////////////////////////////
+        if (this.roomCreated)
+        {
+            console.log("Room Id = " + this.connection.id);
+            client.data.obj = {
+                roomId: this.connection.id,
+                isPlayer: false,
+            };
+            client.join(this.connection.id);
+            client.emit("saveData", {
+                roomId: this.connection.id,
+                player: "NotPlayer",
+                is_player: false,
+                userId: user.id
+            });
+            this.roomCreated = 0;
+            return ;
+        }
+        //////////////////////////////////////////
         this.beforeStart(client);
     }
 
@@ -181,8 +207,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         // }
     }
 
-    @SubscribeMessage('')
-    async brod(client: Socket, d: any)
+    @SubscribeMessage('sendToWatcher')
+    async brodToWatchers(client: Socket, d: any)
     {
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
@@ -190,7 +216,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
-        
+        this.server.to(d.roomId).emit('Watchers', d);
     }
 
     @SubscribeMessage('join')
@@ -209,7 +235,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
 
     @SubscribeMessage('watcher')
-    async newWatcher(client: Socket, roomid: string)
+    async newWatcher(client: Socket, roomId: string)
     {
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
@@ -218,12 +244,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             return user;
         }
         client.data.obj = {
-            roomId: roomid,
+            roomId,
             isPlayer: false,
         };
-        client.join(roomid);
+        client.join(roomId);
         client.emit("saveData", {
-            roomid,
+            roomId,
             player: "",
             is_player: false,
             userId: user.id
@@ -280,7 +306,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         }
         client.data.obj.lScore = data.lScore;
         client.data.obj.rScore = data.rScore;
-        client.broadcast.to(data.roomid).emit('recv', data);
+        client.broadcast.to(data.roomId).emit('recv', data);
     }
 
     async beforeStart(client: Socket)
@@ -320,7 +346,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             select: {
                 id: true,
             }
+
         });
+        this.roomCreated += 1;
+        console.log("Room Id = " + this.connection.id);
         this.insertSocketData(this.que.Socket, this.que.userId, "player1");
         this.insertSocketData(client, user.id, "player2");
         this.que = null;
