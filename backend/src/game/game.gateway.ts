@@ -82,6 +82,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 await this.prisma.userGame.update({
                     data: {
                         score: (client.data.obj.player == "player1") ? client.data.obj.rScore : client.data.obj.lScore,
+                        user: {         
+                            update: {  
+                                score: {
+                                    increment: (client.data.obj.player  == "player1") ? client.data.obj.rScore :  client.data.obj.lScore,
+                                },
+                                wins: {
+                                    increment: ((client.data.obj.player == "player1" && client.data.obj.rScore == 10) ||
+                                                (client.data.obj.player == "player2" && client.data.obj.lScore == 10)) ? 1 : 0,
+                                },
+                                loses: {
+                                    increment: ((client.data.obj.player == "player1" && client.data.obj.rScore != 10) ||
+                                                (client.data.obj.player == "player2" && client.data.obj.lScore != 10)) ? 1 : 0,
+                                }  
+                            },
+                        }
                     },
                     where: {
                         uid_gid: {
@@ -106,23 +121,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             return user;
         }
         //////////////////////////////////////
-        if (this.roomCreated)
-        {
-            console.log("Room Id = " + this.connection.id);
-            client.data.obj = {
-                roomId: this.connection.id,
-                isPlayer: false,
-            };
-            client.join(this.connection.id);
-            client.emit("saveData", {
-                roomId: this.connection.id,
-                player: "NotPlayer",
-                is_player: false,
-                userId: user.id
-            });
-            this.roomCreated = 0;
-            return ;
-        }
+        // if (this.roomCreated)
+        // {
+        //     console.log("Room Id = " + this.connection.id);
+        //     client.data.obj = {
+        //         roomId: this.connection.id,
+        //         isPlayer: false,
+        //     };
+        //     client.join(this.connection.id);
+        //     client.emit("saveData", {
+        //         roomId: this.connection.id,
+        //         player: "NotPlayer",
+        //         is_player: false,
+        //         userId: user.id
+        //     });
+        //     this.roomCreated = 0;
+        //     return ;
+        // }
         //////////////////////////////////////////
         this.beforeStart(client);
     }
@@ -188,8 +203,24 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         {
             this.tab[d.roomId].endGame = true;
             await this.prisma.userGame.update({
+                
                 data: {
                     score: (d.player == "player1") ? d.rscore :  d.lscore,
+                    user: {         
+                        update: {  
+                            score: {
+                                increment: (d.player == "player1") ? d.rscore :  d.lscore,
+                            },
+                            wins: {
+                                increment: ((d.player == "player1" && d.rscore == 10) ||
+                                            (d.player == "player2" && d.lscore == 10)) ? 1 : 0,
+                            },
+                            loses: {
+                                increment: ((d.player == "player1" && d.rscore != 10) ||
+                                            (d.player == "player2" && d.lscore != 10)) ? 1 : 0,
+                            }  
+                        },
+                    }
                 },
                 where: {
                     uid_gid: {
@@ -346,7 +377,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             select: {
                 id: true,
             }
-
         });
         this.roomCreated += 1;
         console.log("Room Id = " + this.connection.id);
