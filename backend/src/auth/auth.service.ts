@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserDto } from 'src/user/dto';
+import { HOST } from 'src/utils';
 
 @Injectable()
 export class AuthService {
@@ -36,7 +37,7 @@ export class AuthService {
             }
         });
 
-        const referer = req.header("Referer") || `http://${process.env.HOST}:3000`;
+        const referer = req.header("Referer") || `http://${HOST}:3000`;
 
         const cookie = this.getCookieWithJwtAccessToken(user.id);
         req.res.setHeader('Set-Cookie', cookie)
