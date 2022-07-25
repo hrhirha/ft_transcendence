@@ -63,6 +63,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     
     async handleDisconnect(client: Socket)
     {
+        this.roomCreated  = 0;
         console.log('Client Disconnect with ID: ' + client.id);
 
         const user =(await this.jwt.getUserFromSocket(client));
@@ -121,23 +122,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             return user;
         }
         //////////////////////////////////////
-        // if (this.roomCreated)
-        // {
-        //     console.log("Room Id = " + this.connection.id);
-        //     client.data.obj = {
-        //         roomId: this.connection.id,
-        //         isPlayer: false,
-        //     };
-        //     client.join(this.connection.id);
-        //     client.emit("saveData", {
-        //         roomId: this.connection.id,
-        //         player: "NotPlayer",
-        //         is_player: false,
-        //         userId: user.id
-        //     });
-        //     this.roomCreated = 0;
-        //     return ;
-        // }
+        if (this.roomCreated)
+        {
+            console.log("Room Id = " + this.connection.id);
+            client.data.obj = {
+                roomId: this.connection.id,
+                isPlayer: false,
+            };
+            client.join(this.connection.id);
+            client.emit("saveData", {
+                roomId: this.connection.id,
+                player: "NotPlayer",
+                is_player: false,
+                userId: user.id
+            });
+            this.roomCreated = 0;
+            return ;
+        }
         //////////////////////////////////////////
         this.beforeStart(client);
     }
@@ -231,11 +232,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             });
             /// emit restart 
             client.emit('restart', d.status);
+            return ;
         }
-        // else
-        // {
-        //     client.leave(client.data.obj.roomId); /// a watcher leave the room 
-        // }
+        client.emit("watcherEndMatch"); /// a watcher leave the room 
     }
 
     @SubscribeMessage('sendToWatcher')
@@ -378,7 +377,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 id: true,
             }
         });
-        this.roomCreated += 1;
+        this.roomCreated = 1;
         console.log("Room Id = " + this.connection.id);
         this.insertSocketData(this.que.Socket, this.que.userId, "player1");
         this.insertSocketData(client, user.id, "player2");
