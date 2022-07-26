@@ -77,7 +77,7 @@ export class UserController {
         {
             await this._userS.editAvatar(id, file);
             const f = createReadStream(join(file.path));
-            req.res.setHeader("Content-Type", file.mimetype)
+            req.res.setHeader("Content-Type", file.mimetype);
             return new StreamableFile(f);
         }
         catch (e)

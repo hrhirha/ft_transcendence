@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { friend_status, HOST } from 'src/utils';
+import { friend_status, HOST, PORT } from 'src/utils';
 import { EditFullNameDto, EditUsernameDto } from './dto';
 
 @Injectable()
@@ -43,7 +43,8 @@ export class UserService {
             throw new ForbiddenException('user not found');
         const req = u.sentReq.length === 1 ? u.sentReq[0] : (u.recievedReq.length === 1 ? u.recievedReq[0] : null);
         delete u.sentReq && delete u.recievedReq;
-        return { user: u, friendship_status: req ? req.status : null };
+        user['relation'] = req ? req.status : null;
+        return { user: u };
     }
 
     async getUserByUsername(user: User, username: string)
@@ -78,7 +79,8 @@ export class UserService {
             throw new ForbiddenException('user not found');
         const req = u.sentReq.length === 1 ? u.sentReq[0] : (u.recievedReq.length === 1 ? u.recievedReq[0] : null);
         delete u.sentReq && delete u.recievedReq;
-        return { user: u, friendship_status: req ? req.status : null };
+        user['relation'] = req ? req.status : null;
+        return { user: u };
     } 
 
     async updateStatus(id:string, status: string)
@@ -154,7 +156,7 @@ export class UserService {
         const user = await this._prismaS.user.update({
             where: { id },
             data: {
-                imageUrl: `http://${HOST}/${file.path}`
+                imageUrl: `http://${HOST}:${PORT}/${file.path}`
             },
         });
         return {success: true};
