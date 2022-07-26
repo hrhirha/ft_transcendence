@@ -718,6 +718,32 @@ export class ChatService {
         return {success: true}
     }
 
+    async inviteToGame(user: User, opponent: UserIdDto)
+    {
+        const u = await this._prismaS.user.findUnique({
+            where: {
+                id: opponent.id,
+            },
+            select: {
+                id: true,
+                username: true,
+                sentReq: {
+                    where: { rcv_id: user.id, status: friend_status.BLOCKED },
+                    select: { rcv_id: true, }
+                },
+                recievedReq: {
+                    where: { snd_id: user.id, status: friend_status.BLOCKED },
+                    select: { snd_id: true, }
+                },
+            }
+        });
+        if (!u)
+            throw new WsException('user not found');
+        if (u.recievedReq.length === 1 || u.sentReq.length === 1)
+            throw new WsException('your friend status is blocked');
+        return u;
+    }
+
     // GET
 
     async getJoinedRooms(user: User)

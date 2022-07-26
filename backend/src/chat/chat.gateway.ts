@@ -485,6 +485,28 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
+    @SubscribeMessage('invite2game')
+    async inviteToGame(@ConnectedSocket() client: Socket, @MessageBody() opponent: UserIdDto)
+    {
+        let u = await this._chat.getUserFromSocket(client);
+        if (!u)
+            throw new WsException('you must login first');
+        try
+        {
+            const d = await this._chat.inviteToGame(u, opponent);
+            const sockets = await this.server.fetchSockets();
+
+            sockets.forEach((s) => {
+                s.data.username === d.username && this.server.to(s.id).emit('game_invitation', { id: u.id });
+            });
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message:e.message});
+            throw new WsException('failed to invite user to a game');
+        }
+    }
+
     @SubscribeMessage('get_chats')
     async getJoinedChatRooms(@ConnectedSocket() client: Socket)
     {
