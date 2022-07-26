@@ -31,39 +31,21 @@ export class WsValidationPipe extends ValidationPipe
 
 
 @UsePipes(WsValidationPipe)
-@WebSocketGateway({ cors: true, namespace: 'game'})
-export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
+@WebSocketGateway({ cors: true, namespace: 'privateGame'})
+export class PrivateGameGateway implements OnGatewayConnection, OnGatewayDisconnect
 {
     @WebSocketServer()
-
     server : Server;
-    roomCreated: number = 0;
-    connection: any;
     que: {
         Socket: Socket,
         userId: string,
     } = null;
     
     tab = new Map;
-    // {
-    //     user1: {
-    //         usrId: string,
-    //         restart: boolean,
-    //         disconected: boolean
-    //     },
-    //     user2: {
-    //         usrId: string,
-    //         restart: boolean,
-    //         disconected: boolean
-    //     },
-    //     endGame: boolean,
-    // }
-    
     constructor(private prisma: PrismaService, private jwt: ChatService){}
     
     async handleDisconnect(client: Socket)
     {
-        this.roomCreated  = 0;
         console.log('Client Disconnect with ID: ' + client.id);
 
         const user =(await this.jwt.getUserFromSocket(client));
@@ -71,10 +53,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             return user;
         
         if (client.data.obj == undefined)
-        {
-            this.que = (client == this.que.Socket) ? null : this.que;
             return ;
-        }
 
         if (client.data.obj.isPlayer)
         {
@@ -112,6 +91,40 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         else
             client.leave(client.data.obj.roomId); /// a watcher leave the room 
     }
+        
+    @SubscribeMessage('createGame')
+    async createGame(client: Socket, usrId: string)
+    {
+        const user =(await this.jwt.getUserFromSocket(client));
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
+        console.log("herrreee");
+        var soc: any = (await this.server.fetchSockets()).filter((s) => {
+            if (s.data.usrId == usrId)
+                return s;
+        });
+        if (!soc.length)
+        {
+            client.disconnect();
+            return ;
+        }
+        this.start(soc[0], client);
+    }
+
+    @SubscribeMessage('getId')
+    async getId(client: Socket)
+    {
+        const user =(await this.jwt.getUserFromSocket(client));
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
+        client.emit("test", user.id);
+    }
 
     async handleConnection(client: Socket, ...args: any[]) {
         console.log('Client Connected with ID: ' + client.id);
@@ -122,29 +135,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             return user;
         }
 
-        // //////////////////////////////////////
-        // if (this.roomCreated)
-        // {
-        //     console.log("Room Id = " + this.connection.id);
-        //     client.data.obj = {
-        //         roomId: this.connection.id,
-        //         isPlayer: false,
-        //     };
-        //     client.join(this.connection.id);
-        //     client.emit("saveData", {
-        //         roomId: this.connection.id,
-        //         player: "NotPlayer",
-        //         is_player: false,
-        //         userId: user.id
-        //     });
-        //     this.roomCreated = 0;
-        //     return ;
-        // }
+        console.log(user.id);
+        client.data.usrId = user.id;
 
-        if (client.data.obj) /// it's a watcher !! 
-            return ; 
-        // //////////////////////////////////////////
-        this.beforeStart(client);
+ 
+        // if (client.data.obj) /// it's a watcher !! 
+        //     return ;
     }
 
     @SubscribeMessage('restart')
@@ -268,12 +264,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         client.emit("restartGame");
     }
 
-    @SubscribeMessage('privateGame')
-    async privateGame(usr1: string, usr2: string)
-    {
-
-    }
-
     @SubscribeMessage('watcher')
     async newWatcher(client: Socket, roomId: string)
     {
@@ -296,14 +286,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         });
     }
 
-    insertSocketData(client: Socket, usrId: string, player: string)
+
+    insertSocketData(client: Socket, player: string, gameId: string )
     {
         if (player == "player1")
         {
-            this.tab[this.connection.id] = {
+            this.tab[gameId] = {
                 user1:
                 {
-                    usrId,
+                    usrId: client.data.usrId,
                     restart: false,
                     disconected: false
                 },
@@ -317,21 +308,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             }
         }
         else
-            this.tab[this.connection.id].user2.usrId = usrId;
-        client.join(this.connection.id);
+            this.tab[gameId].user2.usrId = client.data.usrId;
+        client.join(gameId);
         client.data.obj = {
             player,
-            usrId,
+            usrId: client.data.usrId,
             lScore: 0,
             rScore: 0,
-            roomId: this.connection.id,
+            roomId: gameId,
             isPlayer: true,
         };
+
         client.emit("saveData", {
             player,
             is_player: true,
-            roomId: this.connection.id,
-            userId: usrId
+            roomId: gameId,
+            usrId: client.data.usrId,
         });
     }
 
@@ -349,27 +341,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         client.broadcast.to(data.roomId).emit('recv', data);
     }
 
-    async beforeStart(client: Socket)
+    async start(client1: Socket, client2: Socket)
     {
-        const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)
-        {
-            client.disconnect();
-            return user;
-        }
-
-        //  user1 save info /////////////////////
-        if (!this.que)
-        {
-            this.que = {
-                Socket: client,
-                userId: user.id
-            };
-            return ;
-        }
-        /////////////////////////////////////////
-
-        this.connection =  await this.prisma.game.create({
+        let connection =  await this.prisma.game.create({
             data: {
                 map: "map_url",
                 user_game:
@@ -377,8 +351,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                     createMany: {
                         data:
                         [
-                            { uid: user.id              },
-                            { uid: this.que.userId }
+                            { uid: client1.data.usrId },
+                            { uid: client2.data.usrId  }
                         ]
                     }
                 }
@@ -387,12 +361,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 id: true,
             }
         });
-        this.roomCreated = 1;
-        console.log("Room Id = " + this.connection.id);
-        this.insertSocketData(this.que.Socket, this.que.userId, "player1");
-        this.insertSocketData(client, user.id, "player2");
-        this.que = null;
-        this.server.to(this.connection.id).emit('startGame');
-        return user;
+        console.log("Room Id = " + connection.id);
+        this.insertSocketData(client1, "player1", connection.id);
+        this.insertSocketData(client2, "player2", connection.id);
+        this.server.to(connection.id).emit('startGame');
     }
 }
