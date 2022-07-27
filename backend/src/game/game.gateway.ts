@@ -37,33 +37,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     @WebSocketServer()
 
     server : Server;
-    roomCreated: number = 0;
-    connection: any;
     que: {
         Socket: Socket,
         userId: string,
     } = null;
-    
     tab = new Map;
-    // {
-    //     user1: {
-    //         usrId: string,
-    //         restart: boolean,
-    //         disconected: boolean
-    //     },
-    //     user2: {
-    //         usrId: string,
-    //         restart: boolean,
-    //         disconected: boolean
-    //     },
-    //     endGame: boolean,
-    // }
-    
+
     constructor(private prisma: PrismaService, private jwt: ChatService){}
     
     async handleDisconnect(client: Socket)
     {
-        this.roomCreated  = 0;
         console.log('Client Disconnect with ID: ' + client.id);
 
         const user =(await this.jwt.getUserFromSocket(client));
@@ -121,30 +104,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
-
-        // //////////////////////////////////////
-        // if (this.roomCreated)
-        // {
-        //     console.log("Room Id = " + this.connection.id);
-        //     client.data.obj = {
-        //         roomId: this.connection.id,
-        //         isPlayer: false,
-        //     };
-        //     client.join(this.connection.id);
-        //     client.emit("saveData", {
-        //         roomId: this.connection.id,
-        //         player: "NotPlayer",
-        //         is_player: false,
-        //         userId: user.id
-        //     });
-        //     this.roomCreated = 0;
-        //     return ;
-        // }
-
-        if (client.data.obj) /// it's a watcher !! 
-            return ; 
-        // //////////////////////////////////////////
-        this.beforeStart(client);
     }
 
     @SubscribeMessage('restart')
@@ -253,6 +212,18 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         this.server.to(d.roomId).emit('Watchers', d);
     }
 
+    @SubscribeMessage('newPlayer')
+    async Newplayer(client: Socket)
+    {
+        const user =(await this.jwt.getUserFromSocket(client));
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
+
+        this.beforeStart(client);
+    }
     @SubscribeMessage('join')
     async joinNewRoom(client: Socket, d: any)
     {
@@ -266,12 +237,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         client.leave(d.oldData.roomId);
         client.join(d.newRoom);
         client.emit("restartGame");
-    }
-
-    @SubscribeMessage('privateGame')
-    async privateGame(usr1: string, usr2: string)
-    {
-
     }
 
     @SubscribeMessage('watcher')
@@ -296,11 +261,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         });
     }
 
-    insertSocketData(client: Socket, usrId: string, player: string)
+    insertSocketData(client: Socket, usrId: string, player: string, room: string)
     {
         if (player == "player1")
         {
-            this.tab[this.connection.id] = {
+            this.tab[room] = {
                 user1:
                 {
                     usrId,
@@ -317,20 +282,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             }
         }
         else
-            this.tab[this.connection.id].user2.usrId = usrId;
-        client.join(this.connection.id);
+            this.tab[room].user2.usrId = usrId;
+        client.join(room);
         client.data.obj = {
             player,
             usrId,
             lScore: 0,
             rScore: 0,
-            roomId: this.connection.id,
+            roomId: room,
             isPlayer: true,
         };
         client.emit("saveData", {
             player,
             is_player: true,
-            roomId: this.connection.id,
+            roomId: room,
             userId: usrId
         });
     }
@@ -369,7 +334,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         }
         /////////////////////////////////////////
 
-        this.connection =  await this.prisma.game.create({
+        let connection =  await this.prisma.game.create({
             data: {
                 map: "map_url",
                 user_game:
@@ -387,12 +352,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 id: true,
             }
         });
-        this.roomCreated = 1;
-        console.log("Room Id = " + this.connection.id);
-        this.insertSocketData(this.que.Socket, this.que.userId, "player1");
-        this.insertSocketData(client, user.id, "player2");
+        this.insertSocketData(this.que.Socket, this.que.userId, "player1", connection.id);
+        this.insertSocketData(client, user.id, "player2", connection.id);
         this.que = null;
-        this.server.to(this.connection.id).emit('startGame');
+        this.server.to(connection.id).emit('startGame');
         return user;
     }
 }
