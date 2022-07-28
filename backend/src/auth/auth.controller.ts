@@ -20,8 +20,8 @@ export class AuthController {
             throw new ForbiddenException({success: false, message: "already logged in"});
         try
         {
-            await this._authS.login(dto, req);
-            return {logged_in: true}
+            const u = await this._authS.login(dto, req);
+            return {success: true};
         }
         catch (e)
         {

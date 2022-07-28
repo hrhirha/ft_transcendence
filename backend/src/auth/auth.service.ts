@@ -29,6 +29,7 @@ export class AuthService {
                 fullName: true,
                 email: true,
                 imageUrl: true,
+                isTfaEnabled: true,
                 score: true,
                 rank: true,
                 wins: true,
@@ -37,7 +38,9 @@ export class AuthService {
             }
         });
 
-        const referer = req.header("Referer") || `http://${HOST}:3000`;
+        let referer = req.header("Referer") || `http://${HOST}:3000`;
+        if (user.isTfaEnabled)
+            referer += "/checkpoint";
 
         const cookie = this.getCookieWithJwtAccessToken(user.id);
         req.res.setHeader('Set-Cookie', cookie)

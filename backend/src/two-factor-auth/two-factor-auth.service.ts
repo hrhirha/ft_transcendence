@@ -6,6 +6,7 @@ import { authenticator } from 'otplib';
 import { toFileStream } from 'qrcode';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
+import { HOST } from 'src/utils';
 import { TFADto } from './dto';
 
 @Injectable()
@@ -61,7 +62,9 @@ export class TwoFactorAuthService {
         if (!this.verify(user, dto))
             throw new UnauthorizedException('invalid authentication code');
         const cookie = this._authS.getCookieWithJwtAccessToken(user.id, true);
-        req.res.setHeader('Set-Cookie', [cookie]);
+        let referer = req.header("Referer") || `http://${HOST}:3000`;
+        req.res.setHeader('Set-Cookie', [cookie])
+        .setHeader('Location', referer);
         return { success: true };
     }
 }
