@@ -10,7 +10,6 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
 import { ArgumentMetadata, HttpException, UsePipes, ValidationPipe } from '@nestjs/common';
-
 export class WsValidationPipe extends ValidationPipe
 {
     async transform(value: any, metadata: ArgumentMetadata) {
@@ -37,8 +36,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     @WebSocketServer()
 
     server : Server;
-    que: {
-        Socket: Socket,
+
+    normaleQue: {
+        soc: Socket,
+        userId: string,
+    } = null;
+
+    ultimateQue: {
+        soc: Socket,
         userId: string,
     } = null;
     tab = new Map;
@@ -55,7 +60,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         
         if (client.data.obj == undefined)
         {
-            this.que = (client == this.que.Socket) ? null : this.que;
+            client.emit("leave");
+            this.ultimateQue = (this.ultimateQue && client == this.ultimateQue.soc) ? null : this.ultimateQue;
+            this.normaleQue = (this.normaleQue && client == this.normaleQue.soc) ? null : this.normaleQue;
             return ;
         }
 
@@ -212,8 +219,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         this.server.to(d.roomId).emit('Watchers', d);
     }
 
-    @SubscribeMessage('newPlayer')
-    async Newplayer(client: Socket)
+    @SubscribeMessage('normaleQue')
+    async normaleQuee(client: Socket)
     {
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
@@ -221,9 +228,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
-
-        this.beforeStart(client);
+        this.beforeStart(client, this.normaleQue);
     }
+
+    @SubscribeMessage('ultimateQue')
+    async ultimateQuee(client: Socket)
+    {
+        const user =(await this.jwt.getUserFromSocket(client));
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
+        this.beforeStart(client, this.ultimateQue);
+    }
+
+
     @SubscribeMessage('join')
     async joinNewRoom(client: Socket, d: any)
     {
@@ -314,7 +334,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         client.broadcast.to(data.roomId).emit('recv', data);
     }
 
-    async beforeStart(client: Socket)
+    async beforeStart(client: Socket, que: { soc:Socket, userId: string })
     {
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
@@ -324,12 +344,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         }
 
         //  user1 save info /////////////////////
-        if (!this.que)
+        if (!que)
         {
-            this.que = {
-                Socket: client,
+            que = {
+                soc: client,
                 userId: user.id
             };
+            client.emit("waiting");
             return ;
         }
         /////////////////////////////////////////
@@ -342,8 +363,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                     createMany: {
                         data:
                         [
-                            { uid: user.id              },
-                            { uid: this.que.userId }
+                            { uid: user.id    },
+                            { uid: que.userId }
                         ]
                     }
                 }
@@ -352,9 +373,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 id: true,
             }
         });
-        this.insertSocketData(this.que.Socket, this.que.userId, "player1", connection.id);
+        this.insertSocketData(que.soc, que.userId, "player1", connection.id);
         this.insertSocketData(client, user.id, "player2", connection.id);
-        this.que = null;
+        que = null;
         this.server.to(connection.id).emit('startGame');
         return user;
     }
