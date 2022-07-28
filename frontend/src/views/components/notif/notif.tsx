@@ -7,26 +7,29 @@ interface Props {
     icon: ReactNode,
     title: string,
     description: string,
+    time: number,
     actions?: Array<{title: string, color: string, action: Function}>
 }
 
-const NotifContext = createContext({});
+
+const NotifContext = createContext(Function());
 
 export const useNotif = () => useContext(NotifContext);
 
 
-const NotifCard:React.FC<Props> = (Props) => {
+const NotifCard:React.FC<{animate: boolean, props: Props, onClose: Function}> = ({animate, props, onClose}) => {
     return (
-    <section className={`notif ${Props.type}`} >
-        <FontAwesomeIcon icon={faClose}/>
-        <span className="icon">{Props.icon}</span>
+    <section className={`notif ${props.type} ${animate ? "notifAnimation" : "notifix"}`} >
+        <FontAwesomeIcon icon={faClose} onClick={() => onClose()}/>
+        <span className="icon">{props.icon}</span>
         <div className="infos">
-            <h6 className="title">{Props.title}</h6>
-            <p className="description">{Props.description}</p>
-            {Props.actions && <ul className="actions">
-                {Props.actions.map((a, k) => {
+            <h6 className="title">{props.title}</h6>
+            <p className="description">{props.description}</p>
+            {props.actions && <ul className="actions">
+                {props.actions.map((a, k) => {
                     return (k < 2)
                         ? <li className="action"
+                            key={`${Date.now()}_${k}`}
                             style={{background: a.color}}
                             onClick={() => a.action()}>
                             {a.title}
@@ -40,13 +43,20 @@ const NotifCard:React.FC<Props> = (Props) => {
 }
 
 export const Notif:React.FC<{children: Array<ReactNode>}> = ({children}) => {
-    const [notifs, setNotifs] = useState<Array<Props>>();
+    const [notifs, setNotifs] = useState<Array<Props>>([]);
+
+    const pushNotif = (newNotif: Props) => {
+        if (notifs.length > 4)
+            setNotifs(oldNotifs => oldNotifs.splice(0, 4));
+        else
+            setNotifs(oldNotifs => [newNotif, ...oldNotifs]);
+    }
 
     return (
-        <NotifContext.Provider value={setNotifs}>
+        <NotifContext.Provider value={pushNotif}>
             {children}
-            {notifs && notifs.length > 0 && <div className="notifications">
-                {notifs.map((n) => <NotifCard type={n.type} icon={n.icon} title={n.title} description={n.description} actions={n.actions}/>)}
+            {notifs.length > 0 && <div className="notifications">
+                {notifs.map((n, k) => <NotifCard key={`${k}_${Date.now()}`} animate={k == 0} onClose={() => setNotifs(notifs.filter((notif) => notif !== n))} props={n}/>)}
             </div>}
         </NotifContext.Provider>
     );

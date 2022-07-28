@@ -1,9 +1,10 @@
 section.notif {
-  @include _flex(row, space-between, center);
+  @include _flex(row, flex-start, center);
   @include _selectionOff();
   cursor: default;
   padding: .5rem;
-  border-radius: 1rem;
+  margin: .4rem 0;
+  border-radius: .5rem;
   min-width: 15rem;
   max-width: 20rem;
   min-height: 2.5rem;
@@ -41,37 +42,49 @@ section.notif {
   div.infos {
     @include _flex(column, center, flex-start);
     .title {
-      font-size: $fsize * .9;
+      font-size: $fsize * .75;
+      padding-right: .5rem;
       font-family: $BFont;
       text-transform: uppercase;
-      line-height: 1.5;
+      line-height: 1.2;
+      margin-bottom: .5rem;
     }
     p.description {
       font-size: $fsize * .75;
-      font-family: $MFont;
+      font-family: $LFont;
+      line-height: 1.2;
     }
   }
   ul.actions {
     @include _flex(row, center, center);
+    width: 100%;
     list-style: none;
     padding: .5rem 0;
     li.action {
       cursor: pointer;
-      padding: .25rem .5rem;
+      padding: .5rem .75rem;
       font-size: $fsize * .8;
-      font-family: $BFont;
+      font-family: $LFont;
       line-height: 1.25;
       border-radius: .5rem;
     }
   }
-  -webkit-animation: slide 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
-  animation: slide 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
   z-index: 100;
 }
 .error {
     @include _gradientBg(#b52228, #c1151b);
     // @include _gradientBg(#4caf50, #3d8540);
     color: $light1;
+}
+
+.notifAnimation {
+  -webkit-animation: slide 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+  animation: slide 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+}
+
+.notifix {
+  -webkit-transform: translateX(-2.5rem);
+  transform: translateX(-2.5rem);
 }
 
 @-webkit-keyframes slide {
@@ -99,3 +112,13 @@ section.notif {
               opacity: 1;
     }
 } 
+
+.notifications {
+  @include _flex(column, flex-start, flex-end);
+  position: fixed;
+  overflow: unset;
+  padding: .25rem;
+  right: .5rem;
+  bottom: 1rem;
+  z-index: 10;
+}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FriendsManager } from "./friends_manager/friends_manager";
 import { ProfileInfos } from "./profile_infos/profile_infos";
-import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faUsersGear, faHistory, faBan} from "@fortawesome/free-solid-svg-icons";
+import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faUsersGear, faHistory, faBan, faHome} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { MatchesHistory } from "./matches_history/matches_history";
 import { get_me } from "../../../controller/user/user";
@@ -113,7 +113,7 @@ export const Profile:React.FC = () => {
     const [switchTab, setSwitchTab] = useState<number>(0);
     const [editable, setEditable] = useState<boolean>(false);
     const [userInfos, setUserInfos] = useState<any>(null);
-    const setNotifs = useNotif();
+    const pushNotif = useNotif();
 
     const tabs = [
         {
@@ -130,7 +130,7 @@ export const Profile:React.FC = () => {
             try {
                 const me = await get_me();
                 setUserInfos(me);
-                // setNotifs && setNotifs([{type: "error", title: "Error", icon:<FontAwesomeIcon icon={faBan}/>, description: "ORRY! You don't have access to this bullshit hhh "}]);
+                
             } catch (err) {
                 //error
             }
@@ -171,6 +171,19 @@ export const Profile:React.FC = () => {
                             </div>
                             {switchTab === 0 && <MatchesHistory />}
                             {switchTab === 1 && <FriendsManager />}
+                            <button onClick={() => {
+                                pushNotif({
+                                    type: Math.random() > .5 ? "error" :"",
+                                    icon: <FontAwesomeIcon icon={faHome}/>,
+                                    title: "Lorem ipsum title sdf adf asdf asdfas f fdfadfas fds fasdfa fsa ddfasfd fssda",
+                                    description:" Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                                    time: Math.round(Math.random()) ? 5000 : 5000,
+                                    actions: [{title: "string", color: "#123", action: () => {
+                                    }}] 
+                                });
+                                console.log("OK");
+                            } 
+                            }>Notif</button>
                         </div>
                     </div>
             </div>
