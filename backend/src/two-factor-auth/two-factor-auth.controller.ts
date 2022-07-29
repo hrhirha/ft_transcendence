@@ -1,4 +1,4 @@
-import { Body, Catch, Controller, ForbiddenException, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Catch, Controller, ForbiddenException, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { Request, Response } from 'express';
 import { JwtAuthGuard } from 'src/auth/guard';
@@ -12,7 +12,7 @@ import { TwoFactorAuthService } from './two-factor-auth.service';
 export class TwoFactorAuthController {
     constructor(private _tfaS: TwoFactorAuthService) {}
 
-    @Post('generate')
+    @Get('generate')
     async generate(@GetUser() user: User, @Res() res: Response)
     {
         try
