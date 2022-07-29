@@ -28,7 +28,6 @@ export class WsValidationPipe extends ValidationPipe
     }
 }
 
-
 @UsePipes(WsValidationPipe)
 @WebSocketGateway({ cors: true, namespace: 'game'})
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
@@ -228,7 +227,41 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
-        this.beforeStart(client, this.normaleQue);
+        //  user1 save info /////////////////////
+        if (!this.normaleQue)
+        {
+            this.normaleQue = {
+                soc: client,
+                userId: user.id
+            };
+            client.emit("waiting");
+            return this.normaleQue;
+        }
+        /////////////////////////////////////////
+
+        let connection =  await this.prisma.game.create({
+            data: {
+                map: "map_url",
+                user_game:
+                {
+                    createMany: {
+                        data:
+                        [
+                            { uid: user.id    },
+                            { uid: this.normaleQue.userId }
+                        ]
+                    }
+                }
+            },
+            select: {
+                id: true,
+            }
+        });
+        this.insertSocketData(this.normaleQue.soc, this.normaleQue.userId, "player1", connection.id);
+        this.insertSocketData(client, user.id, "player2", connection.id);
+        this.server.to(connection.id).emit('startGame');
+        this.normaleQue = null;
+
     }
 
     @SubscribeMessage('ultimateQue')
@@ -240,7 +273,40 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
-        this.beforeStart(client, this.ultimateQue);
+        //  user1 save info /////////////////////
+        if (!this.ultimateQue)
+        {
+            this.ultimateQue = {
+                soc: client,
+                userId: user.id
+            };
+            client.emit("waiting");
+            return this.ultimateQue;
+        }
+        /////////////////////////////////////////
+
+        let connection =  await this.prisma.game.create({
+            data: {
+                map: "map_url",
+                user_game:
+                {
+                    createMany: {
+                        data:
+                        [
+                            { uid: user.id    },
+                            { uid: this.ultimateQue.userId }
+                        ]
+                    }
+                }
+            },
+            select: {
+                id: true,
+            }
+        });
+        this.insertSocketData(this.ultimateQue.soc, this.ultimateQue.userId, "player1", connection.id);
+        this.insertSocketData(client, user.id, "player2", connection.id);
+        this.server.to(connection.id).emit('startGame');
+        this.ultimateQue = null;
     }
 
 
@@ -334,49 +400,4 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         client.broadcast.to(data.roomId).emit('recv', data);
     }
 
-    async beforeStart(client: Socket, que: { soc:Socket, userId: string })
-    {
-        const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)
-        {
-            client.disconnect();
-            return user;
-        }
-
-        //  user1 save info /////////////////////
-        if (!que)
-        {
-            que = {
-                soc: client,
-                userId: user.id
-            };
-            client.emit("waiting");
-            return ;
-        }
-        /////////////////////////////////////////
-
-        let connection =  await this.prisma.game.create({
-            data: {
-                map: "map_url",
-                user_game:
-                {
-                    createMany: {
-                        data:
-                        [
-                            { uid: user.id    },
-                            { uid: que.userId }
-                        ]
-                    }
-                }
-            },
-            select: {
-                id: true,
-            }
-        });
-        this.insertSocketData(que.soc, que.userId, "player1", connection.id);
-        this.insertSocketData(client, user.id, "player2", connection.id);
-        que = null;
-        this.server.to(connection.id).emit('startGame');
-        return user;
-    }
 }
