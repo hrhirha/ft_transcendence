@@ -1,11 +1,15 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
-import { faCameraRotate, faPen, faPercent, faTableTennisPaddleBall, faTrophy } from "@fortawesome/free-solid-svg-icons";
+import { faCameraRotate, faCheck, faClose, faPen, faPercent, faTableTennisPaddleBall, faTrophy } from "@fortawesome/free-solid-svg-icons";
 import { buttons, userType } from "../profile";
 import { Numeral } from "../../../components/numeral/numeral";
-import { patch_avatar_upload } from "../../../../controller/user/edit";
+import { patch_avatar_upload, patch_edit_fullname } from "../../../../controller/user/edit";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { get_me, me_info } from "../../../../controller/user/user";
+import { useNotif } from "../../../components/notif/notif";
+import { stringify } from "querystring";
 
 
 const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, stat: number}) => {
@@ -18,18 +22,28 @@ const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, sta
     </span>;
 }
 
-interface ProfileInfosProps {
-    id: string,
-    avatar: string;
-    username: string;
-    fullName: string;
-    ranking: number;
-    wins: number;
-    loses: number;
-}
+const defaultValues = {
+    id: "",
+    username: "",
+    email: "",
+    fullName: "",
+    profileUrl: "",
+    imageUrl: "",
+    score: 0,
+    rank: 0,
+    status: "",
+    wins: 0,
+    loses: 0
+};
 
-export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
+export const ProfileInfos:React.FC = () => {
     const navigate = useNavigate();
+    const pushNotif = useNotif();
+    const [editMode, setEditMode] = useState<boolean>(false);
+    const [userInfos, setUserInfos] = useState<me_info>(defaultValues);
+    const [fullName, setFullName] = useState<string>();
+    const [userImage, setUserImage] = useState<any>();
+
     const updateAvatar = () => {
         var f = document.createElement('input');
         f.style.display='none';
@@ -38,39 +52,79 @@ export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
         f.accept='.jpg,.jpeg,.png,.gif';
         f.addEventListener("change", async (e : any) => {
             const [file] = e.target.files;
-            await patch_avatar_upload(file);
-            window.location.reload();
+            setUserImage(file);
         });
         f.click();
     }
+
+
+    const editProfile = async ()  => {
+        try {
+            if (!/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(\-[a-zA-Z]+)*\.?))+$/.test(fullName!) || fullName!.length > 40)
+                throw("Full Name can only contain a-z SP A-Z - . and max length 40");
+            await patch_edit_fullname(fullName!);
+            await patch_avatar_upload(userImage);
+        }
+        catch(e: any) {
+            setEditMode(oldMode => !oldMode);
+            pushNotif({
+                type: "error",
+                icon: <FontAwesomeIcon icon={faClose}/>,
+                title: "ERROR",
+                description: e
+            });
+        }
+    }
+
+    useEffect(() => {
+        (async function() {
+            try {
+                const me: me_info = await get_me();
+                setUserInfos(me);
+                setFullName(me.fullName);
+            } catch (err) {
+                pushNotif({
+                    type: "",
+                    icon: <FontAwesomeIcon icon={faClose}/>,
+                    title: "ERROR",
+                    description: err
+                });
+            }
+        })();
+    },[]);
+
     return (
         <section id="profileInfos">
-            <button className="edit" title="Edit Profile">
-                <FontAwesomeIcon icon={faPen}/>
+            <button className={editMode ? "save" : "edit"} title="Edit Profile" onClick={() => {
+                setEditMode(oldMode => !oldMode);
+                if (editMode)
+                    editProfile();
+            }}>
+                <FontAwesomeIcon icon={editMode ? faCheck : faPen}/>
             </button>
             <div className="profileData">
                 <div className="avatar">
-                    <CircleAvatar avatarURL={Props.avatar} dimensions={120} showStatus={false}/>
-                    <span className="ranking"><Numeral value={Props.ranking}/></span>
-                    <span className="editAvatar" title="Change Your Avatar" onClick={updateAvatar}>
+                    <CircleAvatar avatarURL={userImage && URL.createObjectURL(userImage) || userInfos?.imageUrl} dimensions={120} showStatus={false}/>
+                    <span className="score"><Numeral value={userInfos?.score}/></span>
+                    {editMode && <span className="editAvatar" title="Change Your Avatar" onClick={updateAvatar}>
                         <FontAwesomeIcon icon={faCameraRotate}/>
-                    </span>
+                    </span>}
                 </div>
                 <div className="profileMoreData">
-                    <input type="text" disabled className="fullName" placeholder="Full Name" onChange={() => {}} value={Props.fullName}/>
-                    <span className="userName">@{Props.username}</span>
+                    <input type="text" disabled={!editMode} className="fullName" placeholder="Full Name" onChange={(e) => setFullName(e.target.value)} value={fullName}/>
+                    <span className="userName">@{userInfos?.username}</span>
                     <div className="stats">
-                        <StatCard icon={faTableTennisPaddleBall} title="Games" stat={Number(Props.wins + Props.loses)}/>
-                        <StatCard icon={faTrophy} title="Wins" stat={Number(Props.wins)}/>
-                        <StatCard icon={faPercent} title="Ratio" stat={Number(Number((Props.wins) / (Props.wins + Props.loses) * 100).toFixed(1)) || 0}/>
+                        <StatCard icon={faTableTennisPaddleBall} title="Games" stat={Number(userInfos?.wins + userInfos?.loses)}/>
+                        <StatCard icon={faTrophy} title="Wins" stat={Number(userInfos?.wins)}/>
+                        <StatCard icon={faPercent} title="Ratio" stat={Number(Number((userInfos?.wins) / (userInfos?.wins + userInfos?.loses) * 100).toFixed(1)) || 0}/>
                     </div>
                 </div>
             </div>
-            <div className="actionButtons">
+            {!editMode && <div className="actionButtons">
                 {buttons.map((button) => {
                     if (button.type === userType.none) {
                         return (
-                            <button key={`${button.text.replace(' ', '')}`} className={`btn${button.text.replace(' ', '')}`} onClick={() => button.onClick(Props.id)}>
+                            <button key={`${button.text.replace(' ', '')}`} className={`btn${button.text.replace(' ', '')}`} onClick={() => button.onClick(userInfos?.id)}>
                                 <FontAwesomeIcon icon={button.icon} />
                                 {button.text}
                             </button>
@@ -78,7 +132,7 @@ export const ProfileInfos:React.FC<ProfileInfosProps> = (Props) => {
                     }
                     return null;
                 })}
-            </div>
+            </div>}
         </section>
     );
 }

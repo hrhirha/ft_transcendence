@@ -46,7 +46,7 @@ section#profileInfos {
                 width: 120px;
                 height: 120px;
             }
-            .ranking {
+            .score {
                 @include _flex(row, center, center);
                 font-family: $XBFont;
                 background-color: $dark3;
@@ -149,7 +149,7 @@ section#profileInfos {
             }
         }
     }
-    button.edit {
+    button.edit, button.save {
         @include _flex(column, center, center);
         position: absolute;
         top: -.5rem;
@@ -169,5 +169,12 @@ section#profileInfos {
             }
         }
         z-index: 5;
+    }
+}
+
+button.save {
+    background-color: $purple!important;
+    svg {
+        font-size: $fsize * .9!important;
     }
 }

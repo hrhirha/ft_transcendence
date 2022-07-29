@@ -4,7 +4,6 @@ import { ProfileInfos } from "./profile_infos/profile_infos";
 import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faUsersGear, faHistory, faBan, faHome} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { MatchesHistory } from "./matches_history/matches_history";
-import { get_me } from "../../../controller/user/user";
 import { post_friendreq_accept, post_friendreq_cancel, post_friendreq_decline, post_friendreq_send } from "../../../controller/user/friendreq";
 import { post_friend_block, post_friend_unblock, post_friend_unfriend } from "../../../controller/user/friends";
 import { useNotif } from "../../components/notif/notif";
@@ -112,7 +111,6 @@ export const buttons = [
 export const Profile:React.FC = () => {
     const [switchTab, setSwitchTab] = useState<number>(0);
     const [editable, setEditable] = useState<boolean>(false);
-    const [userInfos, setUserInfos] = useState<any>(null);
     const pushNotif = useNotif();
 
     const tabs = [
@@ -125,31 +123,13 @@ export const Profile:React.FC = () => {
             icon: faUsersGear,
         }
     ];
-    useEffect(() => {
-        (async function() {
-            try {
-                const me = await get_me();
-                setUserInfos(me);
-                
-            } catch (err) {
-                //error
-            }
-        })();
-    },[]);
 
     return (
         <main id="profilePage">
             <div className="profil">
                 <div className='container'>
                         <div className="col col-md-11 col-lg-9 col-xl-8">
-                            <ProfileInfos
-                                id={userInfos?.id}
-                                avatar={userInfos?.imageUrl}
-                                fullName={userInfos?.fullName}
-                                username={userInfos?.username}
-                                ranking={userInfos?.rank || 0}
-                                wins={userInfos?.wins}
-                                loses={userInfos?.loses}/>
+                            <ProfileInfos/>
                         </div>
                         <div className="col col-md-11 col-lg-9 col-xl-8">
                             <nav className="profileTabs">

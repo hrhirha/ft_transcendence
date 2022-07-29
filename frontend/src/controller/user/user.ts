@@ -1,17 +1,17 @@
 import api from "../../api/axois";
 
-interface me_info {
+export interface me_info {
     id: string,
-    createdAt: string,
-    updatedAt: string,
+    createdAt?: string,
+    updatedAt?: string,
     username: string,
     email: string,
     fullName: string,
-    profileUrl: string,
+    profileUrl?: string,
     imageUrl: string,
-    refresh_token: string,
-    isTfaEnabled: boolean,
-    tfaSecret: string,
+    refresh_token?: string,
+    isTfaEnabled?: boolean,
+    tfaSecret?: string,
     score: number,
     rank: number,
     status: string,
