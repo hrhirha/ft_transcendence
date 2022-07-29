@@ -42,15 +42,16 @@ section.notif {
   div.infos {
     @include _flex(column, center, flex-start);
     .title {
-      font-size: $fsize * .75;
-      padding-right: .5rem;
+      font-size: $fsize * .8;
+      padding:.5rem;
+      padding-left: 0;
       font-family: $BFont;
       text-transform: uppercase;
       line-height: 1.2;
       margin-bottom: .5rem;
     }
     p.description {
-      font-size: $fsize * .75;
+      font-size: $fsize * .85;
       font-family: $LFont;
       line-height: 1.2;
     }
@@ -75,6 +76,10 @@ section.notif {
     @include _gradientBg(#b52228, #c1151b);
     // @include _gradientBg(#4caf50, #3d8540);
     color: $light1;
+}
+.info {
+  @include _gradientBg($light6, $light4);
+
 }
 
 .notifAnimation {
