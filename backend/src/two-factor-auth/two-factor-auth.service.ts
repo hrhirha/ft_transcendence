@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@prisma/client';
 import { Request, Response } from 'express';
@@ -47,8 +47,13 @@ export class TwoFactorAuthService {
         throw new UnauthorizedException('invalid authentication code');
     }
     
-    async disable(user: User) {
-        return await this._userS.disable2fa(user.id);
+    async disable(user: User, dto: TFADto)
+    {
+        if (this.verify(user, dto))
+        {
+            return await this._userS.disable2fa(user.id);
+        }
+        throw new ForbiddenException('invalid authentication code');
     }
     
     verify(user: User, dto: TFADto)

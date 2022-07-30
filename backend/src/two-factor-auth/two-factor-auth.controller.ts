@@ -43,11 +43,11 @@ export class TwoFactorAuthController {
 
     @UseGuards(Jwt2FAAuthGuard)
     @Post('disable')
-    async disable(@GetUser() user: User)
+    async disable(@GetUser() user: User, @Body() dto: TFADto)
     {
         try
         {
-            return await this._tfaS.disable(user);
+            return await this._tfaS.disable(user, dto);
         }
         catch (e)
         {
