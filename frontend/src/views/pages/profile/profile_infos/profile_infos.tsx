@@ -5,12 +5,11 @@ import { faCameraRotate, faCheck, faClose, faPen, faPercent, faTableTennisPaddle
 import { buttons, userType } from "../profile";
 import { Numeral } from "../../../components/numeral/numeral";
 import { patch_avatar_upload, patch_edit_fullname } from "../../../../controller/user/edit";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { get_me, me_info } from "../../../../controller/user/user";
 import { useNotif } from "../../../components/notif/notif";
 import { TwoFAButton, TwoFACard } from "../../../components/twofa_card/twofa";
-import { disableTFA, enableTFA } from "../../../../controller/2fa/2fa";
+import { disableTFA, enableTFA } from "../../../../controller/auth/auth";
 
 
 const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, stat: number}) => {
@@ -39,13 +38,12 @@ const defaultValues = {
 };
 
 export const ProfileInfos:React.FC = () => {
-    const navigate = useNavigate();
-    const pushNotif = useNotif();
     const [editMode, setEditMode] = useState<boolean>(false);
     const [userInfos, setUserInfos] = useState<me_info>(defaultValues);
     const [fullName, setFullName] = useState<string>();
     const [userImage, setUserImage] = useState<any>();
     const [enable2fa, setEnable2fa] = useState<boolean>(false);
+    const pushNotif = useNotif();
 
     const updateAvatar = () => {
         var f = document.createElement('input');
@@ -88,12 +86,27 @@ export const ProfileInfos:React.FC = () => {
 
     const switchTwoFA = async (code: string) => {
         try {
-            if (userInfos.isTfaEnabled)
-                await disableTFA();
-            if (!userInfos.isTfaEnabled)
-                await enableTFA(code);
-            // setUserInfos(oldUser => oldUser.isTfaEnabled = true;);
-            setEnable2fa(false);
+            let _enabled2fa :boolean = true;
+            if (/^[0-9]{6}$/.test(code))
+            {
+                if (userInfos.isTfaEnabled)
+                {
+                    await disableTFA(code);
+                    _enabled2fa = false;
+                }
+                if (!userInfos.isTfaEnabled)
+                    await enableTFA(code);
+                await getUserData();
+                setEnable2fa(false);
+                pushNotif({
+                    type: "success",
+                    icon: <FontAwesomeIcon icon={faCheck}/>,
+                    title: "SUCCESS",
+                    description: `2FA methode ${_enabled2fa ? "ENABLED" : "DISABLED"} successfully`
+                });
+            }
+            else 
+                throw({message: "CODE must be 6 digits"});
         } catch (err: any) {
             pushNotif({
                 type: "error",

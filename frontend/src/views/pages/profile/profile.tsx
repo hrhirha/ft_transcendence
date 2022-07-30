@@ -110,7 +110,6 @@ export const buttons = [
 
 export const Profile:React.FC = () => {
     const [switchTab, setSwitchTab] = useState<number>(0);
-    const [editable, setEditable] = useState<boolean>(false);
     const pushNotif = useNotif();
 
     const tabs = [

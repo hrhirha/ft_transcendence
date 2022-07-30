@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import "./views/style/index.scss";
 import { Login } from './views/pages/login/login';
 import { faPuzzlePiece } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
@@ -11,6 +10,8 @@ import { LeaderBoard } from './views/pages/leader_board/leader_board';
 import { Profile } from './views/pages/profile/profile';
 import { NotFound } from './views/pages/not_found/not_found';
 import { AuthChecker } from './views/components/check_auth/auth_checker';
+import "./views/style/index.scss";
+import { Checkpoint } from './views/pages/checkpoint/checkpoint';
 
 
 library.add(faPuzzlePiece);
@@ -27,6 +28,7 @@ root.render(
           <Route path="/leader_board" element={<AuthChecker redirect="/leader_board" wrappedContent={<LeaderBoard/>} />} />
           <Route path="/chat" element={<AuthChecker redirect="/chat" wrappedContent={<Chat/>}/>} />
           <Route path="/profile" element={<AuthChecker redirect="/profile" wrappedContent={<Profile/>}/>} />
+          <Route path="/checkpoint" element={<AuthChecker redirect="/checkpoint" wrappedContent={<Checkpoint/>}/>} />
           <Route path="*" element={<AuthChecker redirect="/" wrappedContent={<NotFound/>}/>} />
       </Routes>
   </BrowserRouter>

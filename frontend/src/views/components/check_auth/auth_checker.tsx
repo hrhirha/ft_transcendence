@@ -23,7 +23,7 @@ export const AuthChecker:React.FC<{wrappedContent: React.ReactNode, redirect: st
                     navigator(redirect);
             }
             catch(err: AxiosError | any) {
-                if (location.pathname != "/login")
+                if (location.pathname != "/login" && location.pathname != "/checkpoint")
                     navigator("/login");
             }
             setLoading(false);
@@ -31,7 +31,7 @@ export const AuthChecker:React.FC<{wrappedContent: React.ReactNode, redirect: st
     }, []);
     return (<Notif>
         {loading && <Loading width="100vw" height="100vh"/>}
-        {!loading && (location.pathname != "/login") && <NavBar user={user}/>}
+        {!loading && (location.pathname != "/login" && location.pathname != "/checkpoint") && <NavBar user={user}/>}
         {!loading && wrappedContent}
     </Notif>);
 }

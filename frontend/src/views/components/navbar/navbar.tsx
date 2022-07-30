@@ -6,6 +6,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { CircleAvatar } from "../circle_avatar/circle_avatar";
 import { user_infos } from "../../../controller/user/user";
 import { useNotif } from "../notif/notif";
+import { logout } from "../../../controller/auth/auth";
 
 interface NavButtonData {
     icon: IconDefinition,
@@ -45,6 +46,8 @@ const NavButton:React.FC<{element: NavButtonData}> = ({element}) => {
 const ProfileNavBtn:React.FC<{picture: string}> = ({picture}) => {
     const location = useLocation();
     const pushNotif = useNotif();
+
+
     return (
         <div className="logoutAndProfile">
             <NavLink
@@ -59,7 +62,8 @@ const ProfileNavBtn:React.FC<{picture: string}> = ({picture}) => {
                     icon: <FontAwesomeIcon icon={faPowerOff}/>,
                     title: "Are you leaving?",
                     description:"Are you sure want to logout ?",
-                    actions: [{title: "Logout now", color: "#6970d4", action: () => {
+                    actions: [{title: "Logout now", color: "#6970d4", action: async () => {
+                        await logout();
                         document.location = "/";
                     }}] 
                 });

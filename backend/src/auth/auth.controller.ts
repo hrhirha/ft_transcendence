@@ -33,7 +33,7 @@ export class AuthController {
     @UseGuards(Jwt2FAAuthGuard)
     @Get('logout')
     logout (@Req() req: Request) {
-        req.res.setHeader('Set-Cookie', 'Authentication=; HttpOnly; Path=/; Max-Age=0');
+        req.res.setHeader('Set-Cookie', 'access_token=; HttpOnly; Path=/; Max-Age=0');
         return {logged_out: true};
     }
 }
