@@ -35,11 +35,14 @@ export class TwoFactorAuthService {
         return toFileStream(res, otp_auth_url);
     }
     
-    async enable(user: User, dto: TFADto)
+    async enable(user: User, dto: TFADto, req: Request)
     {
         if (this.verify(user, dto))
         {
-            return await this._userS.enable2fa(user.id);
+            await this._userS.enable2fa(user.id);
+            const cookie = this._authS.getCookieWithJwtAccessToken(user.id, true);
+            req.res.setHeader('Set-Cookie', [cookie]);
+            return { success: true, }
         }
         throw new UnauthorizedException('invalid authentication code');
     }
@@ -62,9 +65,7 @@ export class TwoFactorAuthService {
         if (!this.verify(user, dto))
             throw new UnauthorizedException('invalid authentication code');
         const cookie = this._authS.getCookieWithJwtAccessToken(user.id, true);
-        let referer = req.header("Referer") || `http://${HOST}:3000`;
-        req.res.setHeader('Set-Cookie', [cookie])
-        .setHeader('Location', referer);
+        req.res.setHeader('Set-Cookie', [cookie]);
         return { success: true };
     }
 }

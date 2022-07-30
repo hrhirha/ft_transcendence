@@ -18,7 +18,6 @@ export class TwoFactorAuthController {
         try
         {
             const {otp_auth_url} = await this._tfaS.generate(user);
-            console.log({otp_auth_url});
             return this._tfaS.pipeQrStream(res, otp_auth_url);
         }
         catch (e)
@@ -29,11 +28,11 @@ export class TwoFactorAuthController {
     }
 
     @Post('enable')
-    async enable(@GetUser() user: User, @Body() dto: TFADto)
+    async enable(@GetUser() user: User, @Body() dto: TFADto, @Req() req: Request)
     {
         try
         {
-            return await this._tfaS.enable(user, dto);
+            return await this._tfaS.enable(user, dto, req);
         }
         catch (e)
         {

@@ -110,7 +110,7 @@ CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "users_id_tfaSecret_key" ON "users"("id", "tfaSecret");
+CREATE UNIQUE INDEX "users_id_isTfaEnabled_key" ON "users"("id", "isTfaEnabled");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_rooms_uid_rid_key" ON "user_rooms"("uid", "rid");

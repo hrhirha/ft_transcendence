@@ -117,7 +117,10 @@ export class UserService {
                 tfaSecret: secret,
             },
             where: {
-                id,
+                id_isTfaEnabled: {
+                    id,
+                    isTfaEnabled: false,
+                },
             }
         });
         return u;
