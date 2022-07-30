@@ -9,7 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { get_me, me_info } from "../../../../controller/user/user";
 import { useNotif } from "../../../components/notif/notif";
-import { stringify } from "querystring";
+import { TwoFAButton, TwoFACard } from "../../../components/twofa_card/twofa";
+import { disableTFA, enableTFA } from "../../../../controller/2fa/2fa";
 
 
 const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, stat: number}) => {
@@ -29,6 +30,7 @@ const defaultValues = {
     fullName: "",
     profileUrl: "",
     imageUrl: "",
+    isTfaEnabled: false,
     score: 0,
     rank: 0,
     status: "",
@@ -43,6 +45,7 @@ export const ProfileInfos:React.FC = () => {
     const [userInfos, setUserInfos] = useState<me_info>(defaultValues);
     const [fullName, setFullName] = useState<string>();
     const [userImage, setUserImage] = useState<any>();
+    const [enable2fa, setEnable2fa] = useState<boolean>(false);
 
     const updateAvatar = () => {
         var f = document.createElement('input');
@@ -61,9 +64,16 @@ export const ProfileInfos:React.FC = () => {
     const editProfile = async ()  => {
         try {
             if (!/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(\-[a-zA-Z]+)*\.?))+$/.test(fullName!) || fullName!.length > 40)
-                throw("Full Name can only contain a-z SP A-Z - . and max length 40");
+                throw({message: "Full Name can only contain a-z SP A-Z - . and max length 40"});
             await patch_edit_fullname(fullName!);
             await patch_avatar_upload(userImage);
+            await getUserData();
+            pushNotif({
+                type: "success",
+                icon: <FontAwesomeIcon icon={faCheck}/>,
+                title: "Success",
+                description: "Profile updated successfully!"
+            });
         }
         catch(e: any) {
             setEditMode(oldMode => !oldMode);
@@ -71,26 +81,46 @@ export const ProfileInfos:React.FC = () => {
                 type: "error",
                 icon: <FontAwesomeIcon icon={faClose}/>,
                 title: "ERROR",
-                description: e
+                description: e.message
             });
         }
     }
 
+    const switchTwoFA = async (code: string) => {
+        try {
+            if (userInfos.isTfaEnabled)
+                await disableTFA();
+            if (!userInfos.isTfaEnabled)
+                await enableTFA(code);
+            // setUserInfos(oldUser => oldUser.isTfaEnabled = true;);
+            setEnable2fa(false);
+        } catch (err: any) {
+            pushNotif({
+                type: "error",
+                icon: <FontAwesomeIcon icon={faClose}/>,
+                title: "ERROR",
+                description: err.message
+            });
+        }
+    }
+
+    const getUserData = async () => {
+        try {
+            const me: me_info = await get_me();
+            setUserInfos(me);
+            setFullName(me.fullName);
+        } catch (err: any) {
+            pushNotif({
+                type: "error",
+                icon: <FontAwesomeIcon icon={faClose}/>,
+                title: "ERROR",
+                description: err.message
+            });
+        }
+    };
+
     useEffect(() => {
-        (async function() {
-            try {
-                const me: me_info = await get_me();
-                setUserInfos(me);
-                setFullName(me.fullName);
-            } catch (err) {
-                pushNotif({
-                    type: "",
-                    icon: <FontAwesomeIcon icon={faClose}/>,
-                    title: "ERROR",
-                    description: err
-                });
-            }
-        })();
+        getUserData();
     },[]);
 
     return (
@@ -133,6 +163,8 @@ export const ProfileInfos:React.FC = () => {
                     return null;
                 })}
             </div>}
+            {editMode && <TwoFAButton onClick={() => setEnable2fa(true)} enabled={userInfos?.isTfaEnabled}/>}
+            {enable2fa && <TwoFACard enabled={userInfos?.isTfaEnabled} onSubmit={(code: string) => switchTwoFA(code)} onClose={() => setEnable2fa(false)}/>}
         </section>
     );
 }

@@ -5,7 +5,7 @@ section.notif {
   padding: .5rem;
   margin: .4rem 0;
   border-radius: .5rem;
-  min-width: 15rem;
+  min-width: 17rem;
   max-width: 20rem;
   min-height: 2.5rem;
   & > svg {
@@ -23,7 +23,7 @@ section.notif {
   span.icon {
     @include _flex(column, center, center);
     min-width: 3rem;
-    width: 25%;
+    width: 3rem;
     margin-right: .5rem;
     & > #circleAvatar {
       min-width: 2rem!important;
@@ -35,7 +35,9 @@ section.notif {
       font-size: $fsize * 1.2;
       background-color: rgba($light1, .18);
       padding: .5rem;
-      border-radius: 100%
+      border-radius: 100%;
+      width: 1rem;
+      height: 1rem;
     }
   }
   
@@ -43,17 +45,17 @@ section.notif {
     @include _flex(column, center, flex-start);
     .title {
       font-size: $fsize * .8;
-      padding:.5rem;
+      padding:.2rem;
       padding-left: 0;
       font-family: $BFont;
       text-transform: uppercase;
       line-height: 1.2;
-      margin-bottom: .5rem;
     }
     p.description {
       font-size: $fsize * .85;
       font-family: $LFont;
       line-height: 1.2;
+      padding: .5rem 0;
     }
   }
   ul.actions {
@@ -76,6 +78,11 @@ section.notif {
     @include _gradientBg(#b52228, #c1151b);
     // @include _gradientBg(#4caf50, #3d8540);
     color: $light1;
+}
+.success {
+  @include _gradientBg(#5BB318, #2B7A0B);
+  // @include _gradientBg(#4caf50, #3d8540);
+  color: $light1;
 }
 .info {
   @include _gradientBg($light6, $light4);

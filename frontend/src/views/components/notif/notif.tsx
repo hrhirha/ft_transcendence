@@ -17,6 +17,7 @@ export const useNotif = () => useContext(NotifContext);
 const animatedNotifs: Array<Props> = [];
 
 const NotifCard:React.FC<{props: Props, onClose: Function}> = ({props, onClose}) => {
+    
     return (
     <section className={`notif ${props.type} ${animatedNotifs.find((n) => n === props) ? "notifAnimation" : "notifix"}`} >
         <FontAwesomeIcon icon={faClose} onClick={() => onClose()}/>
