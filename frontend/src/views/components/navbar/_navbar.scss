@@ -3,6 +3,7 @@ header#navbar {
     width: auto;
     padding-top: 1rem;
     padding-bottom: 1rem;
+    z-index: 100;
     @include _selectionOff();
     @include _gradientBg($light4, $dark2, 145);
     div.container {
