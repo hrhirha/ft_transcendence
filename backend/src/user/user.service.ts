@@ -21,12 +21,12 @@ export class UserService {
         if (sent)
         {
             if (sent.status === friend_status.ACCEPTED) return relation_status.FRIEND;
-            if (sent.status === friend_status.PENDING) return relation_status.PENDING;
+            if (sent.status === friend_status.PENDING) return relation_status.REQUESTED;
         }
         if (rcvd)
         {
             if (rcvd.status === friend_status.ACCEPTED) return relation_status.FRIEND;
-            if (rcvd.status === friend_status.PENDING) return relation_status.REQUESTED;
+            if (rcvd.status === friend_status.PENDING) return relation_status.PENDING;
         }
         return relation_status.BLOCKED;
     }
