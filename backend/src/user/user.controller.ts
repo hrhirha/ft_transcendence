@@ -22,8 +22,18 @@ export class UserController {
     @Get('me')
     me(@GetUser() dto: User)
     {
-        const { refresh_token, tfaSecret, ...new_dto } = dto;
-        return new_dto;
+        return {
+            id: dto.id,
+            username: dto.username,
+            fullName: dto.fullName,
+            imageUrl: dto.imageUrl,
+            score: dto.score,
+            wins: dto.wins,
+            loses: dto.loses,
+            status: dto.status,
+            isTfaEnabled: dto.isTfaEnabled,
+            relation: null,
+        };
     }
     
     @Patch('edit/username')

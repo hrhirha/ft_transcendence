@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { friend_status, HOST, PORT } from 'src/utils';
+import { friend_status, HOST, PORT, relation_status } from 'src/utils';
 import { EditFullNameDto, EditUsernameDto } from './dto';
 
 @Injectable()
@@ -11,29 +11,49 @@ export class UserService {
 
     // User
 
+    private _getFriendRelation(me: User, friend: any)
+    {
+        const sent = friend.sentReq.length === 1 ? friend.sentReq[0] : null;
+        const rcvd = friend.recievedReq.length === 1 ? friend.recievedReq[0] : null;
+
+        if (me.id === friend.id) return null;
+        if (!sent && !rcvd) return relation_status.NONE;
+        if (sent)
+        {
+            if (sent.status === friend_status.ACCEPTED) return relation_status.FRIEND;
+            if (sent.status === friend_status.PENDING) return relation_status.PENDING;
+        }
+        if (rcvd)
+        {
+            if (rcvd.status === friend_status.ACCEPTED) return relation_status.FRIEND;
+            if (rcvd.status === friend_status.PENDING) return relation_status.REQUESTED;
+        }
+        return relation_status.BLOCKED;
+    }
+
     async getUserById(user: User, id: string)
     {
         const u = await this._prismaS.user.findUnique({
             where: { id, },
             select: {
+                id: true,
                 username: true,
-                email: true,
                 fullName: true,
                 imageUrl: true,
                 score: true,
-                rank: true,
                 wins: true,
                 loses: true,
                 status: true,
+                isTfaEnabled: true,
                 sentReq: {
                     where: {
-                        OR: [{ snd_id: user.id }, { rcv_id: user.id }]
+                        rcv_id: user.id
                     },
                     select: { status: true, }
                 },
                 recievedReq: {
                     where: {
-                        OR: [{ snd_id: user.id }, { rcv_id: user.id }]
+                        snd_id: user.id
                     },
                     select: { status: true, }
                 },
@@ -41,9 +61,11 @@ export class UserService {
         });
         if (!u)
             throw new ForbiddenException('user not found');
-        const req = u.sentReq.length === 1 ? u.sentReq[0] : (u.recievedReq.length === 1 ? u.recievedReq[0] : null);
+
+        u["relation"] = this._getFriendRelation(user, u);
         delete u.sentReq && delete u.recievedReq;
-        user['relation'] = req ? req.status : null;
+        if (user.id === u.id) u.isTfaEnabled = null;
+        
         return { user: u };
     }
 
@@ -52,15 +74,15 @@ export class UserService {
         const u = await this._prismaS.user.findUnique({
             where: { username, },
             select: {
+                id: true,
                 username: true,
-                email: true,
                 fullName: true,
                 imageUrl: true,
                 score: true,
-                rank: true,
                 wins: true,
                 loses: true,
                 status: true,
+                isTfaEnabled: true,
                 sentReq: {
                     where: {
                         OR: [{ snd_id: user.id }, { rcv_id: user.id }]
@@ -77,9 +99,11 @@ export class UserService {
         });
         if (!u)
             throw new ForbiddenException('user not found');
-        const req = u.sentReq.length === 1 ? u.sentReq[0] : (u.recievedReq.length === 1 ? u.recievedReq[0] : null);
+
+        u["relation"] = this._getFriendRelation(user, u);
         delete u.sentReq && delete u.recievedReq;
-        user['relation'] = req ? req.status : null;
+        if (user.id === u.id) u.isTfaEnabled = null;
+        
         return { user: u };
     } 
 
