@@ -1,8 +1,9 @@
 main#notFound {
     > .container {
         @include _flex(column, center, center);
-        min-height: calc(100vh - 90px);
+        min-height: calc(100vh - 100px);
         @media (max-width: $sm) {
+            min-height: calc(100vh - 200px);
             width: auto;
         }
          
