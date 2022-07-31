@@ -40,7 +40,7 @@ export class AuthService {
 
         let referer = req.header("Referer") || `http://${HOST}:3000`;
         if (user.isTfaEnabled)
-            referer += "/checkpoint";
+            referer += "checkpoint";
 
         const cookie = this.getCookieWithJwtAccessToken(user.id);
         req.res.setHeader('Set-Cookie', cookie)

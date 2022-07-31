@@ -2,7 +2,7 @@ import { faBan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { get_me, user_infos } from "../../../controller/user/user";
 import { Loading } from "../loading/loading";
 import { NavBar } from "../navbar/navbar";
@@ -11,6 +11,7 @@ import { Notif } from "../notif/notif";
 export const AuthChecker:React.FC<{wrappedContent: React.ReactNode, redirect: string}> = ({wrappedContent, redirect}) => {
     const [loading, setLoading] = useState<boolean>(true);
     const [user, setUser] = useState<any>(null);
+    const params = useParams();
     const navigator = useNavigate();
     const location = useLocation();
 
@@ -20,11 +21,16 @@ export const AuthChecker:React.FC<{wrappedContent: React.ReactNode, redirect: st
                 const me: user_infos = await get_me();
                 setUser(me);
                 if (location.pathname != redirect)
-                    navigator(redirect);
+                {
+                    if (redirect === "/u")
+                        navigator(`/u/${params.username}`, {replace : true});
+                    else
+                        navigator(redirect, {replace : true});
+                }
             }
             catch(err: AxiosError | any) {
                 if (location.pathname != "/login" && location.pathname != "/checkpoint")
-                    navigator("/login");
+                    navigator("/login", {replace : true});
             }
             setLoading(false);
         })();

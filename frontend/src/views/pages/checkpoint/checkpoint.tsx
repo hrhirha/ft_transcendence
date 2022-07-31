@@ -1,8 +1,21 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { TFAauthenticate } from "../../../controller/auth/auth";
 import { Brand } from "../../components/brand/brand";
 
 export const Checkpoint:React.FC = () =>  {
     const [code, setCode] = useState<string>("");
+    const [error, setError] = useState<string>("");
+
+
+    const TFAAuth = async () => {
+        try {
+            await TFAauthenticate(code);
+            window.location.pathname = '/';
+        } catch(e: any) {
+            setError(e.message);
+        } 
+    }
 
     return (
         <main id="checkpoint">
@@ -16,7 +29,8 @@ export const Checkpoint:React.FC = () =>  {
                     if (Number.isInteger(Number(val)) && val.length < 7)
                         setCode(val);
                 }} value={code}/>
-                <button  onClick={() => {}} className="confirm">Continue</button>
+                {error != "" && <span className="error">{error}</span>}
+                <button  onClick={() => TFAAuth()} className="confirm">Continue</button>
             </div>
         </main>
     );

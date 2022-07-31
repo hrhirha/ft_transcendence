@@ -6,10 +6,11 @@ import { buttons, userType } from "../profile";
 import { Numeral } from "../../../components/numeral/numeral";
 import { patch_avatar_upload, patch_edit_fullname } from "../../../../controller/user/edit";
 import { useEffect, useState } from "react";
-import { get_me, me_info } from "../../../../controller/user/user";
+import { get_me, get_user_by_username, user_infos } from "../../../../controller/user/user";
 import { useNotif } from "../../../components/notif/notif";
 import { TwoFAButton, TwoFACard } from "../../../components/twofa_card/twofa";
 import { disableTFA, enableTFA } from "../../../../controller/auth/auth";
+import { useParams } from "react-router-dom";
 
 
 const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, stat: number}) => {
@@ -25,25 +26,25 @@ const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, sta
 const defaultValues = {
     id: "",
     username: "",
-    email: "",
     fullName: "",
-    profileUrl: "",
     imageUrl: "",
-    isTfaEnabled: false,
     score: 0,
-    rank: 0,
-    status: "",
     wins: 0,
-    loses: 0
+    loses: 0,
+    status: "",
+    isTfaEnabled: false
 };
 
-export const ProfileInfos:React.FC = () => {
+
+export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => {
     const [editMode, setEditMode] = useState<boolean>(false);
-    const [userInfos, setUserInfos] = useState<me_info>(defaultValues);
+    const [userInfos, setUserInfos] = useState<user_infos>(defaultValues);
     const [fullName, setFullName] = useState<string>();
     const [userImage, setUserImage] = useState<any>();
     const [enable2fa, setEnable2fa] = useState<boolean>(false);
     const pushNotif = useNotif();
+    const username = useParams();
+
 
     const updateAvatar = () => {
         var f = document.createElement('input');
@@ -117,11 +118,21 @@ export const ProfileInfos:React.FC = () => {
         }
     }
 
+
+
     const getUserData = async () => {
         try {
-            const me: me_info = await get_me();
-            setUserInfos(me);
-            setFullName(me.fullName);
+            if (userProfile)
+            {
+                const me: user_infos = await get_me();
+                setUserInfos(me);
+                setFullName(me.fullName);
+            }
+            else{
+                const user: user_infos = await get_user_by_username(username.username!);
+                setUserInfos(user);
+                setFullName(user.fullName);
+            }
         } catch (err: any) {
             pushNotif({
                 type: "error",
@@ -138,13 +149,13 @@ export const ProfileInfos:React.FC = () => {
 
     return (
         <section id="profileInfos">
-            <button className={editMode ? "save" : "edit"} title="Edit Profile" onClick={() => {
+            {userProfile && <button className={editMode ? "save" : "edit"} title="Edit Profile" onClick={() => {
                 setEditMode(oldMode => !oldMode);
                 if (editMode)
                     editProfile();
             }}>
                 <FontAwesomeIcon icon={editMode ? faCheck : faPen}/>
-            </button>
+            </button>}
             <div className="profileData">
                 <div className="avatar">
                     <CircleAvatar avatarURL={userImage && URL.createObjectURL(userImage) || userInfos?.imageUrl} dimensions={120} showStatus={false}/>
@@ -163,7 +174,7 @@ export const ProfileInfos:React.FC = () => {
                     </div>
                 </div>
             </div>
-            {!editMode && <div className="actionButtons">
+            {!userProfile && <div className="actionButtons">
                 {buttons.map((button) => {
                     if (button.type === userType.none) {
                         return (
@@ -176,8 +187,8 @@ export const ProfileInfos:React.FC = () => {
                     return null;
                 })}
             </div>}
-            {editMode && <TwoFAButton onClick={() => setEnable2fa(true)} enabled={userInfos?.isTfaEnabled}/>}
-            {enable2fa && <TwoFACard enabled={userInfos?.isTfaEnabled} onSubmit={(code: string) => switchTwoFA(code)} onClose={() => setEnable2fa(false)}/>}
+            {userProfile && <TwoFAButton onClick={() => setEnable2fa(true)} enabled={userInfos?.isTfaEnabled!}/>}
+            {enable2fa && <TwoFACard enabled={userInfos?.isTfaEnabled!} onSubmit={(code: string) => switchTwoFA(code)} onClose={() => setEnable2fa(false)}/>}
         </section>
     );
 }
