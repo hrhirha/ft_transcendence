@@ -23,11 +23,15 @@ export async function TFAauthenticate(_code : string) {
         const res  = await api.post("2fa/authenticate", {code : _code});
         return res.data;
     } catch(e: any) {
-        throw({message: "CODE invalid"});
+        throw (e.response.data);
     }
 }
 
 export async function logout() {
-    const res  = await api.get("/auth/logout");
-    return res.data;
+    try {
+        const res  = await api.get("/auth/logout");
+        return res.data;
+    } catch(e: any) {
+        throw (e.response.data);
+    }
 }

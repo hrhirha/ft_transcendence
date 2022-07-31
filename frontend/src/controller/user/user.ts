@@ -14,16 +14,31 @@ export interface user_infos {
 }
 
 export async function get_me() {
-    const res  : user_infos = (await api.get("user/me")).data;
-    return res;
+    try
+    {
+        const res  : user_infos = (await api.get("user/me")).data;
+        return res;
+    } catch(e: any) {
+        throw (e.response.data);
+    }
 }
 
 export async function get_user_by_id(user_id : string) {
-    const res  : user_infos = (await api.get("user/id/"+ user_id )).data;
-    return res;
+    try
+    {
+        const res  : user_infos = (await api.get("user/id/"+ user_id )).data;
+        return res;
+    } catch(e: any) {
+        throw (e.response.data);
+    }
 }
 
 export async function get_user_by_username(username : string) {
-    const res  : user_infos = (await api.get("user/u/"+ username )).data;
-    return res;
+    try
+    {
+        const res  : user_infos = (await api.get("user/u/"+ username )).data;
+        return res;
+    } catch(e: any) {
+        throw (e.response.data);
+    }
 }

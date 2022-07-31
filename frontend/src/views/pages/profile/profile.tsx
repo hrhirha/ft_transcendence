@@ -59,6 +59,7 @@ export const buttons = [
         onClick: async (userId: string, action?: Function) => {
             await post_friend_block(userId);
             action && action(userId);
+            window.location.pathname = "/";
         }
     },
     {

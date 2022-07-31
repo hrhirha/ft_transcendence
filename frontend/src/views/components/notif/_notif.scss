@@ -8,6 +8,7 @@ section.notif {
   min-width: 17rem;
   max-width: 20rem;
   min-height: 2.5rem;
+  box-shadow: 0 0 3rem -1rem $dark1;
   & > svg {
     position: absolute;
     right: -.5rem;
