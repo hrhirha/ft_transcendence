@@ -66,7 +66,7 @@ export class UserService {
         delete u.sentReq && delete u.recievedReq;
         if (user.id === u.id) u.isTfaEnabled = null;
         
-        return { user: u };
+        return u;
     }
 
     async getUserByUsername(user: User, username: string)
@@ -104,7 +104,7 @@ export class UserService {
         delete u.sentReq && delete u.recievedReq;
         if (user.id === u.id) u.isTfaEnabled = null;
         
-        return { user: u };
+        return u;
     } 
 
     async updateStatus(id:string, status: string)

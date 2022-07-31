@@ -188,7 +188,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                 })}
             </div>}
             {userProfile && <TwoFAButton onClick={() => setEnable2fa(true)} enabled={userInfos?.isTfaEnabled!}/>}
-            {enable2fa && <TwoFACard enabled={userInfos?.isTfaEnabled!} onSubmit={(code: string) => switchTwoFA(code)} onClose={() => setEnable2fa(false)}/>}
+            {userProfile && enable2fa && <TwoFACard enabled={userInfos?.isTfaEnabled!} onSubmit={(code: string) => switchTwoFA(code)} onClose={() => setEnable2fa(false)}/>}
         </section>
     );
 }
