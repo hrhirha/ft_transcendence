@@ -12,6 +12,7 @@ import { NotFound } from './views/pages/not_found/not_found';
 import { AuthChecker } from './views/components/check_auth/auth_checker';
 import "./views/style/index.scss";
 import { Checkpoint } from './views/pages/checkpoint/checkpoint';
+import { Game } from './views/pages/game/game';
 
 
 library.add(faPuzzlePiece);
@@ -26,6 +27,7 @@ root.render(
           <Route path="/login" element={<AuthChecker redirect="/" wrappedContent={<Login/>}/>}/>
           <Route path="/" element={<AuthChecker redirect="/" wrappedContent={<Home/>} />} />
           <Route path="/leader_board" element={<AuthChecker redirect="/leader_board" wrappedContent={<LeaderBoard/>} />} />
+          <Route path="/play" element={<AuthChecker redirect="/play" wrappedContent={<Game/>} />} />
           <Route path="/chat" element={<AuthChecker redirect="/chat" wrappedContent={<Chat/>}/>} />
           <Route path="/profile" element={<AuthChecker redirect="/profile" wrappedContent={<Profile userProfile={true}/>}/>} />
           <Route path="/u/:username" element={<AuthChecker redirect="/u" wrappedContent={<Profile userProfile={false}/>}/>} />
