@@ -74,7 +74,7 @@ export const ChatRoom:React.FC<{roomId: string}> = ({roomId}) => {
                 username="Jhon don"
                 image="https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg"
                 status="last seen yesterday 2.30 PM"
-                onClose={() => navigate("/chat")}
+                onClose={() => navigate("/chat", {replace : true})}
                 showSettings={() => setShowSettings(true)}
             />
             <ChatRoomBody/>

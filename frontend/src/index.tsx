@@ -27,9 +27,10 @@ root.render(
           <Route path="/" element={<AuthChecker redirect="/" wrappedContent={<Home/>} />} />
           <Route path="/leader_board" element={<AuthChecker redirect="/leader_board" wrappedContent={<LeaderBoard/>} />} />
           <Route path="/chat" element={<AuthChecker redirect="/chat" wrappedContent={<Chat/>}/>} />
-          <Route path="/profile" element={<AuthChecker redirect="/profile" wrappedContent={<Profile/>}/>} />
-          <Route path="/checkpoint" element={<AuthChecker redirect="/checkpoint" wrappedContent={<Checkpoint/>}/>} />
-          <Route path="*" element={<AuthChecker redirect="/" wrappedContent={<NotFound/>}/>} />
+          <Route path="/profile" element={<AuthChecker redirect="/profile" wrappedContent={<Profile userProfile={true}/>}/>} />
+          <Route path="/u/:username" element={<AuthChecker redirect="/u" wrappedContent={<Profile userProfile={false}/>}/>} />
+          <Route path="/checkpoint" element={<AuthChecker redirect="/" wrappedContent={<Checkpoint/>}/>} />
+          <Route path="*" element={<AuthChecker redirect="/noftound" wrappedContent={<NotFound/>}/>} />
       </Routes>
   </BrowserRouter>
   </React.StrictMode>

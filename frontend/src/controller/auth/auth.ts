@@ -19,8 +19,12 @@ export async function disableTFA(_code : string) {
 }
 
 export async function TFAauthenticate(_code : string) {
-    const res  = await api.post("2fa/authenticate", {code : _code});
-    return res.data;
+    try {
+        const res  = await api.post("2fa/authenticate", {code : _code});
+        return res.data;
+    } catch(e: any) {
+        throw({message: "CODE invalid"});
+    }
 }
 
 export async function logout() {
