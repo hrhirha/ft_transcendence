@@ -1,4 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useNavigate } from 'react-router-dom'
 import { CircleAvatar } from '../../../components/circle_avatar/circle_avatar'
 import { buttons, userType } from '../profile'
 
@@ -12,9 +13,11 @@ interface Props {
 }
 
 export const FriendCard = (Props : Props) => {
+	const navigate = useNavigate();
+
 	return (
 		<div className="friendCard">
-			<div className="friendInfos" onClick={() => {}}>
+			<div className="friendInfos" onClick={() => navigate(`/u/${Props.username}`)}>
 				<div className='avatar'>
 					<CircleAvatar avatarURL={Props.avatar} dimensions={85} showStatus={false}/>
 				</div>

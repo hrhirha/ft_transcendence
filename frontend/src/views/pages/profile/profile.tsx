@@ -22,11 +22,7 @@ export const buttons = [
         icon: faUserPlus,
         text: 'Add Friend',
         onClick: async (userId: string, action?: Function) => {
-            try {
-                await post_friendreq_send(userId);
-            } catch(err) {
-
-            } 
+            await post_friendreq_send(userId);
         }
     },
     {
@@ -34,12 +30,8 @@ export const buttons = [
         icon: faUserCheck,
         text: 'Accept',
         onClick: async (userId: string, action?: Function) => {
-            try {
-                await post_friendreq_accept(userId);
-                action && action(userId);
-            } catch(err) {
-
-            } 
+            await post_friendreq_accept(userId);
+            action && action(userId);
         }
     },
     {
@@ -47,11 +39,8 @@ export const buttons = [
         icon: faUserXmark,
         text: 'Decline',
         onClick: async (userId: string, action?: Function) => {
-            try {
-                await post_friendreq_decline(userId);
-                action && action(userId);
-            } catch(err) {
-            }
+            await post_friendreq_decline(userId);
+            action && action(userId);
         }
     },
     {
@@ -59,11 +48,8 @@ export const buttons = [
         icon: faUserMinus,
         text: 'Unfriend',
         onClick: async (userId: string, action?: Function) => {
-            try {
-                await post_friend_unfriend(userId);
-                action && action(userId);
-            } catch(err) {
-            }
+            await post_friend_unfriend(userId);
+            action && action(userId);
         }
     },
     {
@@ -71,12 +57,8 @@ export const buttons = [
         icon: faUserSlash,
         text: 'Block',
         onClick: async (userId: string, action?: Function) => {
-            try {
-                await post_friend_block(userId);
-                action && action(userId);
-            } catch(err) {
-
-            }
+            await post_friend_block(userId);
+            action && action(userId);
         }
     },
     {
@@ -84,12 +66,8 @@ export const buttons = [
         icon: faUserMinus,
         text: 'Unblock',
         onClick: async (userId: string, action?: Function) => {
-            try {
-                await post_friend_unblock(userId);
-                action && action(userId);
-            } catch(err) {
-
-            }
+            await post_friend_unblock(userId);
+            action && action(userId);
         }
     },
     {
@@ -97,12 +75,8 @@ export const buttons = [
         icon: faUserXmark,
         text: 'Cancle',
         onClick: async (userId: string, action?: Function) => {
-            try {
-                await post_friendreq_cancel(userId);
-                action && action(userId);
-            } catch(err) {
-
-            }
+            await post_friendreq_cancel(userId);
+            action && action(userId);
         }
     }
 ];
@@ -120,6 +94,8 @@ export const Profile:React.FC<{userProfile: boolean}> = ({userProfile}) => {
             icon: faUsersGear,
         }
     ];
+
+    useEffect(() => {setSwitchTab(0)},[userProfile]);
 
     return (
         <main id="profilePage">

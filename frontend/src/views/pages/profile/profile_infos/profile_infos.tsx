@@ -10,7 +10,7 @@ import { get_me, get_user_by_username, user_infos } from "../../../../controller
 import { useNotif } from "../../../components/notif/notif";
 import { TwoFAButton, TwoFACard } from "../../../components/twofa_card/twofa";
 import { disableTFA, enableTFA } from "../../../../controller/auth/auth";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 
 const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, stat: number}) => {
@@ -44,6 +44,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
     const [enable2fa, setEnable2fa] = useState<boolean>(false);
     const pushNotif = useNotif();
     const username = useParams();
+    const navigate = useNavigate();
 
 
     const updateAvatar = () => {
@@ -128,10 +129,21 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                 setUserInfos(me);
                 setFullName(me.fullName);
             }
-            else{
-                const user: user_infos = await get_user_by_username(username.username!);
-                setUserInfos(user);
-                setFullName(user.fullName);
+            else 
+            {
+                try {
+                    const user: user_infos = await get_user_by_username(username.username!);
+                    setUserInfos(user);
+                    setFullName(user.fullName);
+                    if (user.relation === null)
+                        navigate("/profile");
+                    console.log(user.relation);
+                    if (user.relation === "blocked")
+                        navigate("/notfound");
+                }
+                catch(e) {
+                    navigate("/notfound");
+                }
             }
         } catch (err: any) {
             pushNotif({
@@ -145,7 +157,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
 
     useEffect(() => {
         getUserData();
-    },[]);
+    },[userProfile]);
 
     return (
         <section id="profileInfos">
@@ -176,9 +188,22 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
             </div>
             {!userProfile && <div className="actionButtons">
                 {buttons.map((button) => {
-                    if (button.type === userType.none) {
+                    if (userType[button.type] === userInfos?.relation) {
                         return (
-                            <button key={`${button.text.replace(' ', '')}`} className={`btn${button.text.replace(' ', '')}`} onClick={() => button.onClick(userInfos?.id)}>
+                            <button key={`${button.text.replace(' ', '')}`} className={`btn${button.text.replace(' ', '')}`} onClick={async () => {
+                                try {
+                                    await button.onClick(userInfos?.id);
+                                    await getUserData();
+                                }
+                                catch(e: any) {
+                                    pushNotif({
+                                        type: "error",
+                                        icon: <FontAwesomeIcon icon={faClose}/>,
+                                        title: "ERROR",
+                                        description: e.message
+                                    });
+                                }
+                            }}>
                                 <FontAwesomeIcon icon={button.icon} />
                                 {button.text}
                             </button>
