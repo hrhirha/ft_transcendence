@@ -121,7 +121,8 @@ model Game {
   id          String @id @default(cuid())
   createdAt   DateTime @default(now())
 
-  map       String
+  map         String
+  is_ultimate Boolean @default(false)
 
   user_game UserGame[]
 

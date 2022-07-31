@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, Req, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, ForbiddenException, Get, Param, Patch, Post, Req, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from './decorator';
 import { EditFullNameDto, EditUsernameDto, UserDto, UserIdDto } from './dto';
@@ -85,6 +85,7 @@ export class UserController {
     {
         try
         {
+            if (!file) throw new BadRequestException({error: 'no file was uploaded'});
             await this._userS.editAvatar(id, file);
             const f = createReadStream(join(file.path));
             req.res.setHeader("Content-Type", file.mimetype);

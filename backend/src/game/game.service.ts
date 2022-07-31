@@ -37,6 +37,7 @@ export class GameService
             select: {
                 id: true,
                 map: true,
+                is_ultimate: true,
                 user_game: {
                     select: {
                         user: {
