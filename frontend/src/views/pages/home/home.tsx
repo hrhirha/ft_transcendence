@@ -17,10 +17,10 @@ export const Home:React.FC = () => {
                 </div>
                 <div className='row center' >
                     <div className='col col-md-6 col-lg-4'>
-                        <GameCard onClick={() => {navigate('/play', {replace: true})}} image={UltimateGame} background='https://i.pinimg.com/originals/d4/1a/3e/d41a3e3cce22dbc082a46c607a013c24.jpg'/>
+                        <GameCard onClick={() => {navigate('/play/ultimate', {replace: true})}} image={UltimateGame} background='https://i.pinimg.com/originals/d4/1a/3e/d41a3e3cce22dbc082a46c607a013c24.jpg'/>
                     </div>
                     <div className='col col-md-6 col-lg-4'>
-                        <GameCard onClick={() => {navigate('/play/ultimate', {replace: true})}} image={DefaultGame} background='https://i.pinimg.com/originals/d4/1a/3e/d41a3e3cce22dbc082a46c607a013c24.jpg'/>
+                        <GameCard onClick={() => {navigate('/play', {replace: true})}} image={DefaultGame} background='https://i.pinimg.com/originals/d4/1a/3e/d41a3e3cce22dbc082a46c607a013c24.jpg'/>
                     </div>
                 </div>
             </div>

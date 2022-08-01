@@ -1,3 +1,14 @@
-main#gamePage {
-    
+section#gameView {
+    @include _gradientBg($light4, $dark3);
+    box-shadow: 0 0 2rem -.5rem $dark2;
+    border: .45rem solid $light4;
+    min-width: 300px;
+    width: 100%;
+    height: 100vh * .6;
+    border-radius: 1rem;
+    margin: 1rem auto;
+    @media (max-width: $sm) {
+        padding: 0;
+        width: auto;
+    }
 }

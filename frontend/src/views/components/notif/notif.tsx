@@ -50,7 +50,8 @@ export const Notif:React.FC<{children: Array<ReactNode>}> = ({children}) => {
     const pushNotif = (newNotif: Props) => {
         if (notifs.find(n => n.id === newNotif.id))
             return ;
-        newNotif.time = 5000;
+        if (newNotif.time === undefined)
+            newNotif.time = 5000;
         if (notifs.length > 4)
             setNotifs(oldNotifs => oldNotifs.splice(0, 4));
         else
@@ -64,7 +65,7 @@ export const Notif:React.FC<{children: Array<ReactNode>}> = ({children}) => {
                     n.time -= 1000;
                     return n.time >= 0;
                 }));
-            }, 1000));
+            }, 500));
         }
         if (notifs.length >= 0)
             clearInterval(timer);

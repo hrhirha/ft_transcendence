@@ -1,5 +1,5 @@
 @import "./games_slider/games_slider";
 
 main#gameWatcher {
-    
+    @include _flex(column, center, center);
 }

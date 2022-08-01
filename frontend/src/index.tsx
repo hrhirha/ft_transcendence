@@ -28,8 +28,8 @@ root.render(
           <Route path="/login" element={<AuthChecker redirect="/" wrappedContent={<Login/>}/>}/>
           <Route path="/" element={<AuthChecker redirect="/" wrappedContent={<Home/>} />} />
           <Route path="/leader_board" element={<AuthChecker redirect="/leader_board" wrappedContent={<LeaderBoard/>} />} />
-          <Route path="/play" element={<AuthChecker redirect="/play" wrappedContent={<GamePlayer/>} />} />
-          <Route path="/play/ultimate" element={<AuthChecker redirect="/play/ultimate" wrappedContent={<GamePlayer /*ULTIMATE*//>} />} />
+          <Route path="/play" element={<AuthChecker redirect="/play" wrappedContent={<GamePlayer ultimateGame={false}/>} />} />
+          <Route path="/play/ultimate" element={<AuthChecker redirect="/play/ultimate" wrappedContent={<GamePlayer ultimateGame={true}/>} />} />
           <Route path="/watch" element={<AuthChecker redirect="/watch" wrappedContent={<GameWatcher />}/>} />
           <Route path="/chat" element={<AuthChecker redirect="/chat" wrappedContent={<Chat/>}/>} />
           <Route path="/profile" element={<AuthChecker redirect="/profile" wrappedContent={<Profile userProfile={true}/>}/>} />
