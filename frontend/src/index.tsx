@@ -12,7 +12,7 @@ import { NotFound } from './views/pages/not_found/not_found';
 import { AuthChecker } from './views/components/check_auth/auth_checker';
 import "./views/style/index.scss";
 import { Checkpoint } from './views/pages/checkpoint/checkpoint';
-import { GamePlayer } from './views/pages/game_player/game';
+import { GamePlayer } from './views/pages/game_player/game_player';
 import { GameWatcher } from './views/pages/game_watcher/game_watcher';
 
 
