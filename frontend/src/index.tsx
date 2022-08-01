@@ -22,7 +22,7 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
   <BrowserRouter>
       <Routes>
           <Route path="/login" element={<AuthChecker redirect="/" wrappedContent={<Login/>}/>}/>
@@ -38,5 +38,5 @@ root.render(
           <Route path="*" element={<AuthChecker redirect="/noftound" wrappedContent={<NotFound/>}/>} />
       </Routes>
   </BrowserRouter>
-  </React.StrictMode>
+  // </React.StrictMode>
 );
