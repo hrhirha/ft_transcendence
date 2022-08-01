@@ -15,7 +15,7 @@ export const Achievement:React.FC<{score: number}> = ({score}) => {
             return (["Bronze", Bronze]);
     }
 
-    return (<>{(score > 100) && <span className="achievement">
+    return (<>{(score > 150) && <span className="achievement">
             <img src={getAchievement()![1]} title={getAchievement()![0]} alt="achievement" />
         </span>}</>);
 }
