@@ -84,14 +84,10 @@ export const FriendsManager:React.FC = () => {
             <div className="body">
                 <div className="grid">
                     {friendsList.length === 0 && <div className="empty">
-                        {activeTab === tabs.friends && <img alt="empty" src={EmptyFriends}/>}
-                        {activeTab === tabs.friends && <h5>You Have No Friends Yet</h5>}
-                        {activeTab === tabs.requests && <img alt="empty" src={EmptyFriendsRequests}/>}
-                        {activeTab === tabs.requests && <h5>You Have No Friend Requests</h5>}
-                        {activeTab === tabs.blocking && <img alt="empty" src={EmptyBlocking}/>}
-                        {activeTab === tabs.blocking && <h5>You Didn't Block Any One</h5>}
-                        {activeTab === tabs.pending && <img alt="empty" src={EmptyPending}/>}
-                        {activeTab === tabs.pending && <h5>You Have No Pending Requests</h5>}
+                        {activeTab === tabs.friends && <><img alt="empty" src={EmptyFriends}/><h5>You Have No Friends Yet</h5></>}
+                        {activeTab === tabs.requests && <><img alt="empty" src={EmptyFriendsRequests}/><h5>You Have No Friend Requests</h5></>}
+                        {activeTab === tabs.blocking && <><img alt="empty" src={EmptyBlocking}/><h5>You Didn't Block Any One</h5></>}
+                        {activeTab === tabs.pending && <><img alt="empty" src={EmptyPending}/><h5>You Have No Pending Requests</h5></>}
                     </div>}
                     {friendsList.length > 0
                     && friendsList.map((friend: user_info) => 

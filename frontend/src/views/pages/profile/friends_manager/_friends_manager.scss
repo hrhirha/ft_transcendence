@@ -44,6 +44,7 @@ section#friendsManager {
                 margin: auto;
                 img {
                     width: 45%;
+                    min-height: 20rem;
                     @media (max-width: $md) {
                         width: 75%;
                     }
