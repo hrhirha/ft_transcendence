@@ -23,7 +23,7 @@ export async function TFAauthenticate(_code : string) {
         const res  = await api.post("2fa/authenticate", {code : _code});
         return res.data;
     } catch(e: any) {
-        throw (e.response.data);
+        throw ({message: "Incorrect CODE"});
     }
 }
 

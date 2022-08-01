@@ -59,6 +59,12 @@ main#checkpoint {
           color: $dark3;
       }
     }
+    span.error {
+      background: transparent!important;
+      color: rgba($red, .6);
+      font-family: $BFont;
+      margin-bottom: .5rem;
+    }
     button {
       @include _roundedButtonStyle($bgcolor1: $purple, $bgcolor2: $light6);
       @include _selectionOff();
