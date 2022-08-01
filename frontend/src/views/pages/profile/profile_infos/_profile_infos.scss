@@ -57,6 +57,14 @@ section#profileInfos {
                 position: absolute;
                 bottom: -20%;
                 z-index: 6;
+                .achievement {
+                    position: absolute;
+                    left: 0;
+                    bottom: .1rem;
+                }
+            }
+            .score.ach {
+                padding-left: .75rem;
             }
             .editAvatar {
                 @include _flex(row, center, center);
