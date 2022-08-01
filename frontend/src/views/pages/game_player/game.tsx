@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { MatchCard } from "../../components/match_card/match_card";
 
-export const Game:React.FC = () =>  {
+export const GamePlayer:React.FC = () =>  {
 
     return (
         <main id="gamePage">

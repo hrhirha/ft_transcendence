@@ -6,6 +6,7 @@ import React from "react";
 interface Props {
     background?: string,
     image: string,
+    onClick: Function
 }
 
 export const GameCard:React.FC<Props> = (Props) => {
@@ -13,7 +14,7 @@ export const GameCard:React.FC<Props> = (Props) => {
         <div id="gameCard" style={{backgroundImage: `url(${Props.background})`}}>
             <div className="overlay">
                 <img alt="game background" src={Props.image} />
-                <button className="playGame">
+                <button className="playGame" onClick={() => Props.onClick()}>
                     <FontAwesomeIcon icon={faGamepad}/>
                     Play
                 </button>

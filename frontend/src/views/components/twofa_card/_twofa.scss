@@ -1,5 +1,6 @@
 button.twoFASwitch {
       @include _roundedButtonStyle($bgcolor1: rgba($purple, 0), $bgcolor2: rgba($light6, 0));
+    @include _selectionOff();      
       font-size: $fsize * .85;
       border: 2px solid $light2;
       margin-right: 1.5rem;
