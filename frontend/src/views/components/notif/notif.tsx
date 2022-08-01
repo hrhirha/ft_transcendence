@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { createContext, ReactNode, useContext, useState } from "react";
 
 interface Props {
+    id: string,
     type: string,
     icon: ReactNode,
     title: string,
@@ -46,6 +47,8 @@ export const Notif:React.FC<{children: Array<ReactNode>}> = ({children}) => {
     const [notifs, setNotifs] = useState<Array<Props>>([]);
 
     const pushNotif = (newNotif: Props) => {
+        if (notifs.find(n => n.id === newNotif.id))
+            return ;
         if (notifs.length > 4)
             setNotifs(oldNotifs => oldNotifs.splice(0, 4));
         else

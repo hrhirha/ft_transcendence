@@ -58,6 +58,7 @@ const ProfileNavBtn:React.FC<{picture: string}> = ({picture}) => {
             </NavLink>
             <FontAwesomeIcon onClick={() => {
                 pushNotif({
+                    id: "LOGOUTCONFIRMATION",
                     type: "info",
                     icon: <FontAwesomeIcon icon={faPowerOff}/>,
                     title: "Are you leaving?",

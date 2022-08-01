@@ -69,6 +69,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
             await patch_avatar_upload(userImage);
             await getUserData();
             pushNotif({
+                id: "UPDATEPROFILESUCCESS",
                 type: "success",
                 icon: <FontAwesomeIcon icon={faCheck}/>,
                 title: "Success",
@@ -78,6 +79,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
         catch(e: any) {
             setEditMode(oldMode => !oldMode);
             pushNotif({
+                id: "UPDATEPROFILEERROR",
                 type: "error",
                 icon: <FontAwesomeIcon icon={faClose}/>,
                 title: "ERROR",
@@ -101,6 +103,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                 await getUserData();
                 setEnable2fa(false);
                 pushNotif({
+                    id: "2FAMETHODESUCCESS",
                     type: "success",
                     icon: <FontAwesomeIcon icon={faCheck}/>,
                     title: "SUCCESS",
@@ -111,6 +114,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                 throw({message: "CODE must be 6 digits"});
         } catch (err: any) {
             pushNotif({
+                id: "2FAMETHODEERROR",
                 type: "error",
                 icon: <FontAwesomeIcon icon={faClose}/>,
                 title: "ERROR",
@@ -147,6 +151,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
             }
         } catch (err: any) {
             pushNotif({
+                id: "GETUSERDATAERROR",
                 type: "error",
                 icon: <FontAwesomeIcon icon={faClose}/>,
                 title: "ERROR",
@@ -197,6 +202,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                                 }
                                 catch(e: any) {
                                     pushNotif({
+                                        id: "BUTTONACTIONERROR",
                                         type: "error",
                                         icon: <FontAwesomeIcon icon={faClose}/>,
                                         title: "ERROR",
