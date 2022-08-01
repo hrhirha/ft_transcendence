@@ -1,6 +1,6 @@
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { createContext, ReactNode, useContext, useState } from "react";
+import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 interface Props {
     id: string,
@@ -8,6 +8,7 @@ interface Props {
     icon: ReactNode,
     title: string,
     description: string,
+    time: number,
     actions?: Array<{title: string, color: string, action: Function}>
 }
 
@@ -45,15 +46,29 @@ const NotifCard:React.FC<{props: Props, onClose: Function}> = ({props, onClose})
 
 export const Notif:React.FC<{children: Array<ReactNode>}> = ({children}) => {
     const [notifs, setNotifs] = useState<Array<Props>>([]);
-
+    const [timer, setTimer] = useState<any>();
     const pushNotif = (newNotif: Props) => {
         if (notifs.find(n => n.id === newNotif.id))
             return ;
+        newNotif.time = 5000;
         if (notifs.length > 4)
             setNotifs(oldNotifs => oldNotifs.splice(0, 4));
         else
             setNotifs(oldNotifs => [newNotif, ...oldNotifs]);
     }
+    useEffect(() => {
+        if (notifs.length > 0)
+        {
+            setTimer(setInterval(() => {
+                setNotifs(notifs.filter(n => {
+                    n.time -= 1000;
+                    return n.time >= 0;
+                }));
+            }, 1000));
+        }
+        if (notifs.length >= 0)
+            clearInterval(timer);
+    }, [notifs]);
 
     return (
         <NotifContext.Provider value={pushNotif}>
