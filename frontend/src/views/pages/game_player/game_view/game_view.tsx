@@ -11,18 +11,20 @@ export const GameView:React.FC = () =>  {
         const config: Phaser.Types.Core.GameConfig = {
             type: Phaser.AUTO,
             parent: "gameView",
-            backgroundColor: "#000",
+            width: 1280,
+            height: 720,
+            backgroundColor: "#62679b",
             scale: {
                 mode: Phaser.Scale.FIT,
                 autoCenter: Phaser.Scale.CENTER_BOTH,
                 width: 1280,
-                height: 720,
+            height: 720,
             },
             physics: {
                 default: 'arcade',
                 arcade: {
                     gravity: { y: 0 },
-                    debug: true
+                    debug: false
                 }
             }
         }
@@ -32,7 +34,6 @@ export const GameView:React.FC = () =>  {
     }, []);
 
     return (
-        <section id="gameView" className="container">
-        </section>
+        <section id="gameView"></section>
     );
 }

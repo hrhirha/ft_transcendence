@@ -1,8 +1,7 @@
 import Phaser from "phaser";
 import background from "assets/images/GameField.svg";
-import paddle from "assets/images/paddle.png";
+import paddle from "assets/images/paddle.svg";
 import ball from "assets/images/ball.png";
-import restartButton from "assets/images/restartButton.png";
 import youlose from "assets/images/youlose.png";
 import youwin from "assets/images/youwin.png";
 import winner from "assets/images/Winner.png";
@@ -59,13 +58,15 @@ export default class PingPong extends Phaser.Scene
     {
         this.h = this.cameras.main.height;
         this.w = this.cameras.main.width;
+        console.log(this.w);
+        console.log(this.h);
+
         this.load.image('table', background);
         this.load.image('loser', loser);
         this.load.image('exit', exit);
         this.load.image('winner', winner);
         this.load.image('ball', ball);
         this.load.image('paddle', paddle);
-        // this.load.image('restart', restartButton);
         this.load.image('youwin', youwin);
         this.load.image('youlose', youlose);
     }
@@ -122,15 +123,16 @@ export default class PingPong extends Phaser.Scene
 
     create() : void
     {
-        console.log(this.soc);
-        console.log(this.type);
+        // console.log(this.soc);
+        // console.log(this.type);
 
         // no collision detection on left side and right side 
         this.physics.world.setBounds(-this.bounds, 0, this.w + (this.bounds * 2), this.h);
         
         // resize the images to fit the window
+
         this.bg = this.add.sprite(this.w / 2, this.h / 2, 'table');
-        console.log(this.bg);
+
         /////////////////////////////// text ////////////////////////
         this.leftScoretxt = this.add.text((this.w / 2) - (this.w / 10) , 30, this.leftScore.toString(), {
             fontSize: "60px",
