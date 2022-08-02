@@ -40,7 +40,7 @@ section#profileInfos {
             width: 120px;
             height: 120px;
             #circleAvatar {
-                border: .4rem solid $dark2;
+                border: .4rem solid $light6;
                 position: absolute;
                 top: 0;
                 width: 120px;
@@ -57,10 +57,19 @@ section#profileInfos {
                 position: absolute;
                 bottom: -20%;
                 z-index: 6;
-                .achievement {
+            }
+            .achievement {
+                @include _flex(column, center, center);
+                position: absolute;
+                bottom: -1.2rem;
+                width: 1rem;
+                height: 1rem;
+                border-radius: 100%;
+                box-shadow: 0rem 0rem 1rem 1rem $dark3;
+                img {
+                    min-width: 3rem;
+                    max-width: 3rem;
                     position: absolute;
-                    left: 0;
-                    bottom: .1rem;
                 }
             }
             .score.ach {

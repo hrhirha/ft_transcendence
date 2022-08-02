@@ -177,10 +177,10 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
             <div className="profileData">
                 <div className="avatar">
                     <CircleAvatar avatarURL={userImage && URL.createObjectURL(userImage) || userInfos?.imageUrl} dimensions={120} showStatus={false}/>
-                    <span className={`score ${userInfos?.score >= 150 && "ach"}`}>
-                        <Achievement score={userInfos?.score} />
+                    <Achievement score={userInfos?.score} />
+                    {/* <span className={`score ${userInfos?.score >= 150 && "ach"}`}>
                         <Numeral value={userInfos?.score}/>
-                    </span>
+                    </span> */}
                     {editMode && <span className="editAvatar" title="Change Your Avatar" onClick={updateAvatar}>
                         <FontAwesomeIcon icon={faCameraRotate}/>
                     </span>}

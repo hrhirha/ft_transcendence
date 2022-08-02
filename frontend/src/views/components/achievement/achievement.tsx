@@ -1,21 +1,20 @@
-import { Bronze, Diamond, Gold, GoldStar, Silver } from "assets";
+import { BronzeBadge, DiamondBadge, GoldBadge, SilverBadge, IronBadge, WoodBadge } from "assets";
 
 export const Achievement:React.FC<{score: number}> = ({score}) => {
 
     const getAchievement = () => {
         if (score >= 10000)
-            return (["Diamond", Diamond]);
+            return (["Diamond", DiamondBadge]);
         if (score >= 5000)
-            return (["Gold Star", GoldStar]);
+            return (["Gold", GoldBadge]);
         if (score >= 2000)
-            return (["Gold", Gold]);
+            return (["Silver", SilverBadge]);
         if (score >= 1000)
-            return (["Silver", Silver]);
-        if (score >= 150)
-            return (["Bronze", Bronze]);
+            return (["Bronze", BronzeBadge]);
+        if (score >= 500)
+            return (["Iron", IronBadge]);
+        return (["Wood", WoodBadge]);
     }
 
-    return (<>{(score > 150) && <span className="achievement">
-            <img src={getAchievement()![1]} title={getAchievement()![0]} alt="achievement" />
-        </span>}</>);
+    return (<span className="achievement"><img src={getAchievement()![1]} title={getAchievement()![0]} alt="achievement" /></span>);
 }
