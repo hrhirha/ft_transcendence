@@ -6,7 +6,7 @@ import PingPong from "game_controller/pingpong";
 export const GameView:React.FC = () =>  {
 
     useEffect(() => {
-        const sock: Socket = io("ws://10.11.3.3:3001/game", {withCredentials: false});
+        const sock: Socket = io("ws://127.0.0.1:3001/game", {withCredentials: false});
         const scene: PingPong = new PingPong(sock, "normaleQue");
         const config: Phaser.Types.Core.GameConfig = {
             type: Phaser.AUTO,

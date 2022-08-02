@@ -18,7 +18,7 @@ export const TwoFACard:React.FC<{enabled: boolean, onClose: Function, onSubmit: 
             <div className="twofaCard">
                 <FontAwesomeIcon icon={faClose}  onClick={() => onClose()}/>
                 <h3>{enabled ? "Disable 2FA" : "Enable 2FA"}</h3>
-                {!enabled && <img src={`http://10.11.3.3:3001/2fa/generate`} alt="qrcode"/>}
+                {!enabled && <img src={`http://127.0.0.1:3001/2fa/generate`} alt="qrcode"/>}
                 <input type="text" className="twofaCode" placeholder="CODE HERE" onChange={(e) => {
                     const val = e.target.value.trim();
                     console.log(Number.isInteger(Number(val)), val.length < 7);

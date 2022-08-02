@@ -8,14 +8,16 @@ import winner from "assets/images/Winner.png";
 import loser from "assets/images/Loser.png";
 import exit from "assets/images/Exit.png";
 import { Socket } from "socket.io-client";
+import { buttons } from "views/pages/profile/profile";
+import { text } from "body-parser";
 export default class PingPong extends Phaser.Scene
 {
     ballScale: number = 0.19;
     paddleScale: number = 0.4;
     ballspeed: number = 800;
     bounds: number = 100;
-    leftScore: number = 0;
-    rightScore: number = 0;
+    leftScore: number = 9;
+    rightScore: number = 9;
     h: number  = 720;
     w: number = 1080;
     bg?: Phaser.GameObjects.Sprite;
@@ -35,7 +37,7 @@ export default class PingPong extends Phaser.Scene
     End: boolean = false;
     sprite?: any;
     re: boolean = false;
-    text?: Phaser.GameObjects.Text;
+    counter?: Phaser.GameObjects.Text;
     timedEvent?: Phaser.Time.TimerEvent;
     initialTime :number = 5;
     goal: boolean = false;
@@ -43,9 +45,11 @@ export default class PingPong extends Phaser.Scene
     win?: Phaser.GameObjects.Image;
     lose?: Phaser.GameObjects.Image;
     exit?: Phaser.GameObjects.Image;
-    waiting?: Phaser.GameObjects.Text;
-    leave?: Phaser.GameObjects.Text;
+    
     type: string;
+    waiting?: Phaser.GameObjects.Text;
+    buttonBg?: Phaser.GameObjects.Sprite;
+    leave?: Phaser.GameObjects.Text;
     
     constructor(msoc: Socket, type:string)
     {
@@ -58,8 +62,6 @@ export default class PingPong extends Phaser.Scene
     {
         this.h = this.cameras.main.height;
         this.w = this.cameras.main.width;
-        console.log(this.w);
-        console.log(this.h);
 
         this.load.image('table', background);
         this.load.image('loser', loser);
@@ -70,6 +72,22 @@ export default class PingPong extends Phaser.Scene
         this.load.image('youwin', youwin);
         this.load.image('youlose', youlose);
     }
+//////////////////////// listeners Func '////////////////////////
+    leaveFunc() : void
+    {
+        this.leave.text = "";
+        this.soc.disconnect();
+        this.scene.stop();
+        this.buttonBg.destroy();
+    }
+
+    restartFunc()
+    {
+        this.soc.removeAllListeners();
+        this.re = true;
+        this.scene.restart();
+    }
+////////////////////////.................////////////////////////
     
     createObjects(ballx: number, bally: number, lpaddle: number, rpaddle: number)
     {
@@ -134,10 +152,15 @@ export default class PingPong extends Phaser.Scene
         this.bg = this.add.sprite(this.w / 2, this.h / 2, 'table');
 
         /////////////////////////////// text ////////////////////////
-        this.leftScoretxt = this.add.text((this.w / 2) - (this.w / 10) , 30, this.leftScore.toString(), {
+        this.add.text((this.w / 2) , 30, "", {
             fontSize: "60px",
             fontFamily: "Poppins_B",
             align: "center"
+        });
+        this.leftScoretxt = this.add.text((this.w / 2) - (this.w / 10) - 40 , 30, this.leftScore.toString(), {
+            fontSize: "60px",
+            fontFamily: "Poppins_B",
+            align: "center",
         });
         
         this.rightScoretxt = this.add.text((this.w / 2) + (this.w / 10) , 30, this.rightScore.toString(), {
@@ -150,6 +173,7 @@ export default class PingPong extends Phaser.Scene
         {
             if (data.player == "player1")
             {
+                this.buttonBg.destroy();
                 this.leave.destroy();
                 this.waiting.destroy();
             }
@@ -160,15 +184,19 @@ export default class PingPong extends Phaser.Scene
             this.startGame();
         });
 
+
         this.soc.on("waiting", () => {
 
             this.waiting = this.add.text(this.w / 2 , this.h / 2 , "Waiting ...", { font:"35px Arial", align: "center" }).setOrigin(0.5);
+            this.buttonBg = this.add.sprite(this.w - 190 , this.h - 100 , 'exit').setInteractive().setOrigin(0.5);
             this.leave = this.add.text(this.w - 190 , this.h - 100 , "leave the queue", { font:"35px Arial", align: "center" }).setInteractive().setOrigin(0.5);
+            this.buttonBg.on('pointerdown', () =>
+            {
+                this.leaveFunc();
+            }, this);
             this.leave.on('pointerdown', () =>
             {
-                this.leave.text = "";
-                this.soc.disconnect();
-                this.scene.stop();
+                this.leaveFunc();
             }, this);
 
         });
@@ -229,7 +257,7 @@ export default class PingPong extends Phaser.Scene
             this.scene.stop();
         });
 
-        this.soc.on("watcherEndMatch", ()=> {
+        this.soc.on("watcherEndMatch", () => {
             this.exit = this.add.image(this.w / 2 , this.h / 2 , 'exit').setInteractive().setOrigin(0.5);
             this.exit.on('pointerdown', () => {
                 this.soc.disconnect();
@@ -250,15 +278,17 @@ export default class PingPong extends Phaser.Scene
         });
 
         this.soc.on("restart", (img) => {
-            this.add.image(this.w/2, this.h/2 - 100, img).setOrigin(0.5);
+            this.add.image(this.w/2, this.h/2 - 200, img).setOrigin(0.5);
+            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 , 'exit').setInteractive().setOrigin(0.5);
+
             const text = this.add.text(this.w / 2 , this.h / 2 , "Click to Restart", { fontSize: "60px",
             fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-            text.on('pointerdown',  () =>
-            {
-                text.text = "";
-                this.soc.removeAllListeners();
-                this.re = true;
-                this.scene.restart();
+            
+            text.on('pointerdown',  () => {
+                this.restartFunc();
+            }, this);
+            this.buttonBg.on('pointerdown', () => {
+                this.restartFunc();
             }, this);
 
         });
@@ -322,12 +352,12 @@ export default class PingPong extends Phaser.Scene
         if (this.initialTime <= 0)
             return ;
         this.initialTime -= 1; // One second
-        this.text.setText('' + this.formatTime(this.initialTime)).setOrigin(0.5);
+        this.counter.setText('' + this.formatTime(this.initialTime)).setOrigin(0.5);
         if (this.initialTime <= 0)
         {
             this.goal = false;
             // this.timedEvent = undefined;
-            this.text.text = "";
+            this.counter.text = "";
             if (this.data.is_player)
                 this.startGame();
             else
@@ -348,7 +378,7 @@ export default class PingPong extends Phaser.Scene
         if (this.data.player == "player1")
             this.paddle = this.add.sprite(this.posx, this.posy, 'paddle').setOrigin(0,0);
         else 
-            this.paddle = this.add.sprite((this.w - (145 * this.paddleScale) - 30) , this.posy, 'paddle').setOrigin(0,0);
+            this.paddle = this.add.sprite((this.w - (44 * this.paddleScale) - 30) , this.posy, 'paddle').setOrigin(0,0);
         this.paddle.setScale(this.paddleScale); // scale the sprit
         this.physics.add.existing(this.paddle, true); // set the physicss to paddle !!
         this.physics.add.collider(this.paddle, this.ball); // set the collider with paddle and the ball 
@@ -427,7 +457,7 @@ export default class PingPong extends Phaser.Scene
     goalTime()
     {
         this.initialTime = 2;
-        this.text = this.add.text(this.w / 2, this.h / 2, '' + this.formatTime(this.initialTime), { fontSize: "60px",
+        this.counter = this.add.text(this.w / 2, this.h / 2, '' + this.formatTime(this.initialTime), { fontSize: "60px",
             fontFamily: "Poppins_B", align: "center" }).setOrigin(0.5);
         // Each 1000 ms call onEvent
         this.timedEvent = this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });

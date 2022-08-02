@@ -7,7 +7,7 @@ export const Login:React.FC = () =>  {
     const [con, setCon] = useState();
 
     const ConnectTo42 = async () => {
-        window.open("http://10.11.3.3:3001/auth/login", '_self');
+        window.open("http://127.0.0.1:3001/auth/login", '_self');
     }
     
     return (
