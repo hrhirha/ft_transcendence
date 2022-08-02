@@ -1,40 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { io,Socket } from "socket.io-client";
 import Phaser from "phaser";
-import TitleScreen from "game_controller/scenes/TitleScreen";
-
-interface Config {
-    type: number;
-    parent: string,
-    backgroundColor: string,
-    scale: {
-        mode: number;
-        autoCenter: number;
-        width: number;
-        height: number;
-    };
-    physics: {
-        default: string;
-        arcade: {
-            gravity: {
-                y: number;
-            };
-            debug: boolean;
-        };
-    };
-}
+import PingPong from "game_controller/pingpong";
 
 export const GameView:React.FC = () =>  {
 
     useEffect(() => {
-        const config: Config = {
+        const sock: Socket = io("ws://10.11.3.3:3001/game", {withCredentials: false});
+        const scene: PingPong = new PingPong(sock, "normaleQue");
+        const config: Phaser.Types.Core.GameConfig = {
             type: Phaser.AUTO,
             parent: "gameView",
             backgroundColor: "#000",
             scale: {
                 mode: Phaser.Scale.FIT,
                 autoCenter: Phaser.Scale.CENTER_BOTH,
-                width: 1080,
+                width: 1280,
                 height: 720,
             },
             physics: {
@@ -46,10 +27,8 @@ export const GameView:React.FC = () =>  {
             }
         }
         const game: Phaser.Game = new Phaser.Game(config);
-        const socket = io("ws://127.0.0.1:3001/game", {withCredentials: true});
-        const scene: TitleScreen = new TitleScreen(socket, "normaleQue");
-        game.scene.add("titlescreen", scene);
-        game.scene.start("titlescreen");
+        game.scene.add("PingPong", scene);
+        game.scene.start("PingPong");
     }, []);
 
     return (

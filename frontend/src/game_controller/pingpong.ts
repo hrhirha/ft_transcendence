@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import background from "assets/images/table.png";
+import background from "assets/images/GameField.svg";
 import paddle from "assets/images/paddle.png";
 import ball from "assets/images/ball.png";
 import restartButton from "assets/images/restartButton.png";
@@ -9,7 +9,7 @@ import winner from "assets/images/Winner.png";
 import loser from "assets/images/Loser.png";
 import exit from "assets/images/Exit.png";
 import { Socket } from "socket.io-client";
-export default class TitleScreen extends Phaser.Scene
+export default class PingPong extends Phaser.Scene
 {
     ballScale: number = 0.19;
     paddleScale: number = 0.4;
@@ -17,8 +17,8 @@ export default class TitleScreen extends Phaser.Scene
     bounds: number = 100;
     leftScore: number = 0;
     rightScore: number = 0;
-    h: number = 0;
-    w: number = 0;
+    h: number  = 720;
+    w: number = 1080;
     bg?: Phaser.GameObjects.Sprite;
     ball?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
     paddle?: Phaser.GameObjects.Sprite;
@@ -65,10 +65,9 @@ export default class TitleScreen extends Phaser.Scene
         this.load.image('winner', winner);
         this.load.image('ball', ball);
         this.load.image('paddle', paddle);
-        this.load.image('restart', restartButton);
+        // this.load.image('restart', restartButton);
         this.load.image('youwin', youwin);
         this.load.image('youlose', youlose);
-        // this.create();
     }
     
     createObjects(ballx: number, bally: number, lpaddle: number, rpaddle: number)
@@ -134,12 +133,14 @@ export default class TitleScreen extends Phaser.Scene
         console.log(this.bg);
         /////////////////////////////// text ////////////////////////
         this.leftScoretxt = this.add.text((this.w / 2) - (this.w / 10) , 30, this.leftScore.toString(), {
-            font:"65px Arial",
+            fontSize: "60px",
+            fontFamily: "Poppins_B",
             align: "center"
         });
         
         this.rightScoretxt = this.add.text((this.w / 2) + (this.w / 10) , 30, this.rightScore.toString(), {
-            font:"65px Arial",
+            fontSize: "60px",
+            fontFamily: "Poppins_B",
             align: "center"
         });
         
@@ -248,7 +249,8 @@ export default class TitleScreen extends Phaser.Scene
 
         this.soc.on("restart", (img) => {
             this.add.image(this.w/2, this.h/2 - 100, img).setOrigin(0.5);
-            const text = this.add.text(this.w / 2 , this.h / 2 , "Click to Restart", { font:"65px Arial", align: "center" }).setInteractive().setOrigin(0.5);
+            const text = this.add.text(this.w / 2 , this.h / 2 , "Click to Restart", { fontSize: "60px",
+            fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
             text.on('pointerdown',  () =>
             {
                 text.text = "";
@@ -423,7 +425,8 @@ export default class TitleScreen extends Phaser.Scene
     goalTime()
     {
         this.initialTime = 2;
-        this.text = this.add.text(this.w / 2, this.h / 2, '' + this.formatTime(this.initialTime), { font:"65px Arial", align: "center" }).setOrigin(0.5);
+        this.text = this.add.text(this.w / 2, this.h / 2, '' + this.formatTime(this.initialTime), { fontSize: "60px",
+            fontFamily: "Poppins_B", align: "center" }).setOrigin(0.5);
         // Each 1000 ms call onEvent
         this.timedEvent = this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });
     }

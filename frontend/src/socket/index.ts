@@ -52,7 +52,7 @@ interface remove_password {
 export class Socket {
     socket :any;
     constructor() {
-        this.socket = io("ws://127.0.0.1:3001/chat",{
+        this.socket = io("ws://10.11.3.3:3001/chat",{
             withCredentials: true
         });
     }
