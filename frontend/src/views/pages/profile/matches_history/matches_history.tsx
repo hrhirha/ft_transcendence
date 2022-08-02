@@ -1,7 +1,7 @@
 import { faGamepad } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { EmptyHistory } from "../../../../assets";
-import { MatchCard } from "../../../components/match_card/match_card";
+import { EmptyHistory } from "assets";
+import { MatchCard } from "views/components/match_card/match_card";
 
 
 const NoHistroy = () => {

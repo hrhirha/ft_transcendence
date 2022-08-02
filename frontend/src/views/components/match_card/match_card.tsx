@@ -1,6 +1,6 @@
 import React from "react";
-import { DefaultGame, UltimateGame } from "../../../assets";
-import { CircleAvatar } from "../circle_avatar/circle_avatar";
+import { DefaultGame, UltimateGame } from "assets";
+import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 
 interface Player {
     avatar: string;

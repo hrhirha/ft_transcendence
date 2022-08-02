@@ -1,15 +1,15 @@
 // import { useNavigate } from "react-router-dom";
-import { Chats, joinedGroups } from "../../../test_data/roomchatdata";
-import { ChatRoom } from "./chat_room/chat_room";
-import  {ChatRoomItem }  from "./chatroom_item/chatroom_item";
+import { Chats, joinedGroups } from "test_data/roomchatdata";
+import { ChatRoom } from "views/pages/chat/chat_room/chat_room";
+import  {ChatRoomItem }  from "views/pages/chat/chatroom_item/chatroom_item";
 import {faCommentMedical, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { CreateNewChat } from "./create_chat/create_chat";
+import { CreateNewChat } from "views/pages/chat/create_chat/create_chat";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChatHomeVector, NoConversations } from "../../../assets";
-import { Socket } from "../../../socket";
-import { management_memeber, chats, dm_started, management_password, receive_message, room_created, user_joined, user_left, user_unbanned, user_muted, message_deleted, user_info, messages } from "../../../socket/interface";
+import { ChatHomeVector, NoConversations } from "assets";
+import { Socket } from "socket";
+import { management_memeber, chats, dm_started, management_password, receive_message, room_created, user_joined, user_left, user_unbanned, user_muted, message_deleted, user_info, messages } from "socket/interface";
 
 // interface Props {
 //     username: string,

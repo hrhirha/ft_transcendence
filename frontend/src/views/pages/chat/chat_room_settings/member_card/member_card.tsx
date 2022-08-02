@@ -1,7 +1,7 @@
-import { CircleAvatar } from '../../../../components/circle_avatar/circle_avatar'
-import { SettingsOption } from '../settings_option/settings_option';
+import { CircleAvatar } from 'views/components/circle_avatar/circle_avatar'
+import { SettingsOption } from 'views/pages/chat/chat_room_settings/settings_option/settings_option';
 import { faBan, faCommentSlash, faGamepad, faUserGear } from '@fortawesome/free-solid-svg-icons';
-import { DefaultGame, UltimateGame } from '../../../../../assets';
+import { DefaultGame, UltimateGame } from 'assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 

@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { DefaultGame, LiveGames, UltimateGame } from '../../../assets';
-import { GameCard } from "./game_card/game_card";
-import { LiveGamesCard } from "./live_games_card/live_games_card";
+import { DefaultGame, LiveGames, UltimateGame } from 'assets';
+import { GameCard } from "views/pages/home/game_card/game_card";
+import { LiveGamesCard } from "views/pages/home/live_games_card/live_games_card";
 
 export const Home:React.FC = () => {
     const navigate = useNavigate();

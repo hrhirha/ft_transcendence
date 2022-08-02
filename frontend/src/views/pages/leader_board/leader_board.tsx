@@ -1,11 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import {faClose, faMedal, faRankingStar, faTrophy } from "@fortawesome/free-solid-svg-icons";
-import { CircleAvatar } from "../../components/circle_avatar/circle_avatar";
-import { Numeral } from "../../components/numeral/numeral";
-import { get_leader_board } from "../../../controller/leader_board/leader_board";
+import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
+import { Numeral } from "views/components/numeral/numeral";
+import { get_leader_board } from "controller/leader_board/leader_board";
 import { useNavigate } from "react-router-dom";
-import { useNotif } from "../../components/notif/notif";
+import { useNotif } from "views/components/notif/notif";
 
 interface RowProps {
     rank: number,

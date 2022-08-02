@@ -1,10 +1,10 @@
 import { faUsers, faUsersBetweenLines, faUsersRays, faUsersSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
-import { EmptyBlocking, EmptyFriends, EmptyFriendsRequests, EmptyPending } from "../../../../assets";
-import { get_friendreqs_received, get_friendreqs_sent } from "../../../../controller/user/friendreq";
-import { get_friends, get_friends_blocked, user_info } from "../../../../controller/user/friends";
-import { FriendCard } from "../friend_card/friend_card";
+import { EmptyBlocking, EmptyFriends, EmptyFriendsRequests, EmptyPending } from "assets";
+import { get_friendreqs_received, get_friendreqs_sent } from "controller/user/friendreq";
+import { get_friends, get_friends_blocked, user_info } from "controller/user/friends";
+import { FriendCard } from "views/pages/profile/friend_card/friend_card";
 
 
 

@@ -2,7 +2,7 @@ import { faHome } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { NotFound404 } from "../../../assets";
+import { NotFound404 } from "assets";
 
 export const NotFound:React.FC = () => {
     return (

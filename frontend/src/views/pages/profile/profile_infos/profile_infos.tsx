@@ -1,17 +1,17 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
+import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { faCameraRotate, faCheck, faClose, faPen, faPercent, faTableTennisPaddleBall, faTrophy } from "@fortawesome/free-solid-svg-icons";
-import { buttons, userType } from "../profile";
-import { Numeral } from "../../../components/numeral/numeral";
-import { patch_avatar_upload, patch_edit_fullname } from "../../../../controller/user/edit";
+import { buttons, userType } from "views/pages/profile/profile";
+import { Numeral } from "views/components/numeral/numeral";
+import { patch_avatar_upload, patch_edit_fullname } from "controller/user/edit";
 import { useEffect, useState } from "react";
-import { get_me, get_user_by_username, user_infos } from "../../../../controller/user/user";
-import { useNotif } from "../../../components/notif/notif";
-import { TwoFAButton, TwoFACard } from "../../../components/twofa_card/twofa";
-import { disableTFA, enableTFA } from "../../../../controller/auth/auth";
+import { get_me, get_user_by_username, user_infos } from "controller/user/user";
+import { useNotif } from "views/components/notif/notif";
+import { TwoFAButton, TwoFACard } from "views/components/twofa_card/twofa";
+import { disableTFA, enableTFA } from "controller/auth/auth";
 import { useNavigate, useParams } from "react-router-dom";
-import { Achievement } from "../../../components/achievement/achievement";
+import { Achievement } from "views/components/achievement/achievement";
 
 
 const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, stat: number}) => {

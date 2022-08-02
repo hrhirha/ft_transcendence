@@ -1,4 +1,4 @@
-import api from "../../api/axois";
+import api from "api/axois";
 
 export interface user_infos {
     id: string,

@@ -1,19 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Login } from './views/pages/login/login';
+import { Login } from 'views/pages/login/login';
 import { faPuzzlePiece } from "@fortawesome/free-solid-svg-icons";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { Home } from './views/pages/home/home';
-import { Chat } from './views/pages/chat/chat';
-import { LeaderBoard } from './views/pages/leader_board/leader_board';
-import { Profile } from './views/pages/profile/profile';
-import { NotFound } from './views/pages/not_found/not_found';
-import { AuthChecker } from './views/components/check_auth/auth_checker';
-import "./views/style/index.scss";
-import { Checkpoint } from './views/pages/checkpoint/checkpoint';
-import { GamePlayer } from './views/pages/game_player/game_player';
-import { GameWatcher } from './views/pages/game_watcher/game_watcher';
+import { Home } from 'views/pages/home/home';
+import { Chat } from 'views/pages/chat/chat';
+import { LeaderBoard } from 'views/pages/leader_board/leader_board';
+import { Profile } from 'views/pages/profile/profile';
+import { NotFound } from 'views/pages/not_found/not_found';
+import { AuthChecker } from 'views/components/check_auth/auth_checker';
+import "views/style/index.scss";
+import { Checkpoint } from 'views/pages/checkpoint/checkpoint';
+import { GamePlayer } from 'views/pages/game_player/game_player';
+import { GameWatcher } from 'views/pages/game_watcher/game_watcher';
 
 
 library.add(faPuzzlePiece);

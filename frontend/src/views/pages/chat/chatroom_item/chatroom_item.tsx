@@ -1,4 +1,4 @@
-import { CircleAvatar } from '../../../components/circle_avatar/circle_avatar'
+import { CircleAvatar } from 'views/components/circle_avatar/circle_avatar'
 import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en.json'
 import ReactTimeAgo from 'react-time-ago';

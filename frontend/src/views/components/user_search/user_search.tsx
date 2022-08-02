@@ -1,7 +1,7 @@
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState, useEffect } from "react";
-import { CircleAvatar } from "../circle_avatar/circle_avatar";
+import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 
 const resulst = [
     {id: "5ads4f54adsf", avatar: "https://i.pravatar.cc/301", username: "jhondoe", fullName: "John Doe", status: "online"},

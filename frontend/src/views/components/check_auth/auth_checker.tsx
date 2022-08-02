@@ -3,10 +3,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { get_me, user_infos } from "../../../controller/user/user";
-import { Loading } from "../loading/loading";
-import { NavBar } from "../navbar/navbar";
-import { Notif } from "../notif/notif";
+import { get_me, user_infos } from "controller/user/user";
+import { Loading } from "views/components/loading/loading";
+import { NavBar } from "views/components/navbar/navbar";
+import { Notif } from "views/components/notif/notif";
 
 export const AuthChecker:React.FC<{wrappedContent: React.ReactNode, redirect: string}> = ({wrappedContent, redirect}) => {
     const [loading, setLoading] = useState<boolean>(true);

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { TFAauthenticate } from "../../../controller/auth/auth";
-import { Brand } from "../../components/brand/brand";
+import { TFAauthenticate } from "controller/auth/auth";
+import { Brand } from "views/components/brand/brand";
 
 export const Checkpoint:React.FC = () =>  {
     const [code, setCode] = useState<string>("");

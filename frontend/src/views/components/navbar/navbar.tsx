@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition, faHouse, faRankingStar, faComments, faPowerOff } from "@fortawesome/free-solid-svg-icons";
-import { Brand } from "../brand/brand";
+import { Brand } from "views/components/brand/brand";
 import { NavLink, useLocation } from "react-router-dom";
-import { CircleAvatar } from "../circle_avatar/circle_avatar";
-import { user_infos } from "../../../controller/user/user";
-import { useNotif } from "../notif/notif";
-import { logout } from "../../../controller/auth/auth";
+import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
+import { user_infos } from "controller/user/user";
+import { useNotif } from "views/components/notif/notif";
+import { logout } from "controller/auth/auth";
 
 interface NavButtonData {
     icon: IconDefinition,

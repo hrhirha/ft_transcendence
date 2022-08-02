@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useNavigate } from 'react-router-dom'
-import { CircleAvatar } from '../../../components/circle_avatar/circle_avatar'
-import { buttons, userType } from '../profile'
+import { CircleAvatar } from 'views/components/circle_avatar/circle_avatar'
+import { buttons, userType } from 'views/pages/profile/profile'
 
 interface Props {
 	type: userType,

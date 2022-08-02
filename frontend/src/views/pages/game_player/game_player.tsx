@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { MatchCard } from "../../components/match_card/match_card";
-import { GameView } from "./game_view/game_view";
+import { MatchCard } from "views/components/match_card/match_card";
+import { GameView } from "views/pages/game_player/game_view/game_view";
 
 export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) =>  {
 

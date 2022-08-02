@@ -1,4 +1,4 @@
-import { Bronze, Diamond, Gold, GoldStar, Silver } from "../../../assets";
+import { Bronze, Diamond, Gold, GoldStar, Silver } from "assets";
 
 export const Achievement:React.FC<{score: number}> = ({score}) => {
 
