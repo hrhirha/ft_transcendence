@@ -69,32 +69,53 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         {
             if (!this.tab[client.data.obj.roomId].endGame)
             {
-                await this.prisma.userGame.update({
-                    data: {
-                        score: (client.data.obj.player == "player1") ? client.data.obj.rScore : client.data.obj.lScore,
-                        user: {         
-                            update: {  
-                                score: {
-                                    increment: (client.data.obj.player  == "player1") ? client.data.obj.rScore :  client.data.obj.lScore,
+                this.prisma.$transaction(async () => {
+                    const ranks = await this.prisma.rank.findMany({ select: { id: true, require: true, } });
+    
+                    const u = (await this.prisma.userGame.update({
+                        data: {
+                            score: (client.data.obj.player == "player1") ? client.data.obj.rScore : client.data.obj.lScore,
+                            user: {         
+                                update: {  
+                                    score: {
+                                        increment: (client.data.obj.player  == "player1") ? client.data.obj.rScore :  client.data.obj.lScore,
+                                    },
+                                    wins: {
+                                        increment: ((client.data.obj.player == "player1" && client.data.obj.rScore == 10) ||
+                                                    (client.data.obj.player == "player2" && client.data.obj.lScore == 10)) ? 1 : 0,
+                                    },
+                                    loses: {
+                                        increment: ((client.data.obj.player == "player1" && client.data.obj.rScore != 10) ||
+                                                    (client.data.obj.player == "player2" && client.data.obj.lScore != 10)) ? 1 : 0,
+                                    }  
                                 },
-                                wins: {
-                                    increment: ((client.data.obj.player == "player1" && client.data.obj.rScore == 10) ||
-                                                (client.data.obj.player == "player2" && client.data.obj.lScore == 10)) ? 1 : 0,
-                                },
-                                loses: {
-                                    increment: ((client.data.obj.player == "player1" && client.data.obj.rScore != 10) ||
-                                                (client.data.obj.player == "player2" && client.data.obj.lScore != 10)) ? 1 : 0,
-                                }  
-                            },
+                            }
+                        },
+                        where: {
+                            uid_gid: {
+                                uid: client.data.obj.usrId,
+                                gid: client.data.obj.roomId
+                            }
+                        },
+                        select: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    score: true,
+                                }
+                            }
                         }
-                    },
-                    where: {
-                        uid_gid: {
-                            uid: client.data.obj.usrId,
-                            gid: client.data.obj.roomId
+                    })).user;
+    
+                    const u_rank = (ranks.filter(r => { u.score >= r.require }))[0];
+    
+                    await this.prisma.user.update({
+                        where: { id: u.id },
+                        data: {
+                            rank_id: u_rank.id
                         }
-                    }
-                });
+                    });
+                })
             }
             this.server.to(client.data.obj.roomId).emit("leave");
         }

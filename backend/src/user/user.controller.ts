@@ -5,7 +5,7 @@ import { EditFullNameDto, EditUsernameDto, UserDto, UserIdDto } from './dto';
 import { UserService } from './user.service';
 import { Express, Request, Response } from 'express'
 import { diskStorage } from 'multer';
-import { User } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
 import { randomUUID } from 'crypto';
 import { createReadStream } from 'fs';
@@ -20,14 +20,16 @@ export class UserController {
 
     // User
     @Get('me')
-    me(@GetUser() dto: User)
+    async me(@GetUser() dto: User)
     {
+        console.log(dto)
         return {
             id: dto.id,
             username: dto.username,
             fullName: dto.fullName,
             imageUrl: dto.imageUrl,
             score: dto.score,
+            rank: await (new PrismaClient()).rank.findUnique({where: {id: dto.rank_id}}),
             wins: dto.wins,
             loses: dto.loses,
             status: dto.status,

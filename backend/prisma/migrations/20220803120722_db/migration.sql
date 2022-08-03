@@ -12,12 +12,23 @@ CREATE TABLE "users" (
     "isTfaEnabled" BOOLEAN DEFAULT false,
     "tfaSecret" TEXT DEFAULT E'',
     "score" INTEGER DEFAULT 0,
-    "rank" INTEGER,
     "status" TEXT DEFAULT E'OFFLINE',
     "wins" INTEGER DEFAULT 0,
     "loses" INTEGER DEFAULT 0,
+    "rank_id" TEXT NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ranks" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL DEFAULT E'Wood',
+    "icon" TEXT NOT NULL,
+    "field" TEXT NOT NULL,
+    "require" INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT "ranks_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -114,6 +125,15 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 CREATE UNIQUE INDEX "users_id_isTfaEnabled_key" ON "users"("id", "isTfaEnabled");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "ranks_title_key" ON "ranks"("title");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ranks_icon_key" ON "ranks"("icon");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "ranks_field_key" ON "ranks"("field");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "user_rooms_uid_rid_key" ON "user_rooms"("uid", "rid");
 
 -- CreateIndex
@@ -121,6 +141,9 @@ CREATE UNIQUE INDEX "user_games_uid_gid_key" ON "user_games"("uid", "gid");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_bans_id_uid_rid_key" ON "user_bans"("id", "uid", "rid");
+
+-- AddForeignKey
+ALTER TABLE "users" ADD CONSTRAINT "users_rank_id_fkey" FOREIGN KEY ("rank_id") REFERENCES "ranks"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "friend_requests" ADD CONSTRAINT "friend_requests_snd_id_fkey" FOREIGN KEY ("snd_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

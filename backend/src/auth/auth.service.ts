@@ -18,10 +18,11 @@ export class AuthService {
     async login(dto: UserDto, req: Request)
     {
         const user = await this._prismaS.user.upsert({
-            where: {email: dto.email, },
+            where: {username: dto.username, },
             update: {},
             create: {
-                ...dto
+                ...dto,
+                rank: {connect: {title: 'Wood'}}
             },
             select: {
                 id: true,
