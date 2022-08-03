@@ -1,7 +1,5 @@
 import Phaser from "phaser";
-import background from "assets/images/normal_game_field.svg";
-import paddle from "assets/images/paddle.svg";
-import ball from "assets/images/ball.png";
+import { NormalField, UltimateField, Ball, Paddle } from "assets";
 import youlose from "assets/images/youlose.png";
 import youwin from "assets/images/youwin.png";
 import winner from "assets/images/Winner.png";
@@ -13,7 +11,7 @@ import { text } from "body-parser";
 export default class PingPong extends Phaser.Scene
 {
     ballScale: number = 0.19;
-    paddleScale: number = 0.4;
+    paddleScale: number = 0.25;
     ballspeed: number = 800;
     bounds: number = 100;
     leftScore: number = 9;
@@ -63,12 +61,12 @@ export default class PingPong extends Phaser.Scene
         this.h = this.cameras.main.height;
         this.w = this.cameras.main.width;
 
-        this.load.image('table', background);
+        this.load.image('table', NormalField);
+        this.load.image('ball', Ball);
+        this.load.image('paddle', Paddle);
         this.load.image('loser', loser);
         this.load.image('exit', exit);
         this.load.image('winner', winner);
-        this.load.image('ball', ball);
-        this.load.image('paddle', paddle);
         this.load.image('youwin', youwin);
         this.load.image('youlose', youlose);
     }
