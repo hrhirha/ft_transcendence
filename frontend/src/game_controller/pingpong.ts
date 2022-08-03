@@ -1,7 +1,6 @@
 import Phaser from "phaser";
-import { NormalField, UltimateField, Ball, Paddle } from "assets";
+import { NormalField, UltimateField, Ball, Paddle, YouWin } from "assets";
 import youlose from "assets/images/youlose.png";
-import youwin from "assets/images/youwin.png";
 import winner from "assets/images/Winner.png";
 import loser from "assets/images/Loser.png";
 import exit from "assets/images/Exit.png";
@@ -67,7 +66,7 @@ export default class PingPong extends Phaser.Scene
         this.load.image('loser', loser);
         this.load.image('exit', exit);
         this.load.image('winner', winner);
-        this.load.image('youwin', youwin);
+        this.load.image('youwin', YouWin);
         this.load.image('youlose', youlose);
     }
 //////////////////////// listeners Func '////////////////////////
