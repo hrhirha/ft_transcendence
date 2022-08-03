@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import background from "assets/images/GameField.svg";
+import background from "assets/images/normal_game_field.svg";
 import paddle from "assets/images/paddle.svg";
 import ball from "assets/images/ball.png";
 import youlose from "assets/images/youlose.png";
