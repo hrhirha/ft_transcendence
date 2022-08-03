@@ -6,6 +6,7 @@ import * as cookieParser from 'cookie-parser';
 import { Request, Response } from 'express';
 import { join } from 'path';
 import { AppModule } from './app.module';
+import { PrismaService } from './prisma/prisma.service';
 import { HOST, PORT } from './utils';
 
 @Catch(HttpException)
@@ -33,8 +34,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
 async function createRanks() {
   try {
-
-    await (new PrismaClient).rank.createMany({
+    const pr = new PrismaService();
+    await pr.rank.createMany({
       data: [
         {
           title: 'Wood',
@@ -75,7 +76,7 @@ async function createRanks() {
       ]
     });
   }
-  catch {}
+  catch (e) {}
 }
 
 async function bootstrap() {
@@ -102,8 +103,11 @@ async function bootstrap() {
     credentials: true,
   });
   app.useGlobalFilters(new HttpExceptionFilter);
-  createRanks();
-  await app.listen(PORT);
-  console.log(`server is listening on: ${HOST}:${PORT}`);
+
+  
+  await app.listen(PORT).then(async () => {
+    console.log(`server is listening on: ${HOST}:${PORT}`);
+    await createRanks();
+  });
 }
 bootstrap();

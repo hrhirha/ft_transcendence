@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from './decorator';
 import { EditFullNameDto, EditUsernameDto, UserDto, UserIdDto } from './dto';
 import { UserService } from './user.service';
-import { Express, Request, Response } from 'express'
+import { Request } from 'express'
 import { diskStorage } from 'multer';
 import { PrismaClient, User } from '@prisma/client';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
@@ -22,14 +22,13 @@ export class UserController {
     @Get('me')
     async me(@GetUser() dto: User)
     {
-        console.log(dto)
         return {
             id: dto.id,
             username: dto.username,
             fullName: dto.fullName,
             imageUrl: dto.imageUrl,
             score: dto.score,
-            rank: await (new PrismaClient()).rank.findUnique({where: {id: dto.rank_id}}),
+            rank: await this._userS.getRank(dto.rank_id),
             wins: dto.wins,
             loses: dto.loses,
             status: dto.status,

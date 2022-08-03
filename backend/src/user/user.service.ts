@@ -107,7 +107,12 @@ export class UserService {
         if (user.id === u.id) u.isTfaEnabled = null;
         
         return u;
-    } 
+    }
+
+    async getRank(id: string)
+    {
+        return await this._prismaS.rank.findUnique({ where: { id } });
+    }
 
     async updateStatus(id:string, status: string)
     {

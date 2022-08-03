@@ -107,12 +107,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                         }
                     })).user;
     
-                    const u_rank = (ranks.filter(r => { u.score >= r.require }))[0];
+                    const u_rank = (ranks.filter(r => { u.score >= r.require }));
     
                     await this.prisma.user.update({
                         where: { id: u.id },
                         data: {
-                            rank_id: u_rank.id
+                            rank_id: u_rank[u_rank.length - 1].id
                         }
                     });
                 })
@@ -193,33 +193,53 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         if (client.data.obj.isPlayer)
         {
             this.tab[d.roomId].endGame = true;
-            await this.prisma.userGame.update({
-                
-                data: {
-                    score: (d.player == "player1") ? d.rscore :  d.lscore,
-                    user: {         
-                        update: {  
-                            score: {
-                                increment: (d.player == "player1") ? d.rscore :  d.lscore,
+            this.prisma.$transaction(async () => {
+                const ranks = await this.prisma.rank.findMany({ select: { id: true, require: true, } });
+                const u = (await this.prisma.userGame.update({ 
+                    data: {
+                        score: (d.player == "player1") ? d.rscore :  d.lscore,
+                        user: {         
+                            update: {  
+                                score: {
+                                    increment: (d.player == "player1") ? d.rscore :  d.lscore,
+                                },
+                                wins: {
+                                    increment: ((d.player == "player1" && d.rscore == 10) ||
+                                                (d.player == "player2" && d.lscore == 10)) ? 1 : 0,
+                                },
+                                loses: {
+                                    increment: ((d.player == "player1" && d.rscore != 10) ||
+                                                (d.player == "player2" && d.lscore != 10)) ? 1 : 0,
+                                }  
                             },
-                            wins: {
-                                increment: ((d.player == "player1" && d.rscore == 10) ||
-                                            (d.player == "player2" && d.lscore == 10)) ? 1 : 0,
-                            },
-                            loses: {
-                                increment: ((d.player == "player1" && d.rscore != 10) ||
-                                            (d.player == "player2" && d.lscore != 10)) ? 1 : 0,
-                            }  
-                        },
+                        }
+                    },
+                    where: {
+                        uid_gid: {
+                            uid: d.userId,
+                            gid: d.roomId
+                        }
+                    },
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                score: true,
+                            }
+                        }
                     }
-                },
-                where: {
-                    uid_gid: {
-                        uid: d.userId,
-                        gid: d.roomId
+                })).user;
+
+                const u_rank = (ranks.filter(r => { u.score >= r.require }));
+
+                await this.prisma.user.update({
+                    where: { id: u.id },
+                    data: {
+                        rank_id: u_rank[u_rank.length - 1].id
                     }
-                }
+                });
             });
+
             /// emit restart 
             client.emit('restart', d.status);
             return ;
