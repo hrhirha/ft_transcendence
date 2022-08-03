@@ -19,11 +19,3 @@ export {default as UltimateField} from "assets/images/ultimate_game_field.svg"
 export {default as Ball} from "assets/images/ball.svg"
 export {default as Paddle} from "assets/images/paddle.svg"
 export {default as YouWin} from "assets/images/you_win.svg"
-
-//....
-export {default as WoodBadge} from "assets/images/rank/wood_game_icon.svg"
-export {default as IronBadge} from "assets/images/rank/iron_game_icon.svg"
-export {default as BronzeBadge} from "assets/images/rank/bronze_game_icon.svg"
-export {default as SilverBadge} from "assets/images/rank/silver_game_icon.svg"
-export {default as GoldBadge} from "assets/images/rank/gold_game_icon.svg"
-export {default as DiamondBadge} from "assets/images/rank/diamond_game_icon.svg"

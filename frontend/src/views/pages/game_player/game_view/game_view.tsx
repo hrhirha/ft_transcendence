@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { io,Socket } from "socket.io-client";
 import Phaser from "phaser";
-import PingPong from "game_controller/pingpong";
+import PingPong from "controller/game/pingpong";
 
 export const GameView:React.FC = () =>  {
 

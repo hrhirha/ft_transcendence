@@ -11,7 +11,6 @@ import { useNotif } from "views/components/notif/notif";
 import { TwoFAButton, TwoFACard } from "views/components/twofa_card/twofa";
 import { disableTFA, enableTFA } from "controller/auth/auth";
 import { useNavigate, useParams } from "react-router-dom";
-import { Achievement } from "views/components/achievement/achievement";
 
 
 const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, stat: number}) => {
@@ -177,10 +176,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
             <div className="profileData">
                 <div className="avatar">
                     <CircleAvatar avatarURL={userImage && URL.createObjectURL(userImage) || userInfos?.imageUrl} dimensions={120} showStatus={false}/>
-                    <Achievement score={userInfos?.score} />
-                    {/* <span className={`score ${userInfos?.score >= 150 && "ach"}`}>
-                        <Numeral value={userInfos?.score}/>
-                    </span> */}
+                    {/* <span className="achievement"><img src={getAchievement()![1]} title={getAchievement()![0]} alt="achievement" /></span> */}
                     {editMode && <span className="editAvatar" title="Change Your Avatar" onClick={updateAvatar}>
                         <FontAwesomeIcon icon={faCameraRotate}/>
                     </span>}
