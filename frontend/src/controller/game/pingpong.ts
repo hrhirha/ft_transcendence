@@ -148,11 +148,6 @@ export default class PingPong extends Phaser.Scene
         this.bg = this.add.sprite(this.w / 2, this.h / 2, 'normalField');
 
         /////////////////////////////// text ////////////////////////
-        this.add.text((this.w / 2) , 30, "", {
-            fontSize: "60px",
-            fontFamily: "Poppins_B",
-            align: "center"
-        });
         this.leftScoretxt = this.add.text((this.w / 2) - (this.w / 10) - 40 , 30, this.leftScore.toString(), {
             fontSize: "60px",
             fontFamily: "Poppins_B",
@@ -167,6 +162,7 @@ export default class PingPong extends Phaser.Scene
         
         this.soc.on("saveData", (data: { player: string, is_player: boolean, roomId: string, userId: string } ) => 
         {
+            console.log(data);
             if (data.player == "player1")
             {
                 this.buttonBg.destroy();
@@ -183,15 +179,13 @@ export default class PingPong extends Phaser.Scene
 
         this.soc.on("waiting", () => {
 
-            this.waiting = this.add.text(this.w / 2 , this.h / 2 , "Waiting ...", { font:"35px Arial", align: "center" }).setOrigin(0.5);
-            this.buttonBg = this.add.sprite(this.w - 190 , this.h - 100 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.4);
-            this.leave = this.add.text(this.w - 190 , this.h - 100 , "leave the queue", { font:"35px Arial", align: "center" }).setInteractive().setOrigin(0.5);
-            this.buttonBg.on('pointerdown', () =>
-            {
+            this.waiting = this.add.text(this.w / 2 , this.h / 2 , "Waiting ...", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setOrigin(0.5);
+            this.buttonBg = this.add.sprite(this.w - 190 , this.h - 100 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+            this.leave = this.add.text(this.w - 190 , this.h - 100 , "Leave", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+            this.buttonBg.on('pointerdown', () => {
                 this.leaveFunc();
             }, this);
-            this.leave.on('pointerdown', () =>
-            {
+            this.leave.on('pointerdown', () => {
                 this.leaveFunc();
             }, this);
 
@@ -254,12 +248,16 @@ export default class PingPong extends Phaser.Scene
         });
 
         this.soc.on("watcherEndMatch", () => {
-            this.exit = this.add.image(this.w / 2 , this.h / 2 , 'redButton').setInteractive().setOrigin(0.5);
-            this.exit.on('pointerdown', () => {
-                this.soc.disconnect();
-                this.scene.stop();
+            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+            this.leave = this.add.text(this.w / 2 , this.h / 2 , "exit", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+            this.buttonBg.on('pointerdown', () =>
+            {
+                this.leaveFunc();
             }, this);
-
+            this.leave.on('pointerdown', () =>
+            {
+                this.leaveFunc();
+            }, this);
             let right = this.w - (this.w / 4);
             let left = this.w / 4;
             if (this.rightScore == this.bestOf)
@@ -275,14 +273,29 @@ export default class PingPong extends Phaser.Scene
 
         this.soc.on("restart", (img) => {
             this.add.image(this.w/2, this.h/2 - 100, img).setOrigin(0.5).setScale(0.4);
-            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 100, 'redButton').setInteractive().setOrigin(0.5).setScale(0.4);
-            const text = this.add.text(this.w / 2 , this.h / 2 + 100 , "Click to Restart", { fontSize: "60px",
-            fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.5);
+            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 100, 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
+            const text = this.add.text(this.w / 2 , this.h / 2 + 100 , "Restart", { fontSize: "35px",
+            fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+            //here
+            const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 180 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+            this.leave = this.add.text(this.w / 2 , this.h / 2 + 180 , "Exit", { fontSize: "35px",
+            fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
             
+            exitBg.on('pointerdown', () =>
+            {
+                this.leaveFunc();
+            }, this);
+
+            this.leave.on('pointerdown', () =>
+            {
+                this.leaveFunc();
+            }, this);
+
             text.on('pointerdown',  () => {
                 text.setInteractive(false);
                 this.restartFunc();
             }, this);
+            
             this.buttonBg.on('pointerdown', () => {
                 this.buttonBg.setInteractive(false);
                 this.restartFunc();
@@ -334,14 +347,13 @@ export default class PingPong extends Phaser.Scene
     }
 
     formatTime(seconds:number){
-        // Minutes
-        var minutes = Math.floor(seconds/60);
+
         // Seconds
         var partInSeconds = seconds%60;
         // Adds left zeros to seconds
-        var partInSecondsS = partInSeconds.toString().padStart(2,'0');
+        var partInSecondsS = partInSeconds.toString();
         // Returns formated time
-        return `${minutes}:${partInSecondsS}`;
+        return `${partInSecondsS}`;
     }
 
     onEvent ()
@@ -456,7 +468,7 @@ export default class PingPong extends Phaser.Scene
     
     goalTime()
     {
-        this.initialTime = 2;
+        this.initialTime = 3;
         this.counter = this.add.text(this.w / 2, this.h / 2, '' + this.formatTime(this.initialTime), { fontSize: "60px",
             fontFamily: "Poppins_B", align: "center" }).setOrigin(0.5);
         // Each 1000 ms call onEvent

@@ -276,8 +276,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         }
         client.data.bestOf = 5;
         //  user1 save info /////////////////////
-        if (!this.normaleQue)
+        if (!this.normaleQue || this.normaleQue.userId == user.id)
         {
+            if (this.normaleQue && this.normaleQue.userId == user.id)
+                this.normaleQue.soc.disconnect();
             this.normaleQue = {
                 soc: client,
                 userId: user.id
@@ -285,8 +287,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.emit("waiting");
             return this.normaleQue;
         }
-        if (this.normaleQue.soc == client)
-            return this.normaleQue;
         /////////////////////////////////////////
 
         let connection =  await this.prisma.game.create({
@@ -447,10 +447,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             return user;
         }
         if (!client.data.obj)
-        {
-            console.log(client.data.obj);
-
-        }
+            return ;
         client.data.obj.lScore = data.lScore;
         client.data.obj.rScore = data.rScore;
         client.broadcast.to(data.roomId).emit('recv', data);
