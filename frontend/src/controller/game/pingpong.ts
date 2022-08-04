@@ -1,6 +1,5 @@
 import Phaser from "phaser";
-import { NormalField, UltimateField, Ball, Paddle, YouWin, RedButton, NormalButton } from "assets";
-import youlose from "assets/images/youlose.png";
+import { NormalField, UltimateField, Ball, Paddle, YouWin, YouLose, RedButton, NormalButton } from "assets";
 import { Socket } from "socket.io-client";
 
 export default class PingPong extends Phaser.Scene
@@ -63,7 +62,7 @@ export default class PingPong extends Phaser.Scene
         this.load.image('exit', RedButton);
         this.load.image('winner', NormalButton);
         this.load.image('youwin', YouWin);
-        this.load.image('youlose', youlose);
+        this.load.image('youlose', YouLose);
     }
 //////////////////////// listeners Func '////////////////////////
     leaveFunc() : void
