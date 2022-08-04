@@ -9,6 +9,11 @@ export interface user_infos {
     wins: number,
     loses: number,
     status: string,
+    rank: {
+        title: string,
+        icon: string,
+        field: string
+    }
     isTfaEnabled?: boolean,
     relation?: string
 }

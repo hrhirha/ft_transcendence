@@ -32,6 +32,12 @@ const defaultValues = {
     wins: 0,
     loses: 0,
     status: "",
+    rank: {
+        title: "",
+        icon: "",
+        field: "",
+        require: 0
+    },
     isTfaEnabled: false
 };
 
@@ -176,7 +182,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
             <div className="profileData">
                 <div className="avatar">
                     <CircleAvatar avatarURL={userImage && URL.createObjectURL(userImage) || userInfos?.imageUrl} dimensions={120} showStatus={false}/>
-                    {/* <span className="achievement"><img src={getAchievement()![1]} title={getAchievement()![0]} alt="achievement" /></span> */}
+                    <span className="achievement"><img src={userInfos.rank.icon} title={userInfos.rank.title} alt="achievement" /></span>
                     {editMode && <span className="editAvatar" title="Change Your Avatar" onClick={updateAvatar}>
                         <FontAwesomeIcon icon={faCameraRotate}/>
                     </span>}

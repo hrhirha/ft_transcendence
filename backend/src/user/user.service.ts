@@ -41,7 +41,13 @@ export class UserService {
                 fullName: true,
                 imageUrl: true,
                 score: true,
-                rank: true,
+                rank: {
+                    select: {
+                        title: true,
+                        icon: true,
+                        field: true,
+                    }
+                },
                 wins: true,
                 loses: true,
                 status: true,
@@ -80,7 +86,13 @@ export class UserService {
                 fullName: true,
                 imageUrl: true,
                 score: true,
-                rank: true,
+                rank: {
+                    select: {
+                        title: true,
+                        icon: true,
+                        field: true,
+                    }
+                },
                 wins: true,
                 loses: true,
                 status: true,
@@ -111,7 +123,14 @@ export class UserService {
 
     async getRank(id: string)
     {
-        return await this._prismaS.rank.findUnique({ where: { id } });
+        return await this._prismaS.rank.findUnique({
+            where: { id },
+            select: {
+                title: true,
+                icon: true,
+                field: true,
+            }
+        });
     }
 
     async updateStatus(id:string, status: string)
