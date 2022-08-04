@@ -41,6 +41,14 @@ section.panel {
       font-family: $BFont;
       text-transform: capitalize;
     }
+    span.help {
+      cursor: pointer;
+      font-size: $fsize * .75;
+      margin-top: .75rem;
+      svg {
+        margin-right: .25rem;
+      }
+    }
     img {
       width: 12rem;
       height: 12rem;
