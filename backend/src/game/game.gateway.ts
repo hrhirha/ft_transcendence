@@ -81,12 +81,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                                         increment: (client.data.obj.player  == "player1") ? client.data.obj.rScore :  client.data.obj.lScore,
                                     },
                                     wins: {
-                                        increment: ((client.data.obj.player == "player1" && client.data.obj.rScore == 10) ||
-                                                    (client.data.obj.player == "player2" && client.data.obj.lScore == 10)) ? 1 : 0,
+                                        increment: ((client.data.obj.player == "player1" && client.data.obj.rScore == client.data.bestOf) ||
+                                                    (client.data.obj.player == "player2" && client.data.obj.lScore == client.data.bestOf)) ? 1 : 0,
                                     },
                                     loses: {
-                                        increment: ((client.data.obj.player == "player1" && client.data.obj.rScore != 10) ||
-                                                    (client.data.obj.player == "player2" && client.data.obj.lScore != 10)) ? 1 : 0,
+                                        increment: ((client.data.obj.player == "player1" && client.data.obj.rScore != client.data.bestOf) ||
+                                                    (client.data.obj.player == "player2" && client.data.obj.lScore != client.data.bestOf)) ? 1 : 0,
                                     }  
                                 },
                             }
@@ -207,12 +207,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                                     increment: (d.player == "player1") ? d.rscore :  d.lscore,
                                 },
                                 wins: {
-                                    increment: ((d.player == "player1" && d.rscore == 10) ||
-                                                (d.player == "player2" && d.lscore == 10)) ? 1 : 0,
+                                    increment: ((d.player == "player1" && d.rscore == client.data.bestOf) ||
+                                                (d.player == "player2" && d.lscore == client.data.bestOf)) ? 1 : 0,
                                 },
                                 loses: {
-                                    increment: ((d.player == "player1" && d.rscore != 10) ||
-                                                (d.player == "player2" && d.lscore != 10)) ? 1 : 0,
+                                    increment: ((d.player == "player1" && d.rscore != client.data.bestOf) ||
+                                                (d.player == "player2" && d.lscore != client.data.bestOf)) ? 1 : 0,
                                 }  
                             },
                         }
@@ -274,16 +274,19 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
+        client.data.bestOf = 5;
         //  user1 save info /////////////////////
         if (!this.normaleQue)
         {
             this.normaleQue = {
                 soc: client,
                 userId: user.id
-            };
+            };           
             client.emit("waiting");
             return this.normaleQue;
         }
+        if (this.normaleQue.soc == client)
+            return this.normaleQue;
         /////////////////////////////////////////
 
         let connection =  await this.prisma.game.create({
@@ -320,6 +323,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
+        client.data.bestOf = 3;
         //  user1 save info /////////////////////
         if (!this.ultimateQue)
         {
@@ -441,6 +445,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         {
             client.disconnect();
             return user;
+        }
+        if (!client.data.obj)
+        {
+            console.log(client.data.obj);
+
         }
         client.data.obj.lScore = data.lScore;
         client.data.obj.rScore = data.rScore;

@@ -1,15 +1,18 @@
 import Phaser from "phaser";
 import { NormalField, UltimateField, Ball, Paddle, YouWin, YouLose, RedButton, NormalButton } from "assets";
 import { Socket } from "socket.io-client";
+import { threadId } from "worker_threads";
 
 export default class PingPong extends Phaser.Scene
 {
+    connection: boolean = true;
+    bestOf: number = 5;
     ballScale: number = 0.19;
     paddleScale: number = 0.25;
     ballspeed: number = 800;
     bounds: number = 100;
-    leftScore: number = 9;
-    rightScore: number = 9;
+    leftScore: number = 4;
+    rightScore: number = 4;
     h: number  = 720;
     w: number = 1080;
     bg?: Phaser.GameObjects.Sprite;
@@ -55,12 +58,11 @@ export default class PingPong extends Phaser.Scene
         this.h = this.cameras.main.height;
         this.w = this.cameras.main.width;
 
-        this.load.image('table', NormalField);
+        this.load.image('normalField', NormalField);
         this.load.image('ball', Ball);
         this.load.image('paddle', Paddle);
-        this.load.image('loser', NormalButton);
-        this.load.image('exit', RedButton);
-        this.load.image('winner', NormalButton);
+        this.load.image('normalButton', NormalButton);
+        this.load.image('redButton', RedButton);
         this.load.image('youwin', YouWin);
         this.load.image('youlose', YouLose);
     }
@@ -75,6 +77,8 @@ export default class PingPong extends Phaser.Scene
 
     restartFunc()
     {
+        if (this.re)
+            return ;
         this.soc.removeAllListeners();
         this.re = true;
         this.scene.restart();
@@ -135,13 +139,13 @@ export default class PingPong extends Phaser.Scene
     {
         // console.log(this.soc);
         // console.log(this.type);
-
+        this.bestOf = (this.type == "normaleQue") ? this.bestOf : 3;
         // no collision detection on left side and right side 
         this.physics.world.setBounds(-this.bounds, 0, this.w + (this.bounds * 2), this.h);
         
         // resize the images to fit the window
 
-        this.bg = this.add.sprite(this.w / 2, this.h / 2, 'table');
+        this.bg = this.add.sprite(this.w / 2, this.h / 2, 'normalField');
 
         /////////////////////////////// text ////////////////////////
         this.add.text((this.w / 2) , 30, "", {
@@ -180,7 +184,7 @@ export default class PingPong extends Phaser.Scene
         this.soc.on("waiting", () => {
 
             this.waiting = this.add.text(this.w / 2 , this.h / 2 , "Waiting ...", { font:"35px Arial", align: "center" }).setOrigin(0.5);
-            this.buttonBg = this.add.sprite(this.w - 190 , this.h - 100 , 'exit').setInteractive().setOrigin(0.5);
+            this.buttonBg = this.add.sprite(this.w - 190 , this.h - 100 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.4);
             this.leave = this.add.text(this.w - 190 , this.h - 100 , "leave the queue", { font:"35px Arial", align: "center" }).setInteractive().setOrigin(0.5);
             this.buttonBg.on('pointerdown', () =>
             {
@@ -241,8 +245,8 @@ export default class PingPong extends Phaser.Scene
                     paddleY: this.paddle.y,
                     ballx: (this.ball.body) ? this.ball.body.x: 0,
                     bally: (this.ball.body) ? this.ball.body.y: 0,
-                    lScore: 10,
-                    rScore: 10
+                    lScore: this.bestOf,
+                    rScore: this.bestOf
                 });
             }
             this.soc.disconnect();
@@ -250,7 +254,7 @@ export default class PingPong extends Phaser.Scene
         });
 
         this.soc.on("watcherEndMatch", () => {
-            this.exit = this.add.image(this.w / 2 , this.h / 2 , 'exit').setInteractive().setOrigin(0.5);
+            this.exit = this.add.image(this.w / 2 , this.h / 2 , 'redButton').setInteractive().setOrigin(0.5);
             this.exit.on('pointerdown', () => {
                 this.soc.disconnect();
                 this.scene.stop();
@@ -258,28 +262,29 @@ export default class PingPong extends Phaser.Scene
 
             let right = this.w - (this.w / 4);
             let left = this.w / 4;
-            if (this.rightScore == 10)
+            if (this.rightScore == this.bestOf)
             {
-                this.win = this.add.image(right, this.h/2, "winner").setOrigin(0.5, 0.5).setScale(0.45);
-                this.lose = this.add.image(left, this.h/2, "loser").setOrigin(0.5);
+                this.win = this.add.image(right, this.h/2, "normalButton").setOrigin(0.5, 0.5).setScale(0.45);
+                this.lose = this.add.image(left, this.h/2, "normalButton").setOrigin(0.5);
                 return ;
             }
-            this.win = this.add.image(left, this.h/2, "winner").setOrigin(0.5, 0.5).setScale(0.45);
-            this.lose = this.add.image(right, this.h/2, "loser").setOrigin(0.5);
+            this.win = this.add.image(left, this.h/2, "normalButton").setOrigin(0.5, 0.5).setScale(0.45);
+            this.lose = this.add.image(right, this.h/2, "normalButton").setOrigin(0.5);
 
         });
 
         this.soc.on("restart", (img) => {
-            this.add.image(this.w/2, this.h/2 - 200, img).setOrigin(0.5);
-            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 , 'exit').setInteractive().setOrigin(0.5);
-
-            const text = this.add.text(this.w / 2 , this.h / 2 , "Click to Restart", { fontSize: "60px",
-            fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+            this.add.image(this.w/2, this.h/2 - 100, img).setOrigin(0.5).setScale(0.4);
+            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 100, 'redButton').setInteractive().setOrigin(0.5).setScale(0.4);
+            const text = this.add.text(this.w / 2 , this.h / 2 + 100 , "Click to Restart", { fontSize: "60px",
+            fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.5);
             
             text.on('pointerdown',  () => {
+                text.setInteractive(false);
                 this.restartFunc();
             }, this);
             this.buttonBg.on('pointerdown', () => {
+                this.buttonBg.setInteractive(false);
                 this.restartFunc();
             }, this);
 
@@ -306,18 +311,21 @@ export default class PingPong extends Phaser.Scene
                 this.ball.y = data.bally;
             }
         });
-        if (!this.gameIsStarted && !this.re)
+        if (this.connection)
+        {
+            this.connection = false;
             this.soc.emit(this.type);
+        }
         if (this.re)
         {
             this.re = false;
             this.soc.emit('restart', this.data);
         }
-        else if (!this.End && (this.rightScore >= 10 || this.leftScore >= 10))
+        else if (!this.End && (this.rightScore >= this.bestOf || this.leftScore >= this.bestOf))
         {
             this.gameIsStarted = false;
             this.End = true;
-            const msg = ((this.leftScore >= 10 && this.data.player === "player1") || (this.rightScore >= 10 && this.data.player === "player2")) ? "youwin" : "youlose";
+            const msg = ((this.leftScore >= this.bestOf && this.data.player === "player1") || (this.rightScore >= this.bestOf && this.data.player === "player2")) ? "youwin" : "youlose";
             this.winner(msg);
         }
         else if  (!this.End && this.goal && !this.re && (this.leftScore || this.rightScore))
@@ -488,7 +496,7 @@ export default class PingPong extends Phaser.Scene
                 ballx: (this.ball.body) ? this.ball.body.x: 0,
                 bally: (this.ball.body) ? this.ball.body.y: 0,
                 lScore: this.leftScore,
-                rScore :this.rightScore
+                rScore:this.rightScore
             });
         }
         //////////////////////////////////////////////
