@@ -109,12 +109,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     
                     const u_rank = (ranks.filter(r => { u.score >= r.require }));
     
-                    await this.prisma.user.update({
-                        where: { id: u.id },
-                        data: {
-                            rank_id: u_rank[u_rank.length - 1].id
-                        }
-                    });
+                    if (u_rank.length !== 0)
+                    {
+                        await this.prisma.user.update({
+                            where: { id: u.id },
+                            data: {
+                                rank_id: u_rank[u_rank.length - 1].id
+                            }
+                        });
+                    }
                 })
             }
             this.server.to(client.data.obj.roomId).emit("leave");
@@ -232,12 +235,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
                 const u_rank = (ranks.filter(r => { u.score >= r.require }));
 
-                await this.prisma.user.update({
-                    where: { id: u.id },
-                    data: {
-                        rank_id: u_rank[u_rank.length - 1].id
-                    }
-                });
+                if (u_rank.length !== 0)
+                {
+                    await this.prisma.user.update({
+                        where: { id: u.id },
+                        data: {
+                            rank_id: u_rank[u_rank.length - 1].id
+                        }
+                    });
+                }
             });
 
             /// emit restart 

@@ -1,12 +1,8 @@
 import Phaser from "phaser";
-import { NormalField, UltimateField, Ball, Paddle, YouWin } from "assets";
+import { NormalField, UltimateField, Ball, Paddle, YouWin, RedButton, NormalButton } from "assets";
 import youlose from "assets/images/youlose.png";
-import winner from "assets/images/Winner.png";
-import loser from "assets/images/Loser.png";
-import exit from "assets/images/Exit.png";
 import { Socket } from "socket.io-client";
-import { buttons } from "views/pages/profile/profile";
-import { text } from "body-parser";
+
 export default class PingPong extends Phaser.Scene
 {
     ballScale: number = 0.19;
@@ -63,9 +59,9 @@ export default class PingPong extends Phaser.Scene
         this.load.image('table', NormalField);
         this.load.image('ball', Ball);
         this.load.image('paddle', Paddle);
-        this.load.image('loser', loser);
-        this.load.image('exit', exit);
-        this.load.image('winner', winner);
+        this.load.image('loser', NormalButton);
+        this.load.image('exit', RedButton);
+        this.load.image('winner', NormalButton);
         this.load.image('youwin', YouWin);
         this.load.image('youlose', youlose);
     }
