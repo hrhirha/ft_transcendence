@@ -278,6 +278,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
+        if (client.data.obj)
+            client.leave(client.data.obj.roomId);
         client.data.bestOf = 5;
         //  user1 save info /////////////////////
         if (!this.normaleQue || this.normaleQue.userId == user.id)
@@ -313,8 +315,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         });
         this.insertSocketData(this.normaleQue.soc, this.normaleQue.userId, "player1", connection.id);
         this.insertSocketData(client, user.id, "player2", connection.id);
-        this.server.to(connection.id).emit('startGame');
         this.normaleQue = null;
+        this.server.to(connection.id).emit('startGame');
 
     }
 
@@ -327,6 +329,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
+        if (client.data.obj)
+            client.leave(client.data.obj.roomId);
         client.data.bestOf = 3;
         //  user1 save info /////////////////////
         if (!this.ultimateQue)

@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { NormalField, UltimateField, Ball, Paddle, YouWin, YouLose, RedButton, NormalButton } from "assets";
 import { Socket } from "socket.io-client";
 import { threadId } from "worker_threads";
+import { getTextOfJSDocComment } from "typescript";
 
 export default class PingPong extends Phaser.Scene
 {
@@ -49,6 +50,8 @@ export default class PingPong extends Phaser.Scene
     restartText: Phaser.GameObjects.Text;
     restartClick: boolean = false;
     isPlayer: boolean = false;
+    replay: Phaser.GameObjects.Text;
+    replayClick: boolean = false;
     
     constructor(msoc: Socket, type:string, isPlayer: boolean)
     {
@@ -79,6 +82,19 @@ export default class PingPong extends Phaser.Scene
         this.scene.stop();
         if (this.buttonBg)
             this.buttonBg.destroy();
+    }
+    replayGame() : void
+    {
+        if (this.replayClick)
+            return ;
+        this.soc.removeAllListeners();
+        this.replayClick = true;
+        this.gameIsStarted = false;
+        this.rightScore = 4;
+        this.leftScore = 4;
+        this.connection = true;
+        // this.data = null;
+        this.scene.restart();
     }
 
     restartFunc()
@@ -168,6 +184,7 @@ export default class PingPong extends Phaser.Scene
         
         this.soc.on("saveData", (data: { player: string, is_player: boolean, roomId: string, userId: string } ) => 
         {
+            console.log("Save the data On !!");
             console.log(data);
             if (data.player == "player1")
             {
@@ -179,6 +196,14 @@ export default class PingPong extends Phaser.Scene
         });
         
         this.soc.on("startGame", () => {
+            if (this.waiting || this.buttonBg || this.leave)
+            {
+                this.End = false;
+                this.waiting.destroy();
+                this.buttonBg.destroy();
+                this.leave.destroy();
+                this.replayClick = false;
+            }
             this.goalTime();
         });
 
@@ -239,13 +264,22 @@ export default class PingPong extends Phaser.Scene
 
         this.soc.on("youWin", () => 
         {
-            console.log("herrrre");
             if (this.End && this.data.is_player)
             {
                 if (!this.restartClick)
                 {
                     this.buttonBg.destroy();
                     this.restartText.destroy();
+                    const replayBg = this.add.sprite(this.w / 2 , this.h / 2 + 60 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                    this.replay = this.add.text(this.w / 2 , this.h / 2 + 60 , "New Game", { fontSize: "35px",
+                    fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.8);
+                    replayBg.on('pointerdown', () => {
+                        this.replayGame();
+                    }, this);
+        
+                    this.replay.on('pointerdown', () =>  {
+                        this.replayGame();
+                    }, this);
                     return ;
                 }
                 this.leave = this.add.text(this.w / 2 , this.h / 2 , "One Of players left the Game", { fontSize: "35px",
@@ -264,9 +298,12 @@ export default class PingPong extends Phaser.Scene
             }
             if (!this.End && this.data.is_player)
             {
-                this.ball.destroy();
-                this.paddle.destroy();
-                this.enemy.destroy();
+                if (this.ball)
+                    this.ball.destroy();
+                if (this.paddle)
+                    this.paddle.destroy();
+                if (this.enemy)
+                    this.enemy.destroy();
                 this.add.image(this.w/2, this.h/2 - 100, "youwin").setOrigin(0.5).setScale(0.4);
                 const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 60 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
                 this.leave = this.add.text(this.w / 2 , this.h / 2 + 60 , "Exit", { fontSize: "35px",
@@ -340,7 +377,7 @@ export default class PingPong extends Phaser.Scene
         this.soc.on("restart", (img) => {
             this.add.image(this.w/2, this.h/2 - 100, img).setOrigin(0.5).setScale(0.4);
             this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 60, 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
-            this.restartText = this.add.text(this.w / 2 , this.h / 2 + 60 , "Restart", { fontSize: "35px",
+            this.restartText = this.add.text(this.w / 2 , this.h / 2 + 60 , "Replay", { fontSize: "35px",
             fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
             this.exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 140 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
             this.leave = this.add.text(this.w / 2 , this.h / 2 + 140 , "Exit", { fontSize: "35px",
@@ -396,6 +433,7 @@ export default class PingPong extends Phaser.Scene
         });
         if (this.isPlayer && this.connection)
         {
+            console.log("connection");
             this.connection = false;
             this.soc.emit(this.type);
         }
