@@ -34,7 +34,7 @@ export const TwoFACard:React.FC<{enabled: boolean, onClose: Function, onSubmit: 
                     icon: <FontAwesomeIcon icon={faQuestion}/>,
                     time: 15000,
                     title: "How to use 2FA ?",
-                    description:"Install google authenticator app on your phone and scan QR code above !"
+                    description:"Install an authenticator app on your phone and scan QR code above !"
                 })}><FontAwesomeIcon icon={faQuestionCircle} />How to use</span>}
             </div>
         </section>
