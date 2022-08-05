@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { NormalField, UltimateField, Ball, Paddle, YouWin, YouLose, RedButton, NormalButton } from "assets";
 import { Socket } from "socket.io-client";
-import { threadId } from "worker_threads";
+// import { threadId } from "worker_threads";
 
 export default class PingPong extends Phaser.Scene
 {
@@ -145,7 +145,7 @@ export default class PingPong extends Phaser.Scene
     {
         // console.log(this.soc);
         // console.log(this.type);
-        this.bestOf = (this.type == "normaleQue") ? this.bestOf : 3;
+        this.bestOf = (this.type === "normaleQue") ? this.bestOf : 3;
         // no collision detection on left side and right side 
         this.physics.world.setBounds(-this.bounds, 0, this.w + (this.bounds * 2), this.h);
         
@@ -169,7 +169,7 @@ export default class PingPong extends Phaser.Scene
         this.soc.on("saveData", (data: { player: string, is_player: boolean, roomId: string, userId: string } ) => 
         {
             console.log(data);
-            if (data.player == "player1")
+            if (data.player === "player1")
             {
                 this.buttonBg.destroy();
                 this.leave.destroy();
@@ -326,7 +326,7 @@ export default class PingPong extends Phaser.Scene
             }, this);
             let right = this.w - (this.w / 4);
             let left = this.w / 4;
-            if (this.rightScore == this.bestOf)
+            if (this.rightScore === this.bestOf)
             {
                 this.win = this.add.image(right, this.h/2, "normalButton").setOrigin(0.5, 0.5).setScale(0.45);
                 this.lose = this.add.image(left, this.h/2, "normalButton").setOrigin(0.5);
@@ -387,7 +387,7 @@ export default class PingPong extends Phaser.Scene
                     this.ball.x = data.ballx;
                     this.ball.y = data.bally;
                 }
-                if (this.data.player === "player2" && (this.rightScore != data.rScore || this.leftScore != data.lScore))
+                if (this.data.player === "player2" && (this.rightScore !== data.rScore || this.leftScore !== data.lScore))
                 {
                     this.rightScore = data.rScore;
                     this.leftScore = data.lScore;
@@ -429,7 +429,7 @@ export default class PingPong extends Phaser.Scene
 
     onEvent ()
     {
-        // if (this.timedEvent == undefined)
+        // if (this.timedEvent === undefined)
         //     return ;
 
         if (this.initialTime <= 0)
@@ -454,11 +454,11 @@ export default class PingPong extends Phaser.Scene
         this.gameIsStarted = true;
         // loading a ball add sprite to the 
         this.posx = (this.data.player === "player1") ? 30: this.w - (145 * this.paddleScale) - 30 ;
-        this.eposx = (this.data.player != "player1") ? 30: this.w - (145 * this.paddleScale) - 30 ;
+        this.eposx = (this.data.player !== "player1") ? 30: this.w - (145 * this.paddleScale) - 30 ;
         this.posy = ( ( (this.h / 2) - (this.h / 3) ) / 2) + (this.h / 3);
 
         this.createBall();
-        if (this.data.player == "player1")
+        if (this.data.player === "player1")
             this.paddle = this.add.sprite(this.posx, this.posy, 'paddle').setOrigin(0,0);
         else 
             this.paddle = this.add.sprite((this.w - (44 * this.paddleScale) - 30) , this.posy, 'paddle').setOrigin(0,0);
@@ -475,7 +475,7 @@ export default class PingPong extends Phaser.Scene
 
     createEnemy(w: number) : void
     {
-        if (this.data.player == "player1")
+        if (this.data.player === "player1")
             this.enemy = this.add.sprite((this.w - (w * this.paddleScale) - 30) , this.posy, 'paddle').setOrigin(0,0);
         else
             this.enemy = this.add.sprite(30, this.posy, 'paddle').setOrigin(0,0);
@@ -598,8 +598,7 @@ export default class PingPong extends Phaser.Scene
             });
         }
         //////       check For the goals    //////////
-        if ( this.data.is_player && !this.End && this.ball && ((this.ball.x < 0) || 
-            ( this.data.player == "player2") &&( (this.ball.x - 20 ) < 0 )))
+        if ( this.data.is_player && !this.End && this.ball && (this.ball.x < 0 ||   (this.data.player === "player2" && (this.ball.x - 20 ) < 0 )))
         {
             /******************* add score for the leftUser *******************************/
             this.rightScore += 1;
@@ -628,8 +627,7 @@ export default class PingPong extends Phaser.Scene
             }
             
         }
-        else if (this.data.is_player && !this.End && this.ball && ((this.ball.x > this.w) || 
-            ( this.data.player == "player2") &&( (this.ball.x + 20 ) > this.w) ))
+        else if (this.data.is_player && !this.End && this.ball && ((this.ball.x > this.w) || ( this.data.player === "player2" && (this.ball.x + 20 ) > this.w) ))
         {
             /******************* update the position of the paddle ************************/
             /******************************************************************************/
