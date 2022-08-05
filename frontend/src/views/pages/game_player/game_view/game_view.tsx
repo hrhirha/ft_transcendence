@@ -7,7 +7,7 @@ export const GameView:React.FC = () =>  {
 
     useEffect(() => {
         const sock: Socket = io("ws://127.0.0.1:3001/game", {withCredentials: true});
-        const scene: PingPong = new PingPong(sock, "normaleQue");
+        const scene: PingPong = new PingPong(sock, "normaleQue", true);
         const config: Phaser.Types.Core.GameConfig = {
             type: Phaser.AUTO,
             parent: "gameView",

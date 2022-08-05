@@ -59,7 +59,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         
         if (client.data.obj == undefined)
         {
-            client.emit("leave");
+            // client.emit("leave");
             this.ultimateQue = (this.ultimateQue && client == this.ultimateQue.soc) ? null : this.ultimateQue;
             this.normaleQue = (this.normaleQue && client == this.normaleQue.soc) ? null : this.normaleQue;
             return ;
@@ -69,6 +69,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         {
             if (!this.tab[client.data.obj.roomId].endGame)
             {
+                let factor = (client.data.bestOf == 5) ? { facWin: 5, losFac: 2 } : { facWin: 15, losFac: 5};
+                let winner = ((client.data.obj.player == "player1" && client.data.obj.lScore == client.data.bestOf)
+                || (client.data.obj.player == "player2" && client.data.obj.rScore == client.data.bestOf)) ? factor.facWin : factor.losFac;
                 this.prisma.$transaction(async () => {
                     const ranks = await this.prisma.rank.findMany({ select: { id: true, require: true, } });
     
@@ -78,15 +81,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                             user: {         
                                 update: {  
                                     score: {
-                                        increment: (client.data.obj.player  == "player1") ? client.data.obj.rScore :  client.data.obj.lScore,
+                                        increment: (client.data.obj.player  == "player1") ? client.data.obj.rScore * winner :  client.data.obj.lScore * winner,
                                     },
                                     wins: {
-                                        increment: ((client.data.obj.player == "player1" && client.data.obj.rScore == client.data.bestOf) ||
-                                                    (client.data.obj.player == "player2" && client.data.obj.lScore == client.data.bestOf)) ? 1 : 0,
+                                        increment: ((client.data.obj.player == "player1" && client.data.obj.lScore == client.data.bestOf) ||
+                                                    (client.data.obj.player == "player2" && client.data.obj.rScore == client.data.bestOf)) ? 1 : 0,
                                     },
                                     loses: {
-                                        increment: ((client.data.obj.player == "player1" && client.data.obj.rScore != client.data.bestOf) ||
-                                                    (client.data.obj.player == "player2" && client.data.obj.lScore != client.data.bestOf)) ? 1 : 0,
+                                        increment: ((client.data.obj.player == "player1" && client.data.obj.lScore != client.data.bestOf) ||
+                                                    (client.data.obj.player == "player2" && client.data.obj.rScore != client.data.bestOf)) ? 1 : 0,
                                     }  
                                 },
                             }
@@ -116,11 +119,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                             data: {
                                 rank_id: u_rank[u_rank.length - 1].id
                             }
-                        });
+                        }); 
                     }
                 })
             }
-            this.server.to(client.data.obj.roomId).emit("leave");
+            this.server.to(client.data.obj.roomId).emit("youWin");
         }
         else
             client.leave(client.data.obj.roomId); /// a watcher leave the room 
@@ -152,7 +155,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             true: this.tab[d.roomId].user1.restart;
             this.tab[d.roomId].user2.restart = (d.player === "player2") ?
             true: this.tab[d.roomId].user2.restart;
-            
             if (this.tab[d.roomId].user1.restart && this.tab[d.roomId].user2.restart)
             {
                 const newid  = await this.prisma.game.create({
@@ -193,26 +195,28 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
-        if (client.data.obj.isPlayer)
+        if (client.data.obj && client.data.obj.isPlayer)
         {
+            let factor = (client.data.bestOf == 5) ? { facWin: 5, losFac: 2 } : { facWin: 15, losFac: 5};
+            let winner = ((d.player == "player1" && d.lscore == client.data.bestOf) || (d.player == "player2" && d.rscore == client.data.bestOf)) ? factor.facWin : factor.losFac;
             this.tab[d.roomId].endGame = true;
             this.prisma.$transaction(async () => {
                 const ranks = await this.prisma.rank.findMany({ select: { id: true, require: true, } });
                 const u = (await this.prisma.userGame.update({ 
                     data: {
                         score: (d.player == "player1") ? d.rscore :  d.lscore,
-                        user: {         
+                        user: {
                             update: {  
                                 score: {
-                                    increment: (d.player == "player1") ? d.rscore :  d.lscore,
+                                    increment: (d.player == "player1") ? d.rscore * winner :  d.lscore * winner,
                                 },
                                 wins: {
-                                    increment: ((d.player == "player1" && d.rscore == client.data.bestOf) ||
-                                                (d.player == "player2" && d.lscore == client.data.bestOf)) ? 1 : 0,
+                                    increment: ((d.player == "player1" && d.lscore == client.data.bestOf) ||
+                                                (d.player == "player2" && d.rscore == client.data.bestOf)) ? 1 : 0,
                                 },
                                 loses: {
-                                    increment: ((d.player == "player1" && d.rscore != client.data.bestOf) ||
-                                                (d.player == "player2" && d.lscore != client.data.bestOf)) ? 1 : 0,
+                                    increment: ((d.player == "player1" && d.lscore != client.data.bestOf) ||
+                                                (d.player == "player2" && d.rscore != client.data.bestOf)) ? 1 : 0,
                                 }  
                             },
                         }
@@ -452,5 +456,4 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         client.data.obj.rScore = data.rScore;
         client.broadcast.to(data.roomId).emit('recv', data);
     }
-
 }
