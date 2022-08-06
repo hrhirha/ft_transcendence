@@ -1,14 +1,12 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { User } from 'controller/user/user'
 import { useNavigate } from 'react-router-dom'
 import { CircleAvatar } from 'views/components/circle_avatar/circle_avatar'
 import { buttons, userType } from 'views/pages/profile/profile'
 
 interface Props {
 	type: userType,
-	id: string,
-	avatar: string,
-	fullName: string,
-	username: string,
+	user: User;
 	action: Function
 }
 
@@ -17,12 +15,12 @@ export const FriendCard = (Props : Props) => {
 
 	return (
 		<div className="friendCard">
-			<div className="friendInfos" onClick={() => navigate(`/u/${Props.username}`)}>
+			<div className="friendInfos" onClick={() => navigate(`/u/${Props.user.username}`)}>
 				<div className='avatar'>
-					<CircleAvatar avatarURL={Props.avatar} dimensions={85} showStatus={false}/>
+					<CircleAvatar avatarURL={Props.user.imageUrl} dimensions={85} showStatus={false}/>
 				</div>
-				<h6>{Props.fullName} </h6>
-				<span>@{Props.username} </span>
+				<h6>{Props.user.fullName} </h6>
+				<span>@{Props.user.username} </span>
 			</div>
 			<div className="actionButtons">
 				{buttons.map((button) => {
@@ -32,7 +30,7 @@ export const FriendCard = (Props : Props) => {
 								key={`${button.text.replace(' ', '')}`}
 								className={`btn${button.text.replace(' ', '')}`}
 								onClick={() => {
-									button.onClick(Props.id, Props.action);
+									button.onClick(Props.user.id, Props.action);
 								}}>
 								<FontAwesomeIcon icon={button.icon} />
 								{button.text}

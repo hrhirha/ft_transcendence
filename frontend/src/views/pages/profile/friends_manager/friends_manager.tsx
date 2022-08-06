@@ -94,11 +94,8 @@ export const FriendsManager:React.FC = () => {
                     && friendsList.map((friend: User) => 
                     <FriendCard
                         key={`${friend.id}`}
-                        id={friend.id}
-                        type = {activeTab.valueOf()}
-                        avatar = {friend.imageUrl}
-                        fullName= {friend.fullName}
-                        username = {friend.username}
+                        type={activeTab.valueOf()}
+                        user={friend}
                         action={(id: string) => {setFriendsList(friendsList.filter((u) => u.id !== id))}}
                     />)}
                 </div>

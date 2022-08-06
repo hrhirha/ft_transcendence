@@ -6,31 +6,25 @@ import { Numeral } from "views/components/numeral/numeral";
 import { get_leader_board } from "controller/leader_board/leader_board";
 import { useNavigate } from "react-router-dom";
 import { useNotif } from "views/components/notif/notif";
+import { User } from "controller/user/user";
 
-interface RowProps {
-    rank: number,
-    username: string,
-    avatar: string,
-    fullname: string,
-    score: number
-}
 
-const BoardRow:React.FC<RowProps> = (RowProps) => {
+const BoardRow:React.FC<{index: number, user: User}> = ({index, user}) => {
     const navigate = useNavigate();
     return(
-    <tr id={"_"+RowProps.rank} className="col-sm-12 col-8">
+    <tr id={`_${index}`} className="col-sm-12 col-8">
         <td className="rank">
-            {RowProps.rank === 1 && <span><FontAwesomeIcon icon={faTrophy}/></span>}
-            {RowProps.rank === 2 && <span><FontAwesomeIcon icon={faMedal}/></span>}
-            {RowProps.rank === 3 && <span><FontAwesomeIcon icon={faMedal}/></span>}
-            {RowProps.rank > 3 && <span><Numeral value={RowProps.rank} /></span>}
+            {index === 1 && <span><FontAwesomeIcon icon={faTrophy}/></span>}
+            {index === 2 && <span><FontAwesomeIcon icon={faMedal}/></span>}
+            {index === 3 && <span><FontAwesomeIcon icon={faMedal}/></span>}
+            {index > 3 && <span><Numeral value={index} /></span>}
         </td>
-        <td onClick={() => navigate(`/u/${RowProps.username}`)}>
-            <CircleAvatar avatarURL={RowProps.avatar} dimensions={40} showStatus={false}/>
-            <span className="fullName">{RowProps.fullname}</span>
+        <td onClick={() => navigate(`/u/${user.username}`)}>
+            <CircleAvatar avatarURL={user.imageUrl} dimensions={40} showStatus={false}/>
+            <span className="fullName">{user.fullName}</span>
         </td>
         <td>
-            <span className="score"><Numeral value={RowProps.score}/></span>
+            <span className="score"><Numeral value={user.score}/></span>
         </td>
     </tr>);
 }
@@ -43,7 +37,7 @@ export const LeaderBoard:React.FC = () => {
         (async () => {
             try {
                 const usersList: Array<any> = await get_leader_board();
-                setUsers(usersList.map((u, k) => <BoardRow key={u.id} rank={k + 1} username={u.username} avatar={u.imageUrl} fullname={u.fullName} score={u.score}/>));
+                setUsers(usersList.map((u, k) => <BoardRow key={u.id} index={k + 1} user={u}/>));
             }
             catch(e: any) {
                 pushNotif({

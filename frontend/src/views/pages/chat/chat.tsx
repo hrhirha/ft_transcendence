@@ -1,4 +1,3 @@
-// import { useNavigate } from "react-router-dom";
 import { Chats, joinedGroups } from "test_data/roomchatdata";
 import { ChatRoom } from "views/pages/chat/chat_room/chat_room";
 import  {ChatRoomItem }  from "views/pages/chat/chatroom_item/chatroom_item";
@@ -11,10 +10,6 @@ import { ChatHomeVector, NoConversations } from "assets";
 import { Socket } from "socket";
 import { management_memeber, chats, dm_started, management_password, receive_message, room_created, user_joined, user_left, user_unbanned, user_muted, message_deleted, user_info, messages } from "socket/interface";
 
-// interface Props {
-//     username: string,
-//     image: string,
-// }
 
 enum chatTabs {
     chats,
