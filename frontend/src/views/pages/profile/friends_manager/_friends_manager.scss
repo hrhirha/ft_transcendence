@@ -32,13 +32,13 @@ section#friendsManager {
     .body {
         width: 100%;
         .grid {
-            border-radius: 1rem;
             @include _flex(row, flex-start, flex-start);
-            @include _gradientBg(rgba($dark2, 50), rgba($dark1, 0), 180);
             flex-wrap: wrap;
             height: 100%;
             padding: .5rem;
             .empty {
+                @include _gradientBg(rgba($dark2, 50), rgba($dark1, 0), 180);
+                border-radius: 1rem;
                 @include _flex(column, center, center);
                 @include _selectionOff();
                 width: 100%;
