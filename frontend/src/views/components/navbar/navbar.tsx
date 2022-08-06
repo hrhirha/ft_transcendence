@@ -4,7 +4,7 @@ import { IconDefinition, faHouse, faRankingStar, faComments, faPowerOff } from "
 import { Brand } from "views/components/brand/brand";
 import { NavLink, useLocation } from "react-router-dom";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
-import { user_infos } from "controller/user/user";
+import { User } from "controller/user/user";
 import { useNotif } from "views/components/notif/notif";
 import { logout } from "controller/auth/auth";
 
@@ -73,7 +73,7 @@ const ProfileNavBtn:React.FC<{picture: string}> = ({picture}) => {
     );
 }
 
-const Menu:React.FC<{user: user_infos}> = ({user}) => {
+const Menu:React.FC<{user: User}> = ({user}) => {
     return (
         <ul id="navMenu">
             {MenuData.map((e, i) => <li key={i}><NavButton element={e}/></li>)}
@@ -84,7 +84,7 @@ const Menu:React.FC<{user: user_infos}> = ({user}) => {
     );
 }
 
-export const NavBar:React.FC<{user: user_infos}> = ({user}) => {
+export const NavBar:React.FC<{user: User}> = ({user}) => {
     return (
         <header id="navbar" className="container-fluid">
             <div className="container">

@@ -6,7 +6,7 @@ import { buttons, userType } from "views/pages/profile/profile";
 import { Numeral } from "views/components/numeral/numeral";
 import { patch_avatar_upload, patch_edit_fullname } from "controller/user/edit";
 import { useEffect, useState } from "react";
-import { get_me, get_user_by_username, user_infos } from "controller/user/user";
+import { get_me, get_user_by_username, userDefault, User } from "controller/user/user";
 import { useNotif } from "views/components/notif/notif";
 import { TwoFAButton, TwoFACard } from "views/components/twofa_card/twofa";
 import { disableTFA, enableTFA } from "controller/auth/auth";
@@ -23,28 +23,9 @@ const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, sta
     </span>;
 }
 
-const defaultValues = {
-    id: "",
-    username: "",
-    fullName: "",
-    imageUrl: "",
-    score: 0,
-    wins: 0,
-    loses: 0,
-    status: "",
-    rank: {
-        title: "",
-        icon: "",
-        field: "",
-        require: 0
-    },
-    isTfaEnabled: false
-};
-
-
 export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => {
     const [editMode, setEditMode] = useState<boolean>(false);
-    const [userInfos, setUserInfos] = useState<user_infos>(defaultValues);
+    const [userInfos, setUserInfos] = useState<User>(userDefault);
     const [fullName, setFullName] = useState<string>();
     const [userImage, setUserImage] = useState<any>();
     const [enable2fa, setEnable2fa] = useState<boolean>(false);
@@ -135,14 +116,14 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
         try {
             if (userProfile)
             {
-                const me: user_infos = await get_me();
+                const me: User = await get_me();
                 setUserInfos(me);
                 setFullName(me.fullName);
             }
             else 
             {
                 try {
-                    const user: user_infos = await get_user_by_username(username.username!);
+                    const user: User = await get_user_by_username(username.username!);
                     setUserInfos(user);
                     setFullName(user.fullName);
                     if (user.relation === null)

@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { get_me, user_infos } from "controller/user/user";
+import { get_me, User } from "controller/user/user";
 import { Loading } from "views/components/loading/loading";
 import { NavBar } from "views/components/navbar/navbar";
 import { Notif } from "views/components/notif/notif";
@@ -18,7 +18,7 @@ export const AuthChecker:React.FC<{wrappedContent: React.ReactNode, redirect: st
     useEffect(() =>  {
         (async () => {
             try {
-                const me: user_infos = await get_me();
+                const me: User = await get_me();
                 setUser(me);
                 if (location.pathname != redirect)
                 {

@@ -4,7 +4,7 @@ section.matchCard {
     padding: 1rem;
     margin: .5rem auto;
     border-radius: 1rem;
-    background-color: $light4;
+    @include _gradientBg($light4, $dark3);
     @media (max-width: $lg)
     {
         padding: .5rem;

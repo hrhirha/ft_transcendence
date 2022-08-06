@@ -1,16 +1,10 @@
 import api from "api/axois";
-
-export interface user_info {
-    id: string,
-    username: string,
-    fullName: string,
-    imageUrl :string,
-}
+import { User } from "controller/user/user";
 
 export async function get_friends() {
     try
     {
-        const res : user_info[] = (await api.get("user/friends")).data;
+        const res : User[] = (await api.get("user/friends")).data;
         return res;
     } catch(e: any) {
         throw (e.response.data);
@@ -30,7 +24,7 @@ export async function post_friend_block(user_id : string) {
 export async function get_friends_blocked() {
     try
     {
-        const res : user_info[] = (await api.get("user/friends/blocked")).data;
+        const res : User[] = (await api.get("user/friends/blocked")).data;
         return res;
     } catch(e: any) {
         throw (e.response.data);

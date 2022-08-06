@@ -18,17 +18,18 @@ main#notFound {
         }
         h3 {
             font-size: $fsize * 2;
-            font-family: $XBFont;
+            font-family: $XLFont;
             text-align: center;
+            margin-bottom: 1rem;
+            color: $light3;
             @media (max-width: $sm) {
                 font-size: $fsize * 1.25;
             }
         }
         a {
             text-decoration: none;
-            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $purple, $bgcolor2: $light4, $font: $MFont, $bradius: 5rem);
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $purple, $bgcolor2: $purple, $font: $MFont, $bradius: 5rem);
             font-size: $fsize;
-            font-family: $BFont;
             margin-top: 1rem;
             svg {
                 margin-right: .5rem;

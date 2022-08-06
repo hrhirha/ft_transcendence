@@ -1,11 +1,5 @@
 import api from "api/axois";
-
-interface user_info {
-    id: string,
-    username: string,
-    fullName: string,
-    imageUrl :string,
-}
+import { User } from "controller/user/user";
 
 export async function post_friendreq_accept(user_id : string) {
     try {
@@ -27,7 +21,7 @@ export async function post_friendreq_send(user_id : string) {
 
 export async function get_friendreqs_received() {
     try {
-        const res : user_info[] = (await api.get("user/friendreqs/received")).data;
+        const res : User[] = (await api.get("user/friendreqs/received")).data;
         return res;
     } catch(e: any) {
         throw (e.response.data);
@@ -36,7 +30,7 @@ export async function get_friendreqs_received() {
 
 export async function get_friendreqs_sent() {
     try {
-        const res : user_info[] = (await api.get("user/friendreqs/sent")).data;
+        const res : User[] = (await api.get("user/friendreqs/sent")).data;
         return res;
     } catch(e: any) {
         throw (e.response.data);

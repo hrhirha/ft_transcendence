@@ -3,8 +3,10 @@ section#matchesHistory {
     @include _selectionOff();
     .noHistory {
         @include _flex(column, center, center);
+        margin-top: 3rem;
         img {
             width: 55%;
+            opacity: .75;
             @media (max-width: $sm) {
                 width: 80%;
             }
@@ -19,15 +21,16 @@ section#matchesHistory {
             text-align: center;
             line-height: 1;
             font-size: $fsize * 1.5;
-            font-family: $BFont;
-            color: $light4;
+            font-family: $LFont;
+            color: $dark3;
             @media (max-width: $sm) {
                 max-width: 12rem;
             }
         }
         button.playGame {
-            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $purple, $bgcolor2: $light4);
+            @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $purple, $bgcolor2: $purple);
             font-size: $fsize;
+            margin-top: 1rem;
             svg {
                 margin-right: .5rem;
             }
