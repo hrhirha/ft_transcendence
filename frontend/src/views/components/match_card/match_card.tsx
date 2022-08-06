@@ -12,7 +12,6 @@ interface Player {
         icon: string,
         field: string
     };
-    score: number;
 }
 
 interface Props {
@@ -21,6 +20,10 @@ interface Props {
     player1: Player;
     player2: Player;
     onClick: Function;
+    score: {
+        player1: number,
+        player2: number
+    };
 }
 
 export const MatchCard:React.FC<Props> = (Props) => {
@@ -37,9 +40,9 @@ export const MatchCard:React.FC<Props> = (Props) => {
             <h6 className="fullName">{Props.player1.fullName}</h6>
         </div>
         <div className="scoreBoard">
-            <span className="score">{Props.player1.score}</span>
+            <span className="score">{Props.score.player1}</span>
             <img className="gameType" src={Props.gameModePro ? UltimateGame : DefaultGame} alt="Game Type"/>
-            <span className="score">{Props.player2.score}</span>
+            <span className="score">{Props.score.player2}</span>
         </div>
         <div className="player" onClick={() => navigate(`/u/${Props.player2.username}`)}>
             <h6 className="fullName">{Props.player2.fullName}</h6>

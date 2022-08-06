@@ -16,6 +16,7 @@ section#gameView {
         padding: 0;
         @media (max-width: $sm) {
             width: auto;
+            border-width: .2rem;
         }
         @media (min-width: $md) {
             width: 100%!important;

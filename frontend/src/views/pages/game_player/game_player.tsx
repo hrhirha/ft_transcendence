@@ -8,7 +8,7 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
         <main id="gamePage" className="container">
             <MatchCard
                 matchId="MATCH001"
-                gameModePro={true}
+                gameModePro={ultimateGame}
                 player1={
                     {
                         "avatar": "https://i.pravatar.cc/300?img=11",
@@ -18,8 +18,7 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
                             "title": "Wood",
                             "icon" : "http://127.0.0.1:3001/rank/wood_game_icon.svg",
                             "field" : ""
-                        },
-                        "score": 10
+                        }
                     }
                 }
                 player2={
@@ -31,10 +30,13 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
                             "title": "Wood",
                             "icon" : "http://127.0.0.1:3001/rank/wood_game_icon.svg",
                             "field" : ""
-                        },
-                        "score": 8
+                        }
                     }
                 }
+                score={{
+                    "player1": 0,
+                    "player2": 0
+                }}
                 onClick={() => {}}
                 />
             <GameView />

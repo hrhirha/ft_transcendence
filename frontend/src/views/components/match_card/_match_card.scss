@@ -9,6 +9,9 @@ section.matchCard {
     {
         padding: .5rem;
     }
+    @media (min-width: $lg) {
+        width: 77%!important;
+    }
     @media (min-width: $xl) {
         width: 67%!important;
     }
