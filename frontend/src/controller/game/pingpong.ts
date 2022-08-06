@@ -96,7 +96,6 @@ export default class PingPong extends Phaser.Scene
         this.rightScore = 4;
         this.leftScore = 4;
         this.connection = true;
-        // this.data = null;
         this.scene.restart();
     }
 
@@ -302,7 +301,7 @@ export default class PingPong extends Phaser.Scene
                     this.restartText.destroy();
                     return ;
                 }
-                this.leave = this.add.text(this.w / 2 , this.h / 2 , "One Of players left the Game", { fontSize: "35px",
+                this.leave = this.add.text(this.w / 2 , this.h / 1.20 , "One Of players left the Game", { fontSize: "35px",
                 fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
                 const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 170 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
                 this.leave = this.add.text(this.w / 2 , this.h / 2 + 170 , "Exit", { fontSize: "35px",
@@ -508,6 +507,8 @@ export default class PingPong extends Phaser.Scene
             this.goal = false;
             // this.timedEvent = undefined;
             this.counter.text = "";
+            if (!this.exitEmited)
+                return ;
             if (this.data.is_player)
                 this.startGame();
             else
