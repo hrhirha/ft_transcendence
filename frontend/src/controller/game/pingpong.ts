@@ -210,8 +210,8 @@ export default class PingPong extends Phaser.Scene
         this.soc.on("waiting", () => {
 
             this.waiting = this.add.text(this.w / 2 , this.h / 2 , "Waiting ...", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setOrigin(0.5);
-            this.buttonBg = this.add.sprite(this.w - 120 , this.h - 50 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
-            this.leave = this.add.text(this.w - 120 , this.h - 50 , "Leave", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 1.20 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+            this.leave = this.add.text(this.w / 2 , this.h / 1.20 , "Leave", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
             this.buttonBg.on('pointerdown', () => {
                 this.leaveFunc();
             }, this);
@@ -269,8 +269,8 @@ export default class PingPong extends Phaser.Scene
                 {
                     this.buttonBg.destroy();
                     this.restartText.destroy();
-                    const replayBg = this.add.sprite(this.w / 2 , this.h / 2 + 60 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
-                    this.replay = this.add.text(this.w / 2 , this.h / 2 + 60 , "New Game", { fontSize: "35px",
+                    const replayBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                    this.replay = this.add.text(this.w / 2 , this.h / 2 + 85 , "New Game", { fontSize: "35px",
                     fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.8);
                     replayBg.on('pointerdown', () => {
                         this.replayGame();
@@ -283,8 +283,8 @@ export default class PingPong extends Phaser.Scene
                 }
                 this.leave = this.add.text(this.w / 2 , this.h / 2 , "One Of players left the Game", { fontSize: "35px",
                 fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-                const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 60 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
-                this.leave = this.add.text(this.w / 2 , this.h / 2 + 60 , "Exit", { fontSize: "35px",
+                const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                this.leave = this.add.text(this.w / 2 , this.h / 2 + 85 , "Exit", { fontSize: "35px",
                 fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
      
                 exitBg.on('pointerdown', () => {
@@ -304,8 +304,8 @@ export default class PingPong extends Phaser.Scene
                 if (this.enemy)
                     this.enemy.destroy();
                 this.add.image(this.w/2, this.h/2 - 100, "youwin").setOrigin(0.5).setScale(0.4);
-                const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 60 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
-                this.leave = this.add.text(this.w / 2 , this.h / 2 + 60 , "Exit", { fontSize: "35px",
+                const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                this.leave = this.add.text(this.w / 2 , this.h / 2 + 85 , "Exit", { fontSize: "35px",
                 fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
      
                 exitBg.on('pointerdown', () => {
@@ -322,8 +322,8 @@ export default class PingPong extends Phaser.Scene
             console.log("The Client is Disconnected !! ");
             this.leave = this.add.text(this.w / 2 , this.h / 2 , "One Of players left the Game", { fontSize: "35px",
             fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-            const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 60 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
-            this.leave = this.add.text(this.w / 2 , this.h / 2 + 60 , "Exit", { fontSize: "35px",
+            const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+            this.leave = this.add.text(this.w / 2 , this.h / 2 + 85 , "Exit", { fontSize: "35px",
             fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
  
             exitBg.on('pointerdown', () => {
@@ -375,11 +375,11 @@ export default class PingPong extends Phaser.Scene
 
         this.soc.on("restart", (img) => {
             this.add.image(this.w/2, this.h/2 - 100, img).setOrigin(0.5).setScale(0.4);
-            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 60, 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
-            this.restartText = this.add.text(this.w / 2 , this.h / 2 + 60 , "Replay", { fontSize: "35px",
+            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 85, 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
+            this.restartText = this.add.text(this.w / 2 , this.h / 2 + 85 , "Replay", { fontSize: "35px",
             fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-            this.exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 140 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
-            this.leave = this.add.text(this.w / 2 , this.h / 2 + 140 , "Exit", { fontSize: "35px",
+            this.exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 170 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+            this.leave = this.add.text(this.w / 2 , this.h / 2 + 170 , "Exit", { fontSize: "35px",
             fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
             
             this.exitBg.on('pointerdown', () =>

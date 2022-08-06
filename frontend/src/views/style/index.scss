@@ -90,4 +90,7 @@ body {
     min-height: 100vh;
     min-width: 280px;
     overflow: auto;
+    #root {
+        height: 100%;
+    }
 }
