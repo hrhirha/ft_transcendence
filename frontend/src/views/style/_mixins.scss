@@ -56,3 +56,19 @@
     max-width: $width!important;
     max-height: $width!important;
 }
+
+@mixin _achievment($dimensions_factor: 1, $bottom: -1.2rem) {
+    @include _flex(column, center, center);
+    position: absolute;
+    bottom: $bottom;
+    width: 1rem * $dimensions_factor;
+    height: 1rem * $dimensions_factor;
+    z-index: 6;
+    border-radius: 100%;
+    box-shadow: 0rem 0rem (1rem * $dimensions_factor) (1rem * $dimensions_factor) $dark3;
+    img {
+        min-width: 3rem * $dimensions_factor;
+        max-width: 3rem * $dimensions_factor;
+        position: absolute;
+    }
+}

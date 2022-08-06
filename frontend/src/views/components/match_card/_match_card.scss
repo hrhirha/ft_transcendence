@@ -1,6 +1,5 @@
 section.matchCard {
     @include _flex(row, space-between, center);
-    cursor: pointer;
     width: 95%;
     padding: 1rem;
     margin: .5rem auto;
@@ -10,8 +9,12 @@ section.matchCard {
     {
         padding: .5rem;
     }
+    @media (min-width: $xl) {
+        width: 67%!important;
+    }
    .player {
         @include _flex(row, center, center);
+        cursor: pointer;
         .avatar {
             @include _flex(column, center, center);
             position: relative;
@@ -30,6 +33,9 @@ section.matchCard {
                     @include _square(1.5rem);
                     border-width: 0.15rem;
                 }
+            }
+            .achievment {
+                @include _achievment($dimensions_factor: .4, $bottom: 0rem);
             }
         }
         .fullName {
