@@ -51,6 +51,9 @@ export default class PingPong extends Phaser.Scene
     isPlayer: boolean = false;
     replay: Phaser.GameObjects.Text;
     replayClick: boolean = false;
+    exitEmited: boolean = false;
+    mobile: boolean = false;
+    desktop: boolean = false;
     
     constructor(msoc: Socket, type:string, isPlayer: boolean)
     {
@@ -82,6 +85,7 @@ export default class PingPong extends Phaser.Scene
         if (this.buttonBg)
             this.buttonBg.destroy();
     }
+
     replayGame() : void
     {
         if (this.replayClick)
@@ -158,9 +162,24 @@ export default class PingPong extends Phaser.Scene
 
     create() : void
     {
+        if (this.sys.game.device.os.desktop) {
+            if (this.data.is_player)
+            {
+                this.desktop = true;
+                this.cursors =  this.input.keyboard.createCursorKeys();
+            }
+        }
+        else {
+            if (this.data.is_player)
+            {
+                
+                this.mobile = true;   
+            }
+        }
         // console.log(this.soc);
         // console.log(this.type);
         this.bestOf = (this.type === "normaleQue") ? this.bestOf : 3;
+        this.exitEmited = false;
         // no collision detection on left side and right side 
         this.physics.world.setBounds(-this.bounds, 0, this.w + (this.bounds * 2), this.h);
         
@@ -241,11 +260,12 @@ export default class PingPong extends Phaser.Scene
         {
             this.restartClick = false;
             if (!this.data.is_player)
-            {
-                this.win.destroy();
-                this.lose.destroy();
-                this.exit.destroy();
-            }
+                if (this.win)
+                    this.win.destroy();       
+                if (this.lose)
+                    this.lose.destroy();
+                if (this.lose)
+                    this.lose.destroy();
 
             this.soc.emit("join", {
                 oldData: this.data,
@@ -263,28 +283,29 @@ export default class PingPong extends Phaser.Scene
 
         this.soc.on("youWin", () => 
         {
+            this.exitEmited = true;
             if (this.End && this.data.is_player)
             {
+                const replayBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                this.replay = this.add.text(this.w / 2 , this.h / 2 + 85 , "New Game", { fontSize: "35px",
+                fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.8);
+                replayBg.on('pointerdown', () => {
+                    this.replayGame();
+                }, this);
+    
+                this.replay.on('pointerdown', () =>  {
+                    this.replayGame();
+                }, this);
                 if (!this.restartClick)
                 {
                     this.buttonBg.destroy();
                     this.restartText.destroy();
-                    const replayBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
-                    this.replay = this.add.text(this.w / 2 , this.h / 2 + 85 , "New Game", { fontSize: "35px",
-                    fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.8);
-                    replayBg.on('pointerdown', () => {
-                        this.replayGame();
-                    }, this);
-        
-                    this.replay.on('pointerdown', () =>  {
-                        this.replayGame();
-                    }, this);
                     return ;
                 }
                 this.leave = this.add.text(this.w / 2 , this.h / 2 , "One Of players left the Game", { fontSize: "35px",
                 fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-                const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
-                this.leave = this.add.text(this.w / 2 , this.h / 2 + 85 , "Exit", { fontSize: "35px",
+                const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 170 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                this.leave = this.add.text(this.w / 2 , this.h / 2 + 170 , "Exit", { fontSize: "35px",
                 fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
      
                 exitBg.on('pointerdown', () => {
@@ -304,10 +325,19 @@ export default class PingPong extends Phaser.Scene
                 if (this.enemy)
                     this.enemy.destroy();
                 this.add.image(this.w/2, this.h/2 - 100, "youwin").setOrigin(0.5).setScale(0.4);
-                const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
-                this.leave = this.add.text(this.w / 2 , this.h / 2 + 85 , "Exit", { fontSize: "35px",
+                const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 170 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                this.leave = this.add.text(this.w / 2 , this.h / 2 + 170 , "Exit", { fontSize: "35px",
                 fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-     
+                const replayBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                this.replay = this.add.text(this.w / 2 , this.h / 2 + 85 , "New Game", { fontSize: "35px",
+                fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.8);
+                replayBg.on('pointerdown', () => {
+                    this.replayGame();
+                }, this);
+    
+                this.replay.on('pointerdown', () =>  {
+                    this.replayGame();
+                }, this);
                 exitBg.on('pointerdown', () => {
                     this.leaveFunc();
                 }, this);
@@ -505,9 +535,6 @@ export default class PingPong extends Phaser.Scene
         // create enemy 
         this.createEnemy(this.paddle.width);
         // get the input from the user using "phaser-user-input-system"
-
-        if (this.data.is_player)
-            this.cursors =  this.input.keyboard.createCursorKeys();
     }
 
     createEnemy(w: number) : void
@@ -585,23 +612,49 @@ export default class PingPong extends Phaser.Scene
 
     update () : void
     {
-        if (this.goal || !this.gameIsStarted || !this.data.is_player)
+        if (this.exitEmited || this.goal || !this.gameIsStarted || !this.data.is_player)
             return ;
-        // ///// check For the  movment //////////////// 
-        if (this.data.is_player && !this.End && this.cursors && this.cursors.up.isDown && ( this.paddle.y - 10) >= 0)
+
+        // if(!this.input.activePointer.isDown && isClicking == true) {
+        //     // plane.y = this.input.activePointer.position.y;
+        //     isClicking = false;
+        // } else if(this.input.activePointer.isDown && isClicking == false) {
+        //     isClicking = true;
+        // }
+        // ///// check For the  movment ////////////////
+        if (this.data.is_player && !this.End)
         {
-            this.paddle.y -= 10;
-            if('updateFromGameObject' in this.paddle.body) {
-                this.paddle.body.updateFromGameObject();
+            if (this.desktop && this.cursors && this.cursors.up.isDown && ( this.paddle.y - 10) >= 0)
+            {
+                this.paddle.y -= 10;
+                if('updateFromGameObject' in this.paddle.body) {
+                    this.paddle.body.updateFromGameObject();
+                }
+            }
+            else if (this.mobile && ( this.paddle.y - 10) >= 0)
+            {
+
             }
         }
-        else if (this.data.is_player && !this.End && this.cursors && this.cursors.down.isDown && (this.paddle.y +
-            (Phaser.Math.RoundTo(this.paddle.height * this.paddleScale, 0))
-            + 10) <= this.h)
+        else if (this.data.is_player && !this.End)
         {
-            this.paddle.y += 10;
-            if('updateFromGameObject' in this.paddle.body) {
-                this.paddle.body.updateFromGameObject();
+            if (this.desktop && this.cursors && this.cursors.down.isDown && (this.paddle.y +
+                (Phaser.Math.RoundTo(this.paddle.height * this.paddleScale, 0))
+                + 10) <= this.h)
+                {
+                    this.paddle.y += 10;
+                    if('updateFromGameObject' in this.paddle.body) {
+                        this.paddle.body.updateFromGameObject();
+                    }
+                }
+            else if ( this.mobile && (this.paddle.y +
+                (Phaser.Math.RoundTo(this.paddle.height * this.paddleScale, 0))
+                + 10) <= this.h)
+            {
+                this.paddle.y += 10;
+                if('updateFromGameObject' in this.paddle.body) {
+                    this.paddle.body.updateFromGameObject();
+                }
             }
         }
         /////////////////////////////////////////////////////////
