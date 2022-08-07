@@ -89,6 +89,7 @@ CREATE TABLE "games" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "map" TEXT NOT NULL,
     "is_ultimate" BOOLEAN NOT NULL DEFAULT false,
+    "ongoing" BOOLEAN NOT NULL DEFAULT true,
 
     CONSTRAINT "games_pkey" PRIMARY KEY ("id")
 );

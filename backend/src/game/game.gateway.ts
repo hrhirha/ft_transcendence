@@ -92,7 +92,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                                                     (client.data.obj.player == "player2" && client.data.obj.rScore != client.data.bestOf)) ? 1 : 0,
                                     }  
                                 },
+                            },
+                            // added by hrhirha
+                            game: {
+                                update: {
+                                    ongoing: false,
+                                }
                             }
+                            // end
                         },
                         where: {
                             uid_gid: {
@@ -219,7 +226,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                                                 (d.player == "player2" && d.rscore != client.data.bestOf)) ? 1 : 0,
                                 }  
                             },
+                        },
+                        // added by hrhirha
+                        game: {
+                            update: {
+                                ongoing: false,
+                            }
                         }
+                        // end
                     },
                     where: {
                         uid_gid: {

@@ -136,6 +136,7 @@ model Game {
 
   map         String
   is_ultimate Boolean @default(false)
+  ongoing     Boolean @default(true)
 
   user_game UserGame[]
 

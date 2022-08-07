@@ -37,4 +37,18 @@ export class GameController
             throw new ForbiddenException('unable to get your match history');
         }
     }
+
+    @Get('ongoing')
+    async ongoingGames()
+    {
+        try
+        {
+            return await this._game.ongoingGames();
+        }
+        catch (e)
+        {
+            console.log({code: e.code, message: e.message});
+            throw new ForbiddenException('unable to get ongoing games');
+        }
+    }
 }
