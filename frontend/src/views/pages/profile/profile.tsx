@@ -1,7 +1,7 @@
-import React, { useEffect, useId, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FriendsManager } from "views/pages/profile/friends_manager/friends_manager";
 import { ProfileInfos } from "views/pages/profile/profile_infos/profile_infos";
-import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faUsersGear, faHistory, faBan, faHome} from "@fortawesome/free-solid-svg-icons";
+import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faUsersGear, faHistory} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { MatchesHistory } from "views/pages/profile/matches_history/matches_history";
 import { post_friendreq_accept, post_friendreq_cancel, post_friendreq_decline, post_friendreq_send } from "controller/user/friendreq";
@@ -123,7 +123,7 @@ export const Profile:React.FC<{userProfile: boolean}> = ({userProfile}) => {
                                 </div>
                                 <hr/>
                             </div>
-                            {switchTab === 0 && <MatchesHistory />}
+                            {switchTab === 0 && <MatchesHistory userProfile={userProfile} />}
                             {switchTab === 1 && userProfile && <FriendsManager />}
                         </div>
                     </div>

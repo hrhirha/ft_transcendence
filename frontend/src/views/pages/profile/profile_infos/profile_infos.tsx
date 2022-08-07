@@ -29,6 +29,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
     const [fullName, setFullName] = useState<string>();
     const [userImage, setUserImage] = useState<any>();
     const [enable2fa, setEnable2fa] = useState<boolean>(false);
+    const [detectUpdates, setUpdates] = useState<{avatar: boolean, name: boolean}>({avatar: false, name: false});
     const pushNotif = useNotif();
     const username = useParams();
     const navigate = useNavigate();
@@ -43,6 +44,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
         f.addEventListener("change", async (e : any) => {
             const [file] = e.target.files;
             setUserImage(file);
+            setUpdates({avatar: true, name: detectUpdates.name});
         });
         f.click();
     }
@@ -50,18 +52,25 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
 
     const editProfile = async ()  => {
         try {
-            if (!/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(\-[a-zA-Z]+)*\.?))+$/.test(fullName!) || fullName!.length > 40)
+            console.log(detectUpdates)
+            if (detectUpdates.name && !/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(\-[a-zA-Z]+)*\.?))+$/.test(fullName!) || fullName!.length > 40)
                 throw({message: "Full Name can only contain a-z SP A-Z - . and max length 40"});
-            await patch_edit_fullname(fullName!);
-            await patch_avatar_upload(userImage);
-            await getUserData();
-            pushNotif({
-                id: "UPDATEPROFILESUCCESS",
-                type: "success",
-                icon: <FontAwesomeIcon icon={faCheck}/>,
-                title: "Success",
-                description: "Profile updated successfully!"
-            });
+            if (detectUpdates.name)
+                await patch_edit_fullname(fullName!);
+            if (detectUpdates.avatar)
+                await patch_avatar_upload(userImage);
+            if (detectUpdates.avatar || detectUpdates.name)
+            {
+                await getUserData();
+                pushNotif({
+                    id: "UPDATEPROFILESUCCESS",
+                    type: "success",
+                    icon: <FontAwesomeIcon icon={faCheck}/>,
+                    title: "Success",
+                    description: "Profile updated successfully!"
+                });
+                setUpdates({avatar: false, name: false});
+            }
         }
         catch(e: any) {
             setEditMode(oldMode => !oldMode);
@@ -169,7 +178,10 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                     </span>}
                 </div>
                 <div className="profileMoreData">
-                    <input type="text" disabled={!editMode} className="fullName" placeholder="Full Name" onChange={(e) => setFullName(e.target.value)} value={fullName}/>
+                    {fullName && <input type="text" disabled={!editMode} className="fullName" placeholder="Full Name" onChange={(e) => {
+                        setFullName(e.target.value);
+                        setUpdates({name: true, avatar: detectUpdates.avatar});
+                    }} value={fullName}/>}
                     <span className="userName">@{userInfos?.username}</span>
                     <div className="stats">
                         <StatCard icon={faTableTennisPaddleBall} title="Games" stat={Number(userInfos?.wins + userInfos?.loses)}/>
