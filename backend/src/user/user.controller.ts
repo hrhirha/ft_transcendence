@@ -277,6 +277,8 @@ export class UserController {
     @Get('id/:id')
     async getUserById(@GetUser() user: User, @Param('id') uid: string)
     {
+        if (!(/^c[a-z0-9]{20,}$/.test(uid)))
+            throw new ForbiddenException("Invalid id format");
         try
         {
             return await this._userS.getUserById(user, uid);
@@ -291,6 +293,8 @@ export class UserController {
     @Get('u/:username')
     async getUserByUsername(@GetUser() user: User, @Param('username') username: string)
     {
+        if (!(/^[\w-]{4,20}$/.test(username)))
+            throw new ForbiddenException("Invalid username format");
         try
         {
             return await this._userS.getUserByUsername(user, username);

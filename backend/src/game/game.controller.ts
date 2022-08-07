@@ -1,4 +1,4 @@
-import { Controller, ForbiddenException, Get, UseGuards } from '@nestjs/common';
+import { Controller, ForbiddenException, Get, Param, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
 import { GetUser } from 'src/user/decorator';
@@ -24,12 +24,14 @@ export class GameController
         }
     }
 
-    @Get('match_history')
-    async matchHistory(@GetUser() user: User)
+    @Get('match_history/:username')
+    async matchHistory(@Param('username') username: string)
     {
+        if (!(/^[\w-]{4,20}$/.test(username)))
+            throw new ForbiddenException("Invalid username format");
         try
         {
-            return await this._game.matchHistory(user);
+            return await this._game.matchHistory(username);
         }
         catch (e)
         {

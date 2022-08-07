@@ -24,13 +24,13 @@ export class GameService
         });
     }
 
-    async matchHistory(user: User)
+    async matchHistory(username: string)
     {
         const games = await this._prisma.game.findMany({
             where: {
                 user_game: {
                     some: {
-                        uid: user.id
+                        user: { username }
                     }
                 },
                 ongoing: false,
