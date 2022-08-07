@@ -161,20 +161,6 @@ export default class PingPong extends Phaser.Scene
 
     create() : void
     {
-        if (this.sys.game.device.os.desktop) {
-            if (this.data.is_player)
-            {
-                this.desktop = true;
-                this.cursors =  this.input.keyboard.createCursorKeys();
-            }
-        }
-        else {
-            if (this.data.is_player)
-            {
-                
-                this.mobile = true;   
-            }
-        }
         // console.log(this.soc);
         // console.log(this.type);
         this.bestOf = (this.type === "normaleQue") ? this.bestOf : 3;
@@ -216,9 +202,12 @@ export default class PingPong extends Phaser.Scene
             if (this.waiting || this.buttonBg || this.leave)
             {
                 this.End = false;
-                this.waiting.destroy();
-                this.buttonBg.destroy();
-                this.leave.destroy();
+                if (this.waiting)
+                    this.waiting.destroy();
+                if (this.buttonBg)
+                    this.buttonBg.destroy();
+                if (this.leave)
+                    this.leave.destroy();
                 this.replayClick = false;
             }
             this.goalTime();
@@ -263,9 +252,6 @@ export default class PingPong extends Phaser.Scene
                     this.win.destroy();       
                 if (this.lose)
                     this.lose.destroy();
-                if (this.lose)
-                    this.lose.destroy();
-
             this.soc.emit("join", {
                 oldData: this.data,
                 newRoom: id
@@ -345,6 +331,7 @@ export default class PingPong extends Phaser.Scene
                     this.leaveFunc();
                 }, this);
             }
+
         });
 
         this.soc.on("leave", () => {
@@ -461,7 +448,6 @@ export default class PingPong extends Phaser.Scene
         });
         if (this.isPlayer && this.connection)
         {
-            console.log("connection");
             this.connection = false;
             this.soc.emit(this.type);
         }
@@ -495,9 +481,6 @@ export default class PingPong extends Phaser.Scene
 
     onEvent ()
     {
-        // if (this.timedEvent === undefined)
-        //     return ;
-
         if (this.initialTime <= 0)
             return ;
         this.initialTime -= 1; // One second
@@ -505,9 +488,8 @@ export default class PingPong extends Phaser.Scene
         if (this.initialTime <= 0)
         {
             this.goal = false;
-            // this.timedEvent = undefined;
             this.counter.text = "";
-            if (!this.exitEmited)
+            if (this.exitEmited)
                 return ;
             if (this.data.is_player)
                 this.startGame();
@@ -519,6 +501,19 @@ export default class PingPong extends Phaser.Scene
 
     startGame() : void
     {
+        if (this.sys.game.device.os.desktop) {
+            if (this.isPlayer)
+            {
+                this.desktop = true;
+                this.cursors =  this.input.keyboard.createCursorKeys();
+            }
+        }
+        else {
+            if (this.isPlayer)
+            {
+                this.mobile = true;   
+            }
+        }
         this.gameIsStarted = true;
         // loading a ball add sprite to the 
         this.posx = (this.data.player === "player1") ? 30: this.w - (145 * this.paddleScale) - 30 ;
@@ -613,7 +608,7 @@ export default class PingPong extends Phaser.Scene
 
     update () : void
     {
-        if (this.exitEmited || this.goal || !this.gameIsStarted || !this.data.is_player)
+        if (this.exitEmited || this.goal || !this.gameIsStarted || !this.isPlayer)
             return ;
 
         // if(!this.input.activePointer.isDown && isClicking == true) {
@@ -623,40 +618,43 @@ export default class PingPong extends Phaser.Scene
         //     isClicking = true;
         // }
         // ///// check For the  movment ////////////////
-        if (this.data.is_player && !this.End)
+        if (this.desktop && !this.End)
         {
-            if (this.desktop && this.cursors && this.cursors.up.isDown && ( this.paddle.y - 10) >= 0)
+            if (this.cursors && this.cursors.up.isDown && ( this.paddle.y - 10) >= 0)
             {
+
                 this.paddle.y -= 10;
                 if('updateFromGameObject' in this.paddle.body) {
                     this.paddle.body.updateFromGameObject();
                 }
             }
-            else if (this.mobile && ( this.paddle.y - 10) >= 0)
-            {
-
-            }
-        }
-        else if (this.data.is_player && !this.End)
-        {
-            if (this.desktop && this.cursors && this.cursors.down.isDown && (this.paddle.y +
-                (Phaser.Math.RoundTo(this.paddle.height * this.paddleScale, 0))
-                + 10) <= this.h)
-                {
-                    this.paddle.y += 10;
-                    if('updateFromGameObject' in this.paddle.body) {
-                        this.paddle.body.updateFromGameObject();
-                    }
-                }
-            else if ( this.mobile && (this.paddle.y +
-                (Phaser.Math.RoundTo(this.paddle.height * this.paddleScale, 0))
-                + 10) <= this.h)
+            else if (this.cursors && this.cursors.down.isDown && (this.paddle.y +
+            (Phaser.Math.RoundTo(this.paddle.height * this.paddleScale, 0))
+            + 10) <= this.h)
             {
                 this.paddle.y += 10;
                 if('updateFromGameObject' in this.paddle.body) {
                     this.paddle.body.updateFromGameObject();
                 }
             }
+        }
+        else if (this.mobile && !this.End)
+        {
+            // if (( this.paddle.y - 10) >= 0)
+            // {
+            //     console.log("mobile control");
+            // }
+            // else if ((this.paddle.y +
+            //     (Phaser.Math.RoundTo(this.paddle.height * this.paddleScale, 0))
+            //     + 10) <= this.h)
+            // {
+            //     console.log("mobile control");
+
+            //     this.paddle.y += 10;
+            //     if('updateFromGameObject' in this.paddle.body) {
+            //         this.paddle.body.updateFromGameObject();
+            //     }
+            // }
         }
         /////////////////////////////////////////////////////////
 
