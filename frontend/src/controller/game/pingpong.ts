@@ -55,6 +55,7 @@ export default class PingPong extends Phaser.Scene
     exitEmited: boolean = false;
     mobile: boolean = false;
     desktop: boolean = false;
+    imgbg: string = undefined;
     
     constructor(msoc: Socket, type:string, isPlayer: boolean)
     {
@@ -70,6 +71,7 @@ export default class PingPong extends Phaser.Scene
         this.w = this.cameras.main.width;
 
         this.load.image('normalField', NormalField);
+        this.load.image('ultimateField', UltimateField);
         this.load.image('ball', Ball);
         this.load.image('paddle', Paddle);
         this.load.image('normalButton', NormalButton);
@@ -141,6 +143,8 @@ export default class PingPong extends Phaser.Scene
 
         if (!this.enemy && !this.ball && !this.paddle)
         {
+            this.imgbg = d.mapUrl;
+            
             this.createObjects(d.ballx, d.bally, d.lpaddle, d.rpaddle);
             return ;
         }
@@ -169,9 +173,10 @@ export default class PingPong extends Phaser.Scene
         // no collision detection on left side and right side 
         this.physics.world.setBounds(-this.bounds, 0, this.w + (this.bounds * 2), this.h);
         
+        console.log(this.type);
         // resize the images to fit the window
-
-        this.bg = this.add.sprite(this.w / 2, this.h / 2, 'normalField');
+        this.imgbg = ( !this.imgbg && this.type === "normaleQue") ? "normalField" : "ultimateField";
+        this.bg = this.add.sprite(this.w / 2, this.h / 2, this.imgbg);
 
         /////////////////////////////// text ////////////////////////
         this.leftScoretxt = this.add.text((this.w / 2) - (this.w / 10) - 40 , 30, this.leftScore.toString(), {
@@ -188,13 +193,15 @@ export default class PingPong extends Phaser.Scene
 
         this.soc.on("saveData", (data: { player: string, is_player: boolean, roomId: string, userId: string } ) => 
         {
-            console.log("Save the data On !!");
             console.log(data);
             if (data.player === "player1")
             {
-                this.buttonBg.destroy();
-                this.leave.destroy();
-                this.waiting.destroy();
+                if (this.buttonBg)
+                    this.buttonBg.destroy();
+                if (this.leave)
+                    this.leave.destroy();
+                if (this.waiting)
+                    this.waiting.destroy();
             }
             this.data = data;
         });
@@ -266,6 +273,12 @@ export default class PingPong extends Phaser.Scene
                 return ;
             this.watcherRender(data);
         });
+        this.soc.on("map", (Map_url: string) => 
+        {
+            this.imgbg = Map_url;
+            this.bg = this.add.sprite(this.w / 2, this.h / 2, this.imgbg);
+        });
+
 
         this.soc.on("youWin", () => 
         {
@@ -284,8 +297,10 @@ export default class PingPong extends Phaser.Scene
                 }, this);
                 if (!this.restartClick)
                 {
-                    this.buttonBg.destroy();
-                    this.restartText.destroy();
+                    if (this.buttonBg)
+                        this.buttonBg.destroy();
+                    if (this.restartText)
+                        this.restartText.destroy();
                     return ;
                 }
                 this.leave = this.add.text(this.w / 2 , this.h / 1.20 , "One Of players left the Game", { fontSize: "35px",
@@ -573,8 +588,10 @@ export default class PingPong extends Phaser.Scene
     {
         if (this.ball)
             this.ball.destroy();
-        this.paddle.destroy();
-        this.enemy.destroy();
+        if (this.paddle)
+            this.paddle.destroy();
+        if (this.enemy)
+            this.enemy.destroy();
         this.input.keyboard.enabled = false;
         this.soc.emit('endGame', {
             player: this.data.player,
@@ -759,6 +776,7 @@ export default class PingPong extends Phaser.Scene
                         rScore: this.rightScore,
                         endGame: this.End,
                         goal: this.goal,
+                        mapUrl: this.imgbg,
                     });
                 }
                 // this.soc.removeAllListeners();
