@@ -22,6 +22,40 @@ main#homePage {
     .center {
         @include _flex(row, center, center);
         width: 100%;
+        .sectionTitle {
+            @include _flex(row, center, center);
+            max-width: 15rem;
+            margin: 1.5rem auto;
+            svg {
+                font-size: $fsize * 3.3;
+                path {
+                    color: $gold;
+                }
+            }
+            h2 {
+                margin-left: .5rem;
+                font-family: $XBFont;
+                color: $light3;
+                text-transform: uppercase;
+                font-size: $fsize * 2.2;
+                line-height: .8;
+                width: min-content;
+            }
+            @media (max-width: $sm) {
+                margin-bottom: .5rem;
+                h2 {
+                    font-size: $fsize * 1.5;
+                }
+                svg {
+                    font-size: $fsize * 2.25;
+                }
+            }
+        }
+        .searchForm {
+            .searchInput {
+                width: 100%;
+            }
+        }
     }
     
 }
