@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { DefaultGame, LiveGames, UltimateGame } from 'assets';
 import { GameCard } from "views/pages/home/game_card/game_card";
 import { LiveGamesCard } from "views/pages/home/live_games_card/live_games_card";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPeoplePulling, faPingPongPaddleBall } from "@fortawesome/free-solid-svg-icons";
+import { UserSearchForm } from "views/components/user_search/user_search";
 
 export const Home:React.FC = () => {
     const navigate = useNavigate();
@@ -10,6 +13,15 @@ export const Home:React.FC = () => {
     return (
         <main id="homePage">
             <div className='container'>
+                {/* <div className='row center' >
+                    <div className="sectionTitle">
+                        <FontAwesomeIcon icon={faPingPongPaddleBall}/>
+                        <h2>Invite Player</h2>
+                    </div>
+                    <div className="searchForm">
+                        <UserSearchForm callback={() => {}}/>
+                    </div>
+                </div> */}
                 <div className='row center' >
                     <div className='col col-lg-8'>
                         <LiveGamesCard onClick={() => {navigate('/watch', {replace: true})}} title="Watch Live games" background={LiveGames}/>

@@ -21,8 +21,14 @@ section#searchUser {
         svg {
             position: absolute;
             top: .6rem;
-            left: .75rem;
+            left: 9%;
             z-index: 5;
+            @media(max-width: $sm) {
+                left: 8%;
+            }
+            @media(max-width: $xs) {
+                left: 7.25%;
+            }
             path {
                 color: $light3;
             }
