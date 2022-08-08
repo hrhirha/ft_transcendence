@@ -611,7 +611,7 @@ export default class PingPong extends Phaser.Scene
     {
         if (this.exitEmited || this.goal || !this.gameIsStarted || !this.isPlayer)
             return ;
-            
+
         // ///// check For the  movment ////////////////
         if (this.desktop && !this.End)
         {
@@ -648,9 +648,9 @@ export default class PingPong extends Phaser.Scene
                 this.isClicking = true;
             }
         
-            if(this.swipeDirection == "down" && this.paddle.y < 500) {
-                if(Math.abs(this.paddle.y - 500) <= 10) {
-                    this.paddle.y = 500;
+            if(this.swipeDirection == "down" && this.paddle.y < 530) {
+                if(Math.abs(this.paddle.y - 530) <= 10) {
+                    this.paddle.y = 530;
                     if('updateFromGameObject' in this.paddle.body) {
                         this.paddle.body.updateFromGameObject();
                     }
@@ -660,9 +660,9 @@ export default class PingPong extends Phaser.Scene
                         this.paddle.body.updateFromGameObject();
                     }
                 }
-            } else if(this.swipeDirection == "up" && this.paddle.y > 40) {
-                if(Math.abs(this.paddle.y - 40) <= 10) {
-                    this.paddle.y = 40;
+            } else if(this.swipeDirection == "up" && this.paddle.y > 15) {
+                if(Math.abs(this.paddle.y - 15) <= 10) {
+                    this.paddle.y = 15 ;
                     if('updateFromGameObject' in this.paddle.body) {
                         this.paddle.body.updateFromGameObject();
                     }
