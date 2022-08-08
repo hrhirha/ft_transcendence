@@ -1,6 +1,7 @@
 main#loginPage {
     @include _flex(column, center, center);
     @include _selectionOff();
+    background-size: cover;
     min-height: 100vh;
     > div {
         @include _flex(column, space-evenly, center);

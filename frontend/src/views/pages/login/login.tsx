@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Brand } from "views/components/brand/brand";
-import { Logo1337, Logo42} from 'assets';
+import { Logo1337, Logo42, Background} from 'assets';
 
 
 export const Login:React.FC = () =>  {
@@ -11,7 +11,7 @@ export const Login:React.FC = () =>  {
     }
     
     return (
-        <main id="loginPage">
+        <main id="loginPage" style={{backgroundImage: Background}}>
             <div>
                 <Brand/>
                 <h4>Welcome !
