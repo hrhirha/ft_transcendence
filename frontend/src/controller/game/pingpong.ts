@@ -1,7 +1,6 @@
 import Phaser from "phaser";
 import { NormalField, UltimateField, Ball, Paddle, YouWin, YouLose, RedButton, NormalButton } from "assets";
 import { Socket } from "socket.io-client";
-// import { threadId } from "worker_threads";
 
 export default class PingPong extends Phaser.Scene
 {
@@ -180,13 +179,13 @@ export default class PingPong extends Phaser.Scene
             fontFamily: "Poppins_B",
             align: "center",
         });
-        
+
         this.rightScoretxt = this.add.text((this.w / 2) + (this.w / 10) , 30, this.rightScore.toString(), {
             fontSize: "60px",
             fontFamily: "Poppins_B",
             align: "center"
         });
-        
+
         this.soc.on("saveData", (data: { player: string, is_player: boolean, roomId: string, userId: string } ) => 
         {
             console.log("Save the data On !!");
@@ -199,7 +198,7 @@ export default class PingPong extends Phaser.Scene
             }
             this.data = data;
         });
-        
+
         this.soc.on("startGame", () => {
             if (this.waiting || this.buttonBg || this.leave)
             {
@@ -612,13 +611,7 @@ export default class PingPong extends Phaser.Scene
     {
         if (this.exitEmited || this.goal || !this.gameIsStarted || !this.isPlayer)
             return ;
-
-        // if(!this.input.activePointer.isDown && isClicking == true) {
-        //     // plane.y = this.input.activePointer.position.y;
-        //     isClicking = false;
-        // } else if(this.input.activePointer.isDown && isClicking == false) {
-        //     isClicking = true;
-        // }
+            
         // ///// check For the  movment ////////////////
         if (this.desktop && !this.End)
         {
@@ -667,9 +660,9 @@ export default class PingPong extends Phaser.Scene
                         this.paddle.body.updateFromGameObject();
                     }
                 }
-            } else if(this.swipeDirection == "up" && this.paddle.y > 150) {
-                if(Math.abs(this.paddle.y - 150) <= 10) {
-                    this.paddle.y = 150;
+            } else if(this.swipeDirection == "up" && this.paddle.y > 40) {
+                if(Math.abs(this.paddle.y - 40) <= 10) {
+                    this.paddle.y = 40;
                     if('updateFromGameObject' in this.paddle.body) {
                         this.paddle.body.updateFromGameObject();
                     }
@@ -681,19 +674,6 @@ export default class PingPong extends Phaser.Scene
                 }
             }
         }
-            // else if ((this.paddle.y +
-            //     (Phaser.Math.RoundTo(this.paddle.height * this.paddleScale, 0))
-            //     + 10) <= this.h)
-            // {
-            //     console.log("mobile control");
-
-            //     this.paddle.y += 10;
-            //     if('updateFromGameObject' in this.paddle.body)
-            //     {
-            //         this.paddle.body.updateFromGameObject();
-            //     }
-            // }
-            // }
         /////////////////////////////////////////////////////////
 
         
