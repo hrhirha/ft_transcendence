@@ -65,28 +65,27 @@ export class UserService {
                 wins: true,
                 loses: true,
                 status: true,
-                isTfaEnabled: true,
-                sentReq: {
-                    where: {
-                        rcv_id: user.id
-                    },
-                    select: { status: true, }
-                },
-                recievedReq: {
-                    where: {
-                        snd_id: user.id
-                    },
-                    select: { status: true, }
-                },
+                // sentReq: {
+                //     where: {
+                //         rcv_id: user.id
+                //     },
+                //     select: { status: true, }
+                // },
+                // recievedReq: {
+                //     where: {
+                //         snd_id: user.id
+                //     },
+                //     select: { status: true, }
+                // },
             }
         });
         if (arr.length === 0)
             throw new ForbiddenException('no users were found');
 
-        arr.forEach(u => {
-            u["relation"] = this._getFriendRelation(user, u);
-            delete u.sentReq && delete u.recievedReq;
-        });
+        // arr.forEach(u => {
+        //     u["relation"] = this._getFriendRelation(user, u);
+        //     delete u.sentReq && delete u.recievedReq;
+        // });
         return arr;
     }
 
@@ -110,7 +109,6 @@ export class UserService {
                 wins: true,
                 loses: true,
                 status: true,
-                isTfaEnabled: true,
                 sentReq: {
                     where: {
                         rcv_id: user.id
@@ -130,7 +128,6 @@ export class UserService {
 
         u["relation"] = this._getFriendRelation(user, u);
         delete u.sentReq && delete u.recievedReq;
-        if (user.id === u.id) u.isTfaEnabled = null;
         
         return u;
     }
@@ -155,7 +152,6 @@ export class UserService {
                 wins: true,
                 loses: true,
                 status: true,
-                isTfaEnabled: true,
                 sentReq: {
                     where: {
                         OR: [{ snd_id: user.id }, { rcv_id: user.id }]
@@ -175,7 +171,6 @@ export class UserService {
 
         u["relation"] = this._getFriendRelation(user, u);
         delete u.sentReq && delete u.recievedReq;
-        if (user.id === u.id) u.isTfaEnabled = null;
         
         return u;
     }

@@ -727,6 +727,7 @@ export class ChatService {
             select: {
                 id: true,
                 username: true,
+                status: true,
                 sentReq: {
                     where: { rcv_id: user.id, status: friend_status.BLOCKED },
                     select: { rcv_id: true, }
@@ -741,6 +742,8 @@ export class ChatService {
             throw new WsException('user not found');
         if (u.recievedReq.length === 1 || u.sentReq.length === 1)
             throw new WsException('your friend status is blocked');
+        if (u.status === user_status.INGAME)
+            throw new WsException('user already playing');
         return u;
     }
 

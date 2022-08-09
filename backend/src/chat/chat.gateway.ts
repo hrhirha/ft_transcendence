@@ -496,9 +496,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const d = await this._chat.inviteToGame(u, opponent);
             const sockets = await this.server.fetchSockets();
 
-            sockets.forEach((s) => {
-                s.data.username === d.username && this.server.to(s.id).emit('game_invitation', { id: u.id });
-            });
+            const so = sockets.find(s=>{s.data.username === d.username})
+            so && this.server.to(so.id).emit('game_invitation', {id: u.id});
+
+            // sockets.forEach((s) => {
+            //     if (s.data.username === d.username)
+            //     {
+            //         this.server.to(s.id).emit('game_invitation', { id: u.id });
+            //         return ;
+            //     }
+            // });
         }
         catch (e)
         {

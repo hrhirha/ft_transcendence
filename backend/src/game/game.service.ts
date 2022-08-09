@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -47,6 +46,17 @@ export class GameService
                                 username: true,
                                 fullName: true,
                                 imageUrl: true,
+                                score: true,
+                                rank: {
+                                    select: {
+                                        title: true,
+                                        icon: true,
+                                        field: true,
+                                    }
+                                },
+                                wins: true,
+                                loses: true,
+                                status: true,
                             }
                         },
                         score: true,
@@ -57,12 +67,15 @@ export class GameService
 
         let hist = [];
         games.forEach(game => {
-            const p1 = game.user_game[0].user;
-            p1["score"] = game.user_game[0].score;
-            const p2 = game.user_game[1].user;
-            p2["score"] = game.user_game[1].score;
+            const ug1 = game.user_game[0];
+            const ug2 = game.user_game[1];
+            const p1 = ug1.user;
+            const p2 = ug2.user;
+
+            game['score'] = { p1: ug1.score, p2: ug2.score }
 
             delete game.user_game;
+            
             hist.push({ ...game , p1, p2 });
         });
         return hist;
@@ -86,6 +99,17 @@ export class GameService
                                 username: true,
                                 fullName: true,
                                 imageUrl: true,
+                                score: true,
+                                rank: {
+                                    select: {
+                                        title: true,
+                                        icon: true,
+                                        field: true,
+                                    }
+                                },
+                                wins: true,
+                                loses: true,
+                                status: true,
                             }
                         },
                         score: true,
@@ -96,12 +120,15 @@ export class GameService
 
         let hist = [];
         games.forEach(game => {
-            const p1 = game.user_game[0].user;
-            p1["score"] = game.user_game[0].score;
-            const p2 = game.user_game[1].user;
-            p2["score"] = game.user_game[1].score;
+            const ug1 = game.user_game[0];
+            const ug2 = game.user_game[1];
+            const p1 = ug1.user;
+            const p2 = ug2.user;
+
+            game['score'] = { p1: ug1.score, p2: ug2.score }
 
             delete game.user_game;
+
             hist.push({ ...game , p1, p2 });
         });
         return hist;
