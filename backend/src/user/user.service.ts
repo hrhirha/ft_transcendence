@@ -31,6 +31,65 @@ export class UserService {
         return relation_status.BLOCKED;
     }
 
+    async getAll(user: User)
+    {
+        const arr = await this._prismaS.user.findMany({
+            where : {
+                id: { not: user.id },
+                AND: [
+                    {
+                        sentReq: {
+                            none: { rcv_id: user.id, status: friend_status.BLOCKED }
+                        }
+                    },
+                    {
+                        recievedReq: {
+                            none: { snd_id: user.id, status: friend_status.BLOCKED }
+                        }
+                    }
+                ]
+            },
+            select: {
+                id: true,
+                username: true,
+                fullName: true,
+                imageUrl: true,
+                score: true,
+                rank: {
+                    select: {
+                        title: true,
+                        icon: true,
+                        field: true,
+                    }
+                },
+                wins: true,
+                loses: true,
+                status: true,
+                isTfaEnabled: true,
+                sentReq: {
+                    where: {
+                        rcv_id: user.id
+                    },
+                    select: { status: true, }
+                },
+                recievedReq: {
+                    where: {
+                        snd_id: user.id
+                    },
+                    select: { status: true, }
+                },
+            }
+        });
+        if (arr.length === 0)
+            throw new ForbiddenException('no users were found');
+
+        arr.forEach(u => {
+            u["relation"] = this._getFriendRelation(user, u);
+            delete u.sentReq && delete u.recievedReq;
+        });
+        return arr;
+    }
+
     async getUserById(user: User, id: string)
     {
         const u = await this._prismaS.user.findUnique({

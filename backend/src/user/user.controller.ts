@@ -19,6 +19,21 @@ export class UserController {
         private _userS: UserService) {}
 
     // User
+
+    @Get('all')
+    async getAll(@GetUser() user: User)
+    {
+        try
+        {
+            return await this._userS.getAll(user);
+        }
+        catch (e)
+        {
+            console.log({error: e.message});
+            throw new ForbiddenException('could not get all users');
+        }
+    }
+
     @Get('me')
     async me(@GetUser() dto: User)
     {
