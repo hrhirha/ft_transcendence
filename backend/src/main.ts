@@ -75,13 +75,18 @@ async function createRanks() {
         },
       ]
     });
+    
   }
   catch (e) {}
 }
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
+  app.enableCors({
+    origin: `http://${HOST}:3000`,
+    credentials: true,
+  });
+  
   // for chat dev
   app.useStaticAssets(join(__dirname, "..", "uploads"), {
     prefix: '/uploads/',
@@ -98,10 +103,6 @@ async function bootstrap() {
     forbidNonWhitelisted: true,
   }));
   app.use(cookieParser());
-  app.enableCors({
-    origin: `http://${HOST}:3000`,
-    credentials: true,
-  });
   app.useGlobalFilters(new HttpExceptionFilter);
 
   

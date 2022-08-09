@@ -10,7 +10,6 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
 import { ArgumentMetadata, HttpException, UsePipes, ValidationPipe } from '@nestjs/common';
-import { User } from '@prisma/client';
 export class WsValidationPipe extends ValidationPipe
 {
     async transform(value: any, metadata: ArgumentMetadata) {
@@ -39,12 +38,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
     normaleQue: {
         soc: Socket,
-        user: User,
+        user: any,
     } = null;
 
     ultimateQue: {
         soc: Socket,
-        user: User,
+        user: any,
     } = null;
     tab = new Map;
 
@@ -357,10 +356,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         }
         /////////////////////////////////////////
 
-        // const mapUrl: string = (this.ultimateQue.user.score > user.score) ? this.ultimateQue.user
+        const mapUrl: string = (this.ultimateQue.user.score > user.score) ? this.ultimateQue.user.rank.field: user.rank.field;
         let connection =  await this.prisma.game.create({
             data: {
-                map: "mapUrl",
+                map: mapUrl,
                 user_game:
                 {
                     createMany: {
@@ -378,7 +377,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         });
         this.insertSocketData(this.ultimateQue.soc, this.ultimateQue.user.id, "player1", connection.id);
         this.insertSocketData(client, user.id, "player2", connection.id);
-        this.server.to(connection.id).emit('startGame');
+        this.server.to(connection.id).emit('map', mapUrl);
         this.ultimateQue = null;
     }
 

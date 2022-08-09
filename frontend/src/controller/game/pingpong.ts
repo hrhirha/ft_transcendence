@@ -1,4 +1,4 @@
-import Phaser from "phaser";
+import Phaser, { Core } from "phaser";
 import { NormalField, UltimateField, Ball, Paddle, YouWin, YouLose, RedButton, NormalButton } from "assets";
 import { Socket } from "socket.io-client";
 
@@ -16,7 +16,7 @@ export default class PingPong extends Phaser.Scene
     rightScore: number = 4;
     h: number  = 720;
     w: number = 1080;
-    bg?: Phaser.GameObjects.Sprite;
+    bg?: Phaser.GameObjects.Image;
     ball?: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
     paddle?: Phaser.GameObjects.Sprite;
     soc: Socket;
@@ -64,12 +64,35 @@ export default class PingPong extends Phaser.Scene
         this.type = type;
         this.soc = msoc;
     };
+    
+    addSprites ()
+    {
+        this.add.image(this.w / 2, this.h / 2, "backGround");
+    }
+
+    addScore()
+    {
+        if (this.leftScoretxt)
+            this.leftScoretxt.destroy();
+        this.leftScoretxt = this.add.text((this.w / 2) - (this.w / 10) - 40 , 30, this.leftScore.toString(), {
+            fontSize: "60px",
+            fontFamily: "Poppins_B",
+            align: "center",
+        });
+        
+        if (this.rightScoretxt)
+            this.rightScoretxt.destroy();
+        this.rightScoretxt = this.add.text((this.w / 2) + (this.w / 10) , 30, this.rightScore.toString(), {
+            fontSize: "60px",
+            fontFamily: "Poppins_B",
+            align: "center"
+        });
+    }
 
     preload () : void
     {
         this.h = this.cameras.main.height;
         this.w = this.cameras.main.width;
-
         this.load.image('normalField', NormalField);
         this.load.image('ultimateField', UltimateField);
         this.load.image('ball', Ball);
@@ -173,23 +196,16 @@ export default class PingPong extends Phaser.Scene
         // no collision detection on left side and right side 
         this.physics.world.setBounds(-this.bounds, 0, this.w + (this.bounds * 2), this.h);
         
-        console.log(this.type);
         // resize the images to fit the window
-        this.imgbg = ( !this.imgbg && this.type === "normaleQue") ? "normalField" : "ultimateField";
-        this.bg = this.add.sprite(this.w / 2, this.h / 2, this.imgbg);
+        if (!this.imgbg)
+            this.imgbg = (this.type === "normaleQue") ? "normalField" : "ultimateField";
+        else
+            this.imgbg = "backGround";
+        this.bg = this.add.image(this.w / 2, this.h / 2, this.imgbg);
 
         /////////////////////////////// text ////////////////////////
-        this.leftScoretxt = this.add.text((this.w / 2) - (this.w / 10) - 40 , 30, this.leftScore.toString(), {
-            fontSize: "60px",
-            fontFamily: "Poppins_B",
-            align: "center",
-        });
 
-        this.rightScoretxt = this.add.text((this.w / 2) + (this.w / 10) , 30, this.rightScore.toString(), {
-            fontSize: "60px",
-            fontFamily: "Poppins_B",
-            align: "center"
-        });
+        this.addScore();
 
         this.soc.on("saveData", (data: { player: string, is_player: boolean, roomId: string, userId: string } ) => 
         {
@@ -273,10 +289,15 @@ export default class PingPong extends Phaser.Scene
                 return ;
             this.watcherRender(data);
         });
+
         this.soc.on("map", (Map_url: string) => 
         {
             this.imgbg = Map_url;
-            this.bg = this.add.sprite(this.w / 2, this.h / 2, this.imgbg);
+            this.load.once('complete', this.addSprites, this);
+            this.load.image('backGround', this.imgbg);
+            this.load.start();
+            this.addScore();
+            this.goalTime();
         });
 
 
@@ -465,7 +486,7 @@ export default class PingPong extends Phaser.Scene
         if (this.isPlayer && this.connection)
         {
             this.connection = false;
-            this.soc.emit(this.type);
+            this.soc.emit("ultimateQue");
         }
         if (this.re)
         {
@@ -731,7 +752,7 @@ export default class PingPong extends Phaser.Scene
 
             if (this.data.is_player && !this.End)
             {
-                // this.goal = true;
+                this.goal = true;
                 if (this.data.is_player && this.data.player === "player1")
                 {
                     this.soc.emit('sendToWatcher', {
@@ -746,8 +767,8 @@ export default class PingPong extends Phaser.Scene
                         goal: this.goal,
                     });
                 }
-                // this.soc.removeAllListeners();
-                // this.scene.restart();
+                this.soc.removeAllListeners();
+                this.scene.restart();
             }
             
         }
@@ -763,7 +784,7 @@ export default class PingPong extends Phaser.Scene
 
             if (this.data.is_player && !this.End)
             {
-                // this.goal = true;
+                this.goal = true;
                 if (this.data.is_player && this.data.player === "player1")
                 {
                     this.soc.emit('sendToWatcher', {
@@ -779,8 +800,8 @@ export default class PingPong extends Phaser.Scene
                         mapUrl: this.imgbg,
                     });
                 }
-                // this.soc.removeAllListeners();
-                // this.scene.restart();
+                this.soc.removeAllListeners();
+                this.scene.restart();
             }
         }
     }

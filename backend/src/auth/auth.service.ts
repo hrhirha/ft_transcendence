@@ -73,6 +73,9 @@ export class AuthService {
             if (payload.sub) {
                 const user = await this._prismaS.user.findUnique({
                     where: { id: payload.sub, },
+                    include: {
+                        rank: true,
+                    }
                 });
                 return user;
             }
