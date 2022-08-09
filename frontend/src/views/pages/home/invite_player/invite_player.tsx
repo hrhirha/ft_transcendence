@@ -50,7 +50,7 @@ export const InvitePlayerForm:React.FC<{callback: Function}> = ({callback}) => {
                 time: 15000,
                 icon: <FontAwesomeIcon icon={faGamepad}/>,
                 title: "Game Invitation",
-                description: `You are invited ${user.fullName.toUpperCase()} to play ${ultimate ? "an ULTIMATE" : "a NORMAL"} GAME, please wait for his answer!`
+                description: `You are invited <b>${user.fullName}</b> to play ${ultimate ? "an <b>ULTIMATE" : "a <b>NORMAL"} GAME</b>, please wait for his answer!`
             });
         } catch(e: any) {
             pushNotif({
@@ -83,7 +83,7 @@ export const InvitePlayerForm:React.FC<{callback: Function}> = ({callback}) => {
                             time: 15000,
                             icon: <FontAwesomeIcon icon={faGamepad}/>,
                             title: "Game Invitation",
-                            description: `Which game you want to play with ${user.fullName} ?`,
+                            description: `Which game you want to play with <b>${user.fullName}</b> ?`,
                             actions: [
                                 {title: "Normal Game", color: "#6970d4", action: async () => sentInvite(user, false)},
                                 {title: "Ultimate Game", color: "#6970d4", action: async () => sentInvite(user, true)}

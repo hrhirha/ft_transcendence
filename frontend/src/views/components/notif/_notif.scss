@@ -57,6 +57,10 @@ section.notif {
       font-family: $LFont;
       line-height: 1.2;
       padding: .5rem 0;
+      b {
+        font-family: $BFont;
+        font-size: $fsize * .8;
+      }
     }
   }
   ul.actions {
