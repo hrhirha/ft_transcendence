@@ -15,7 +15,7 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
     });
     return (
         <main id="gamePage" className="container">
-            <MatchCard
+            {/* <MatchCard
                 matchId="MATCH001"
                 gameModePro={ultimateGame}
                 player1={RP}
@@ -25,7 +25,7 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
                     "player2": score.lp
                 }}
                 onClick={() => {}}
-                />
+                /> */}
             <GameView gameSocket={socket}/>
         </main>
     );

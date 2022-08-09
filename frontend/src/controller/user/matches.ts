@@ -1,7 +1,16 @@
 import api from "api/axois";
+import { User } from "controller/user/user";
 
 export interface Match {
     id: string,
+    map: string,
+    is_ultimate: boolean,
+    p1: User,
+    p2: User,
+    score: {
+        p1: number,
+        p2: number
+    }
 }
 
 export async function get_matches_histroy(username : string) {

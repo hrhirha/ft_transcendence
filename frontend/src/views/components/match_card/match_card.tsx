@@ -2,44 +2,32 @@ import React from "react";
 import { DefaultGame, UltimateGame } from "assets";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { useNavigate } from "react-router-dom";
-import { User } from "controller/user/user";
+import { Match } from "controller/user/matches";
 
-interface Props {
-    matchId: string;
-    gameModePro: boolean;
-    player1: User;
-    player2: User;
-    onClick: Function;
-    score: {
-        player1: number,
-        player2: number
-    };
-}
-
-export const MatchCard:React.FC<Props> = (Props) => {
+export const MatchCard:React.FC<{match: Match}> = ({match}) => {
     const navigate = useNavigate();
     return (
-    <section className="matchCard" id={Props.matchId}>
-        <div className="player" onClick={() => navigate(`/u/${Props.player1.username}`)}>
+    <section className="matchCard" id={match.id}>
+        <div className="player" onClick={() => navigate(`/u/${match.p1.username}`)}>
             <div className="avatar">
-                <CircleAvatar avatarURL={Props.player1.imageUrl} dimensions={60} showStatus={false}/>
-                <span className="achievment" title={Props.player1.rank.title}>
-                    <img src={Props.player1.rank.icon} alt={Props.player1.rank.title}/>
+                <CircleAvatar avatarURL={match.p1.imageUrl} dimensions={60} showStatus={false}/>
+                <span className="achievment" title={match.p1.rank.title}>
+                    <img src={match.p1.rank.icon} alt={match.p1.rank.title}/>
                 </span>
             </div>
-            <h6 className="fullName">{Props.player1.fullName}</h6>
+            <h6 className="fullName">{match.p1.fullName}</h6>
         </div>
         <div className="scoreBoard">
-            <span className="score">{Props.score.player1}</span>
-            <img className="gameType" src={Props.gameModePro ? UltimateGame : DefaultGame} alt="Game Type"/>
-            <span className="score">{Props.score.player2}</span>
+            <span className="score">{match.score.p1}</span>
+            <img className="gameType" src={match.is_ultimate ? UltimateGame : DefaultGame} alt="Game Type"/>
+            <span className="score">{match.score.p2}</span>
         </div>
-        <div className="player" onClick={() => navigate(`/u/${Props.player2.username}`)}>
-            <h6 className="fullName">{Props.player2.fullName}</h6>
+        <div className="player" onClick={() => navigate(`/u/${match.p1.username}`)}>
+            <h6 className="fullName">{match.p1.fullName}</h6>
             <div className="avatar">
-                <CircleAvatar avatarURL={Props.player2.imageUrl} dimensions={60} showStatus={false}/>
-                <span className="achievment" title={Props.player2.rank.title}>
-                    <img src={Props.player2.rank.icon} alt={Props.player2.rank.title}/>
+                <CircleAvatar avatarURL={match.p1.imageUrl} dimensions={60} showStatus={false}/>
+                <span className="achievment" title={match.p1.rank.title}>
+                    <img src={match.p1.rank.icon} alt={match.p1.rank.title}/>
                 </span>
             </div>
         </div>

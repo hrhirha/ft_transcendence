@@ -46,6 +46,16 @@ export async function get_me() {
     }
 }
 
+export async function get_all_users() {
+    try
+    {
+        const res  : Array<User> = (await api.get("user/all")).data;
+        return res;
+    } catch(e: any) {
+        throw (e.response.data);
+    }
+}
+
 export async function get_user_by_id(user_id : string) {
     try
     {
