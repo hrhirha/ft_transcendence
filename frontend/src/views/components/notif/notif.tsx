@@ -52,7 +52,14 @@ export const Notif:React.FC<{children: Array<ReactNode>}> = ({children}) => {
     const [timer, setTimer] = useState<any>();
     const pushNotif = (newNotif: Props) => {
         if (notifs.find(n => n.id === newNotif.id))
-            return ;
+        {
+            setNotifs(oldNotifs => oldNotifs.map((n) => {
+                if (n.id === newNotif.id)
+                    return newNotif;
+                return n;
+            }));
+            return;
+        }
         if (newNotif.time === undefined)
             newNotif.time = 5000;
         if (notifs.length > 4)
