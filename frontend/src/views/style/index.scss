@@ -86,7 +86,8 @@
 }
 
 body {
-    background: $dark1;
+    background-color: $dark1;
+    background-image: url("../../assets/images/bg.svg");
     min-height: 100vh;
     min-width: 280px;
     overflow: auto;

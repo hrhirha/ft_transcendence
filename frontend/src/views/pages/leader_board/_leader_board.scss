@@ -20,7 +20,7 @@
     .sectionTitle {
         @include _flex(row, center, center);
         max-width: 15rem;
-        margin: 1.5rem auto;
+        margin: 2rem auto;
         svg {
             font-size: $fsize * 3.3;
             path {

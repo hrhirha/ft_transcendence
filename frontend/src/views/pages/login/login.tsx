@@ -1,17 +1,16 @@
 import React, { useState } from "react";
 import { Brand } from "views/components/brand/brand";
-import { Logo1337, Logo42, Background} from 'assets';
+import { Logo1337, Logo42 } from 'assets';
 
 
 export const Login:React.FC = () =>  {
-    const [con, setCon] = useState();
 
     const ConnectTo42 = async () => {
         window.open("http://127.0.0.1:3001/auth/login", '_self');
     }
     
     return (
-        <main id="loginPage" style={{backgroundImage: Background}}>
+        <main id="loginPage">
             <div>
                 <Brand/>
                 <h4>Welcome !
@@ -22,7 +21,6 @@ export const Login:React.FC = () =>  {
                     <span>Login</span>
                 </button >
                 <img src={Logo1337} alt="1337"/>
-                <p>{con}</p>
             </div>
         </main>
     );
