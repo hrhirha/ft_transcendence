@@ -25,7 +25,7 @@ section#invitePlayer {
                 width: min-content;
             }
             @media (max-width: $sm) {
-                margin-bottom: .5rem;
+                margin-bottom: 1rem;
                 h2 {
                     font-size: $fsize * 1.5;
                 }
@@ -41,8 +41,11 @@ section#invitePlayer {
         position: relative;
         .searchInput {
             width: 100%;
+            @media (max-width: $xs) {
+                width: auto;
+            }
             padding: .5rem 1rem;
-            @include _flex(row, center, center);
+            @include _flex(row, flex-start, center);
             input#username {
                 background: transparent;
                 border: none;
@@ -97,6 +100,9 @@ section#invitePlayer {
                             width: 100%;
                             margin-left: .5rem;
                             h6 {
+                                @media (max-width: 300px) {
+                                    @include _textOverflow(8rem);
+                                }
                                 font-size: $fsize * .8;
                                 line-height: 1;
                             }
@@ -109,9 +115,12 @@ section#invitePlayer {
                             font-size: $fsize * .55;
                             text-transform: uppercase;
                             font-family: $BFont;
+                            background-color: $dark3;
+                            padding: .1rem .5rem;
+                            border-radius: 10rem;
                         }
                         .status.OFFLINE {
-                            color: $light3;
+                            color: rgba($light3, .5);
                         }
                         .status.INGAME {
                             color: $gold;
@@ -122,7 +131,7 @@ section#invitePlayer {
                         }
                     }
                     :hover {
-                        background-color: $light5;
+                        background-color: $light6;
                     }
                 }
             }

@@ -60,7 +60,7 @@ section.notif {
     }
   }
   ul.actions {
-    @include _flex(row, center, center);
+    @include _flex(row, space-around, center);
     width: 100%;
     list-style: none;
     padding: .5rem 0;

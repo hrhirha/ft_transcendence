@@ -18,7 +18,7 @@ const NotifContext = createContext(Function());
 export const useNotif = () => useContext(NotifContext);
 const animatedNotifs: Array<Props> = [];
 
-const NotifCard:React.FC<{props: Props, onClose: Function}> = ({props, onClose}) => {
+const NotifCard:React.FC<{props: Props, onClose: Function, setNotifs: Function}> = ({props, onClose, setNotifs}) => {
     
     return (
     <section className={`notif ${props.type} ${animatedNotifs.find((n) => n === props) ? "notifAnimation" : "notifix"}`} >
@@ -33,7 +33,10 @@ const NotifCard:React.FC<{props: Props, onClose: Function}> = ({props, onClose})
                         ? <li className="action"
                             key={`${Date.now()}_${k}`}
                             style={{background: a.color}}
-                            onClick={() => a.action()}>
+                            onClick={() => {
+                                setNotifs(notifs => notifs.filter((notif) => notif.id !== props.id));
+                                a.action();
+                            }}>
                             {a.title}
                         </li>
                         : null;
@@ -75,7 +78,7 @@ export const Notif:React.FC<{children: Array<ReactNode>}> = ({children}) => {
         <NotifContext.Provider value={pushNotif}>
             {children}
             {notifs.length > 0 && <div className="notifications">
-                {notifs.map((n, k) => <NotifCard key={`${k}_${Date.now()}`} onClose={() => setNotifs(notifs.filter((notif) => notif !== n))} props={n}/>)}
+                {notifs.map((n, k) => <NotifCard key={`${k}_${Date.now()}`} setNotifs={setNotifs} onClose={() => setNotifs(notifs.filter((notif) => notif !== n))} props={n}/>)}
             </div>}
         </NotifContext.Provider>
     );

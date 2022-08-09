@@ -1,7 +1,9 @@
-import { faPingPongPaddleBall, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faGamepad, faPingPongPaddleBall, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { User } from "controller/user/user";
 import React, { useState, useEffect } from "react";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
+import { useNotif } from "views/components/notif/notif";
 
 const resulst = [
     {id: "5ads4f54adsf", avatar: "https://i.pravatar.cc/301", username: "jhondoe", fullName: "John Doe", status: "online"},
@@ -31,12 +33,37 @@ export const InvitePlayerForm:React.FC<{callback: Function}> = ({callback}) => {
     const [suggestions, setSuggestions] = useState<any[]>([]);
     const [userSelected, setUserSelected] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const pushNotif = useNotif();
 
     useEffect(() => {
         if (userSelected !== null) {
             callback(userSelected);
         }
     }, [userSelected]);
+    
+    const sentInvite = (user: User, ultimate: boolean) => {
+        try {
+            //sent invitation
+            pushNotif({
+                id: `INVITATIONSENTTO${user.id}`,
+                type: "info",
+                time: 15000,
+                icon: <FontAwesomeIcon icon={faGamepad}/>,
+                title: "Game Invitation",
+                description: `You are invited ${user.fullName.toUpperCase()} to play ${ultimate ? "an ULTIMATE" : "a NORMAL"} GAME, please wait for his answer!`
+            });
+        } catch(e: any) {
+            pushNotif({
+                id: "GAMEINVITATIOERROR",
+                type: "info",
+                time: 15000,
+                icon: <FontAwesomeIcon icon={faGamepad}/>,
+                title: "Game Invitation",
+                description: e.message
+            });
+        }
+    }
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setShowSuggestions(false);
         if (e.target.value.trim().length > 0) {
@@ -50,11 +77,25 @@ export const InvitePlayerForm:React.FC<{callback: Function}> = ({callback}) => {
                         setShowSuggestions(false);
                         setUserSelected(user);
                         e.target.value = "";
+                        pushNotif({
+                            id: `GAMEINVITATION`,
+                            type: "info",
+                            time: 15000,
+                            icon: <FontAwesomeIcon icon={faGamepad}/>,
+                            title: "Game Invitation",
+                            description: `Which game you want to play with ${user.fullName} ?`,
+                            actions: [
+                                {title: "Normal Game", color: "#6970d4", action: async () => sentInvite(user, false)},
+                                {title: "Ultimate Game", color: "#6970d4", action: async () => sentInvite(user, true)}
+                            ] 
+                        });
                     }} avatar={user.avatar} username={user.username} status={user.status} fullName={user.fullName} key={key} />]);
                 }
             });
         }
     }
+
+    
     return (
     <section id="invitePlayer">
         <div className="sectionTitle">
