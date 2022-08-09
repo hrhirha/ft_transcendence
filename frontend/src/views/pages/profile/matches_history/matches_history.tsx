@@ -58,7 +58,7 @@ export const MatchesHistory:React.FC<{userProfile: boolean}> = ({userProfile}) =
                 });
             }
         })();
-    }, []);
+    }, [userProfile, params]);
 
     return (
         <section id="matchesHistory">

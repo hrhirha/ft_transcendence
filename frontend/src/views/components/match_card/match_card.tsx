@@ -22,12 +22,12 @@ export const MatchCard:React.FC<{match: Match}> = ({match}) => {
             <img className="gameType" src={match.is_ultimate ? UltimateGame : DefaultGame} alt="Game Type"/>
             <span className="score">{match.score.p2}</span>
         </div>
-        <div className="player" onClick={() => navigate(`/u/${match.p1.username}`)}>
-            <h6 className="fullName">{match.p1.fullName}</h6>
+        <div className="player" onClick={() => navigate(`/u/${match.p2.username}`)}>
+            <h6 className="fullName">{match.p2.fullName}</h6>
             <div className="avatar">
-                <CircleAvatar avatarURL={match.p1.imageUrl} dimensions={60} showStatus={false}/>
-                <span className="achievment" title={match.p1.rank.title}>
-                    <img src={match.p1.rank.icon} alt={match.p1.rank.title}/>
+                <CircleAvatar avatarURL={match.p2.imageUrl} dimensions={60} showStatus={false}/>
+                <span className="achievment" title={match.p2.rank.title}>
+                    <img src={match.p2.rank.icon} alt={match.p2.rank.title}/>
                 </span>
             </div>
         </div>

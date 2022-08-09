@@ -21,7 +21,7 @@ const animatedNotifs: Array<Props> = [];
 const NotifCard:React.FC<{props: Props, onClose: Function, setNotifs: Function}> = ({props, onClose, setNotifs}) => {
     
     return (
-    <section className={`notif ${props.type} ${animatedNotifs.find((n) => n === props) ? "notifAnimation" : "notifix"}`} >
+    <section className={`notif ${props.type}`} >
         <FontAwesomeIcon icon={faClose} onClick={() => onClose()}/>
         <span className="icon">{props.icon}</span>
         <div className="infos">
@@ -58,6 +58,8 @@ export const Notif:React.FC<{children: Array<ReactNode>}> = ({children}) => {
                     return newNotif;
                 return n;
             }));
+            if (newNotif.time === undefined)
+                newNotif.time = 5000;
             return;
         }
         if (newNotif.time === undefined)

@@ -53,8 +53,8 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
     const editProfile = async ()  => {
         try {
             console.log(detectUpdates)
-            if (detectUpdates.name && !/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(\-[a-zA-Z]+)*\.?))+$/.test(fullName!) || fullName!.length > 40)
-                throw({message: "Full Name can only contain a-z SP A-Z - . and max length 40"});
+            if (detectUpdates.name && (!/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(-[a-zA-Z]+)*\.?))+$/.test(fullName!) || fullName!.length > 40))
+                throw(Error("Full Name can only contain a-z SP A-Z - . and max length 40"));
             if (detectUpdates.name)
                 await patch_edit_fullname(fullName!);
             if (detectUpdates.avatar)
@@ -107,7 +107,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                 });
             }
             else 
-                throw({message: "CODE must be 6 digits"});
+                throw(Error("CODE must be 6 digits"));
         } catch (err: any) {
             pushNotif({
                 id: "2FAMETHODEERROR",
@@ -158,7 +158,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
 
     useEffect(() => {
         getUserData();
-    },[userProfile]);
+    }, [userProfile, username]);
 
     return (
         <section id="profileInfos">
@@ -171,7 +171,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
             </button>}
             <div className="profileData">
                 <div className="avatar">
-                    <CircleAvatar avatarURL={userImage && URL.createObjectURL(userImage) || userInfos?.imageUrl} dimensions={120} showStatus={false}/>
+                    <CircleAvatar avatarURL={(userImage && URL.createObjectURL(userImage)) || userInfos?.imageUrl} dimensions={120} showStatus={false}/>
                     <span className="achievement"><img src={userInfos.rank.icon} title={userInfos.rank.title} alt="achievement" /></span>
                     {editMode && <span className="editAvatar" title="Change Your Avatar" onClick={updateAvatar}>
                         <FontAwesomeIcon icon={faCameraRotate}/>

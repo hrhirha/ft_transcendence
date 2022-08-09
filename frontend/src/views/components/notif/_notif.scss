@@ -2,6 +2,8 @@ section.notif {
   @include _flex(row, flex-start, center);
   @include _selectionOff();
   cursor: default;
+  position: relative;
+  right: 1rem;
   padding: .5rem;
   margin: .4rem 0;
   border-radius: .5rem;
@@ -9,6 +11,10 @@ section.notif {
   max-width: 20rem;
   min-height: 2.5rem;
   box-shadow: 0 0 3rem -1rem $dark1;
+  @media (max-width: $xs) {
+    min-width: 90%;
+    max-width: 90%;
+  }
   & > svg {
     position: absolute;
     right: -.5rem;
@@ -94,16 +100,6 @@ section.notif {
 
 }
 
-.notifAnimation {
-  -webkit-animation: slide 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
-  animation: slide 0.8s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
-}
-
-.notifix {
-  -webkit-transform: translateX(-2.5rem);
-  transform: translateX(-2.5rem);
-}
-
 @-webkit-keyframes slide {
     0% {
       -webkit-transform: translateX(10rem);
@@ -138,4 +134,7 @@ section.notif {
   right: .5rem;
   bottom: 1rem;
   z-index: 10;
+  @media (max-width: $xs) {
+    right: 0;
+  }
 }
