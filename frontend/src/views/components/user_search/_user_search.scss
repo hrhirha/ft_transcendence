@@ -3,32 +3,26 @@ section#searchUser {
     position: relative;
     margin: .25rem 0;
     margin-top: .5rem;
-    width: 100%;
+    width: 90%;
+    background: $light4;
+    border-radius: 100rem;
+    padding: .5rem;
     .searchInput {
         width: 100%;
-        position: relative;
         @include _flex(row, center, center);
         input#username {
-            padding: .5rem .5rem;
-            padding-left: 2rem;
-            font-size: $fsize * .75;
+            background: transparent;
             border: none;
-            background-color: $light4;
-            border-radius: 1rem;
             outline: none;
-            width: 80%;
+            font-size: $fsize * .75;
+            &:focus {
+                outline: none;
+            }
+            width: 100%;
         }
         svg {
-            position: absolute;
-            top: .6rem;
-            left: 9%;
-            z-index: 5;
-            @media(max-width: $sm) {
-                left: 8%;
-            }
-            @media(max-width: $xs) {
-                left: 7.25%;
-            }
+            margin-right: .5rem;
+            font-size: $fsize;
             path {
                 color: $light3;
             }
@@ -39,14 +33,14 @@ section#searchUser {
     }
     div.suggestions {
         position: absolute;
-        top: 2.25rem;
-        left: 0;
         background-color: $light4;
+        top: 2rem;
         overflow: hidden;
         max-height: 15rem;
         border-radius: 1rem;
         width: 100%;
         padding: 0;
+        margin-top: .15rem;
         ul#suggestions {
             @include _flex(column, flex-start, center);
             margin: 0;
