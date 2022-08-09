@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { friend_status, HOST } from 'src/utils';
+import { friend_status, HOST, PORT, relation_status } from 'src/utils';
 import { EditFullNameDto, EditUsernameDto } from './dto';
 
 @Injectable()
@@ -11,29 +11,113 @@ export class UserService {
 
     // User
 
+    private _getFriendRelation(me: User, friend: any)
+    {
+        const sent = friend.sentReq.length === 1 ? friend.sentReq[0] : null;
+        const rcvd = friend.recievedReq.length === 1 ? friend.recievedReq[0] : null;
+
+        if (me.id === friend.id) return null;
+        if (!sent && !rcvd) return relation_status.NONE;
+        if (sent)
+        {
+            if (sent.status === friend_status.ACCEPTED) return relation_status.FRIEND;
+            if (sent.status === friend_status.PENDING) return relation_status.REQUESTED;
+        }
+        if (rcvd)
+        {
+            if (rcvd.status === friend_status.ACCEPTED) return relation_status.FRIEND;
+            if (rcvd.status === friend_status.PENDING) return relation_status.PENDING;
+        }
+        return relation_status.BLOCKED;
+    }
+
+    async getAll(user: User)
+    {
+        const arr = await this._prismaS.user.findMany({
+            where : {
+                id: { not: user.id },
+                AND: [
+                    {
+                        sentReq: {
+                            none: { rcv_id: user.id, status: friend_status.BLOCKED }
+                        }
+                    },
+                    {
+                        recievedReq: {
+                            none: { snd_id: user.id, status: friend_status.BLOCKED }
+                        }
+                    }
+                ]
+            },
+            select: {
+                id: true,
+                username: true,
+                fullName: true,
+                imageUrl: true,
+                score: true,
+                rank: {
+                    select: {
+                        title: true,
+                        icon: true,
+                        field: true,
+                    }
+                },
+                wins: true,
+                loses: true,
+                status: true,
+                // sentReq: {
+                //     where: {
+                //         rcv_id: user.id
+                //     },
+                //     select: { status: true, }
+                // },
+                // recievedReq: {
+                //     where: {
+                //         snd_id: user.id
+                //     },
+                //     select: { status: true, }
+                // },
+            }
+        });
+        if (arr.length === 0)
+            throw new ForbiddenException('no users were found');
+
+        // arr.forEach(u => {
+        //     u["relation"] = this._getFriendRelation(user, u);
+        //     delete u.sentReq && delete u.recievedReq;
+        // });
+        return arr;
+    }
+
     async getUserById(user: User, id: string)
     {
         const u = await this._prismaS.user.findUnique({
             where: { id, },
             select: {
+                id: true,
                 username: true,
-                email: true,
                 fullName: true,
                 imageUrl: true,
                 score: true,
-                rank: true,
+                rank: {
+                    select: {
+                        title: true,
+                        icon: true,
+                        field: true,
+                    }
+                },
                 wins: true,
                 loses: true,
                 status: true,
                 sentReq: {
                     where: {
-                        OR: [{ snd_id: user.id }, { rcv_id: user.id }]
+                        rcv_id: user.id
                     },
                     select: { status: true, }
                 },
                 recievedReq: {
                     where: {
-                        OR: [{ snd_id: user.id }, { rcv_id: user.id }]
+                        snd_id: user.id
                     },
                     select: { status: true, }
                 },
@@ -41,9 +125,11 @@ export class UserService {
         });
         if (!u)
             throw new ForbiddenException('user not found');
-        const req = u.sentReq.length === 1 ? u.sentReq[0] : (u.recievedReq.length === 1 ? u.recievedReq[0] : null);
+
+        u["relation"] = this._getFriendRelation(user, u);
         delete u.sentReq && delete u.recievedReq;
-        return { user: u, friendship_status: req ? req.status : null };
+        
+        return u;
     }
 
     async getUserByUsername(user: User, username: string)
@@ -51,12 +137,18 @@ export class UserService {
         const u = await this._prismaS.user.findUnique({
             where: { username, },
             select: {
+                id: true,
                 username: true,
-                email: true,
                 fullName: true,
                 imageUrl: true,
                 score: true,
-                rank: true,
+                rank: {
+                    select: {
+                        title: true,
+                        icon: true,
+                        field: true,
+                    }
+                },
                 wins: true,
                 loses: true,
                 status: true,
@@ -76,10 +168,24 @@ export class UserService {
         });
         if (!u)
             throw new ForbiddenException('user not found');
-        const req = u.sentReq.length === 1 ? u.sentReq[0] : (u.recievedReq.length === 1 ? u.recievedReq[0] : null);
+
+        u["relation"] = this._getFriendRelation(user, u);
         delete u.sentReq && delete u.recievedReq;
-        return { user: u, friendship_status: req ? req.status : null };
-    } 
+        
+        return u;
+    }
+
+    async getRank(id: string)
+    {
+        return await this._prismaS.rank.findUnique({
+            where: { id },
+            select: {
+                title: true,
+                icon: true,
+                field: true,
+            }
+        });
+    }
 
     async updateStatus(id:string, status: string)
     {
@@ -115,10 +221,10 @@ export class UserService {
                 tfaSecret: secret,
             },
             where: {
-                id_tfaSecret: {
+                id_isTfaEnabled: {
                     id,
-                    tfaSecret: "",
-                }
+                    isTfaEnabled: false,
+                },
             }
         });
         return u;
@@ -154,7 +260,7 @@ export class UserService {
         const user = await this._prismaS.user.update({
             where: { id },
             data: {
-                imageUrl: `http://${HOST}/${file.path}`
+                imageUrl: `http://${HOST}:${PORT}/${file.path}`
             },
         });
         return {success: true};

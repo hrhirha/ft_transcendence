@@ -1,20 +1,15 @@
 import React, { useState } from "react";
-import { Brand } from "../../components/brand/brand";
-import { Logo1337, Logo42} from '../../../assets';
-import { AuthChecker } from "../../components/check_auth/auth_checker";
+import { Brand } from "views/components/brand/brand";
+import { Logo1337, Logo42 } from 'assets';
 
 
 export const Login:React.FC = () =>  {
-    const [con, setCon] = useState();
 
     const ConnectTo42 = async () => {
         window.open("http://127.0.0.1:3001/auth/login", '_self');
     }
     
     return (
-        <AuthChecker
-        redirect="/"
-        wrappedContent={
         <main id="loginPage">
             <div>
                 <Brand/>
@@ -26,9 +21,7 @@ export const Login:React.FC = () =>  {
                     <span>Login</span>
                 </button >
                 <img src={Logo1337} alt="1337"/>
-                <p>{con}</p>
             </div>
-        </main>}
-    />
+        </main>
     );
 }

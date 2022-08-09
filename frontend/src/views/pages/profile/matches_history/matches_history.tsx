@@ -1,111 +1,68 @@
-import { faGamepad } from "@fortawesome/free-solid-svg-icons";
+import { faClose, faGamepad } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { EmptyHistory } from "../../../../assets";
-import { MatchCard } from "../../../components/match_card/match_card";
+import { EmptyHistory } from "assets";
+import { get_matches_histroy, Match } from "controller/user/matches";
+import { get_me, User } from "controller/user/user";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { MatchCard } from "views/components/match_card/match_card";
+// import { MatchCard } from "views/components/match_card/match_card";
+import { useNotif } from "views/components/notif/notif";
 
 
 const NoHistroy = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+
     return (
         <div className="noHistory">
             <img src={EmptyHistory} alt="no history" />
             <p>No matches history yet</p>
-            <button className="playGame">
+            {location.pathname === '/profile' && <button className="playGame" onClick={() => navigate("/")}>
                 <FontAwesomeIcon icon={faGamepad} />
                 Play One
-            </button>
+            </button>}
         </div>
     );
 }
 
-export const MatchesHistory:React.FC = () => {
+export const MatchesHistory:React.FC<{userProfile: boolean}> = ({userProfile}) => {
+    const [matches, setMatches] = useState<Array<Match>>([]);
+    const params = useParams();
+    const pushNotif = useNotif();
+
+    useEffect(() => {
+        (async () => {
+            let _username: string;
+            try {
+                if (userProfile)
+                {
+                    const me: User = await get_me();
+                    _username = me.username;
+                }
+                else {
+                    _username = params.username!;
+                }
+                const _matches: Array<Match> = await get_matches_histroy(_username);
+                console.log(_matches)
+                setMatches(_matches);
+            }
+            catch(e: any)
+            {
+                pushNotif({
+                    id: "MATCHESHISTORYERROR",
+                    type: "error",
+                    icon: <FontAwesomeIcon icon={faClose}/>,
+                    title: "ERROR",
+                    description: e.message
+                });
+            }
+        })();
+    }, [userProfile, params]);
+
     return (
         <section id="matchesHistory">
-            {/* <NoHistroy /> */}
-            <MatchCard
-                matchId="MATCH001"
-                gameModePro={true}
-                player1={
-                    {
-                        "avatar": "https://i.pravatar.cc/300?img=11",
-                        "fullName": "Player1 Full Name",
-                        "ranking": 1,
-                        "score": 10
-                    }
-                }
-                player2={
-                    {
-                        "avatar": "https://i.pravatar.cc/300?img=18",
-                        "fullName": "Player2 FulName",
-                        "ranking": 2,
-                        "score": 8
-                    }
-                }
-                onClick={() => {}}
-                />
-            <MatchCard
-                matchId="MATCH002"
-                gameModePro={false}
-                player1={
-                    {
-                        "avatar": "https://i.pravatar.cc/300?img=21",
-                        "fullName": "Player1",
-                        "ranking": 12,
-                        "score": 2
-                    }
-                }
-                player2={
-                    {
-                        "avatar": "https://i.pravatar.cc/300?img=38",
-                        "fullName": "Player2",
-                        "ranking": 5,
-                        "score": 10
-                    }
-                }
-                onClick={() => {}}
-                />
-            <MatchCard
-                matchId="MATCH001"
-                gameModePro={true}
-                player1={
-                    {
-                        "avatar": "https://i.pravatar.cc/300?img=11",
-                        "fullName": "Player1 Full Name",
-                        "ranking": 1,
-                        "score": 10
-                    }
-                }
-                player2={
-                    {
-                        "avatar": "https://i.pravatar.cc/300?img=18",
-                        "fullName": "Player2 FulName",
-                        "ranking": 2,
-                        "score": 8
-                    }
-                }
-                onClick={() => {}}
-                />
-            <MatchCard
-                matchId="MATCH002"
-                gameModePro={false}
-                player1={
-                    {
-                        "avatar": "https://i.pravatar.cc/300?img=21",
-                        "fullName": "Player1",
-                        "ranking": 12,
-                        "score": 2
-                    }
-                }
-                player2={
-                    {
-                        "avatar": "https://i.pravatar.cc/300?img=38",
-                        "fullName": "Player2",
-                        "ranking": 5,
-                        "score": 10
-                    }
-                }
-                onClick={() => {}}
-                />
-                
+            {matches.length !== 0 ?  matches.map((m) => <MatchCard match={m}/>) : <NoHistroy />}
         </section>
     );
 }

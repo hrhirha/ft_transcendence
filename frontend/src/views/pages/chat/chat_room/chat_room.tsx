@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
+import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
-import { chat_data } from "../../../../test_data/chat_data";
-import { Chat_msg } from "../chat_msg/chat_msg";
-import { BgVectors } from "../../../../assets";
+import { chat_data } from "test_data/chat_data";
+import { Chat_msg } from "views/pages/chat/chat_msg/chat_msg";
+import { BgVectors } from "assets";
 import { useState } from "react";
-import { ChatRoomSettings } from "../chat_room_settings/chat_room_settings";
+import { ChatRoomSettings } from "views/pages/chat/chat_room_settings/chat_room_settings";
 
 
 interface HeaderProps {
@@ -74,7 +74,7 @@ export const ChatRoom:React.FC<{roomId: string}> = ({roomId}) => {
                 username="Jhon don"
                 image="https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg"
                 status="last seen yesterday 2.30 PM"
-                onClose={() => navigate("/chat")}
+                onClose={() => navigate("/chat", {replace : true})}
                 showSettings={() => setShowSettings(true)}
             />
             <ChatRoomBody/>

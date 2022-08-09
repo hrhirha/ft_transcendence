@@ -1,4 +1,5 @@
 @import "./game_card/game_card";
+@import "./invite_player/invite_player";
 @import "./live_games_card/live_games_card";
 
 main#homePage {
@@ -22,6 +23,9 @@ main#homePage {
     .center {
         @include _flex(row, center, center);
         width: 100%;
+        #invitePlayer {
+            margin-bottom: 1.5rem;
+        }
     }
     
 }

@@ -1,0 +1,76 @@
+main#checkpoint {
+    @include _flex(column, center, center);
+    @include _selectionOff();
+    height: 100vh;
+    width: 100vw;
+    div.twofaCard {
+    @include _flex(column, flex-start, center);
+    @include _gradientBg($light4, $dark3);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    position: relative;
+    & > svg {
+      position: absolute;
+      right: -.5rem;
+      top: -.5rem;
+      padding: .25rem;
+      background: $light4;
+      border-radius: 100%;
+      width: .8rem;
+      height: .8rem;
+      border: .15rem solid $light1;
+      cursor: pointer;
+    }
+    h3 {
+      text-align: center;
+      margin: .5rem auto;
+      margin-top: 1.5rem;
+      font-family: $BFont;
+      text-transform: capitalize;
+      max-width: 15rem;
+      font-size: $fsize  * 1.25;
+      line-height: 1.15;
+    }
+    p {
+      max-width: 15rem;
+      font-size: $fsize * .85;
+      line-height: 1.15;
+      text-align: center;
+      margin: .5rem auto;
+    }
+    img {
+      width: 12rem;
+      height: 12rem;
+      border-radius: .5rem;
+      background-color: $light1;
+    }
+    input.twofaCode {
+      background-color: $dark2;
+      text-align: center;
+      font-family: $BFont;
+      font-size: $fsize * 1.75;
+      max-width: 12rem;
+      margin: 1rem auto;
+      border-radius: .5rem;
+      padding: .4rem 0;
+      border: none;
+      outline: none;
+      &::placeholder {
+          color: $dark3;
+      }
+    }
+    span.error {
+      background: transparent!important;
+      color: rgba($red, .6);
+      font-family: $BFont;
+      margin-bottom: .5rem;
+    }
+    button {
+      @include _roundedButtonStyle($bgcolor1: $purple, $bgcolor2: $light6);
+      @include _selectionOff();
+      width: 12rem;
+      padding: .5rem;
+      font-size: 1rem;
+    }
+  }
+}

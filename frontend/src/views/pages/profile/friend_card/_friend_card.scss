@@ -9,6 +9,7 @@
     width: 100%;
     .friendInfos {
         @include _flex(column, center, center);
+        cursor: pointer;
         width: 100%;
         margin-bottom: .75rem;
         .avatar {

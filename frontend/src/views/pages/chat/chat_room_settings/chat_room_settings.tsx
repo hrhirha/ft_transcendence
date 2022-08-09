@@ -1,9 +1,9 @@
 import { faArrowRightFromBracket, faClose, faGamepad, faPenToSquare, faTrash, faUser, faUsers, faUserSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { DefaultGame, UltimateGame } from "../../../../assets";
-import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
-import { MemeberCard } from "./member_card/member_card";
-import { SettingsOption } from "./settings_option/settings_option";
+import { DefaultGame, UltimateGame } from "assets";
+import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
+import { MemeberCard } from "views/pages/chat/chat_room_settings/member_card/member_card";
+import { SettingsOption } from "views/pages/chat/chat_room_settings/settings_option/settings_option";
 
 
 

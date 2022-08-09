@@ -1,5 +1,5 @@
 import React from 'react'
-import { CircleAvatar } from '../../../components/circle_avatar/circle_avatar'
+import { CircleAvatar } from 'views/components/circle_avatar/circle_avatar'
 
 interface Props {
     display_image :boolean,

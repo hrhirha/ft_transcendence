@@ -1,17 +1,17 @@
 section.matchCard {
     @include _flex(row, space-between, center);
-    cursor: pointer;
     width: 95%;
     padding: 1rem;
     margin: .5rem auto;
     border-radius: 1rem;
-    background-color: $light4;
+    @include _gradientBg($light4, $dark3);
     @media (max-width: $lg)
     {
         padding: .5rem;
     }
    .player {
         @include _flex(row, center, center);
+        cursor: pointer;
         .avatar {
             @include _flex(column, center, center);
             position: relative;
@@ -30,6 +30,9 @@ section.matchCard {
                     @include _square(1.5rem);
                     border-width: 0.15rem;
                 }
+            }
+            .achievment {
+                @include _achievment($dimensions_factor: .4, $bottom: 0rem);
             }
         }
         .fullName {

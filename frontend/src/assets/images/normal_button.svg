@@ -1,0 +1,15 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 250" width="720" height="250">
+	<title>button</title>
+	<defs>
+		<linearGradient id="g1" x1="359.8" y1="224" x2="359.8" y2="26.3" gradientUnits="userSpaceOnUse">
+			<stop offset="0" stop-color="#5259b7"/>
+			<stop offset="1" stop-color="#6b72ce"/>
+		</linearGradient>
+	</defs>
+	<style>
+		.s0 { fill: #9d2121;stroke: #fff7f7;paint-order:stroke fill markers;stroke-linejoin: round;stroke-width: 40 } 
+		.s1 { fill: url(#g1);stroke: #838ae7;stroke-linejoin: round;stroke-width: 15 } 
+	</style>
+	<path id="Layer 3 copy" class="s0" d="m20.3 125.2c2.4-54.6 50.5-98.9 107.4-98.9h473c56.8 0 101 44.3 98.6 98.9-2.4 54.5-50.4 98.8-107.3 98.8h-473c-56.9 0-101.1-44.3-98.7-98.8z"/>
+	<path id="Layer 3" class="s1" d="m20.3 125.2c2.4-54.6 50.5-98.9 107.4-98.9h473c56.8 0 101 44.3 98.6 98.9-2.4 54.5-50.4 98.8-107.3 98.8h-473c-56.9 0-101.1-44.3-98.7-98.8z"/>
+</svg>

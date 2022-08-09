@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { FriendsManager } from "./friends_manager/friends_manager";
-import { ProfileInfos } from "./profile_infos/profile_infos";
-import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faComment, faUsersGear, faHistory} from "@fortawesome/free-solid-svg-icons";
+import { FriendsManager } from "views/pages/profile/friends_manager/friends_manager";
+import { ProfileInfos } from "views/pages/profile/profile_infos/profile_infos";
+import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faUsersGear, faHistory} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { MatchesHistory } from "./matches_history/matches_history";
-import { AuthChecker } from "../../components/check_auth/auth_checker";
-import { get_me } from "../../../controller/user/user";
-import { post_friendreq_accept, post_friendreq_cancel, post_friendreq_decline, post_friendreq_send } from "../../../controller/user/friendreq";
-import { post_friend_block, post_friend_unblock, post_friend_unfriend } from "../../../controller/user/friends";
+import { MatchesHistory } from "views/pages/profile/matches_history/matches_history";
+import { post_friendreq_accept, post_friendreq_cancel, post_friendreq_decline, post_friendreq_send } from "controller/user/friendreq";
+import { post_friend_block, post_friend_unblock, post_friend_unfriend } from "controller/user/friends";
 
 
 export enum userType {
@@ -24,11 +22,7 @@ export const buttons = [
         icon: faUserPlus,
         text: 'Add Friend',
         onClick: async (userId: string, action?: Function) => {
-            try {
-                await post_friendreq_send(userId);
-            } catch(err) {
-
-            } 
+            await post_friendreq_send(userId);
         }
     },
     {
@@ -36,12 +30,8 @@ export const buttons = [
         icon: faUserCheck,
         text: 'Accept',
         onClick: async (userId: string, action?: Function) => {
-            try {
-                await post_friendreq_accept(userId);
-                action && action(userId);
-            } catch(err) {
-
-            } 
+            await post_friendreq_accept(userId);
+            action && action(userId);
         }
     },
     {
@@ -49,11 +39,8 @@ export const buttons = [
         icon: faUserXmark,
         text: 'Decline',
         onClick: async (userId: string, action?: Function) => {
-            try {
-                await post_friendreq_decline(userId);
-                action && action(userId);
-            } catch(err) {
-            }
+            await post_friendreq_decline(userId);
+            action && action(userId);
         }
     },
     {
@@ -61,11 +48,8 @@ export const buttons = [
         icon: faUserMinus,
         text: 'Unfriend',
         onClick: async (userId: string, action?: Function) => {
-            try {
-                await post_friend_unfriend(userId);
-                action && action(userId);
-            } catch(err) {
-            }
+            await post_friend_unfriend(userId);
+            action && action(userId);
         }
     },
     {
@@ -73,12 +57,9 @@ export const buttons = [
         icon: faUserSlash,
         text: 'Block',
         onClick: async (userId: string, action?: Function) => {
-            try {
-                await post_friend_block(userId);
-                action && action(userId);
-            } catch(err) {
-
-            }
+            await post_friend_block(userId);
+            action && action(userId);
+            window.location.pathname = "/";
         }
     },
     {
@@ -86,12 +67,8 @@ export const buttons = [
         icon: faUserMinus,
         text: 'Unblock',
         onClick: async (userId: string, action?: Function) => {
-            try {
-                await post_friend_unblock(userId);
-                action && action(userId);
-            } catch(err) {
-
-            }
+            await post_friend_unblock(userId);
+            action && action(userId);
         }
     },
     {
@@ -99,20 +76,14 @@ export const buttons = [
         icon: faUserXmark,
         text: 'Cancle',
         onClick: async (userId: string, action?: Function) => {
-            try {
-                await post_friendreq_cancel(userId);
-                action && action(userId);
-            } catch(err) {
-
-            }
+            await post_friendreq_cancel(userId);
+            action && action(userId);
         }
     }
 ];
 
-export const Profile:React.FC = () => {
+export const Profile:React.FC<{userProfile: boolean}> = ({userProfile}) => {
     const [switchTab, setSwitchTab] = useState<number>(0);
-    const [editable, setEditable] = useState<boolean>(false);
-    const [userInfos, setUserInfos] = useState<any>(null);
 
     const tabs = [
         {
@@ -124,61 +95,38 @@ export const Profile:React.FC = () => {
             icon: faUsersGear,
         }
     ];
-    useEffect(() => {
-        (async function() {
-            try {
-                const me = await get_me();
-                setUserInfos(me);
-            } catch (err) {
-                //error
-            }
-        })();
-    },[]);
+
+    useEffect(() => {setSwitchTab(0)},[userProfile]);
+
     return (
-    <AuthChecker
-        redirect="/profile"
-        wrappedContent={
         <main id="profilePage">
             <div className="profil">
                 <div className='container'>
                         <div className="col col-md-11 col-lg-9 col-xl-8">
-                            <ProfileInfos
-                                id={userInfos?.id}
-                                avatar={userInfos?.imageUrl}
-                                fullName={userInfos?.fullName}
-                                username={userInfos?.username}
-                                ranking={userInfos?.rank || 0}
-                                wins={userInfos?.wins}
-                                loses={userInfos?.loses}/>
+                            <ProfileInfos userProfile={userProfile}/>
                         </div>
                         <div className="col col-md-11 col-lg-9 col-xl-8">
-                            <nav className="profileTabs">
+                            {userProfile && <nav className="profileTabs">
                                 <ul className="tabs">
                                     {tabs.map((tab, index) => (
                                         <li key={`${tab.title.replace(' ', '_')}`} className={"tabTitle "+(switchTab === index ? "active" : "")} onClick={() =>  setSwitchTab(index)}>{tab.title}</li>
                                     ))}
                                 </ul>
-                            </nav>
+                            </nav>}
                             <div className="tabHeader">
                                 <hr/>
                                 <div className="title">
-                                    {tabs.map((tab, index) => {
-                                        if (index === switchTab) {
-                                            return <div key={`${tab.title.replace(' ', '')}`}>
-                                                <FontAwesomeIcon icon={tab.icon} />
-                                                <span>{tab.title}</span>
-                                            </div>
-                                        }
-                                        return null;
-                                    })}
+                                    {<div key={`${tabs[switchTab].title.replace(' ', '')}`}>
+                                        <FontAwesomeIcon icon={tabs[switchTab].icon} />
+                                        <span>{tabs[switchTab].title}</span>
+                                    </div>}
                                 </div>
                                 <hr/>
                             </div>
-                            {switchTab === 0 && <MatchesHistory />}
-                            {switchTab === 1 && <FriendsManager />}
+                            {switchTab === 0 && <MatchesHistory userProfile={userProfile} />}
+                            {switchTab === 1 && userProfile && <FriendsManager />}
                         </div>
                     </div>
             </div>
-        </main>}
-    />);
+        </main>);
 }

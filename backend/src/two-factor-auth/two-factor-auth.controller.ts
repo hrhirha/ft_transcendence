@@ -1,4 +1,4 @@
-import { Body, Catch, Controller, ForbiddenException, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Catch, Controller, ForbiddenException, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { Request, Response } from 'express';
 import { JwtAuthGuard } from 'src/auth/guard';
@@ -12,13 +12,12 @@ import { TwoFactorAuthService } from './two-factor-auth.service';
 export class TwoFactorAuthController {
     constructor(private _tfaS: TwoFactorAuthService) {}
 
-    @Post('generate')
+    @Get('generate')
     async generate(@GetUser() user: User, @Res() res: Response)
     {
         try
         {
             const {otp_auth_url} = await this._tfaS.generate(user);
-            console.log({otp_auth_url});
             return this._tfaS.pipeQrStream(res, otp_auth_url);
         }
         catch (e)
@@ -29,11 +28,11 @@ export class TwoFactorAuthController {
     }
 
     @Post('enable')
-    async enable(@GetUser() user: User, @Body() dto: TFADto)
+    async enable(@GetUser() user: User, @Body() dto: TFADto, @Req() req: Request)
     {
         try
         {
-            return await this._tfaS.enable(user, dto);
+            return await this._tfaS.enable(user, dto, req);
         }
         catch (e)
         {
@@ -44,11 +43,11 @@ export class TwoFactorAuthController {
 
     @UseGuards(Jwt2FAAuthGuard)
     @Post('disable')
-    async disable(@GetUser() user: User)
+    async disable(@GetUser() user: User, @Body() dto: TFADto)
     {
         try
         {
-            return await this._tfaS.disable(user);
+            return await this._tfaS.disable(user, dto);
         }
         catch (e)
         {

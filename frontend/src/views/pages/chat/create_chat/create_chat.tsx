@@ -1,8 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faClose, faKey, faLock, faLockOpen, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
-import { UserSearchForm } from "../../../components/user_search/user_search";
-import { CircleAvatar } from "../../../components/circle_avatar/circle_avatar";
+import { UserSearchForm } from "views/components/user_search/user_search";
+import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 
 enum chatTypes {
     public, private, protected, direct, none

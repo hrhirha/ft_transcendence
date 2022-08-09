@@ -25,7 +25,6 @@ model User {
   tfaSecret     String? @default("")
 
   score         Int? @default(0)            // updated when a game is played
-  rank          Int?
   status        String? @default("OFFLINE") // "online", "offline", "in a game" ...
 
   wins          Int? @default(0)
@@ -39,8 +38,22 @@ model User {
 
   user_games    UserGame[]
 
+  rank_id       String
+  rank          Rank @relation(fields: [rank_id], references: [id])
+
   @@map("users")
-  @@unique([id, tfaSecret])
+  @@unique([id, isTfaEnabled])
+}
+
+model Rank {
+  id      String  @id @default(cuid())
+  title   String  @unique @default("Wood")
+  icon    String  @unique
+  field   String  @unique
+  require Int     @default(0)
+  user    User[]
+
+  @@map("ranks")
 }
 
 model FriendReq {
@@ -121,7 +134,9 @@ model Game {
   id          String @id @default(cuid())
   createdAt   DateTime @default(now())
 
-  map       String
+  map         String
+  is_ultimate Boolean @default(false)
+  ongoing     Boolean @default(true)
 
   user_game UserGame[]
 

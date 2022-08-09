@@ -1,6 +1,7 @@
-import { ExecutionContext, UnauthorizedException } from "@nestjs/common";
+import { ExecutionContext, HttpException, HttpStatus, UnauthorizedException } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport"
 import { Observable } from "rxjs";
+import { HOST } from "src/utils";
 
 export class OAUth42Guard extends AuthGuard('42') {
     constructor() {
@@ -13,7 +14,8 @@ export class OAUth42Guard extends AuthGuard('42') {
 
     handleRequest<TUser = any>(err: any, user: any, info: any, context: any, status?: any): TUser {
         if (err || !user) {
-            throw new UnauthorizedException({auth_error: 'you are not logged in'});
+            context.getRequest().res.setHeader('Location', `http://${HOST}:3000/login`);
+            throw new HttpException("authentication failed", HttpStatus.PERMANENT_REDIRECT);
         }
         return user;
     }

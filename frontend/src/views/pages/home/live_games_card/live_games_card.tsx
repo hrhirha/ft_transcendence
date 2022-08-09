@@ -6,6 +6,7 @@ import React from "react";
 interface Props {
     background?: string,
     title: string,
+    onClick: Function
 }
 
 export const LiveGamesCard:React.FC<Props> = (Props) => {
@@ -13,7 +14,7 @@ export const LiveGamesCard:React.FC<Props> = (Props) => {
         <div id="liveGamesCard" style={{backgroundImage: `url(${Props.background})`}}>
             <div className="overlay">
                 <h6>{Props.title}</h6>
-                <button id="watchLives">
+                <button id="watchLives" onClick={() => Props.onClick()}>
                     <FontAwesomeIcon icon={faBroadcastTower}/>
                     Watch
                 </button>

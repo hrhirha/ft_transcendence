@@ -37,6 +37,8 @@ section#friendsManager {
             height: 100%;
             padding: .5rem;
             .empty {
+                @include _gradientBg(rgba($dark2, 50), rgba($dark1, 0), 180);
+                border-radius: 1rem;
                 @include _flex(column, center, center);
                 @include _selectionOff();
                 width: 100%;
@@ -44,6 +46,8 @@ section#friendsManager {
                 margin: auto;
                 img {
                     width: 45%;
+                    min-height: 20rem;
+                    opacity: .6;
                     @media (max-width: $md) {
                         width: 75%;
                     }
@@ -58,10 +62,10 @@ section#friendsManager {
                     text-transform: capitalize;
                     position: relative;
                     bottom: 1.5rem;
-                    font-family: $BFont;
-                    font-size: $fsize * 1.75;
+                    font-family: $XLFont;
+                    font-size: $fsize * 1.5;
                     color: $light4;
-                    margin-top: .5rem;
+                    margin-top: .75rem;
                     max-width: 18rem;
                     text-align: center;
                     line-height: 1.2;

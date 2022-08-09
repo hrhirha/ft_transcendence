@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserDto } from 'src/user/dto';
+import { HOST } from 'src/utils';
 
 @Injectable()
 export class AuthService {
@@ -17,10 +18,11 @@ export class AuthService {
     async login(dto: UserDto, req: Request)
     {
         const user = await this._prismaS.user.upsert({
-            where: {email: dto.email, },
+            where: {username: dto.username, },
             update: {},
             create: {
-                ...dto
+                ...dto,
+                rank: {connect: {title: 'Wood'}}
             },
             select: {
                 id: true,
@@ -28,6 +30,7 @@ export class AuthService {
                 fullName: true,
                 email: true,
                 imageUrl: true,
+                isTfaEnabled: true,
                 score: true,
                 rank: true,
                 wins: true,
@@ -36,7 +39,9 @@ export class AuthService {
             }
         });
 
-        const referer = req.header("Referer") || `http://${process.env.HOST}:3000`;
+        let referer = req.header("Referer") || `http://${HOST}:3000`;
+        if (user.isTfaEnabled)
+            referer += "checkpoint";
 
         const cookie = this.getCookieWithJwtAccessToken(user.id);
         req.res.setHeader('Set-Cookie', cookie)
@@ -68,6 +73,9 @@ export class AuthService {
             if (payload.sub) {
                 const user = await this._prismaS.user.findUnique({
                     where: { id: payload.sub, },
+                    include: {
+                        rank: true,
+                    }
                 });
                 return user;
             }
@@ -76,5 +84,5 @@ export class AuthService {
         {
             return null;
         }
-    }
+    }   
 }

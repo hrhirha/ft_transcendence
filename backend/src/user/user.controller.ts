@@ -1,11 +1,11 @@
-import { Body, Controller, ForbiddenException, Get, Param, Patch, Post, Req, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, ForbiddenException, Get, Param, Patch, Post, Req, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from './decorator';
 import { EditFullNameDto, EditUsernameDto, UserDto, UserIdDto } from './dto';
 import { UserService } from './user.service';
-import { Express, Request, Response } from 'express'
+import { Request } from 'express'
 import { diskStorage } from 'multer';
-import { User } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
 import { randomUUID } from 'crypto';
 import { createReadStream } from 'fs';
@@ -19,11 +19,37 @@ export class UserController {
         private _userS: UserService) {}
 
     // User
-    @Get('me')
-    me(@GetUser() dto: User)
+
+    @Get('all')
+    async getAll(@GetUser() user: User)
     {
-        const { refresh_token, tfaSecret, ...new_dto } = dto;
-        return new_dto;
+        try
+        {
+            return await this._userS.getAll(user);
+        }
+        catch (e)
+        {
+            console.log({error: e.message});
+            throw new ForbiddenException('could not get all users');
+        }
+    }
+
+    @Get('me')
+    async me(@GetUser() dto: User)
+    {
+        return {
+            id: dto.id,
+            username: dto.username,
+            fullName: dto.fullName,
+            imageUrl: dto.imageUrl,
+            score: dto.score,
+            rank: await this._userS.getRank(dto.rank_id),
+            wins: dto.wins,
+            loses: dto.loses,
+            status: dto.status,
+            isTfaEnabled: dto.isTfaEnabled,
+            relation: null,
+        };
     }
     
     @Patch('edit/username')
@@ -75,9 +101,10 @@ export class UserController {
     {
         try
         {
+            if (!file) throw new BadRequestException({error: 'no file was uploaded'});
             await this._userS.editAvatar(id, file);
             const f = createReadStream(join(file.path));
-            req.res.setHeader("Content-Type", file.mimetype)
+            req.res.setHeader("Content-Type", file.mimetype);
             return new StreamableFile(f);
         }
         catch (e)
@@ -265,6 +292,8 @@ export class UserController {
     @Get('id/:id')
     async getUserById(@GetUser() user: User, @Param('id') uid: string)
     {
+        if (!(/^c[a-z0-9]{20,}$/.test(uid)))
+            throw new ForbiddenException("Invalid id format");
         try
         {
             return await this._userS.getUserById(user, uid);
@@ -279,6 +308,8 @@ export class UserController {
     @Get('u/:username')
     async getUserByUsername(@GetUser() user: User, @Param('username') username: string)
     {
+        if (!(/^[\w-]{4,20}$/.test(username)))
+            throw new ForbiddenException("Invalid username format");
         try
         {
             return await this._userS.getUserByUsername(user, username);

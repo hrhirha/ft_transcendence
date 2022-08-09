@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -24,19 +23,21 @@ export class GameService
         });
     }
 
-    async matchHistory(user: User)
+    async matchHistory(username: string)
     {
         const games = await this._prisma.game.findMany({
             where: {
                 user_game: {
                     some: {
-                        uid: user.id
+                        user: { username }
                     }
-                }
+                },
+                ongoing: false,
             },
             select: {
                 id: true,
                 map: true,
+                is_ultimate: true,
                 user_game: {
                     select: {
                         user: {
@@ -45,6 +46,17 @@ export class GameService
                                 username: true,
                                 fullName: true,
                                 imageUrl: true,
+                                score: true,
+                                rank: {
+                                    select: {
+                                        title: true,
+                                        icon: true,
+                                        field: true,
+                                    }
+                                },
+                                wins: true,
+                                loses: true,
+                                status: true,
                             }
                         },
                         score: true,
@@ -55,12 +67,68 @@ export class GameService
 
         let hist = [];
         games.forEach(game => {
-            const p1 = game.user_game[0].user;
-            p1["score"] = game.user_game[0].score;
-            const p2 = game.user_game[1].user;
-            p2["score"] = game.user_game[1].score;
+            const ug1 = game.user_game[0];
+            const ug2 = game.user_game[1];
+            const p1 = ug1.user;
+            const p2 = ug2.user;
+
+            game['score'] = { p1: ug1.score, p2: ug2.score }
 
             delete game.user_game;
+            
+            hist.push({ ...game , p1, p2 });
+        });
+        return hist;
+    }
+
+    async ongoingGames()
+    {
+        const games = await this._prisma.game.findMany({
+            where: {
+                ongoing: true,
+            },
+            select: {
+                id: true,
+                map: true,
+                is_ultimate: true,
+                user_game: {
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                fullName: true,
+                                imageUrl: true,
+                                score: true,
+                                rank: {
+                                    select: {
+                                        title: true,
+                                        icon: true,
+                                        field: true,
+                                    }
+                                },
+                                wins: true,
+                                loses: true,
+                                status: true,
+                            }
+                        },
+                        score: true,
+                    }
+                }
+            }
+        });
+
+        let hist = [];
+        games.forEach(game => {
+            const ug1 = game.user_game[0];
+            const ug2 = game.user_game[1];
+            const p1 = ug1.user;
+            const p2 = ug2.user;
+
+            game['score'] = { p1: ug1.score, p2: ug2.score }
+
+            delete game.user_game;
+
             hist.push({ ...game , p1, p2 });
         });
         return hist;

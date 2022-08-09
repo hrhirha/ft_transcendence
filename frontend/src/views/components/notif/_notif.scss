@@ -1,0 +1,140 @@
+section.notif {
+  @include _flex(row, flex-start, center);
+  @include _selectionOff();
+  cursor: default;
+  position: relative;
+  right: 1rem;
+  padding: .5rem;
+  margin: .4rem 0;
+  border-radius: .5rem;
+  min-width: 17rem;
+  max-width: 20rem;
+  min-height: 2.5rem;
+  box-shadow: 0 0 3rem -1rem $dark1;
+  @media (max-width: $xs) {
+    min-width: 90%;
+    max-width: 90%;
+  }
+  & > svg {
+    position: absolute;
+    right: -.5rem;
+    top: -.5rem;
+    padding: .25rem;
+    background: $dark1;
+    border-radius: 100%;
+    width: .75rem;
+    height: .75rem;
+    border: .15rem solid $light1;
+    cursor: pointer;
+  }
+  span.icon {
+    @include _flex(column, center, center);
+    min-width: 3rem;
+    width: 3rem;
+    margin-right: .5rem;
+    & > #circleAvatar {
+      min-width: 2rem!important;
+      max-width: 2rem!important;
+      min-height: 2rem!important;
+      max-height: 2rem!important;
+    }
+    & > svg {
+      font-size: $fsize * 1.2;
+      background-color: rgba($light1, .18);
+      padding: .5rem;
+      border-radius: 100%;
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+  
+  div.infos {
+    @include _flex(column, center, flex-start);
+    .title {
+      font-size: $fsize * .8;
+      padding:.2rem;
+      padding-left: 0;
+      font-family: $BFont;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+    p.description {
+      font-size: $fsize * .85;
+      font-family: $LFont;
+      line-height: 1.2;
+      padding: .5rem 0;
+      b {
+        font-family: $BFont;
+        font-size: $fsize * .8;
+      }
+    }
+  }
+  ul.actions {
+    @include _flex(row, space-around, center);
+    width: 100%;
+    list-style: none;
+    padding: .5rem 0;
+    li.action {
+      cursor: pointer;
+      padding: .5rem .75rem;
+      font-size: $fsize * .8;
+      font-family: $LFont;
+      line-height: 1.25;
+      border-radius: .5rem;
+    }
+  }
+  z-index: 100;
+}
+.error {
+    @include _gradientBg(#b52228, #c1151b);
+    // @include _gradientBg(#4caf50, #3d8540);
+    color: $light1;
+}
+.success {
+  @include _gradientBg(#5BB318, #2B7A0B);
+  // @include _gradientBg(#4caf50, #3d8540);
+  color: $light1;
+}
+.info {
+  @include _gradientBg($light6, $light4);
+
+}
+
+@-webkit-keyframes slide {
+    0% {
+      -webkit-transform: translateX(10rem);
+              transform: translateX(10rem);
+              opacity: 0;
+    }
+    100% {
+      -webkit-transform: translateX(-2.5rem);
+              transform: translateX(-2.5rem);
+              opacity: 1;
+    }
+}
+
+@keyframes slide {
+    0% {
+      -webkit-transform: translateX(10rem);
+              transform: translateX(10rem);
+              opacity: 0;
+    }
+    100% {
+      -webkit-transform: translateX(-2.5rem);
+              transform: translateX(-2.5rem);
+              opacity: 1;
+    }
+} 
+
+.notifications {
+  @include _flex(column, flex-start, flex-end);
+  position: fixed;
+  overflow: unset;
+  padding: .25rem;
+  right: .5rem;
+  bottom: 1rem;
+  z-index: 10;
+  @media (max-width: $xs) {
+    right: 0;
+  }
+}

@@ -1,0 +1,25 @@
+section#gameView {
+    @include _flex(column, center, center);
+    min-width: 280px;
+    max-width: 900px;
+    margin: 0px auto;
+    overflow: visible!important;
+    canvas {
+        margin-top: .5rem!important;
+        @include _gradientBg($light4, $dark3);
+        box-shadow: 0 0 2rem -.5rem $dark2;
+        border: .45rem solid $light4;
+        width: 96%!important;
+        height: auto!important;
+        border-radius: 1rem;
+        margin: 1rem auto;
+        padding: 0;
+        @media (max-width: $sm) {
+            width: auto;
+            border-width: .2rem;
+        }
+        @media (min-width: $md) {
+            width: 100%!important;
+        }
+    }
+}

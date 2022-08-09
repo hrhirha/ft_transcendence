@@ -10,7 +10,6 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
 import { ArgumentMetadata, HttpException, UsePipes, ValidationPipe } from '@nestjs/common';
-
 export class WsValidationPipe extends ValidationPipe
 {
     async transform(value: any, metadata: ArgumentMetadata) {
@@ -29,46 +28,40 @@ export class WsValidationPipe extends ValidationPipe
     }
 }
 
-
 @UsePipes(WsValidationPipe)
 @WebSocketGateway({ cors: true, namespace: 'game'})
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 {
     @WebSocketServer()
+
     server : Server;
-    roomCreated: number = 0;
-    connection: any;
-    que: {
-        Socket: Socket,
-        userId: string,
+
+    normaleQue: {
+        soc: Socket,
+        user: any,
     } = null;
-    
+
+    ultimateQue: {
+        soc: Socket,
+        user: any,
+    } = null;
     tab = new Map;
-    // {
-    //     user1: {
-    //         usrId: string,
-    //         restart: boolean,
-    //         disconected: boolean
-    //     },
-    //     user2: {
-    //         usrId: string,
-    //         restart: boolean,
-    //         disconected: boolean
-    //     },
-    //     endGame: boolean,
-    // }
-    
+
     constructor(private prisma: PrismaService, private jwt: ChatService){}
+    
     async handleDisconnect(client: Socket)
     {
+        console.log('Client Disconnect with ID: ' + client.id);
+
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)  
-            return null
-        console.log('Client Disconnect with ID: ' + client.id);
+            return user;
         
         if (client.data.obj == undefined)
         {
-            this.que = (client == this.que.Socket) ? null : this.que;
+            // client.emit("leave");
+            this.ultimateQue = (this.ultimateQue && client == this.ultimateQue.soc) ? null : this.ultimateQue;
+            this.normaleQue = (this.normaleQue && client == this.normaleQue.soc) ? null : this.normaleQue;
             return ;
         }
 
@@ -76,19 +69,68 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         {
             if (!this.tab[client.data.obj.roomId].endGame)
             {
-                await this.prisma.userGame.update({
-                    data: {
-                        score: (client.data.obj.player == "player1") ? client.data.obj.rScore : client.data.obj.lScore,
-                    },
-                    where: {
-                        uid_gid: {
-                            uid: client.data.obj.usrId,
-                            gid: client.data.obj.roomId
+                let factor = (client.data.bestOf == 5) ? { facWin: 5, losFac: 2 } : { facWin: 15, losFac: 5};
+                let winner = ((client.data.obj.player == "player1" && client.data.obj.lScore == client.data.bestOf)
+                || (client.data.obj.player == "player2" && client.data.obj.rScore == client.data.bestOf)) ? factor.facWin : factor.losFac;
+                this.prisma.$transaction(async () => {
+                    const ranks = await this.prisma.rank.findMany({ select: { id: true, require: true, } });
+    
+                    const u = (await this.prisma.userGame.update({
+                        data: {
+                            score: (client.data.obj.player == "player1") ? client.data.obj.rScore : client.data.obj.lScore,
+                            user: {         
+                                update: {  
+                                    score: {
+                                        increment: (client.data.obj.player  == "player1") ? client.data.obj.rScore * winner :  client.data.obj.lScore * winner,
+                                    },
+                                    wins: {
+                                        increment: ((client.data.obj.player == "player1" && client.data.obj.lScore == client.data.bestOf) ||
+                                                    (client.data.obj.player == "player2" && client.data.obj.rScore == client.data.bestOf)) ? 1 : 0,
+                                    },
+                                    loses: {
+                                        increment: ((client.data.obj.player == "player1" && client.data.obj.lScore != client.data.bestOf) ||
+                                                    (client.data.obj.player == "player2" && client.data.obj.rScore != client.data.bestOf)) ? 1 : 0,
+                                    }  
+                                },
+                            },
+                            // added by hrhirha
+                            game: {
+                                update: {
+                                    ongoing: false,
+                                }
+                            }
+                            // end
+                        },
+                        where: {
+                            uid_gid: {
+                                uid: client.data.obj.usrId,
+                                gid: client.data.obj.roomId
+                            }
+                        },
+                        select: {
+                            user: {
+                                select: {
+                                    id: true,
+                                    score: true,
+                                }
+                            }
                         }
+                    })).user;
+    
+                    const u_rank = (ranks.filter(r => { u.score >= r.require }));
+    
+                    if (u_rank.length !== 0)
+                    {
+                        await this.prisma.user.update({
+                            where: { id: u.id },
+                            data: {
+                                rank_id: u_rank[u_rank.length - 1].id
+                            }
+                        }); 
                     }
-                });
+                })
             }
-            this.server.to(client.data.obj.roomId).emit("leave");
+            this.server.to(client.data.obj.roomId).emit("youWin");
         }
         else
             client.leave(client.data.obj.roomId); /// a watcher leave the room 
@@ -96,16 +138,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
     async handleConnection(client: Socket, ...args: any[]) {
         console.log('Client Connected with ID: ' + client.id);
-        if (!this.beforeStart(client))
+        const user =(await this.jwt.getUserFromSocket(client));
+        if (!user)
+        {
             client.disconnect();
+            return user;
+        }
     }
 
     @SubscribeMessage('restart')
     async restart(client: Socket, d: any)
     {
         const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)  
-            return null
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
         
         if (client.data.obj.isPlayer)
         {
@@ -113,7 +162,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             true: this.tab[d.roomId].user1.restart;
             this.tab[d.roomId].user2.restart = (d.player === "player2") ?
             true: this.tab[d.roomId].user2.restart;
-            
             if (this.tab[d.roomId].user1.restart && this.tab[d.roomId].user2.restart)
             {
                 const newid  = await this.prisma.game.create({
@@ -149,45 +197,200 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     async EndGame(client: Socket, d: any)
     {
         const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)  
-            return null
-        if (client.data.obj.isPlayer)
+        if (!user)
         {
+            client.disconnect();
+            return user;
+        }
+        if (client.data.obj && client.data.obj.isPlayer)
+        {
+            let factor = (client.data.bestOf == 5) ? { facWin: 5, losFac: 2 } : { facWin: 15, losFac: 5};
+            let winner = ((d.player == "player1" && d.lscore == client.data.bestOf) || (d.player == "player2" && d.rscore == client.data.bestOf)) ? factor.facWin : factor.losFac;
             this.tab[d.roomId].endGame = true;
-            await this.prisma.userGame.update({
-                data: {
-                    score: (d.player == "player1") ? d.rscore :  d.lscore,
-                },
-                where: {
-                    uid_gid: {
-                        uid: d.userId,
-                        gid: d.roomId
+            this.prisma.$transaction(async () => {
+                const ranks = await this.prisma.rank.findMany({ select: { id: true, require: true, } });
+                const u = (await this.prisma.userGame.update({ 
+                    data: {
+                        score: (d.player == "player1") ? d.rscore :  d.lscore,
+                        user: {
+                            update: {  
+                                score: {
+                                    increment: (d.player == "player1") ? d.rscore * winner :  d.lscore * winner,
+                                },
+                                wins: {
+                                    increment: ((d.player == "player1" && d.lscore == client.data.bestOf) ||
+                                                (d.player == "player2" && d.rscore == client.data.bestOf)) ? 1 : 0,
+                                },
+                                loses: {
+                                    increment: ((d.player == "player1" && d.lscore != client.data.bestOf) ||
+                                                (d.player == "player2" && d.rscore != client.data.bestOf)) ? 1 : 0,
+                                }  
+                            },
+                        },
+                        // added by hrhirha
+                        game: {
+                            update: {
+                                ongoing: false,
+                            }
+                        }
+                        // end
+                    },
+                    where: {
+                        uid_gid: {
+                            uid: d.userId,
+                            gid: d.roomId
+                        }
+                    },
+                    select: {
+                        user: {
+                            select: {
+                                id: true,
+                                score: true,
+                            }
+                        }
                     }
+                })).user;
+
+                const u_rank = (ranks.filter(r => { u.score >= r.require }));
+
+                if (u_rank.length !== 0)
+                {
+                    await this.prisma.user.update({
+                        where: { id: u.id },
+                        data: {
+                            rank_id: u_rank[u_rank.length - 1].id
+                        }
+                    });
                 }
             });
+
             /// emit restart 
             client.emit('restart', d.status);
+            return ;
         }
-        // else
-        // {
-        //     client.leave(client.data.obj.roomId); /// a watcher leave the room 
-        // }
+        client.emit("watcherEndMatch"); /// a watcher leave the room 
     }
-    @SubscribeMessage('')
-    async brod(client: Socket, d: any)
+
+    @SubscribeMessage('sendToWatcher')
+    async brodToWatchers(client: Socket, d: any)
     {
         const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)  
-            return null
-        
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
+        this.server.to(d.roomId).emit('Watchers', d);
     }
+
+    @SubscribeMessage('normaleQue')
+    async normaleQuee(client: Socket)
+    {
+        const user =(await this.jwt.getUserFromSocket(client));
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
+        if (client.data.obj)
+            client.leave(client.data.obj.roomId);
+        client.data.bestOf = 5;
+        //  user1 save info /////////////////////
+        if (!this.normaleQue || this.normaleQue.user.id == user.id)
+        {
+            if (this.normaleQue && this.normaleQue.user.id == user.id)
+                this.normaleQue.soc.disconnect();
+            this.normaleQue = {
+                soc: client,
+                user: user,
+            };           
+            client.emit("waiting");
+            return this.normaleQue;
+        }
+        /////////////////////////////////////////
+        let connection =  await this.prisma.game.create({
+            data: {
+                map: "map_url",
+                user_game:
+                {
+                    createMany: {
+                        data:
+                        [
+                            { uid: user.id    },
+                            { uid: this.normaleQue.user.id }
+                        ]
+                    }
+                }
+            },
+            select: {
+                id: true,
+            }
+        });
+        this.insertSocketData(this.normaleQue.soc, this.normaleQue.user.id, "player1", connection.id);
+        this.insertSocketData(client, user.id, "player2", connection.id);
+        this.normaleQue = null;
+        this.server.to(connection.id).emit('startGame');
+
+    }
+    @SubscribeMessage('ultimateQue')
+    async ultimateQuee(client: Socket)
+    {
+        const user =(await this.jwt.getUserFromSocket(client));
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
+        if (client.data.obj)
+            client.leave(client.data.obj.roomId);
+        client.data.bestOf = 3;
+        //  user1 save info /////////////////////
+        if (!this.ultimateQue)
+        {
+            this.ultimateQue = {
+                soc: client,
+                user: user,
+            };
+            client.emit("waiting");
+            return this.ultimateQue;
+        }
+        /////////////////////////////////////////
+
+        const mapUrl: string = (this.ultimateQue.user.score > user.score) ? this.ultimateQue.user.rank.field: user.rank.field;
+        let connection =  await this.prisma.game.create({
+            data: {
+                map: mapUrl,
+                user_game:
+                {
+                    createMany: {
+                        data:
+                        [
+                            { uid: user.id    },
+                            { uid: this.ultimateQue.user.id }
+                        ]
+                    }
+                }
+            },
+            select: {
+                id: true,
+            }
+        });
+        this.insertSocketData(this.ultimateQue.soc, this.ultimateQue.user.id, "player1", connection.id);
+        this.insertSocketData(client, user.id, "player2", connection.id);
+        this.server.to(connection.id).emit('map', mapUrl);
+        this.ultimateQue = null;
+    }
+
 
     @SubscribeMessage('join')
     async joinNewRoom(client: Socket, d: any)
     {
         const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)  
-            return null
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
         client.data.obj.roomId = d.newRoom;
         client.leave(d.oldData.roomId);
         client.join(d.newRoom);
@@ -195,29 +398,32 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
 
     @SubscribeMessage('watcher')
-    async newWatcher(client: Socket, roomid: string)
+    async newWatcher(client: Socket, roomId: string)
     {
         const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)  
-            return null
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
         client.data.obj = {
-            roomId: roomid,
+            roomId,
             isPlayer: false,
         };
-        client.join(roomid);
         client.emit("saveData", {
-            roomid,
+            roomId,
             player: "",
             is_player: false,
             userId: user.id
         });
+        client.join(roomId);
     }
 
-    insertSocketData(client: Socket, usrId: string, player: string)
+    insertSocketData(client: Socket, usrId: string, player: string, room: string)
     {
         if (player == "player1")
         {
-            this.tab[this.connection.id] = {
+            this.tab[room] = {
                 user1:
                 {
                     usrId,
@@ -234,20 +440,20 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             }
         }
         else
-            this.tab[this.connection.id].user2.usrId = usrId;
-        client.join(this.connection.id);
+            this.tab[room].user2.usrId = usrId;
+        client.join(room);
         client.data.obj = {
             player,
             usrId,
             lScore: 0,
             rScore: 0,
-            roomId: this.connection.id,
+            roomId: room,
             isPlayer: true,
         };
         client.emit("saveData", {
             player,
             is_player: true,
-            roomId: this.connection.id,
+            roomId: room,
             userId: usrId
         });
     }
@@ -256,52 +462,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     async checkConnection(client: Socket, data: any)
     {
         const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)  
-            return null
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
+        if (!client.data.obj)
+            return ;
         client.data.obj.lScore = data.lScore;
         client.data.obj.rScore = data.rScore;
-        client.broadcast.to(data.roomid).emit('recv', data);
-    }
-
-    async beforeStart(client: Socket)
-    {
-        const user =(await this.jwt.getUserFromSocket(client));
-        if (!user)  
-            return null
-
-        //  user1 save info /////////////////////
-        if (!this.que)
-        {
-            this.que = {
-                Socket: client,
-                userId: user.id
-            };
-            return ;
-        }
-        /////////////////////////////////////////
-
-        this.connection =  await this.prisma.game.create({
-            data: {
-                map: "map_url",
-                user_game:
-                {
-                    createMany: {
-                        data:
-                        [
-                            { uid: user.id              },
-                            { uid: this.que.userId }
-                        ]
-                    }
-                }
-            },
-            select: {
-                id: true,
-            }
-        });
-        this.insertSocketData(this.que.Socket, this.que.userId, "player1");
-        this.insertSocketData(client, user.id, "player2");
-        this.que = null;
-        this.server.to(this.connection.id).emit('startGame');
-        return true;
+        client.broadcast.to(data.roomId).emit('recv', data);
     }
 }

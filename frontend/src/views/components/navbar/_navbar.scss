@@ -3,6 +3,7 @@ header#navbar {
     width: auto;
     padding-top: 1rem;
     padding-bottom: 1rem;
+    z-index: 100;
     @include _selectionOff();
     @include _gradientBg($light4, $dark2, 145);
     div.container {
@@ -64,26 +65,55 @@ header#navbar {
                     }
                     border-color: $light2!important;
                 }
-                a#profileNavBtn {
-                    @include _flex(column, center, center);
-                    background-repeat: no-repeat;
-                    background-size: cover;
-                    background-color: $light3;
-                    border-radius: 100%;
-                    border: .2rem solid $light3;
-                    #circleAvatar {
-                        @media (max-width: 330px) {
-                            min-width: 2rem!important;
-                            min-height: 2rem!important;
-                            max-width: 2rem!important;
-                            max-height: 2rem!important;
+                div.logoutAndProfile {
+                    position: relative;
+                    a#profileNavBtn {
+                        @include _flex(column, center, center);
+                        background-repeat: no-repeat;
+                        background-size: cover;
+                        background-color: $light3;
+                        border-radius: 100%;
+                        border: .2rem solid $light3;
+                        #circleAvatar {
+                            @media (max-width: 330px) {
+                                min-width: 2rem!important;
+                                min-height: 2rem!important;
+                                max-width: 2rem!important;
+                                max-height: 2rem!important;
+                            }
                         }
+                    }
+                    &:hover > .logout {
+                        display: block;
+                    }
+                    .logout {
+                        display: none;
+                        cursor: pointer;
+                        position: absolute;
+                        animation: show .3s cubic-bezier(0, 0.2, 0.8, 1);
+                        padding: .25rem;
+                        background: rgba($light4, .8);
+                        border-radius: 50%;
+                        top: -.5rem;
+                        right: -.5rem;
+                        font-size: .8rem;
+                        border: .1rem solid rgba($light1, .75);
                     }
                 }
             }
         }
     }
 }
+
+@keyframes show {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 .fixed {
     position: fixed;
     top: 0;

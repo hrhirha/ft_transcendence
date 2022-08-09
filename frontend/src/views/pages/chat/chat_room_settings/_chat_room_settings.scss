@@ -7,6 +7,7 @@ section#chatRoomSettings {
     height: 100%;
     background-color: $dark2;
     @include _selectionOff();
+    overflow-y: auto;
     .roomSettings {
         @include _flex(column, flex-start, center);
         position: relative;
@@ -16,6 +17,7 @@ section#chatRoomSettings {
         min-width: 18rem;
         max-width: 20rem;
         max-height: 30rem;
+        margin-top: 2.5rem 0;
         span.closeSettings {
             @include _flex(column, center, center);
             position: absolute;

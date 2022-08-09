@@ -40,13 +40,13 @@ section#profileInfos {
             width: 120px;
             height: 120px;
             #circleAvatar {
-                border: .4rem solid $dark2;
+                border: .4rem solid $light6;
                 position: absolute;
                 top: 0;
                 width: 120px;
                 height: 120px;
             }
-            .ranking {
+            .score {
                 @include _flex(row, center, center);
                 font-family: $XBFont;
                 background-color: $dark3;
@@ -57,6 +57,12 @@ section#profileInfos {
                 position: absolute;
                 bottom: -20%;
                 z-index: 6;
+            }
+            .achievement {
+                @include _achievment();
+            }
+            .score.ach {
+                padding-left: .75rem;
             }
             .editAvatar {
                 @include _flex(row, center, center);
@@ -93,7 +99,7 @@ section#profileInfos {
                 border: none;
                 background: rgba($dark1, .5);
                 font-family: $BFont;
-                font-size: $fsize * 1.45;
+                font-size: $fsize * 1.25;
                 padding: .2rem 1rem;
                 border-radius: 5rem;
                 outline: none;
@@ -149,7 +155,7 @@ section#profileInfos {
             }
         }
     }
-    button.edit {
+    button.edit, button.save {
         @include _flex(column, center, center);
         position: absolute;
         top: -.5rem;
@@ -169,5 +175,12 @@ section#profileInfos {
             }
         }
         z-index: 5;
+    }
+}
+
+button.save {
+    background-color: $purple!important;
+    svg {
+        font-size: $fsize * .9!important;
     }
 }

@@ -7,6 +7,9 @@
 @import "../components/user_search/user_search";
 @import "../components/circle_avatar/circle_avatar";
 @import "../components/match_card/match_card";
+@import "../components/notif/notif";
+@import "../components/twofa_card/twofa";
+@import "../components/loading/loading";
 //containers
 
 //pages
@@ -15,6 +18,10 @@
 @import "../pages/chat/chat";
 @import "../pages/leader_board/leader_board";
 @import "../pages/profile/profile";
+@import "../pages/game/game_view/game_view";
+@import "../pages/game/game_player/game_player";
+@import "../pages/game/game_watcher/game_watcher";
+@import "../pages/checkpoint/checkpoint";
 @import "../pages/not_found/not_found";
 
 
@@ -79,8 +86,12 @@
 }
 
 body {
-    background: $dark1;
+    background-color: $dark1;
+    background-image: url("../../assets/images/bg.svg");
     min-height: 100vh;
     min-width: 280px;
     overflow: auto;
+    #root {
+        height: 100%;
+    }
 }

@@ -1,10 +1,11 @@
 import { faUsers, faUsersBetweenLines, faUsersRays, faUsersSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
-import { EmptyBlocking, EmptyFriends, EmptyFriendsRequests, EmptyPending } from "../../../../assets";
-import { get_friendreqs_received, get_friendreqs_sent } from "../../../../controller/user/friendreq";
-import { get_friends, get_friends_blocked, user_info } from "../../../../controller/user/friends";
-import { FriendCard } from "../friend_card/friend_card";
+import { EmptyBlocking, EmptyFriends, EmptyFriendsRequests, EmptyPending } from "assets";
+import { get_friendreqs_received, get_friendreqs_sent } from "controller/user/friendreq";
+import { get_friends, get_friends_blocked } from "controller/user/friends";
+import { FriendCard } from "views/pages/profile/friend_card/friend_card";
+import { User } from "controller/user/user";
 
 
 
@@ -44,26 +45,26 @@ const NavBar:React.FC<{activeTab: tabs, onChange: Function}> = ({activeTab, onCh
 
 export const FriendsManager:React.FC = () => {
     const [activeTab, setActiveTab] = useState<tabs>(tabs.friends);
-    const [friendsList, setFriendsList] = useState<Array<user_info>>([]);
+    const [friendsList, setFriendsList] = useState<Array<User>>([]);
     useEffect(() => {
         (async () => {
             try {
                 switch(activeTab)
                 {
                     case tabs.pending:
-                        const pending: user_info[] = await get_friendreqs_sent();
+                        const pending: User[] = await get_friendreqs_sent();
                         setFriendsList(pending);
                     break;
                     case tabs.blocking:
-                        const blocked: user_info[] = await get_friends_blocked();
+                        const blocked: User[] = await get_friends_blocked();
                         setFriendsList(blocked);
                     break;
                     case tabs.requests:
-                        const reqFriends: user_info[] = await get_friendreqs_received();
+                        const reqFriends: User[] = await get_friendreqs_received();
                         setFriendsList(reqFriends);
                     break;
                     default:
-                        const friends: user_info[] = await get_friends();
+                        const friends: User[] = await get_friends();
                         setFriendsList(friends);
                 }
             } catch(err) {
@@ -84,24 +85,17 @@ export const FriendsManager:React.FC = () => {
             <div className="body">
                 <div className="grid">
                     {friendsList.length === 0 && <div className="empty">
-                        {activeTab === tabs.friends && <img alt="empty" src={EmptyFriends}/>}
-                        {activeTab === tabs.friends && <h5>You Have No Friends Yet</h5>}
-                        {activeTab === tabs.requests && <img alt="empty" src={EmptyFriendsRequests}/>}
-                        {activeTab === tabs.requests && <h5>You Have No Friend Requests</h5>}
-                        {activeTab === tabs.blocking && <img alt="empty" src={EmptyBlocking}/>}
-                        {activeTab === tabs.blocking && <h5>You Didn't Block Any One</h5>}
-                        {activeTab === tabs.pending && <img alt="empty" src={EmptyPending}/>}
-                        {activeTab === tabs.pending && <h5>You Have No Pending Requests</h5>}
+                        {activeTab === tabs.friends && <><img alt="empty" src={EmptyFriends}/><h5>You Have No Friends Yet</h5></>}
+                        {activeTab === tabs.requests && <><img alt="empty" src={EmptyFriendsRequests}/><h5>You Have No Friend Requests</h5></>}
+                        {activeTab === tabs.blocking && <><img alt="empty" src={EmptyBlocking}/><h5>You Didn't Block Any One</h5></>}
+                        {activeTab === tabs.pending && <><img alt="empty" src={EmptyPending}/><h5>You Have No Pending Requests</h5></>}
                     </div>}
                     {friendsList.length > 0
-                    && friendsList.map((friend: user_info) => 
+                    && friendsList.map((friend: User) => 
                     <FriendCard
                         key={`${friend.id}`}
-                        id={friend.id}
-                        type = {activeTab.valueOf()}
-                        avatar = {friend.imageUrl}
-                        fullName= {friend.fullName}
-                        username = {friend.username}
+                        type={activeTab.valueOf()}
+                        user={friend}
                         action={(id: string) => {setFriendsList(friendsList.filter((u) => u.id !== id))}}
                     />)}
                 </div>

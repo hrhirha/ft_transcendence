@@ -15,13 +15,13 @@ export class AuthController {
     @Get('login')
     async login(@GetUserProfile() dto: UserDto, @Req() req: Request)
     {
-        const token = req?.cookies?.access_token;
-        if (token && await this._authS.getUserFromToken(token))
-            throw new ForbiddenException({success: false, message: "already logged in"});
+        // const token = req?.cookies?.access_token;
+        // if (token && await this._authS.getUserFromToken(token))
+        //     throw new ForbiddenException({success: false, message: "already logged in"});
         try
         {
-            await this._authS.login(dto, req);
-            return {logged_in: true}
+            const u = await this._authS.login(dto, req);
+            return {success: true};
         }
         catch (e)
         {
@@ -33,7 +33,7 @@ export class AuthController {
     @UseGuards(Jwt2FAAuthGuard)
     @Get('logout')
     logout (@Req() req: Request) {
-        req.res.setHeader('Set-Cookie', 'Authentication=; HttpOnly; Path=/; Max-Age=0');
+        req.res.setHeader('Set-Cookie', 'access_token=; HttpOnly; Path=/; Max-Age=0');
         return {logged_out: true};
     }
 }

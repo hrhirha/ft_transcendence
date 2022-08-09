@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@prisma/client';
 import { Request, Response } from 'express';
@@ -6,6 +6,7 @@ import { authenticator } from 'otplib';
 import { toFileStream } from 'qrcode';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
+import { HOST } from 'src/utils';
 import { TFADto } from './dto';
 
 @Injectable()
@@ -34,17 +35,25 @@ export class TwoFactorAuthService {
         return toFileStream(res, otp_auth_url);
     }
     
-    async enable(user: User, dto: TFADto)
+    async enable(user: User, dto: TFADto, req: Request)
     {
         if (this.verify(user, dto))
         {
-            return await this._userS.enable2fa(user.id);
+            await this._userS.enable2fa(user.id);
+            const cookie = this._authS.getCookieWithJwtAccessToken(user.id, true);
+            req.res.setHeader('Set-Cookie', [cookie]);
+            return { success: true, }
         }
         throw new UnauthorizedException('invalid authentication code');
     }
     
-    async disable(user: User) {
-        return await this._userS.disable2fa(user.id);
+    async disable(user: User, dto: TFADto)
+    {
+        if (this.verify(user, dto))
+        {
+            return await this._userS.disable2fa(user.id);
+        }
+        throw new ForbiddenException('invalid authentication code');
     }
     
     verify(user: User, dto: TFADto)

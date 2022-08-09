@@ -43,7 +43,7 @@ export class UserIdDto
     @IsDefined()
     @IsString()
     @IsNotEmpty()
-    @Matches(/^c[a-z0-9]{20,}$/)
+    @Matches(/^c[a-z0-9]{20,}$/, {message: "Invalid id format"})
     id: string;
 }
 

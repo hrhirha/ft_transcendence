@@ -24,3 +24,12 @@ export const msg_type = {
     NOTIF: "NOTIFICATION",
     DEL: "MSG_DELETED"
 };
+
+export const relation_status = {
+    NONE: "none",           // no relation
+    NULL: null,             // profile
+    FRIEND: "friend",       // is friend
+    REQUESTED: 'request',   // request recieved
+    BLOCKED: 'blocked',     // blocked relation
+    PENDING: 'pending',     // pending request
+}
