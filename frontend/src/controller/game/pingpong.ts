@@ -72,16 +72,16 @@ export default class PingPong extends Phaser.Scene
 
     addScore()
     {
-        if (this.leftScoretxt)
-            this.leftScoretxt.destroy();
+        // if (this.leftScoretxt)
+        //     this.leftScoretxt.destroy();
         this.leftScoretxt = this.add.text((this.w / 2) - (this.w / 10) - 40 , 30, this.leftScore.toString(), {
             fontSize: "60px",
             fontFamily: "Poppins_B",
             align: "center",
         });
         
-        if (this.rightScoretxt)
-            this.rightScoretxt.destroy();
+        // if (this.rightScoretxt)
+        //     this.rightScoretxt.destroy();
         this.rightScoretxt = this.add.text((this.w / 2) + (this.w / 10) , 30, this.rightScore.toString(), {
             fontSize: "60px",
             fontFamily: "Poppins_B",
@@ -129,8 +129,8 @@ export default class PingPong extends Phaser.Scene
     {
         if (this.re)
             return ;
-        this.soc.removeAllListeners();
         this.re = true;
+        this.soc.removeAllListeners();
         this.scene.restart();
     }
 ////////////////////////.................////////////////////////
@@ -199,13 +199,12 @@ export default class PingPong extends Phaser.Scene
         // resize the images to fit the window
         if (!this.imgbg)
             this.imgbg = (this.type === "normaleQue") ? "normalField" : "ultimateField";
-        else
-            this.imgbg = "backGround";
+        this.imgbg = (this.type == "ultimateQue") ? "backGround": this.imgbg;
         this.bg = this.add.image(this.w / 2, this.h / 2, this.imgbg);
 
         /////////////////////////////// text ////////////////////////
 
-        this.addScore();
+        // this.addScore();
 
         this.soc.on("saveData", (data: { player: string, is_player: boolean, roomId: string, userId: string } ) => 
         {
@@ -255,8 +254,7 @@ export default class PingPong extends Phaser.Scene
         this.soc.on("restartGame", () => {
             this.leftScore = 0;
             this.rightScore = 0;
-            this.rightScoretxt.text = this.leftScore.toString();
-            this.leftScoretxt.text = this.leftScore.toString();
+            this.addScore();
             this.End = false;
             this.goal = false;
             if (this.data.is_player)
@@ -296,7 +294,6 @@ export default class PingPong extends Phaser.Scene
             this.load.once('complete', this.addSprites, this);
             this.load.image('backGround', this.imgbg);
             this.load.start();
-            this.addScore();
             this.goalTime();
         });
 
@@ -486,13 +483,13 @@ export default class PingPong extends Phaser.Scene
         if (this.isPlayer && this.connection)
         {
             this.connection = false;
-            this.soc.emit("ultimateQue");
+            this.soc.emit(this.type);
         }
         if (this.re)
         {
             this.re = false;
             this.restartClick = true;
-            this.soc.emit('restart', this.data);
+            this.soc.emit('restart', this.data); 
         }
         else if (!this.End && (this.rightScore >= this.bestOf || this.leftScore >= this.bestOf))
         {
@@ -528,6 +525,7 @@ export default class PingPong extends Phaser.Scene
             this.counter.text = "";
             if (this.exitEmited)
                 return ;
+            this.addScore();
             if (this.data.is_player)
                 this.startGame();
             else
@@ -538,20 +536,16 @@ export default class PingPong extends Phaser.Scene
 
     startGame() : void
     {
-        if (this.sys.game.device.os.desktop) {
+        this.gameIsStarted = true;
+        if (this.sys.game.device.os.desktop)
             if (this.isPlayer)
             {
                 this.desktop = true;
                 this.cursors =  this.input.keyboard.createCursorKeys();
             }
-        }
-        else {
+        else
             if (this.isPlayer)
-            {
-                this.mobile = true;   
-            }
-        }
-        this.gameIsStarted = true;
+                this.mobile = true;
         // loading a ball add sprite to the 
         this.posx = (this.data.player === "player1") ? 30: this.w - (145 * this.paddleScale) - 30 ;
         this.eposx = (this.data.player !== "player1") ? 30: this.w - (145 * this.paddleScale) - 30 ;
@@ -639,8 +633,8 @@ export default class PingPong extends Phaser.Scene
     goalTime()
     {
         this.initialTime = 3;
-        this.counter = this.add.text(this.w / 2, this.h / 2, '' + this.formatTime(this.initialTime), { fontSize: "60px",
-            fontFamily: "Poppins_B", align: "center" }).setOrigin(0.5);
+        this.counter = this.add.text(this.w / 2, this.h / 2, '' + this.formatTime(this.initialTime), { fontSize: "60px", 
+        fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
         // Each 1000 ms call onEvent
         this.timedEvent = this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });
     }
