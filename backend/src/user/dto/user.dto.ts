@@ -1,41 +1,21 @@
-import { IsDefined, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches } from "class-validator";
+import { IsDefined, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, MaxLength } from "class-validator";
 
-export class UserDto {
-    @IsNotEmpty()
-    @IsString()
+export interface UserDto
+{
+    id?: string;
     username: string;
-
-    @IsNotEmpty()
-    @IsEmail()
-    email: string;
-
-    @IsNotEmpty()
-    @IsEmail()
-    fullName: string; 
-
-    @IsString()
-    @IsOptional()
-    profileUrl?: string;
-
-    @IsNotEmpty()
-    @IsString()
+    fullName: string;
     imageUrl: string;
-
-    @IsNumber()
-    @IsOptional()
     score?: number;
-
-    @IsString()
-    @IsOptional()
-    status?: string;
-
-    @IsNumber()
-    @IsOptional()
+    rank?: {
+        title: string,
+        icon: string,
+        field: string,
+    };
     wins?: number;
-
-    @IsNumber()
-    @IsOptional()
     loses?: number;
+    status?: string;
+    relation?: string
 }
 
 export class UserIdDto
@@ -59,6 +39,7 @@ export class EditFullNameDto {
     @IsDefined()
     @IsString()
     @IsNotEmpty()
-    @Matches(/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(\-[a-zA-Z]+)*\.?))+$/, { message: "fullName can only contain a-z A-Z 0-9 - . SP" })
+    @MaxLength(40)
+    @Matches(/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(\-[a-zA-Z]+)*\.?))+$/, { message: "fullName can only contain a-z A-Z - . SP" })
     fullName: string;
 }

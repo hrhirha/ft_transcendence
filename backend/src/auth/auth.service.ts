@@ -28,7 +28,6 @@ export class AuthService {
                 id: true,
                 username: true,
                 fullName: true,
-                email: true,
                 imageUrl: true,
                 isTfaEnabled: true,
                 score: true,
@@ -73,8 +72,22 @@ export class AuthService {
             if (payload.sub) {
                 const user = await this._prismaS.user.findUnique({
                     where: { id: payload.sub, },
-                    include: {
-                        rank: true,
+                    select: {
+                        id: true,
+                        username: true,
+                        fullName: true,
+                        imageUrl: true,
+                        score: true,
+                        rank: {
+                            select: {
+                                title: true,
+                                icon: true,
+                                field: true,
+                            }
+                        },
+                        wins: true,
+                        loses: true,
+                        status: true,
                     }
                 });
                 return user;

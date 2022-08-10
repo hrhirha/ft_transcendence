@@ -1,24 +1,25 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
-import { User } from '@prisma/client';
 import * as argon2 from 'argon2'
 import { Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UserIdDto } from 'src/user/dto';
-import { friend_status, msg_type, room_type, user_status } from 'src/utils';
+import { UserDto, UserIdDto } from 'src/user/dto';
+import { UserService } from 'src/user/user.service';
+import { friend_status, msg_type, relation_status, room_type, user_status } from 'src/utils';
 import { AddMessageDto, ChangePasswordDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, RemovePasswordDto, SetPasswordDto, UserRoomDto } from './dto';
 
 @Injectable()
 export class ChatService {
     constructor (
         private _prismaS: PrismaService,
-        private _authS: AuthService
+        private _authS: AuthService,
+        private _user: UserService
         ) {}
 
     // POST
 
-    async createRoom(user: User, room: NewRoomDto)
+    async createRoom(user: UserDto, room: NewRoomDto)
     {
         // hash password for PROTECTED Room
         if (room.password)
@@ -83,7 +84,7 @@ export class ChatService {
         return ret;
     }
     
-    async deleteRoom(user: User, room: OldRoomDto)
+    async deleteRoom(user: UserDto, room: OldRoomDto)
     {
         const del = await this._prismaS.room.deleteMany({
             where: {
@@ -103,7 +104,7 @@ export class ChatService {
         return { id: room.id };
     }
 
-    async setPassword(user: User, dto: SetPasswordDto)
+    async setPassword(user: UserDto, dto: SetPasswordDto)
     {
         // public --> protected
         dto.new_password = await argon2.hash(dto.new_password);
@@ -134,7 +135,7 @@ export class ChatService {
         }
     }
 
-    async changePassword(user: User, dto: ChangePasswordDto)
+    async changePassword(user: UserDto, dto: ChangePasswordDto)
     {
         // protected --> protected
         const room = await this._prismaS.room.findFirst({
@@ -177,7 +178,7 @@ export class ChatService {
         }
     }
 
-    async removePassword(user: User, dto: RemovePasswordDto)
+    async removePassword(user: UserDto, dto: RemovePasswordDto)
     {
         // protected --> public
         const room = await this._prismaS.room.findFirst({
@@ -238,7 +239,7 @@ export class ChatService {
     }
 
     // added is_blocked to user
-    async start_dm(u1: User, u2: UserIdDto)
+    async start_dm(u1: UserDto, u2: UserIdDto)
     {
         let dm = await this._dm_exists(u1.id, u2.id);
         if (!dm)
@@ -318,7 +319,7 @@ export class ChatService {
         return { room: dm, user1, user2, is_blocked };
     }
                 
-    async joinRoom(user: User, room: OldRoomDto)
+    async joinRoom(user: UserDto, room: OldRoomDto)
     {
         let r = await this._prismaS.room.findUnique({
             where: { id: room.id }
@@ -373,7 +374,7 @@ export class ChatService {
         return { room: r, user: u , msg};
     }
 
-    async leaveRoom(user: User, room: OldRoomDto)
+    async leaveRoom(user: UserDto, room: OldRoomDto)
     {
         console.log({room});
         const r = await this._prismaS.room.update({
@@ -396,7 +397,7 @@ export class ChatService {
         return {room: r, msg};
     }
 
-    async addUser(user: User, member: UserRoomDto)
+    async addUser(user: UserDto, member: UserRoomDto)
     {
         await this._is_owner(user.id, member.rid);
 
@@ -429,7 +430,7 @@ export class ChatService {
         return {ur, msg};
     }
 
-    async removeUser(user: User, member: UserRoomDto)
+    async removeUser(user: UserDto, member: UserRoomDto)
     {
         await this._is_owner(user.id, member.rid);
 
@@ -456,7 +457,7 @@ export class ChatService {
         return {ur, msg};
     }
 
-    async addAdmin(user: User, user_room: UserRoomDto)
+    async addAdmin(user: UserDto, user_room: UserRoomDto)
     {
         const ur = await this._prismaS.userRoom.updateMany({
             data: { is_admin: true, },
@@ -480,7 +481,7 @@ export class ChatService {
         return {success: true}
     }
 
-    async removeAdmin(user: User, user_room: UserRoomDto)
+    async removeAdmin(user: UserDto, user_room: UserRoomDto)
     {
         const ur = await this._prismaS.userRoom.updateMany({
             data: { is_admin: false, },
@@ -504,7 +505,7 @@ export class ChatService {
         return {success: true}
     }
 
-    async banUser(user: User, user_room: UserRoomDto)
+    async banUser(user: UserDto, user_room: UserRoomDto)
     {
         const ur0 = await this._get_ur_if_admin(user, user_room);
         if (!ur0)
@@ -556,7 +557,7 @@ export class ChatService {
         return ur
     }
 
-    async unbanUser(user: User, user_room: UserRoomDto)
+    async unbanUser(user: UserDto, user_room: UserRoomDto)
     {
         const ur0 = await this._get_ur_if_admin(user, user_room);
         if (!ur0)
@@ -617,7 +618,7 @@ export class ChatService {
         return ur;
     }
 
-    async muteUser(user: User, user_room: MuteUserDto)
+    async muteUser(user: UserDto, user_room: MuteUserDto)
     {
         const unmute_at = new Date();
         unmute_at.setTime(
@@ -651,7 +652,7 @@ export class ChatService {
         return {success: true}
     }
 
-    async unmuteUser(user: User, user_room: UserRoomDto)
+    async unmuteUser(user: UserDto, user_room: UserRoomDto)
     {
         const ur = await this._prismaS.userRoom.updateMany({
             data: {
@@ -680,7 +681,7 @@ export class ChatService {
         return {success: true}
     }
 
-    async sendMessage(user: User, data: AddMessageDto)
+    async sendMessage(user: UserDto, data: AddMessageDto)
     {
         let dm_uid: string;
         const dm = await this._prismaS.userRoom.findMany({
@@ -700,7 +701,7 @@ export class ChatService {
         return await this._add_msg_to_db(user.id, data);
     }
 
-    async deleteMessage(user: User, msg: DeleteMessageDto)
+    async deleteMessage(user: UserDto, msg: DeleteMessageDto)
     {
         const del =  await this._prismaS.message.updateMany({
             data: {
@@ -718,29 +719,11 @@ export class ChatService {
         return {success: true}
     }
 
-    async inviteToGame(user: User, opponent: UserIdDto)
+    async getOpponent(user: UserDto, opponent: UserIdDto)
     {
-        const u = await this._prismaS.user.findUnique({
-            where: {
-                id: opponent.id,
-            },
-            select: {
-                id: true,
-                username: true,
-                status: true,
-                sentReq: {
-                    where: { rcv_id: user.id, status: friend_status.BLOCKED },
-                    select: { rcv_id: true, }
-                },
-                recievedReq: {
-                    where: { snd_id: user.id, status: friend_status.BLOCKED },
-                    select: { snd_id: true, }
-                },
-            }
-        });
-        if (!u)
-            throw new WsException('user not found');
-        if (u.recievedReq.length === 1 || u.sentReq.length === 1)
+        const u = await this._user.getUserById(user, opponent.id);
+
+        if (u.relation === relation_status.BLOCKED)
             throw new WsException('your friend status is blocked');
         if (u.status === user_status.INGAME)
             throw new WsException('user already playing');
@@ -749,7 +732,7 @@ export class ChatService {
 
     // GET
 
-    async getJoinedRooms(user: User)
+    async getJoinedRooms(user: UserDto)
     {
         const rooms = await this._prismaS.room.findMany({
             where: {
@@ -802,7 +785,7 @@ export class ChatService {
         return joined;
     }
 
-    async ownedRooms(user: User)
+    async ownedRooms(user: UserDto)
     {
         const rooms = await this._prismaS.room.findMany({
             where: {
@@ -824,7 +807,7 @@ export class ChatService {
     }
 
     // added is_blocked to user
-    async getDms(user: User)
+    async getDms(user: UserDto)
     {
         const rooms = await this._prismaS.room.findMany({
             where: {
@@ -887,7 +870,7 @@ export class ChatService {
         return joined;
     }
 
-    async newConnection(user: User)
+    async newConnection(user: UserDto)
     {
         const u = await this._prismaS.user.update({
             where: {
@@ -919,7 +902,7 @@ export class ChatService {
         return room_ids;
     }
 
-    async getRooms(u: User)
+    async getRooms(u: UserDto)
     {
         return await this._prismaS.room.findMany({
             where: {
@@ -1249,7 +1232,7 @@ export class ChatService {
             throw new WsException('room not found | you are not the owner');
     }
 
-    private async _get_ur_if_admin(u: User, ur: UserRoomDto)
+    private async _get_ur_if_admin(u: UserDto, ur: UserRoomDto)
     {
         return await this._prismaS.userRoom.findFirst({
             where: {

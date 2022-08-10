@@ -15,12 +15,9 @@ model User {
   updatedAt     DateTime @updatedAt
 
   username      String @unique
-  email         String  @unique
   fullName      String?
-  profileUrl    String?
   imageUrl      String
 
-  refresh_token String?
   isTfaEnabled  Boolean? @default(false)
   tfaSecret     String? @default("")
 

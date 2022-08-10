@@ -485,7 +485,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    @SubscribeMessage('invite2game')
+    @SubscribeMessage('challenge')
     async inviteToGame(@ConnectedSocket() client: Socket, @MessageBody() opponent: UserIdDto)
     {
         let u = await this._chat.getUserFromSocket(client);
@@ -493,24 +493,16 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('you must login first');
         try
         {
-            const d = await this._chat.inviteToGame(u, opponent);
+            const d = await this._chat.getOpponent(u, opponent);
             const sockets = await this.server.fetchSockets();
 
             const so = sockets.find(s=>{s.data.username === d.username})
-            so && this.server.to(so.id).emit('game_invitation', {id: u.id});
-
-            // sockets.forEach((s) => {
-            //     if (s.data.username === d.username)
-            //     {
-            //         this.server.to(s.id).emit('game_invitation', { id: u.id });
-            //         return ;
-            //     }
-            // });
+            so && this.server.to(so.id).emit('challenge_requested', u);
         }
         catch (e)
         {
             console.log({code: e.code, message:e.message});
-            throw new WsException('failed to invite user to a game');
+            throw new WsException('failed to challenge user to a game');
         }
     }
 

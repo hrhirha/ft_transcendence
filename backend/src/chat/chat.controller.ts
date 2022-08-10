@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Get, InternalServerErrorException, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
 import { GetUser } from 'src/user/decorator';

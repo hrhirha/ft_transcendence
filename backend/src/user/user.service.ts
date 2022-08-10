@@ -1,8 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { friend_status, HOST, PORT, relation_status } from 'src/utils';
-import { EditFullNameDto, EditUsernameDto } from './dto';
+import { EditFullNameDto, EditUsernameDto, UserDto } from './dto';
 
 @Injectable()
 export class UserService {
@@ -11,7 +10,7 @@ export class UserService {
 
     // User
 
-    private _getFriendRelation(me: User, friend: any)
+    private _getFriendRelation(me: UserDto, friend: any)
     {
         const sent = friend.sentReq.length === 1 ? friend.sentReq[0] : null;
         const rcvd = friend.recievedReq.length === 1 ? friend.recievedReq[0] : null;
@@ -31,7 +30,7 @@ export class UserService {
         return relation_status.BLOCKED;
     }
 
-    async getAll(user: User)
+    async getAll(user: UserDto)
     {
         const arr = await this._prismaS.user.findMany({
             where : {
@@ -89,7 +88,7 @@ export class UserService {
         return arr;
     }
 
-    async getUserById(user: User, id: string)
+    async getUserById(user: UserDto, id: string)
     {
         const u = await this._prismaS.user.findUnique({
             where: { id, },
@@ -127,12 +126,13 @@ export class UserService {
             throw new ForbiddenException('user not found');
 
         u["relation"] = this._getFriendRelation(user, u);
+
         delete u.sentReq && delete u.recievedReq;
-        
-        return u;
+
+        return u as UserDto;
     }
 
-    async getUserByUsername(user: User, username: string)
+    async getUserByUsername(user: UserDto, username: string)
     {
         const u = await this._prismaS.user.findUnique({
             where: { username, },
@@ -172,7 +172,7 @@ export class UserService {
         u["relation"] = this._getFriendRelation(user, u);
         delete u.sentReq && delete u.recievedReq;
         
-        return u;
+        return u as UserDto;
     }
 
     async getRank(id: string)
