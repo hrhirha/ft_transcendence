@@ -27,7 +27,7 @@ const config: Phaser.Types.Core.GameConfig = {
 export const GameView:React.FC<{gameSocket: Socket}> = ({gameSocket}) => {
     useEffect(() => {
         const game: Phaser.Game = new Phaser.Game(config);
-        game.scene.add("PingPong",new PingPong(gameSocket, "normaleQue", true));
+        game.scene.add("PingPong",new PingPong(gameSocket, "ultimateQue", true));
         game.scene.start("PingPong");
     }, []);
     return (

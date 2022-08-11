@@ -45,6 +45,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         soc: Socket,
         user: any,
     } = null;
+    
     tab = new Map;
 
     constructor(private prisma: PrismaService, private jwt: ChatService){}
@@ -60,8 +61,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         if (client.data.obj == undefined)
         {
             // client.emit("leave");
-            this.ultimateQue = (this.ultimateQue && client == this.ultimateQue.soc) ? null : this.ultimateQue;
-            this.normaleQue = (this.normaleQue && client == this.normaleQue.soc) ? null : this.normaleQue;
+            this.ultimateQue = (this.ultimateQue && client.id === this.ultimateQue.user.id) ? null : this.ultimateQue;
+            this.normaleQue = (this.normaleQue && client.id === this.normaleQue.user.id) ? null : this.normaleQue;
             return ;
         }
 

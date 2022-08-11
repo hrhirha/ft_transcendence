@@ -56,6 +56,7 @@ export default class PingPong extends Phaser.Scene
     mobile: boolean = false;
     desktop: boolean = false;
     imgbg: string = undefined;
+    map: boolean = false;
     
     constructor(msoc: Socket, type:string, isPlayer: boolean)
     {
@@ -72,16 +73,16 @@ export default class PingPong extends Phaser.Scene
 
     addScore()
     {
-        // if (this.leftScoretxt)
-        //     this.leftScoretxt.destroy();
+        if (this.leftScoretxt)
+            this.leftScoretxt.destroy();
         this.leftScoretxt = this.add.text((this.w / 2) - (this.w / 10) - 40 , 30, this.leftScore.toString(), {
             fontSize: "60px",
             fontFamily: "Poppins_B",
             align: "center",
         });
         
-        // if (this.rightScoretxt)
-        //     this.rightScoretxt.destroy();
+        if (this.rightScoretxt)
+            this.rightScoretxt.destroy();
         this.rightScoretxt = this.add.text((this.w / 2) + (this.w / 10) , 30, this.rightScore.toString(), {
             fontSize: "60px",
             fontFamily: "Poppins_B",
@@ -189,22 +190,20 @@ export default class PingPong extends Phaser.Scene
 
     create() : void
     {
-        // console.log(this.soc);
-        // console.log(this.type);
         this.bestOf = (this.type === "normaleQue") ? this.bestOf : 3;
         this.exitEmited = false;
         // no collision detection on left side and right side 
         this.physics.world.setBounds(-this.bounds, 0, this.w + (this.bounds * 2), this.h);
         
         // resize the images to fit the window
+        this.imgbg = ( this.imgbg && this.type == "ultimateQue") ? "backGround": this.imgbg;
         if (!this.imgbg)
             this.imgbg = (this.type === "normaleQue") ? "normalField" : "ultimateField";
-        this.imgbg = (this.type == "ultimateQue") ? "backGround": this.imgbg;
         this.bg = this.add.image(this.w / 2, this.h / 2, this.imgbg);
 
         /////////////////////////////// text ////////////////////////
-
-        // this.addScore();
+        if (this.type != "ultimateQue")
+            this.addScore();
 
         this.soc.on("saveData", (data: { player: string, is_player: boolean, roomId: string, userId: string } ) => 
         {
@@ -290,11 +289,15 @@ export default class PingPong extends Phaser.Scene
 
         this.soc.on("map", (Map_url: string) => 
         {
+            this.map = true;
             this.imgbg = Map_url;
             this.load.once('complete', this.addSprites, this);
             this.load.image('backGround', this.imgbg);
             this.load.start();
-            this.goalTime();
+            setTimeout(()=> {
+                this.soc.removeAllListeners();
+                this.scene.restart();
+            }, 500);
         });
 
 
@@ -369,7 +372,6 @@ export default class PingPong extends Phaser.Scene
         });
 
         this.soc.on("leave", () => {
-            console.log("The Client is Disconnected !! ");
             this.leave = this.add.text(this.w / 2 , this.h / 2 , "One Of players left the Game", { fontSize: "35px",
             fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
             const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
@@ -480,12 +482,18 @@ export default class PingPong extends Phaser.Scene
                 }
             }
         });
-        if (this.isPlayer && this.connection)
+
+        if (this.map)
+        {
+            this.map = false;
+            this.goalTime();
+        }
+        else if (this.isPlayer && this.connection)
         {
             this.connection = false;
             this.soc.emit(this.type);
         }
-        if (this.re)
+        else if (this.re)
         {
             this.re = false;
             this.restartClick = true;
@@ -641,7 +649,7 @@ export default class PingPong extends Phaser.Scene
 
     update () : void
     {
-        if (this.exitEmited || this.goal || !this.gameIsStarted || !this.isPlayer)
+        if (this.exitEmited || this.goal || !this.gameIsStarted || !this.isPlayer || this.map)
             return ;
 
         // ///// check For the  movment ////////////////
