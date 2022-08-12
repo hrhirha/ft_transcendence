@@ -78,6 +78,13 @@ section#invitePlayer {
             padding: 0;
             margin-top: .15rem;
             box-shadow: 0 0 1rem -1px $dark1;
+            span.emptyResults {
+                @include _flex(row, center, center);
+                padding: 1.5rem;
+                font-family: $BFont;
+                font-size: $fsize * 1.2;
+                color: rgba($light3, .65)
+            }
             ul#suggestions {
                 @include _flex(column, flex-start, center);
                 margin: 0;

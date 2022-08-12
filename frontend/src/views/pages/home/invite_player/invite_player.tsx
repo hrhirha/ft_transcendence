@@ -20,7 +20,7 @@ export const InvitePlayerForm:React.FC<{callback: Function}> = ({callback}) => {
     const [allUsers, setAllUsers] = useState<Array<User>>([]);
     const [suggestions, setSuggestions] = useState<Array<any>>([]);
     const [userSelected, setUserSelected] = useState(null);
-    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [userInput, setUserInput] = useState("");
     const pushNotif = useNotif();
 
     useEffect(() => {
@@ -66,37 +66,36 @@ export const InvitePlayerForm:React.FC<{callback: Function}> = ({callback}) => {
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setShowSuggestions(false);
-        if (e.target.value.trim().length > 0) {
-            setShowSuggestions(true);
-            setSuggestions([]);
-            setTimeout(getUsers,10000);
-            allUsers.forEach((user: any, key: number) => {
-                if (user.username.toLowerCase().includes(e.target.value.toLowerCase()))
-                {
-                    setSuggestions(prvSugges => [...prvSugges,<SuggestionCard onClick={() => {
-                        setShowSuggestions(false);
-                        setUserSelected(user);
-                        e.target.value = "";
-                        pushNotif({
-                            id: `GAMEINVITATION`,
-                            type: "info",
-                            time: 15000,
-                            icon: <FontAwesomeIcon icon={faGamepad}/>,
-                            title: "Game Invitation",
-                            description: `Which game you want to play with <b>${user.fullName}</b> ?`,
-                            actions: [
-                                {title: "Normal Game", color: "#6970d4", action: async () => sentInvite(user, false)},
-                                {title: "Ultimate Game", color: "#6970d4", action: async () => sentInvite(user, true)}
-                            ] 
-                        });
-                    }} avatar={user.imageUrl} username={user.username} status={user.status} fullName={user.fullName} key={key} />]);
-                }
-            });
+        if (e.target.value.trim().length > 10) {
+            e.preventDefault();
+            return;
         }
+        setUserInput(e.target.value.trim());
+        setSuggestions([]);
+        setTimeout(getUsers,10000);
+        allUsers.forEach((user: any, key: number) => {
+            if (user.username.toLowerCase().includes(userInput.toLowerCase()))
+            {
+                setSuggestions(prvSugges => [...prvSugges,<SuggestionCard onClick={() => {
+                    setUserSelected(user);
+                    setUserInput("");
+                    pushNotif({
+                        id: `GAMEINVITATION`,
+                        type: "info",
+                        time: 15000,
+                        icon: <FontAwesomeIcon icon={faGamepad}/>,
+                        title: "Game Invitation",
+                        description: `Which game you want to play with <b>${user.fullName}</b> ?`,
+                        actions: [
+                            {title: "Normal Game", color: "#6970d4", action: async () => sentInvite(user, false)},
+                            {title: "Ultimate Game", color: "#6970d4", action: async () => sentInvite(user, true)}
+                        ] 
+                    });
+                }} avatar={user.imageUrl} username={user.username} status={user.status} fullName={user.fullName} key={key} />]);
+            }
+        });
     }
 
-    
     return (
     <section id="invitePlayer">
         <div className="sectionTitle">
@@ -106,13 +105,14 @@ export const InvitePlayerForm:React.FC<{callback: Function}> = ({callback}) => {
         <div className="searchFrom">
             <div className="searchInput">
                 <FontAwesomeIcon icon={faSearch} />
-                <input id="username" type="text" onChange={(e) => handleChange(e)} placeholder="username" autoComplete="off"/>
+                <input id="username" type="text" value={userInput} onChange={(e) => handleChange(e)} placeholder="username" autoComplete="off"/>
             </div>
-            {showSuggestions && <div className="suggestions">
-            <ul id="suggestions">
-                {suggestions.map((s, k) => <li key={k}>{s}</li>)}
-            </ul>
-        </div>}
+            <div className="suggestions">
+                {suggestions.length === 0 && userInput.length > 0 && <span className="emptyResults">No user matched with "{userInput}"</span>}
+                {suggestions.length > 0 && <ul id="suggestions">
+                    {suggestions.map((s, k) => <li key={k}>{s}</li>)}
+                </ul>}
+            </div>
         </div>
     </section>
     );
