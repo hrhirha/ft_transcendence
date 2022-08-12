@@ -8,7 +8,7 @@ export const GameWatcher:React.FC = () =>  {
     return (
         <section id="gameWatcher">
             
-            <GameView gameSocket={socket}/>
+            <GameView gameSocket={socket} isUltimate={false} watcher={true} roomId={"cl6qss5xm22476z6u29pgkqfqr"}/>
         </section>
     );
 }

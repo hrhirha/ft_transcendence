@@ -12,8 +12,8 @@ export default class PingPong extends Phaser.Scene
     paddleScale: number = 0.25;
     ballspeed: number = 800;
     bounds: number = 100;
-    leftScore: number = 0;
-    rightScore: number = 0;
+    leftScore: number = 4;
+    rightScore: number = 4;
     h: number  = 720;
     w: number = 1080;
     bg?: Phaser.GameObjects.Image;
@@ -57,10 +57,12 @@ export default class PingPong extends Phaser.Scene
     desktop: boolean = false;
     imgbg: string = undefined;
     map: boolean = false;
+    roomId: string = undefined;
     
-    constructor(msoc: Socket, type:string, isPlayer: boolean)
+    constructor(msoc: Socket, type:string, isPlayer: boolean, roomId: string)
     {
         super("");
+        this.roomId = roomId;
         this.isPlayer = isPlayer;
         this.type = type;
         this.soc = msoc;
@@ -483,7 +485,12 @@ export default class PingPong extends Phaser.Scene
             }
         });
 
-        if (this.map)
+        if (!this.isPlayer && !this.connection)
+        {
+            this.connection = true;
+            this.soc.emit("newWatcher", this.roomId);
+        }
+        else if (this.map)
         {
             this.map = false;
             this.goalTime();
@@ -616,6 +623,7 @@ export default class PingPong extends Phaser.Scene
         if (this.enemy)
             this.enemy.destroy();
         this.input.keyboard.enabled = false;
+        console.log("this.data.userId = " + this.data.userId);
         this.soc.emit('endGame', {
             player: this.data.player,
             rscore: this.rightScore,
