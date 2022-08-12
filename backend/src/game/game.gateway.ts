@@ -10,6 +10,9 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
 import { ArgumentMetadata, HttpException, UsePipes, ValidationPipe } from '@nestjs/common';
+import { userInfo } from 'os';
+import { User } from '@prisma/client';
+import { urlencoded } from 'express';
 export class WsValidationPipe extends ValidationPipe
 {
     async transform(value: any, metadata: ArgumentMetadata) {
@@ -60,7 +63,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         
         if (client.data.obj == undefined)
         {
-            // client.emit("leave");
             this.ultimateQue = (this.ultimateQue && client.id === this.ultimateQue.user.id) ? null : this.ultimateQue;
             this.normaleQue = (this.normaleQue && client.id === this.normaleQue.user.id) ? null : this.normaleQue;
             return ;
@@ -394,8 +396,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 id: true,
             }
         });
-        this.insertSocketData(this.ultimateQue.soc, this.ultimateQue.user.id, "player1", connection.id);
-        this.insertSocketData(client, user.id, "player2", connection.id);
+        this.insertSocketData(this.ultimateQue.soc, this.ultimateQue.user, "player1", connection.id);
+        this.insertSocketData(client, user, "player2", connection.id);
         this.ultimateQue = null;
         this.server.to(connection.id).emit('map', mapUrl);
     }
@@ -435,26 +437,31 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             is_player: false,
             userId: user.id
         });
-        let roomUsers = await this.server.in(roomId).fetchSockets();
-        roomUsers.forEach(function(client) {
-            console.log('Username: ' + client.data.obj);
+        client.emit("3marr bach bghitii ", {
+            p1: this.tab[roomId].user1.Usr,
+            p2: this.tab[roomId].user2.Usr,
+            score1: this.tab[roomId].user1.client.data.obj.lScore,
+            score2: this.tab[roomId].user1.client.data.obj.rScore,
         });
-        // client.join(roomId);
+        client.join(roomId);
     }
 
-    insertSocketData(client: Socket, usrId: string, player: string, room: string)
+    insertSocketData(client: Socket, usr: any, player: string, room: string)
     {
         if (player == "player1")
         {
             this.tab[room] = {
                 user1:
                 {
-                    usrId,
+                    client,
+                    Usr: usr,
+                    usrId: usr.id,
                     restart: false,
                     disconected: false
                 },
                 user2:
                 {
+                    Usr: undefined,
                     usrId: undefined,
                     restart: false,
                     disconected: false
@@ -463,11 +470,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             }
         }
         else
-            this.tab[room].user2.usrId = usrId;
+        {
+            this.tab[room].user2.Usr = usr;
+            this.tab[room].user2.usrId = usr.id;
+        }
         client.join(room);
         client.data.obj = {
             player,
-            usrId,
+            usrId: usr.id,
             lScore: 0,
             rScore: 0,
             roomId: room,
@@ -477,7 +487,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             player,
             is_player: true,
             roomId: room,
-            userId: usrId
+            userId: usr.id,
         });
     }
 
