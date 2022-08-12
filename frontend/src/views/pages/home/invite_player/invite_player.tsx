@@ -7,7 +7,7 @@ import { useNotif } from "views/components/notif/notif";
 
 const SuggestionCard:React.FC<{avatar: string, fullName: string, username: string, status: string, onClick: Function}> = ({avatar, fullName, username, status, onClick}) => {
     return <div className="suggestionCard" onClick={() => onClick()}>
-        <CircleAvatar dimensions={30} avatarURL={avatar} showStatus={false}/>
+        <CircleAvatar dimensions={42} avatarURL={avatar} showStatus={false}/>
         <div className="userInfos">
             <h6>{fullName}</h6>
             <span>@{username}</span>
@@ -70,30 +70,34 @@ export const InvitePlayerForm:React.FC<{callback: Function}> = ({callback}) => {
             e.preventDefault();
             return;
         }
-        setUserInput(e.target.value.trim());
         setSuggestions([]);
         setTimeout(getUsers,10000);
-        allUsers.forEach((user: any, key: number) => {
-            if (user.username.toLowerCase().includes(userInput.toLowerCase()))
-            {
-                setSuggestions(prvSugges => [...prvSugges,<SuggestionCard onClick={() => {
-                    setUserSelected(user);
-                    setUserInput("");
-                    pushNotif({
-                        id: `GAMEINVITATION`,
-                        type: "info",
-                        time: 15000,
-                        icon: <FontAwesomeIcon icon={faGamepad}/>,
-                        title: "Game Invitation",
-                        description: `Which game you want to play with <b>${user.fullName}</b> ?`,
-                        actions: [
-                            {title: "Normal Game", color: "#6970d4", action: async () => sentInvite(user, false)},
-                            {title: "Ultimate Game", color: "#6970d4", action: async () => sentInvite(user, true)}
-                        ] 
-                    });
-                }} avatar={user.imageUrl} username={user.username} status={user.status} fullName={user.fullName} key={key} />]);
-            }
-        });
+        setUserInput(e.target.value.trim());
+        if (e.target.value.trim().length > 0)
+        {
+            allUsers.forEach((user: any, key: number) => {
+                if (user.username.toLowerCase().includes(e.target.value.trim().toLowerCase()))
+                {
+                    setSuggestions(prvSugges => [...prvSugges,<SuggestionCard onClick={() => {
+                        setUserSelected(user);
+                        setSuggestions([]);
+                        setUserInput("");
+                        pushNotif({
+                            id: `GAMEINVITATION`,
+                            type: "info",
+                            time: 15000,
+                            icon: <FontAwesomeIcon icon={faGamepad}/>,
+                            title: "Game Invitation",
+                            description: `Which game you want to play with <b>${user.fullName}</b> ?`,
+                            actions: [
+                                {title: "Normal Game", color: "#6970d4", action: async () => sentInvite(user, false)},
+                                {title: "Ultimate Game", color: "#6970d4", action: async () => sentInvite(user, true)}
+                            ] 
+                        });
+                    }} avatar={user.imageUrl} username={user.username} status={user.status} fullName={user.fullName} key={key} />]);
+                }
+            });
+        }
     }
 
     return (

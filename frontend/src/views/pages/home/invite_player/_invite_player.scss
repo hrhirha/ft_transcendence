@@ -85,6 +85,11 @@ section#invitePlayer {
                 font-size: $fsize * 1.2;
                 color: rgba($light3, .65)
             }
+            @media (max-width: $xs) {
+                span.emptyResults {
+                    font-size: $fsize * .85;
+                }
+            }
             ul#suggestions {
                 @include _flex(column, flex-start, center);
                 margin: 0;
@@ -102,6 +107,9 @@ section#invitePlayer {
                         cursor: pointer;
                         padding: .3rem .5rem;
                         text-decoration: none;
+                        span#circleAvatar {
+                            border: .15rem solid $light2;
+                        }
                         .userInfos {
                             @include _flex(column, center, flex-start);
                             width: 100%;
@@ -110,11 +118,11 @@ section#invitePlayer {
                                 @media (max-width: 300px) {
                                     @include _textOverflow(8rem);
                                 }
-                                font-size: $fsize * .8;
+                                font-size: $fsize * .9;
                                 line-height: 1;
                             }
                             span {
-                                font-size: $fsize * .6;
+                                font-size: $fsize * .75;
                                 color: $light3;
                             }
                         }
