@@ -12,8 +12,8 @@ export default class PingPong extends Phaser.Scene
     paddleScale: number = 0.25;
     ballspeed: number = 800;
     bounds: number = 100;
-    leftScore: number = 4;
-    rightScore: number = 4;
+    leftScore: number = 0;
+    rightScore: number = 0;
     h: number  = 720;
     w: number = 1080;
     bg?: Phaser.GameObjects.Image;
@@ -236,7 +236,7 @@ export default class PingPong extends Phaser.Scene
         });
 
 
-        this.soc.on("waiting", () => {
+        this.soc.on("waiting", (walo: any) => {
 
             this.waiting = this.add.text(this.w / 2 , this.h / 2 , "Waiting ...", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setOrigin(0.5);
             this.buttonBg = this.add.sprite(this.w / 2 , this.h / 1.20 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
