@@ -332,6 +332,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             p1: this.normaleQue.user,
             p2: user, 
         });
+
+        this.normaleQue.soc.emit("joined", {
+            p1: this.normaleQue.user,
+            p2: user, 
+        });
         /////////////////////////////////////////
         let connection =  await this.prisma.game.create({
             data: {
@@ -390,6 +395,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             p1: this.ultimateQue.user,
             p2: user, 
         });
+        this.ultimateQue.soc.emit("joined", {
+            p1: this.ultimateQue.user,
+            p2: user, 
+        });
 
         const mapUrl: string = (this.ultimateQue.user.score > user.score) ? this.ultimateQue.user.rank.field: user.rank.field;
         let connection =  await this.prisma.game.create({
@@ -440,7 +449,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
-        console.log("roomId = [" + roomId + "]");
         client.data.obj = {
             roomId,
             isPlayer: false,
@@ -490,7 +498,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             this.tab[room].user2.user = usr;
             this.tab[room].user2.userId = usr.id;
         }
-        client.join(room);
         client.data.obj = {
             player,
             userId: usr.id,
@@ -506,11 +513,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             userId: usr.id,
             mapUrl,
         });
+        client.join(room);
     }
 
     @SubscribeMessage('move')
     async checkConnection(client: Socket, data: any)
     {
+        
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
         {
@@ -519,7 +528,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         }
         if (!client.data.obj)
             return ;
-        if (client.data.obj.lScore != data.lScore || client.data.obj.rScore != data.rScore)
+        if (client.data.obj.player === "player1" && (client.data.obj.lScore != data.lScore || client.data.obj.rScore != data.rScore))
         {
             this.server.to(client.data.obj.roomId).emit("updateScore", {
                 score1: data.lScore,
@@ -528,7 +537,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         }
         client.data.obj.lScore = data.lScore;
         client.data.obj.rScore = data.rScore;
-
         client.broadcast.to(data.roomId).emit('recv', data);
     }
 }

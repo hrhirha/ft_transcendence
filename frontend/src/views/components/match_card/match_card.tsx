@@ -3,34 +3,37 @@ import { DefaultGame, UltimateGame } from "assets";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { useNavigate } from "react-router-dom";
 import { Match } from "controller/user/matchs";
+import { User } from "controller/user/user";
 
-export const MatchCard:React.FC<{match: Match}> = ({match}) => {
+const PlayerData:React.FC<{player: User, left: boolean}> = ({player, left}) => {
     const navigate = useNavigate();
+    if (player === null)
+        return (<></>);
     return (
-    <section className="matchCard" id={match.id}>
-        <div className="player" onClick={() => navigate(`/u/${match.p1.username}`)}>
+        <div className="player" onClick={() => navigate(`/u/${player.username}`)}>
+            {!left && <h6 className="fullName">{player.fullName}</h6>}
             <div className="avatar">
-                <CircleAvatar avatarURL={match.p1.imageUrl} dimensions={60} showStatus={false}/>
-                <span className="achievment" title={match.p1.rank.title}>
-                    <img src={match.p1.rank.icon} alt={match.p1.rank.title}/>
+                <CircleAvatar avatarURL={player.imageUrl} dimensions={60} showStatus={false}/>
+                <span className="achievment" title={player.rank.title}>
+                    <img src={player.rank.icon} alt={player.rank.title}/>
                 </span>
             </div>
-            <h6 className="fullName">{match.p1.fullName}</h6>
+            {left && <h6 className="fullName">{player.fullName}</h6>}
         </div>
+    );
+}
+
+export const MatchCard:React.FC<{match: Match}> = ({match}) => {
+    return (
+    <section className="matchCard" id={match.id}>
+
+        <PlayerData player={match.p1} left={true}/>
         <div className="scoreBoard">
             <span className="score">{match.score.p1}</span>
             <img className="gameType" src={match.is_ultimate ? UltimateGame : DefaultGame} alt="Game Type"/>
             <span className="score">{match.score.p2}</span>
         </div>
-        <div className="player" onClick={() => navigate(`/u/${match.p2.username}`)}>
-            <h6 className="fullName">{match.p2.fullName}</h6>
-            <div className="avatar">
-                <CircleAvatar avatarURL={match.p2.imageUrl} dimensions={60} showStatus={false}/>
-                <span className="achievment" title={match.p2.rank.title}>
-                    <img src={match.p2.rank.icon} alt={match.p2.rank.title}/>
-                </span>
-            </div>
-        </div>
+        <PlayerData player={match.p2} left={true}/>
     </section>
     );
 }

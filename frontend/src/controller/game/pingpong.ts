@@ -308,21 +308,6 @@ export default class PingPong extends Phaser.Scene
             this.watcherRender(data);
         });
 
-        // this.soc.on("map", (Map_url: string) => 
-        // {
-        //     this.map = true;
-        //     this.mapUrl = Map_url;
-        //     this.imgbg = "backGround";
-        //     this.load.once('complete', this.addSprites, this);
-        //     this.load.image(this.imgbg, this.mapUrl);
-        //     this.load.start();
-        //     setTimeout(()=> {
-        //         this.soc.removeAllListeners();
-        //         this.scene.restart();
-        //     }, 500);
-        // });
-
-
         this.soc.on("youWin", () => 
         {
             this.exitEmited = true;
