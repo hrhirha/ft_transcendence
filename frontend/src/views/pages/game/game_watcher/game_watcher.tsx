@@ -22,7 +22,7 @@ export const GameWatcher:React.FC = () =>  {
             <div className="row">
                 <div className="col-10 col-md-8 col-lg-6">
                     {ongoingMatchs.length === 0 && <img className="noLiveGames" src={WatchEmptyState}/>}
-                    {ongoingMatchs.length > 0 && <GameView gameSocket={socket} isUltimate={false} watcher={true} roomId={"cl6qss5xm22476z6u29pgkqfqr"}/>}
+                    {ongoingMatchs.length > 0 && <GameView gameSocket={socket} isUltimate={false} watcher={true} roomId={"cl6rz8v24353109p6sp0tn979a4"}/>}
                 </div>
             </div>
         </section>

@@ -108,7 +108,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                         },
                         where: {
                             uid_gid: {
-                                uid: client.data.obj.usrId,
+                                uid: client.data.obj.userId,
                                 gid: client.data.obj.roomId
                             }
                         },
@@ -176,7 +176,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             {
                 const newid  = await this.prisma.game.create({
                     data: {
-                        map: "map_url",
+                        map: this.tab[d.roomId].mapUrl,
                         user_game:
                         {
                             createMany: {
@@ -335,7 +335,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         /////////////////////////////////////////
         let connection =  await this.prisma.game.create({
             data: {
-                map: "map_url",
+                map: "normalField",
                 user_game:
                 {
                     createMany: {
@@ -351,8 +351,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 id: true,
             }
         });
-        this.insertSocketData(this.normaleQue.soc, this.normaleQue.user, "player1", connection.id);
-        this.insertSocketData(client, user, "player2", connection.id);
+        this.insertSocketData(this.normaleQue.soc, this.normaleQue.user, "player1", connection.id, "normalField");
+        this.insertSocketData(client, user, "player2", connection.id, "normalField");
         this.normaleQue = null;
         this.server.to(connection.id).emit('startGame');
 
@@ -410,10 +410,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 id: true,
             }
         });
-        this.insertSocketData(this.ultimateQue.soc, this.ultimateQue.user, "player1", connection.id);
-        this.insertSocketData(client, user, "player2", connection.id);
+        this.insertSocketData(this.ultimateQue.soc, this.ultimateQue.user, "player1", connection.id, mapUrl);
+        this.insertSocketData(client, user, "player2", connection.id, mapUrl);
         this.ultimateQue = null;
-        this.server.to(connection.id).emit('map', mapUrl);
     }
 
 
@@ -441,6 +440,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
+        console.log("roomId = [" + roomId + "]");
         client.data.obj = {
             roomId,
             isPlayer: false,
@@ -449,7 +449,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             roomId,
             player: "",
             is_player: false,
-            userId: user.id
+            userId: user.id,
+            mapUrl: this.tab[roomId].mapUrl,
         });
         client.emit("joinStream", {
             p1: this.tab[roomId].user1.user,
@@ -460,7 +461,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         client.join(roomId);
     }
 
-    insertSocketData(client: Socket, usr: any, player: string, room: string)
+    insertSocketData(client: Socket, usr: any, player: string, room: string, mapUrl: string)
     {
         if (player == "player1")
         {
@@ -480,7 +481,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                     restart: false,
                     disconected: false
                 },
-                endGame: false
+                endGame: false,
+                mapUrl,
             }
         }
         else
@@ -502,6 +504,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             is_player: true,
             roomId: room,
             userId: usr.id,
+            mapUrl,
         });
     }
 
