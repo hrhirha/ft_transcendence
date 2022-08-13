@@ -15,7 +15,6 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
     });
     return (
         <main id="gamePage" className="container">
-<<<<<<< HEAD
             {/* <MatchCard
                 matchId="MATCH001"
                 gameModePro={ultimateGame}
@@ -28,7 +27,6 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
                 onClick={() => {}}
                 /> */}
             <GameView gameSocket={socket} isUltimate={true} watcher={false} roomId={""}/>
-=======
             <div className="row">
                 <div className="col-12 col-md-9">
                     {/* <MatchCard
@@ -45,7 +43,6 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
                     <GameView gameSocket={socket} isUltimate={ultimateGame} watcher={false} roomId={""}/>
                 </div>
             </div>
->>>>>>> b29102ed624d1305079659604206dbd943614bc3
         </main>
     );
 }
