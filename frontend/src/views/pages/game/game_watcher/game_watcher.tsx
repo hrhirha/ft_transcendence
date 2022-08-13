@@ -2,12 +2,13 @@ import { WatchEmptyState } from "assets";
 import { get_ongoing_matchs, Match } from "controller/user/matchs";
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import { MatchCard } from "views/components/match_card/match_card";
 import { GameView } from "views/pages/game/game_view/game_view";
 
 export const GameWatcher:React.FC = () =>  {
     const socket = io("ws://127.0.0.1:3001/game", {withCredentials: true});
     const [ongoingMatchs, setMatchs] = useState<Array<Match>>([]);
-
+    const [currentMatch, setCurrentMatch] = useState<number>(0);
     useEffect(() => {
         (async () => {
             try {
@@ -17,12 +18,26 @@ export const GameWatcher:React.FC = () =>  {
         })();
     },[]);
 
+    useEffect(() => {
+        socket.on("updateScore", (score) => {
+            alert("Ssuuiiiiii !");
+            setMatchs(oldMatches => oldMatches.map((m, i) => {
+                if (i === currentMatch)
+                {
+                    return {...m, score: {p1: score.score1, p2: score.score2}};
+                }
+                return m;
+            }));
+        });
+    }, [socket]);
+
     return (
         <section id="gameWatcher" className="container">
             <div className="row">
-                <div className="col-10 col-md-8 col-lg-6">
+                <div className="col-12 col-md-9">
                     {ongoingMatchs.length === 0 && <img className="noLiveGames" src={WatchEmptyState}/>}
-                    {ongoingMatchs.length > 0 && <GameView gameSocket={socket} isUltimate={false} watcher={true} roomId={"cl6rz8v24353109p6sp0tn979a4"}/>}
+                    {ongoingMatchs.length > 0 && <MatchCard match={ongoingMatchs[currentMatch]}/>}
+                    {ongoingMatchs.length > 0 && <GameView gameSocket={socket} isUltimate={false} watcher={true} roomId={ongoingMatchs[currentMatch]?.id}/>}
                 </div>
             </div>
         </section>

@@ -8,13 +8,13 @@ import { User } from "controller/user/user";
 const PlayerData:React.FC<{player: User, left: boolean}> = ({player, left}) => {
     const navigate = useNavigate();
     if (player === null)
-        return (<div className="loadinPlayer">
-            {!left && <h6 className="fullName"></h6>}
+        return (<div className={`loadinPlayer ${left ? "left" : "right"}`}>
+            {!left && <h6 className="fullName">waiting ...</h6>}
             <div className="avatar"></div>
-            {left && <h6 className="fullName"></h6>}
+            {left && <h6 className="fullName">waiting ...</h6>}
         </div>);
     return (
-        <div className="player" onClick={() => navigate(`/u/${player.username}`)}>
+        <div className={`player ${left ? "left" : "right"}`} onClick={() => navigate(`/u/${player.username}`)}>
             {!left && <h6 className="fullName">{player.fullName}</h6>}
             <div className="avatar">
                 <CircleAvatar avatarURL={player.imageUrl} dimensions={60} showStatus={false}/>

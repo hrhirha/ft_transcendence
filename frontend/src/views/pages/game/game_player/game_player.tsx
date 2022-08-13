@@ -5,7 +5,7 @@ import { MatchCard } from "views/components/match_card/match_card";
 import { GameView } from "views/pages/game/game_view/game_view";
 
 export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) =>  {
-    const [socket, setSocket] = useState(io("ws://127.0.0.1:3001/game", {withCredentials: true}));
+    const [socket] = useState(io("ws://127.0.0.1:3001/game", {withCredentials: true}));
     const [matchData, setMatchData] = useState<Match>({
         is_ultimate: ultimateGame,
         p1: null,
