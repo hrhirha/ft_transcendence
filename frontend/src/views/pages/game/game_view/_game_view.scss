@@ -1,7 +1,6 @@
 section#gameView {
     @include _flex(column, center, center);
-    min-width: 280px;
-    max-width: 900px;
+    width: 100%;
     margin: 0px auto;
     overflow: visible!important;
     canvas {

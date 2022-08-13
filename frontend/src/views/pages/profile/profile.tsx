@@ -3,9 +3,9 @@ import { FriendsManager } from "views/pages/profile/friends_manager/friends_mana
 import { ProfileInfos } from "views/pages/profile/profile_infos/profile_infos";
 import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faUsersGear, faHistory} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { MatchesHistory } from "views/pages/profile/matches_history/matches_history";
 import { post_friendreq_accept, post_friendreq_cancel, post_friendreq_decline, post_friendreq_send } from "controller/user/friendreq";
 import { post_friend_block, post_friend_unblock, post_friend_unfriend } from "controller/user/friends";
+import { MatchsHistory } from "./matchs_history/matchs_history";
 
 
 export enum userType {
@@ -87,7 +87,7 @@ export const Profile:React.FC<{userProfile: boolean}> = ({userProfile}) => {
 
     const tabs = [
         {
-            title: "Matches History",
+            title: "matchs History",
             icon: faHistory,
         },
         {
@@ -123,7 +123,7 @@ export const Profile:React.FC<{userProfile: boolean}> = ({userProfile}) => {
                                 </div>
                                 <hr/>
                             </div>
-                            {switchTab === 0 && <MatchesHistory userProfile={userProfile} />}
+                            {switchTab === 0 && <MatchsHistory userProfile={userProfile} />}
                             {switchTab === 1 && userProfile && <FriendsManager />}
                         </div>
                     </div>

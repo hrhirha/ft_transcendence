@@ -13,7 +13,7 @@ export interface Match {
     }
 }
 
-export async function get_matches_histroy(username : string) {
+export async function get_matchs_histroy(username : string) {
     try
     {
         const res : Array<Match> = (await api.get("game/match_history/"+ username )).data;
@@ -23,7 +23,7 @@ export async function get_matches_histroy(username : string) {
     }
 }
 
-export async function get_ongoing_matches() {
+export async function get_ongoing_matchs() {
     try
     {
         const res : Array<Match> = (await api.get("/game/ongoing")).data;

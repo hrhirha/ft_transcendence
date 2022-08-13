@@ -1,5 +1,17 @@
 @import "./games_slider/games_slider";
 
-main#gameWatcher {
+section#gameWatcher {
     @include _flex(column, center, center);
+    @include _selectionOff();
+    height: calc(100vh - 10rem);
+    @media (max-width: $sm) {
+        width: auto;
+    }
+    .row {
+        @include _flex(column, center, center);
+        .noLiveGames {
+            max-width: 100%;
+            opacity: .75;
+        }
+    }
 }

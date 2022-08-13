@@ -18,7 +18,7 @@ export const Home:React.FC = () => {
                 </div>
                 <div className='row center' >
                     <div className='col col-lg-8'>
-                        <LiveGamesCard onClick={() => {navigate('/watch', {replace: true})}} title="Watch Live games" background={LiveGames}/>
+                        <LiveGamesCard onClick={() => {navigate('/watch', {replace: true})}} title="Watch Live Matchs" background={LiveGames}/>
                     </div>
                 </div>
                 <div className='row center' >
