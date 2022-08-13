@@ -1,5 +1,4 @@
 import { Match } from "controller/user/matchs";
-import { userDefault, User } from "controller/user/user";
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { MatchCard } from "views/components/match_card/match_card";
@@ -18,18 +17,15 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
     });
 
     useEffect(() => {
+        socket.on("updateScore", (score) => {
+            alert("Ssuuiiiiii !");
+            setMatchData(oldData => ({...oldData, score: {p1: score.score1, p2: score.score2}}));
+        });
         socket.on("waiting", (players) => {
-            console.log(players);
-
             setMatchData(oldData => ({...oldData, p1: players.p1}));
         });
         socket.on("joined", (players) => {
-            console.log(players, matchData);
             setMatchData(oldData => ({...oldData, p1: players.p1, p2: players.p2}));
-        });
-        socket.on("updateScore", (score) => {
-            console.log(score, matchData);
-            setMatchData(oldData => ({...oldData, score: {p1: score.score1, p2: score.score2}}));
         });
         
     }, [socket]);

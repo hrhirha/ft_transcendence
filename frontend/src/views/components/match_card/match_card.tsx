@@ -8,7 +8,11 @@ import { User } from "controller/user/user";
 const PlayerData:React.FC<{player: User, left: boolean}> = ({player, left}) => {
     const navigate = useNavigate();
     if (player === null)
-        return (<></>);
+        return (<div className="loadinPlayer">
+            {!left && <h6 className="fullName"></h6>}
+            <div className="avatar"></div>
+            {left && <h6 className="fullName"></h6>}
+        </div>);
     return (
         <div className="player" onClick={() => navigate(`/u/${player.username}`)}>
             {!left && <h6 className="fullName">{player.fullName}</h6>}
@@ -33,7 +37,7 @@ export const MatchCard:React.FC<{match: Match}> = ({match}) => {
             <img className="gameType" src={match.is_ultimate ? UltimateGame : DefaultGame} alt="Game Type"/>
             <span className="score">{match.score.p2}</span>
         </div>
-        <PlayerData player={match.p2} left={true}/>
+        <PlayerData player={match.p2} left={false}/>
     </section>
     );
 }

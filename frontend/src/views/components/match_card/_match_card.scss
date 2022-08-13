@@ -9,6 +9,36 @@ section.matchCard {
     {
         padding: .5rem;
     }
+    .loadinPlayer {
+        @include _flex(row, center, center);
+        .fullName {
+            width: 6rem;
+            max-width: 6rem;
+            background-color: $light4;
+            border-radius: 5rem;
+            height: .75rem;
+            margin: 0 .5rem;
+        }
+        .avatar {
+            border: .25rem solid rgba($dark3, .65);
+            border-radius: 100%;
+            background-color: $light4;
+            @media (max-width: $lg)
+            {
+                @include _square(3rem);
+            }
+            @media (max-width: $md)
+            {
+                @include _square(2.25rem);
+            }
+            @media (max-width: 520px)
+            {
+                @include _square(1.5rem);
+                border-width: 0.15rem;
+            }
+        }
+    }
+
    .player {
         @include _flex(row, center, center);
         cursor: pointer;
