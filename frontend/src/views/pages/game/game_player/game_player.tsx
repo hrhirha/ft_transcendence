@@ -26,7 +26,7 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
                 }}
                 onClick={() => {}}
                 /> */}
-            <GameView gameSocket={socket} isUltimate={ultimateGame} watcher={false} roomId={""}/>
+            <GameView gameSocket={socket} isUltimate={true} watcher={false} roomId={""}/>
         </main>
     );
 }

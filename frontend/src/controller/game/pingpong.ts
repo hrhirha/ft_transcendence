@@ -58,10 +58,12 @@ export default class PingPong extends Phaser.Scene
     imgbg: string = undefined;
     map: boolean = false;
     roomId: string = undefined;
+    mapUrl: string = undefined;
     
     constructor(msoc: Socket, type:string, isPlayer: boolean, roomId: string)
     {
         super("");
+        console.log("RoomId = " + roomId);
         this.roomId = roomId;
         this.isPlayer = isPlayer;
         this.type = type;
@@ -70,7 +72,7 @@ export default class PingPong extends Phaser.Scene
     
     addSprites ()
     {
-        this.add.image(this.w / 2, this.h / 2, "backGround");
+        this.add.image(this.w / 2, this.h / 2, this.imgbg);
     }
 
     addScore()
@@ -162,15 +164,16 @@ export default class PingPong extends Phaser.Scene
 
     watcherRender(d: any)
     {
+        console.log("here");
+
         this.rightScore = d.rScore;
         this.leftScore = d.lScore;
         this.leftScoretxt.text = d.lScore.toString();
         this.rightScoretxt.text = d.rScore.toString();
 
         if (!this.enemy && !this.ball && !this.paddle)
-        {
-            this.imgbg = d.mapUrl;
-            
+        {   
+            console.log("here");
             this.createObjects(d.ballx, d.bally, d.lpaddle, d.rpaddle);
             return ;
         }
@@ -198,18 +201,19 @@ export default class PingPong extends Phaser.Scene
         this.physics.world.setBounds(-this.bounds, 0, this.w + (this.bounds * 2), this.h);
         
         // resize the images to fit the window
-        this.imgbg = ( this.imgbg && this.type == "ultimateQue") ? "backGround": this.imgbg;
+        this.imgbg = ( this.mapUrl ) ? "backGround": this.imgbg;
         if (!this.imgbg)
             this.imgbg = (this.type === "normaleQue") ? "normalField" : "ultimateField";
         this.bg = this.add.image(this.w / 2, this.h / 2, this.imgbg);
 
         /////////////////////////////// text ////////////////////////
-        if (this.type != "ultimateQue")
+        if (this.type != "ultimateQue" || !this.isPlayer)
             this.addScore();
 
-        this.soc.on("saveData", (data: { player: string, is_player: boolean, roomId: string, userId: string } ) => 
+        this.soc.on("saveData", (data: { player: string, is_player: boolean, roomId: string, userId: string, mapUrl: string } ) => 
         {
             console.log(data);
+            this.data = data;
             if (data.player === "player1")
             {
                 if (this.buttonBg)
@@ -219,7 +223,31 @@ export default class PingPong extends Phaser.Scene
                 if (this.waiting)
                     this.waiting.destroy();
             }
-            this.data = data;
+            if (data.mapUrl != "normalField")
+            {
+                this.map = true;
+                this.mapUrl = data.mapUrl;
+                this.imgbg = "backGround";
+                this.type = "ultimateQue";
+                this.load.once('complete', this.addSprites, this);
+                this.load.image(this.imgbg, this.mapUrl);
+                this.load.start();
+                setTimeout(()=> {
+                    this.soc.removeAllListeners();
+                    this.scene.restart();
+                }, 500);
+            //     this.map = true;
+            //     this.mapUrl = data.mapUrl;
+            //     this.type = "ultimateQue";
+            //     this.imgbg = "backGround";
+            //     this.load.once('complete', this.addSprites, this);
+            //     this.load.image(this.imgbg, this.mapUrl);
+            //     this.load.start();
+            //     setTimeout(()=> {
+            //         this.soc.removeAllListeners();
+            //         this.scene.restart();
+            //     }, 1000);
+            }
         });
 
         this.soc.on("startGame", () => {
@@ -259,12 +287,8 @@ export default class PingPong extends Phaser.Scene
             this.End = false;
             this.goal = false;
             if (this.data.is_player)
-            {
                 this.input.keyboard.enabled = true;
-                this.goalTime();
-                return ;
-            }
-            this.createObjects(this.w / 2, this.h / 2, this.h / 2, this.h / 2);
+            this.goalTime();
         });
         
         this.soc.on("newRoom", (id: string) => 
@@ -284,23 +308,24 @@ export default class PingPong extends Phaser.Scene
 
         this.soc.on("Watchers", (data: any) => 
         {
-            if (!this.data || this.data.is_player)
+            if (!this.data || this.data.is_player || this.map)
                 return ;
             this.watcherRender(data);
         });
 
-        this.soc.on("map", (Map_url: string) => 
-        {
-            this.map = true;
-            this.imgbg = Map_url;
-            this.load.once('complete', this.addSprites, this);
-            this.load.image('backGround', this.imgbg);
-            this.load.start();
-            setTimeout(()=> {
-                this.soc.removeAllListeners();
-                this.scene.restart();
-            }, 500);
-        });
+        // this.soc.on("map", (Map_url: string) => 
+        // {
+        //     this.map = true;
+        //     this.mapUrl = Map_url;
+        //     this.imgbg = "backGround";
+        //     this.load.once('complete', this.addSprites, this);
+        //     this.load.image(this.imgbg, this.mapUrl);
+        //     this.load.start();
+        //     setTimeout(()=> {
+        //         this.soc.removeAllListeners();
+        //         this.scene.restart();
+        //     }, 500);
+        // });
 
 
         this.soc.on("youWin", () => 
@@ -404,26 +429,26 @@ export default class PingPong extends Phaser.Scene
         });
 
         this.soc.on("watcherEndMatch", () => {
-            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
-            this.leave = this.add.text(this.w / 2 , this.h / 2 , "exit", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-            this.buttonBg.on('pointerdown', () =>
-            {
-                this.leaveFunc();
-            }, this);
-            this.leave.on('pointerdown', () =>
-            {
-                this.leaveFunc();
-            }, this);
-            let right = this.w - (this.w / 4);
-            let left = this.w / 4;
-            if (this.rightScore === this.bestOf)
-            {
-                this.win = this.add.image(right, this.h/2, "normalButton").setOrigin(0.5, 0.5).setScale(0.45);
-                this.lose = this.add.image(left, this.h/2, "normalButton").setOrigin(0.5);
-                return ;
-            }
-            this.win = this.add.image(left, this.h/2, "normalButton").setOrigin(0.5, 0.5).setScale(0.45);
-            this.lose = this.add.image(right, this.h/2, "normalButton").setOrigin(0.5);
+            // this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+            // this.leave = this.add.text(this.w / 2 , this.h / 2 , "exit", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+            // this.buttonBg.on('pointerdown', () =>
+            // {
+            //     this.leaveFunc();
+            // }, this);
+            // this.leave.on('pointerdown', () =>
+            // {
+            //     this.leaveFunc();
+            // }, this);
+            // let right = this.w - (this.w / 4);
+            // let left = this.w / 4;
+            // if (this.rightScore === this.bestOf)
+            // {
+            //     this.win = this.add.image(right, this.h/2, "normalButton").setOrigin(0.5, 0.5).setScale(0.45);
+            //     this.lose = this.add.image(left, this.h/2, "normalButton").setOrigin(0.5);
+            //     return ;
+            // }
+            // this.win = this.add.image(left, this.h/2, "normalButton").setOrigin(0.5, 0.5).setScale(0.45);
+            // this.lose = this.add.image(right, this.h/2, "normalButton").setOrigin(0.5);
 
         });
 
@@ -484,16 +509,19 @@ export default class PingPong extends Phaser.Scene
                 }
             }
         });
-
-        if (!this.isPlayer && !this.connection)
+        if (!this.isPlayer && this.connection)
         {
-            this.connection = true;
-            this.soc.emit("newWatcher", this.roomId);
+            this.connection = false;
+            this.soc.emit("watcher", this.roomId);
         }
         else if (this.map)
         {
             this.map = false;
-            this.goalTime();
+            if (this.data.is_player)
+            {
+                this.goalTime();
+                return ;
+            }
         }
         else if (this.isPlayer && this.connection)
         {
@@ -623,7 +651,6 @@ export default class PingPong extends Phaser.Scene
         if (this.enemy)
             this.enemy.destroy();
         this.input.keyboard.enabled = false;
-        console.log("this.data.userId = " + this.data.userId);
         this.soc.emit('endGame', {
             player: this.data.player,
             rscore: this.rightScore,
@@ -657,6 +684,12 @@ export default class PingPong extends Phaser.Scene
 
     update () : void
     {
+        if (this.soc.disconnected)
+        {
+            this.add.text(this.w / 2, this.h / 2.5, 'the Server Is Down !!', { fontSize: "60px", 
+            fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
+            this.scene.pause();
+        }
         if (this.exitEmited || this.goal || !this.gameIsStarted || !this.isPlayer || this.map)
             return ;
 
@@ -807,7 +840,6 @@ export default class PingPong extends Phaser.Scene
                         rScore: this.rightScore,
                         endGame: this.End,
                         goal: this.goal,
-                        mapUrl: this.imgbg,
                     });
                 }
                 this.soc.removeAllListeners();

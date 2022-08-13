@@ -19,7 +19,7 @@ export const GameWatcher:React.FC = () =>  {
     return (
         <section id="gameWatcher">
             {ongoingMatches.length === 0 && <img className="nolivegames" />}
-            {ongoingMatches.length > 0 && <GameView gameSocket={socket} isUltimate={false} watcher={true} roomId={"cl6qss5xm22476z6u29pgkqfqr"}/>}
+            {ongoingMatches.length > 0 && <GameView gameSocket={socket} isUltimate={false} watcher={true} roomId={"cl6ru6gt5108653r4spxg9zqu8e"}/>}
         </section>
     );
 }
