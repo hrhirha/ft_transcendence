@@ -4,8 +4,7 @@ main#gamePage {
     @media (max-width: $sm) {
         width: auto;
     }
-    section.matchCard {
-        max-width: 900px;
-        min-width: 280px;
+    .row {
+        @include _flex(column, center, center);
     }
 }

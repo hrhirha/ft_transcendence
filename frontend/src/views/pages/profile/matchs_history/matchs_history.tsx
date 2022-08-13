@@ -1,7 +1,7 @@
 import { faClose, faGamepad } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { EmptyHistory } from "assets";
-import { get_matches_histroy, Match } from "controller/user/matches";
+import { get_matchs_histroy, Match } from "controller/user/matchs";
 import { get_me, User } from "controller/user/user";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -17,7 +17,7 @@ const NoHistroy = () => {
     return (
         <div className="noHistory">
             <img src={EmptyHistory} alt="no history" />
-            <p>No matches history yet</p>
+            <p>No matchs history yet</p>
             {location.pathname === '/profile' && <button className="playGame" onClick={() => navigate("/")}>
                 <FontAwesomeIcon icon={faGamepad} />
                 Play One
@@ -26,8 +26,8 @@ const NoHistroy = () => {
     );
 }
 
-export const MatchesHistory:React.FC<{userProfile: boolean}> = ({userProfile}) => {
-    const [matches, setMatches] = useState<Array<Match>>([]);
+export const MatchsHistory:React.FC<{userProfile: boolean}> = ({userProfile}) => {
+    const [matchs, setmatchs] = useState<Array<Match>>([]);
     const params = useParams();
     const pushNotif = useNotif();
 
@@ -43,14 +43,14 @@ export const MatchesHistory:React.FC<{userProfile: boolean}> = ({userProfile}) =
                 else {
                     _username = params.username!;
                 }
-                const _matches: Array<Match> = await get_matches_histroy(_username);
-                console.log(_matches)
-                setMatches(_matches);
+                const _matchs: Array<Match> = await get_matchs_histroy(_username);
+                console.log(_matchs)
+                setmatchs(_matchs);
             }
             catch(e: any)
             {
                 pushNotif({
-                    id: "MATCHESHISTORYERROR",
+                    id: "matchsHISTORYERROR",
                     type: "error",
                     icon: <FontAwesomeIcon icon={faClose}/>,
                     title: "ERROR",
@@ -61,8 +61,8 @@ export const MatchesHistory:React.FC<{userProfile: boolean}> = ({userProfile}) =
     }, [userProfile, params]);
 
     return (
-        <section id="matchesHistory">
-            {matches.length !== 0 ?  matches.map((m) => <MatchCard match={m}/>) : <NoHistroy />}
+        <section id="matchsHistory">
+            {matchs.length !== 0 ?  matchs.map((m) => <MatchCard match={m}/>) : <NoHistroy />}
         </section>
     );
 }

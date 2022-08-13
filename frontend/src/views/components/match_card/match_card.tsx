@@ -2,7 +2,7 @@ import React from "react";
 import { DefaultGame, UltimateGame } from "assets";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { useNavigate } from "react-router-dom";
-import { Match } from "controller/user/matches";
+import { Match } from "controller/user/matchs";
 
 export const MatchCard:React.FC<{match: Match}> = ({match}) => {
     const navigate = useNavigate();
