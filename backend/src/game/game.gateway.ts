@@ -17,7 +17,7 @@ export class WsValidationPipe extends ValidationPipe
 {
     async transform(value: any, metadata: ArgumentMetadata) {
         try
-        {
+        { 
             return await super.transform(value, metadata);
         }
         catch (e)
@@ -451,7 +451,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             is_player: false,
             userId: user.id
         });
-        client.emit("3marr bach bghitii ", {
+        client.emit("joinStream", {
             p1: this.tab[roomId].user1.user,
             p2: this.tab[roomId].user2.user,
             score1: this.tab[roomId].user1.client.data.obj.lScore,
