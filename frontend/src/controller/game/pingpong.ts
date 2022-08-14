@@ -23,8 +23,6 @@ export default class PingPong extends Phaser.Scene
     enemy?: Phaser.GameObjects.Sprite;
     cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
     status?: Phaser.GameObjects.Image;
-    leftScoretxt?: Phaser.GameObjects.Text;
-    rightScoretxt?: Phaser.GameObjects.Text;
     posx: number = 0;
     eposx: number = 0;
     posy: number = 0;
@@ -41,6 +39,7 @@ export default class PingPong extends Phaser.Scene
     win?: Phaser.GameObjects.Image;
     lose?: Phaser.GameObjects.Image;
     exit?: Phaser.GameObjects.Image;
+    setupListners = true;
     
     type: string;
     waiting?: Phaser.GameObjects.Text;
@@ -63,9 +62,9 @@ export default class PingPong extends Phaser.Scene
     constructor(msoc: Socket, type:string, isPlayer: boolean, roomId: string)
     {
         super("");
-        console.log("type = " + type);
-        console.log("roomId = " + roomId);
-        console.log("isPlayer = " + isPlayer);
+        // console.log("type = " + type);
+        // console.log("roomId = " + roomId);
+        // console.log("isPlayer = " + isPlayer);
         this.roomId = roomId;
         this.isPlayer = isPlayer;
         this.type = type;
@@ -75,25 +74,6 @@ export default class PingPong extends Phaser.Scene
     addSprites ()
     {
         this.add.image(this.w / 2, this.h / 2, this.imgbg);
-    }
-
-    addScore()
-    {
-        if (this.leftScoretxt)
-            this.leftScoretxt.destroy();
-        this.leftScoretxt = this.add.text((this.w / 2) - (this.w / 10) - 40 , 30, this.leftScore.toString(), {
-            fontSize: "60px",
-            fontFamily: "Poppins_B",
-            align: "center",
-        });
-        
-        if (this.rightScoretxt)
-            this.rightScoretxt.destroy();
-        this.rightScoretxt = this.add.text((this.w / 2) + (this.w / 10) , 30, this.rightScore.toString(), {
-            fontSize: "60px",
-            fontFamily: "Poppins_B",
-            align: "center"
-        });
     }
 
     preload () : void
@@ -108,6 +88,286 @@ export default class PingPong extends Phaser.Scene
         this.load.image('redButton', RedButton);
         this.load.image('youwin', YouWin);
         this.load.image('youlose', YouLose);
+        if (this.setupListners)
+        {
+            this.setupListners = false;
+            this.soc.on("saveData", (data: { player: string, is_player: boolean, roomId: string, userId: string, mapUrl: string } ) =>
+            {
+                console.log(data);
+                this.data = data;
+                if (data.player === "player1")
+                {
+                    if (this.buttonBg)
+                        this.buttonBg.destroy();
+                    if (this.leave)
+                        this.leave.destroy();
+                    if (this.waiting)
+                        this.waiting.destroy();
+                }
+                if (data.mapUrl !== "normalField")
+                {
+                    this.map = true;
+                    this.mapUrl = data.mapUrl;
+                    this.imgbg = "backGround";
+                    this.type = "ultimateQue";
+                    this.load.once('complete', this.addSprites, this);
+                    this.load.image(this.imgbg, this.mapUrl);
+                    this.load.start();
+                    setTimeout(()=> {
+                        this.scene.restart();
+                    }, 500);
+                }
+            });
+
+            this.soc.on("startGame", () => {
+                if (this.waiting || this.buttonBg || this.leave)
+                {
+                    this.End = false;
+                    if (this.waiting)
+                        this.waiting.destroy();
+                    if (this.buttonBg)
+                        this.buttonBg.destroy();
+                    if (this.leave)
+                        this.leave.destroy();
+                    this.replayClick = false;
+                }
+                this.goalTime();
+            });
+
+
+            this.soc.on("waiting", (walo: any) => {
+
+                this.waiting = this.add.text(this.w / 2 , this.h / 2 , "Waiting ...", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setOrigin(0.5);
+                this.buttonBg = this.add.sprite(this.w / 2 , this.h / 1.20 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                this.leave = this.add.text(this.w / 2 , this.h / 1.20 , "Leave", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+                this.buttonBg.on('pointerdown', () => {
+                    this.leaveFunc();
+                }, this);
+                this.leave.on('pointerdown', () => {
+                    this.leaveFunc();
+                }, this);
+
+            });
+
+            this.soc.on("restartGame", () => {
+                this.leftScore = 0;
+                this.rightScore = 0;
+                this.End = false;
+                this.goal = false;
+                if (this.data.is_player)
+                    this.input.keyboard.enabled = true;
+                else
+                    if (this.buttonBg)
+                        this.buttonBg.destroy();
+                    if (this.leave)
+                        this.leave.destroy();
+                this.goalTime();
+            });
+            
+            this.soc.on("newRoom", (id: string) => 
+            {
+                this.restartClick = false;
+                if (!this.data.is_player)
+                    if (this.win)
+                        this.win.destroy();       
+                    if (this.lose)
+                        this.lose.destroy();
+                this.soc.emit("join", {
+                    oldData: this.data,
+                    newRoom: id
+                });
+                this.data.roomId = id;
+            });
+
+            this.soc.on("Watchers", (data: any) => 
+            {
+                if (!this.data || this.data.is_player || this.map)
+                    return ;
+                this.watcherRender(data);
+            });
+
+            this.soc.on("youWin", () => 
+            {
+                this.exitEmited = true;
+                if (this.End && this.data.is_player)
+                {
+                    const replayBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                    this.replay = this.add.text(this.w / 2 , this.h / 2 + 85 , "New Game", { fontSize: "35px",
+                    fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.8);
+                    replayBg.on('pointerdown', () => {
+                        this.replayGame();
+                    }, this);
+        
+                    this.replay.on('pointerdown', () =>  {
+                        this.replayGame();
+                    }, this);
+                    if (!this.restartClick)
+                    {
+                        if (this.buttonBg)
+                            this.buttonBg.destroy();
+                        if (this.restartText)
+                            this.restartText.destroy();
+                        return ;
+                    }
+                    this.leave = this.add.text(this.w / 2 , this.h / 1.20 , "One Of players left the Game", { fontSize: "35px",
+                    fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+                    const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 170 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                    this.leave = this.add.text(this.w / 2 , this.h / 2 + 170 , "Exit", { fontSize: "35px",
+                    fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+        
+                    exitBg.on('pointerdown', () => {
+                        this.leaveFunc();
+                    }, this);
+        
+                    this.leave.on('pointerdown', () =>  {
+                        this.leaveFunc();
+                    }, this);
+                }
+                if (!this.End && this.data.is_player)
+                {
+                    if (this.ball)
+                        this.ball.destroy();
+                    if (this.paddle)
+                        this.paddle.destroy();
+                    if (this.enemy)
+                        this.enemy.destroy();
+                    this.add.image(this.w/2, this.h/2 - 100, "youwin").setOrigin(0.5).setScale(0.4);
+                    const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 170 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                    this.leave = this.add.text(this.w / 2 , this.h / 2 + 170 , "Exit", { fontSize: "35px",
+                    fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+                    const replayBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                    this.replay = this.add.text(this.w / 2 , this.h / 2 + 85 , "New Game", { fontSize: "35px",
+                    fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.8);
+                    replayBg.on('pointerdown', () => {
+                        this.replayGame();
+                    }, this);
+        
+                    this.replay.on('pointerdown', () =>  {
+                        this.replayGame();
+                    }, this);
+                    exitBg.on('pointerdown', () => {
+                        this.leaveFunc();
+                    }, this);
+        
+                    this.leave.on('pointerdown', () =>  {
+                        this.leaveFunc();
+                    }, this);
+                }
+            });
+
+            this.soc.on("leave", () => {
+                this.leave = this.add.text(this.w / 2 , this.h / 2 , "One Of players left the Game", { fontSize: "35px",
+                fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+                const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                this.leave = this.add.text(this.w / 2 , this.h / 2 + 85 , "Exit", { fontSize: "35px",
+                fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+    
+                exitBg.on('pointerdown', () => {
+                    this.leaveFunc();
+                }, this);
+
+                this.leave.on('pointerdown', () =>  {
+                    this.leaveFunc();
+                }, this);
+                
+                if (this.data)
+                {
+                    this.soc.emit('move', {
+                        roomId: this.data.roomId,
+                        paddleY: this.paddle.y,
+                        ballx: (this.ball.body) ? this.ball.body.x: 0,
+                        bally: (this.ball.body) ? this.ball.body.y: 0,
+                        lScore: this.bestOf,
+                        rScore: this.bestOf
+                    });
+                }
+                this.soc.disconnect();
+                this.scene.stop();
+            });
+
+            this.soc.on("watcherEndMatch", () => {
+                this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 150 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.4);
+                this.leave = this.add.text(this.w / 2 , this.h / 2 + 150 , "exit", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+
+                this.buttonBg.on('pointerdown', () =>
+                {
+                    this.leaveFunc();
+                }, this);
+                this.leave.on('pointerdown', () =>
+                {
+                    this.leaveFunc();
+                }, this);
+                let right = this.w - (this.w / 4);
+                let left = this.w / 4;
+                if (this.rightScore === this.bestOf)
+                {
+                    this.win = this.add.image(right, this.h/2, "youwin").setOrigin(0.5, 0.5).setScale(0.3);
+                    this.lose = this.add.image(left, this.h/2, "youlose").setOrigin(0.5, 0.5).setScale(0.3)
+                    return ;
+                }
+                this.win = this.add.image(left, this.h/2, "youwin").setOrigin(0.5, 0.5).setScale(0.3);
+                this.lose = this.add.image(right, this.h/2, "youlose").setOrigin(0.5, 0.5).setScale(0.3);
+
+            });
+
+            this.soc.on("restart", (img) => {
+                this.add.image(this.w/2, this.h/2 - 100, img).setOrigin(0.5).setScale(0.4);
+                this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 85, 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                this.restartText = this.add.text(this.w / 2 , this.h / 2 + 85 , "Replay", { fontSize: "35px",
+                fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+                this.exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 170 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                this.leave = this.add.text(this.w / 2 , this.h / 2 + 170 , "Exit", { fontSize: "35px",
+                fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+                
+                this.exitBg.on('pointerdown', () =>
+                {
+                    this.leaveFunc();
+                }, this);
+
+                this.leave.on('pointerdown', () =>
+                {
+                    this.leaveFunc();
+                }, this);
+
+                this.restartText.on('pointerdown',  () => {
+                    this.restartText.setInteractive(false);
+                    this.restartFunc();
+                }, this);
+                
+                this.buttonBg.on('pointerdown', () => {
+                    this.buttonBg.setInteractive(false);
+                    this.restartFunc();
+                }, this);
+
+            });
+
+            this.soc.on('recv', (data: {
+                roomId: string,
+                paddleY: number,
+                ballx: number,
+                bally: number,
+                lScore: number,
+                rScore: number,
+            }) => {
+                if (this.enemy && this.enemy.body)
+                {
+                    this.enemy.y = data.paddleY;
+                    if('updateFromGameObject' in this.enemy.body) {
+                        this.enemy.body.updateFromGameObject();
+                    }
+                    if (this.ball && this.data.player === "player2")
+                    {
+                        this.ball.x = data.ballx;
+                        this.ball.y = data.bally;
+                    }
+                    // if (this.data.player === "player2" && (this.rightScore !== data.rScore || this.leftScore !== data.lScore))
+                    // {
+                    //     this.rightScore = data.rScore;
+                    //     this.leftScore = data.lScore;
+                    // }
+                }
+            });
+        }
     }
 //////////////////////// listeners Func '////////////////////////
     leaveFunc() : void
@@ -123,7 +383,7 @@ export default class PingPong extends Phaser.Scene
     {
         if (this.replayClick)
             return ;
-        this.soc.removeAllListeners();
+        // this.soc.removeAllListeners();
         this.replayClick = true;
         this.gameIsStarted = false;
         this.rightScore = 4;
@@ -137,7 +397,7 @@ export default class PingPong extends Phaser.Scene
         if (this.re)
             return ;
         this.re = true;
-        this.soc.removeAllListeners();
+        // this.soc.removeAllListeners();
         this.scene.restart();
     }
 ////////////////////////.................////////////////////////
@@ -168,20 +428,14 @@ export default class PingPong extends Phaser.Scene
     {
         this.rightScore = d.rScore;
         this.leftScore = d.lScore;
-        this.leftScoretxt.text = d.lScore.toString();
-        this.rightScoretxt.text = d.rScore.toString();
-        
 
         if (d.goal)
         {
             this.goal = true;
-            this.soc.removeAllListeners();
             this.scene.restart();
         }
-
         if (!this.enemy && !this.ball && !this.paddle)
         {   
-            console.log("gerre");
             this.createObjects(d.ballx, d.bally, d.lpaddle, d.rpaddle);
             return ;
         }
@@ -208,290 +462,7 @@ export default class PingPong extends Phaser.Scene
         this.bg = this.add.image(this.w / 2, this.h / 2, this.imgbg);
 
         /////////////////////////////// text ////////////////////////
-        if (this.type !== "ultimateQue" || !this.isPlayer)
-            this.addScore();
 
-        this.soc.on("saveData", (data: { player: string, is_player: boolean, roomId: string, userId: string, mapUrl: string } ) => 
-        {
-            console.log(data);
-            this.data = data;
-            if (data.player === "player1")
-            {
-                if (this.buttonBg)
-                    this.buttonBg.destroy();
-                if (this.leave)
-                    this.leave.destroy();
-                if (this.waiting)
-                    this.waiting.destroy();
-            }
-            if (data.mapUrl !== "normalField")
-            {
-                this.map = true;
-                this.mapUrl = data.mapUrl;
-                this.imgbg = "backGround";
-                this.type = "ultimateQue";
-                this.load.once('complete', this.addSprites, this);
-                this.load.image(this.imgbg, this.mapUrl);
-                this.load.start();
-                setTimeout(()=> {
-                    this.soc.removeAllListeners();
-                    this.scene.restart();
-                }, 500);
-            }
-        });
-
-        this.soc.on("startGame", () => {
-            if (this.waiting || this.buttonBg || this.leave)
-            {
-                this.End = false;
-                if (this.waiting)
-                    this.waiting.destroy();
-                if (this.buttonBg)
-                    this.buttonBg.destroy();
-                if (this.leave)
-                    this.leave.destroy();
-                this.replayClick = false;
-            }
-            this.goalTime();
-        });
-
-
-        this.soc.on("waiting", (walo: any) => {
-
-            this.waiting = this.add.text(this.w / 2 , this.h / 2 , "Waiting ...", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setOrigin(0.5);
-            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 1.20 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
-            this.leave = this.add.text(this.w / 2 , this.h / 1.20 , "Leave", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-            this.buttonBg.on('pointerdown', () => {
-                this.leaveFunc();
-            }, this);
-            this.leave.on('pointerdown', () => {
-                this.leaveFunc();
-            }, this);
-
-        });
-
-        this.soc.on("restartGame", () => {
-            this.leftScore = 0;
-            this.rightScore = 0;
-            this.addScore();
-            this.End = false;
-            this.goal = false;
-            if (this.data.is_player)
-                this.input.keyboard.enabled = true;
-            else
-                if (this.buttonBg)
-                    this.buttonBg.destroy();
-                if (this.leave)
-                    this.leave.destroy();
-            this.goalTime();
-        });
-        
-        this.soc.on("newRoom", (id: string) => 
-        {
-            this.restartClick = false;
-            if (!this.data.is_player)
-                if (this.win)
-                    this.win.destroy();       
-                if (this.lose)
-                    this.lose.destroy();
-            this.soc.emit("join", {
-                oldData: this.data,
-                newRoom: id
-            });
-            this.data.roomId = id;
-        });
-
-        this.soc.on("Watchers", (data: any) => 
-        {
-            if (!this.data || this.data.is_player || this.map)
-                return ;
-            this.watcherRender(data);
-        });
-
-        this.soc.on("youWin", () => 
-        {
-            this.exitEmited = true;
-            if (this.End && this.data.is_player)
-            {
-                const replayBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
-                this.replay = this.add.text(this.w / 2 , this.h / 2 + 85 , "New Game", { fontSize: "35px",
-                fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.8);
-                replayBg.on('pointerdown', () => {
-                    this.replayGame();
-                }, this);
-    
-                this.replay.on('pointerdown', () =>  {
-                    this.replayGame();
-                }, this);
-                if (!this.restartClick)
-                {
-                    if (this.buttonBg)
-                        this.buttonBg.destroy();
-                    if (this.restartText)
-                        this.restartText.destroy();
-                    return ;
-                }
-                this.leave = this.add.text(this.w / 2 , this.h / 1.20 , "One Of players left the Game", { fontSize: "35px",
-                fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-                const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 170 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
-                this.leave = this.add.text(this.w / 2 , this.h / 2 + 170 , "Exit", { fontSize: "35px",
-                fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-     
-                exitBg.on('pointerdown', () => {
-                    this.leaveFunc();
-                }, this);
-    
-                this.leave.on('pointerdown', () =>  {
-                    this.leaveFunc();
-                }, this);
-            }
-            if (!this.End && this.data.is_player)
-            {
-                if (this.ball)
-                    this.ball.destroy();
-                if (this.paddle)
-                    this.paddle.destroy();
-                if (this.enemy)
-                    this.enemy.destroy();
-                this.add.image(this.w/2, this.h/2 - 100, "youwin").setOrigin(0.5).setScale(0.4);
-                const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 170 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
-                this.leave = this.add.text(this.w / 2 , this.h / 2 + 170 , "Exit", { fontSize: "35px",
-                fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-                const replayBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
-                this.replay = this.add.text(this.w / 2 , this.h / 2 + 85 , "New Game", { fontSize: "35px",
-                fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.8);
-                replayBg.on('pointerdown', () => {
-                    this.replayGame();
-                }, this);
-    
-                this.replay.on('pointerdown', () =>  {
-                    this.replayGame();
-                }, this);
-                exitBg.on('pointerdown', () => {
-                    this.leaveFunc();
-                }, this);
-    
-                this.leave.on('pointerdown', () =>  {
-                    this.leaveFunc();
-                }, this);
-            }
-
-        });
-
-        this.soc.on("leave", () => {
-            this.leave = this.add.text(this.w / 2 , this.h / 2 , "One Of players left the Game", { fontSize: "35px",
-            fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-            const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
-            this.leave = this.add.text(this.w / 2 , this.h / 2 + 85 , "Exit", { fontSize: "35px",
-            fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
- 
-            exitBg.on('pointerdown', () => {
-                this.leaveFunc();
-            }, this);
-
-            this.leave.on('pointerdown', () =>  {
-                this.leaveFunc();
-            }, this);
-            
-            if (this.data)
-            {
-                this.soc.emit('move', {
-                    roomId: this.data.roomId,
-                    paddleY: this.paddle.y,
-                    ballx: (this.ball.body) ? this.ball.body.x: 0,
-                    bally: (this.ball.body) ? this.ball.body.y: 0,
-                    lScore: this.bestOf,
-                    rScore: this.bestOf
-                });
-            }
-            this.soc.disconnect();
-            this.scene.stop();
-        });
-
-        this.soc.on("watcherEndMatch", () => {
-            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.4);
-            this.leave = this.add.text(this.w / 2 , this.h / 2 , "Watching", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 150 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.4);
-            this.leave = this.add.text(this.w / 2 , this.h / 2 + 150 , "exit", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-
-            this.buttonBg.on('pointerdown', () =>
-            {
-                this.leaveFunc();
-            }, this);
-            this.leave.on('pointerdown', () =>
-            {
-                this.leaveFunc();
-            }, this);
-            let right = this.w - (this.w / 4);
-            let left = this.w / 4;
-            if (this.rightScore === this.bestOf)
-            {
-                this.win = this.add.image(right, this.h/2, "youwin").setOrigin(0.5, 0.5).setScale(0.3);
-                this.lose = this.add.image(left, this.h/2, "youlose").setOrigin(0.5, 0.5).setScale(0.3)
-                return ;
-            }
-            this.win = this.add.image(left, this.h/2, "youwin").setOrigin(0.5, 0.5).setScale(0.3);
-            this.lose = this.add.image(right, this.h/2, "youlose").setOrigin(0.5, 0.5).setScale(0.3);
-
-        });
-
-        this.soc.on("restart", (img) => {
-            this.add.image(this.w/2, this.h/2 - 100, img).setOrigin(0.5).setScale(0.4);
-            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 85, 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
-            this.restartText = this.add.text(this.w / 2 , this.h / 2 + 85 , "Replay", { fontSize: "35px",
-            fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-            this.exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 170 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
-            this.leave = this.add.text(this.w / 2 , this.h / 2 + 170 , "Exit", { fontSize: "35px",
-            fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-            
-            this.exitBg.on('pointerdown', () =>
-            {
-                this.leaveFunc();
-            }, this);
-
-            this.leave.on('pointerdown', () =>
-            {
-                this.leaveFunc();
-            }, this);
-
-            this.restartText.on('pointerdown',  () => {
-                this.restartText.setInteractive(false);
-                this.restartFunc();
-            }, this);
-            
-            this.buttonBg.on('pointerdown', () => {
-                this.buttonBg.setInteractive(false);
-                this.restartFunc();
-            }, this);
-
-        });
-
-        this.soc.on('recv', (data: {
-            roomId: string,
-            paddleY: number,
-            ballx: number,
-            bally: number,
-            lScore: number,
-            rScore: number,
-        }) => {
-            if (this.enemy && this.enemy.body)
-            {
-                this.enemy.y = data.paddleY;
-                if('updateFromGameObject' in this.enemy.body) {
-                    this.enemy.body.updateFromGameObject();
-                }
-                if (this.ball && this.data.player === "player2")
-                {
-                    this.ball.x = data.ballx;
-                    this.ball.y = data.bally;
-                }
-                if (this.data.player === "player2" && (this.rightScore !== data.rScore || this.leftScore !== data.lScore))
-                {
-                    this.rightScore = data.rScore;
-                    this.leftScore = data.lScore;
-                }
-            }
-        });
         if (!this.isPlayer && this.connection)
         {
             this.connection = false;
@@ -508,6 +479,20 @@ export default class PingPong extends Phaser.Scene
         }
         else if (this.isPlayer && this.connection)
         {
+            this.rightScore = 0;
+            this.leftScore = 0;
+            this.soc.emit('sendToWatcher', {
+                roomId: this.data.roomId,
+                lpaddle: 0,
+                rpaddle: 0,
+                ballx: 0,
+                bally: 0,
+                lScore: this.leftScore,
+                rScore: this.rightScore,
+                endGame: this.End,
+                goal: this.goal,
+                newEmit: true,
+            });
             this.connection = false;
             this.soc.emit(this.type);
         }
@@ -525,7 +510,9 @@ export default class PingPong extends Phaser.Scene
             this.winner(msg);
         }
         else if  (!this.End && this.goal && !this.re && (this.leftScore || this.rightScore))
+        {
             this.goalTime();
+        }
         
     }
 
@@ -551,7 +538,6 @@ export default class PingPong extends Phaser.Scene
             this.counter.text = "";
             if (this.exitEmited)
                 return ;
-            this.addScore();
             if (this.data.is_player)
                 this.startGame();
             else
@@ -766,6 +752,7 @@ export default class PingPong extends Phaser.Scene
                 rScore: this.rightScore,
                 endGame: this.End,
                 goal: this.goal,
+                newEmit: false,
             });
         }
         //////       check For the goals    //////////
@@ -773,7 +760,6 @@ export default class PingPong extends Phaser.Scene
         {
             /******************* add score for the leftUser *******************************/
             this.rightScore += 1;
-            this.rightScoretxt.text = this.rightScore.toString();
             /******************************************************************************/
 
             if (this.data.is_player && !this.End)
@@ -791,9 +777,9 @@ export default class PingPong extends Phaser.Scene
                         rScore: this.rightScore,
                         endGame: this.End,
                         goal: this.goal,
+                        newEmit: false,
                     });
                 }
-                this.soc.removeAllListeners();
                 this.scene.restart();
             }
             
@@ -805,7 +791,6 @@ export default class PingPong extends Phaser.Scene
             
             /******************* add score for the leftUser *******************************/
             this.leftScore += 1; 
-            this.leftScoretxt.text = this.leftScore.toString();
             /******************************************************************************/
 
             if (this.data.is_player && !this.End)
@@ -823,9 +808,9 @@ export default class PingPong extends Phaser.Scene
                         rScore: this.rightScore,
                         endGame: this.End,
                         goal: this.goal,
+                        newEmit: false,
                     });
                 }
-                this.soc.removeAllListeners();
                 this.scene.restart();
             }
         }

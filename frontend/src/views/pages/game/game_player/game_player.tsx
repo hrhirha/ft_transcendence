@@ -18,7 +18,6 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
 
     useEffect(() => {
         socket.on("updateScore", (score) => {
-            alert("Ssuuiiiiii !");
             setMatchData(oldData => ({...oldData, score: {p1: score.score1, p2: score.score2}}));
         });
         socket.on("waiting", (players) => {

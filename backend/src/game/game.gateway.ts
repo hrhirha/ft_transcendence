@@ -297,7 +297,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
-        this.server.to(d.roomId).emit('Watchers', d);
+        if (client.data.obj && client.data.obj.player === "player1" && (client.data.obj.lScore != d.lScore || client.data.obj.rScore != d.rScore))
+        {
+            this.server.to(client.data.obj.roomId).emit("updateScore", {
+                score1: d.lScore,
+                score2: d.rScore,
+            });
+        }
+        client.data.obj.lScore = d.lScore;
+        client.data.obj.rScore = d.rScore;
+        if (!d.newEmit)
+            this.server.to(d.roomId).emit('Watchers', d);
     }
 
     @SubscribeMessage('normaleQue')
@@ -346,8 +356,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                     createMany: {
                         data:
                         [
-                            { uid: user.id    },
-                            { uid: this.normaleQue.user.id }
+                            { uid: this.normaleQue.user.id },
+                            { uid: user.id }
                         ]
                     }
                 }
@@ -409,8 +419,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                     createMany: {
                         data:
                         [
-                            { uid: user.id    },
-                            { uid: this.ultimateQue.user.id }
+                            { uid: this.ultimateQue.user.id },
+                            { uid: user.id    }
                         ]
                     }
                 }
@@ -528,15 +538,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         }
         if (!client.data.obj)
             return ;
-        if (client.data.obj.player === "player1" && (client.data.obj.lScore != data.lScore || client.data.obj.rScore != data.rScore))
-        {
-            this.server.to(client.data.obj.roomId).emit("updateScore", {
-                score1: data.lScore,
-                score2: data.rScore,
-            });
-        }
-        client.data.obj.lScore = data.lScore;
-        client.data.obj.rScore = data.rScore;
         client.broadcast.to(data.roomId).emit('recv', data);
     }
 }

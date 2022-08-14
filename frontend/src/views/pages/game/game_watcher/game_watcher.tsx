@@ -20,11 +20,19 @@ export const GameWatcher:React.FC = () =>  {
 
     useEffect(() => {
         socket.on("updateScore", (score) => {
-            alert("Ssuuiiiiii !");
             setMatchs(oldMatches => oldMatches.map((m, i) => {
                 if (i === currentMatch)
                 {
                     return {...m, score: {p1: score.score1, p2: score.score2}};
+                }
+                return m;
+            }));
+        });
+        socket.on("joinStream", ({p1, p2, score1, score2}) => {
+            setMatchs(oldMatches => oldMatches.map((m, i) => {
+                if (i === currentMatch)
+                {
+                    return {...m, p1: p1, p2: p2, score: {p1: score1, p2: score2}};
                 }
                 return m;
             }));
