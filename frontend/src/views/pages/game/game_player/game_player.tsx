@@ -15,7 +15,7 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
             p2: 0
         }
     });
-
+    
     useEffect(() => {
         socket.on("updateScore", (score) => {
             setMatchData(oldData => ({...oldData, score: {p1: score.score1, p2: score.score2}}));

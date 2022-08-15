@@ -14,7 +14,7 @@ const PlayerData:React.FC<{player: User, left: boolean}> = ({player, left}) => {
             {left && <h6 className="fullName">waiting ...</h6>}
         </div>);
     return (
-        <div className={`player ${left ? "left" : "right"}`} onClick={() => navigate(`/u/${player.username}`)}>
+        <div className={`player ${left ? "left" : "right"}`} onClick={() => navigate(`/u/${player.username}`, {replace: true})}>
             {!left && <h6 className="fullName">{player.fullName}</h6>}
             <div className="avatar">
                 <CircleAvatar avatarURL={player.imageUrl} dimensions={60} showStatus={false}/>

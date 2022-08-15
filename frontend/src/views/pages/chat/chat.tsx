@@ -61,7 +61,7 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
                     navigate({
                         pathname: '/chat',
                         search: `?id=${chat.id}`,
-                    });
+                    }, {replace: true});
                 }}
             />)}</>);
 }

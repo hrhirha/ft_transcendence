@@ -12,10 +12,9 @@ interface Props {
     actions?: Array<{title: string, color: string, action: Function}>
 }
 
-
 const NotifContext = createContext(Function());
-
 export const useNotif = () => useContext(NotifContext);
+
 const animatedNotifs: Array<Props> = [];
 
 const NotifCard:React.FC<{props: Props, onClose: Function, setNotifs: Function}> = ({props, onClose, setNotifs}) => {
@@ -47,7 +46,7 @@ const NotifCard:React.FC<{props: Props, onClose: Function, setNotifs: Function}>
     );
 }
 
-export const Notif:React.FC<{children: Array<ReactNode>}> = ({children}) => {
+export const Notif:React.FC<{children: ReactNode}> = ({children}) => {
     const [notifs, setNotifs] = useState<Array<Props>>([]);
     const [timer, setTimer] = useState<any>();
     const pushNotif = (newNotif: Props) => {

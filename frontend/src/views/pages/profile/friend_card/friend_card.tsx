@@ -15,7 +15,7 @@ export const FriendCard = (Props : Props) => {
 
 	return (
 		<div className="friendCard">
-			<div className="friendInfos" onClick={() => navigate(`/u/${Props.user.username}`)}>
+			<div className="friendInfos" onClick={() => navigate(`/u/${Props.user.username}`, {replace: true})}>
 				<div className='avatar'>
 					<CircleAvatar avatarURL={Props.user.imageUrl} dimensions={85} showStatus={false}/>
 				</div>

@@ -52,7 +52,6 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
 
     const editProfile = async ()  => {
         try {
-            console.log(detectUpdates)
             if (detectUpdates.name && (!/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(-[a-zA-Z]+)*\.?))+$/.test(fullName!) || fullName!.length > 40))
                 throw(Error("Full Name can only contain a-z SP A-Z - . and max length 40"));
             if (detectUpdates.name)
@@ -136,13 +135,12 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                     setUserInfos(user);
                     setFullName(user.fullName);
                     if (user.relation === null)
-                        navigate("/profile");
-                    console.log(user.relation);
+                        navigate("/profile", {replace: true});
                     if (user.relation === "blocked")
-                        navigate("/notfound");
+                        navigate("/notfound", {replace: true});
                 }
                 catch(e) {
-                    navigate("/notfound");
+                    navigate("/notfound", {replace: true});
                 }
             }
         } catch (err: any) {

@@ -18,7 +18,7 @@ const NoHistroy = () => {
         <div className="noHistory">
             <img src={EmptyHistory} alt="no history" />
             <p>No matchs history yet</p>
-            {location.pathname === '/profile' && <button className="playGame" onClick={() => navigate("/")}>
+            {location.pathname === '/profile' && <button className="playGame" onClick={() => navigate("/", {replace: true})}>
                 <FontAwesomeIcon icon={faGamepad} />
                 Play One
             </button>}
@@ -44,7 +44,6 @@ export const MatchsHistory:React.FC<{userProfile: boolean}> = ({userProfile}) =>
                     _username = params.username!;
                 }
                 const _matchs: Array<Match> = await get_matchs_histroy(_username);
-                console.log(_matchs)
                 setmatchs(_matchs);
             }
             catch(e: any)
@@ -62,7 +61,7 @@ export const MatchsHistory:React.FC<{userProfile: boolean}> = ({userProfile}) =>
 
     return (
         <section id="matchsHistory">
-            {matchs.length !== 0 ?  matchs.map((m) => <MatchCard match={m}/>) : <NoHistroy />}
+            {matchs.length !== 0 ?  matchs.map((m) => <MatchCard key={m.id} match={m}/>) : <NoHistroy />}
         </section>
     );
 }

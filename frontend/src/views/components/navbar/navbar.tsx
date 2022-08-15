@@ -36,7 +36,7 @@ const NavButton:React.FC<{element: NavButtonData}> = ({element}) => {
     const location = useLocation();
 
     return (
-        <NavLink to={element.url} id="navBtn" className={location.pathname === element.url ? "active" : undefined} title={element.title} >
+        <NavLink replace={true} to={element.url} id="navBtn" className={location.pathname === element.url ? "active" : undefined} title={element.title} >
             <FontAwesomeIcon icon={element.icon}/>
             <h3>{element.title}</h3>
         </NavLink>
@@ -90,7 +90,7 @@ export const NavBar:React.FC<{user: User}> = ({user}) => {
             <div className="container">
                 <div className="row">
                     <span id="brand" className='col col-md-3'>
-                        <NavLink to="/" >
+                        <NavLink  replace={true} to="/" >
                             <Brand/>
                         </NavLink>
                     </span>
