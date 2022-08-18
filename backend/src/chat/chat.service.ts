@@ -771,7 +771,6 @@ export class ChatService {
             });
             const jt = me.joined_time;
  
-            console.log({room});
             room.lst_msg_ts < jt && (room.lst_msg = "") && (room.lst_msg_ts = null);
             me.is_banned && (room.lst_msg = 'you are banned') && (room.lst_msg_ts = null);
 
@@ -823,10 +822,11 @@ export class ChatService {
                 lst_msg: true,
                 lst_msg_ts: true,
                 user_rooms: {
-                    where: {
-                        uid: { not: user.id }
-                    },
+                    // where: {
+                    //     uid: { not: user.id }
+                    // },
                     select: {
+                        uid: true,
                         unread: true,
                         user: {
                             select: {
@@ -857,16 +857,19 @@ export class ChatService {
             },
         });
         let joined = [];
-        for (let room of rooms)
-        {
-            const user = room.user_rooms[0].user;
-            const req = user.sentReq.length === 1 ? user.sentReq[0] : (user.recievedReq.length === 1 ? user.recievedReq[0] : null);
-            room['unread'] = room.user_rooms[0].unread;
+        rooms.forEach((room) => {
+            let other, me;
+            room.user_rooms.forEach((ur) => {
+                if (ur.uid === user.id) me = ur;
+                else other = ur;
+            });
+            const req = other.user.sentReq.length === 1 ? other.user.sentReq[0] : (other.user.recievedReq.length === 1 ? other.user.recievedReq[0] : null);
+            room["unread"] = me.unread;
             const is_blocked = (req && req.status === friend_status.BLOCKED) ? true : false;
-            delete user.sentReq && delete user.recievedReq;
+            delete other.user.sentReq && delete other.user.recievedReq;
             delete room.user_rooms;
-            joined.push({room, user, is_blocked});
-        }
+            joined.push({room, user: other.user, is_blocked});
+        });
         return joined;
     }
 
