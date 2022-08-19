@@ -60,23 +60,23 @@ export interface room_created {
 interface room_id {
     id:  string,
     lst_msg: string,
-    lst_msg_ts: string,
+    lst_msg_ts: Date,
     unread: number,
 }
 
-interface dms {
+export interface dms {
     room : room_id,
     user : user_info,
     is_blocked : boolean,
 }
 
-interface others {
+export interface others {
     id: string,
     name : string,
     type : string,
 }
 
-interface info_room {
+export interface info_room {
     id:  string,
     name:  string,
     type : string,
@@ -85,7 +85,7 @@ interface info_room {
     is_banned: false,
     is_muted: false,
     lst_msg: string,
-    lst_msg_ts: string,
+    lst_msg_ts: Date,
 }
 
 export interface chats { 
@@ -147,8 +147,18 @@ export interface messages {
     id : string,
     msg : string,
     timestamp : string,
+    type : string,
     user : user_info,
 }
 //-----------------------------------------------------
 
 
+type data = {
+    rid: string;
+    msg: string;  
+  }
+  
+
+export interface function_send_msg {
+    send_message : (param : data) => void;
+}

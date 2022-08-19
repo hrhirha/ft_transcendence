@@ -29,7 +29,7 @@ export const ChatRoomSettings:React.FC<{roomId: string, onClose: Function}> = ({
                 <h6><FontAwesomeIcon icon={faUsers} />Group Memebers</h6>
                 <div className="members">
                     {
-                        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((member, k) => <MemeberCard key={k} avatar="https://i.pravatar.cc/100" admin={Math.round(Math.random()) == 1} username={`username${k}`} fullName={`Full Name ${k}`} onClick={() => alert(`Go To ${k} Profile`)}/>)
+                        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((member, k) => <MemeberCard key={k} avatar="https://i.pravatar.cc/100" admin={true} username={`username${k}`} fullName={`Full Name ${k}`} onClick={() => alert(`Go To ${k} Profile`)}/>)
                     }
                 </div>
                 {/* <div className="DMOptions options">

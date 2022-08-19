@@ -1,14 +1,13 @@
-import { Chats, joinedGroups } from "test_data/roomchatdata";
 import { ChatRoom } from "views/pages/chat/chat_room/chat_room";
 import  {ChatRoomItem }  from "views/pages/chat/chatroom_item/chatroom_item";
 import {faCommentMedical, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CreateNewChat } from "views/pages/chat/create_chat/create_chat";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChatHomeVector, NoConversations } from "assets";
-import { Socket } from "socket";
-import { management_memeber, chats, dm_started, management_password, receive_message, room_created, user_joined, user_left, user_unbanned, user_muted, message_deleted, user_info, messages } from "socket/interface";
+import { management_memeber, chats, dm_started, management_password, receive_message, room_created, user_joined, user_left, user_unbanned, user_muted, message_deleted, user_info, messages, dms, info_room, others } from "socket/interface";
+import { SocketContext } from "index";
 
 
 enum chatTabs {
@@ -25,18 +24,58 @@ const ChatHome:React.FC<{onClick: Function}> = ({onClick}) => {
     </div>);
 }
 
-const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem: Function}> = ({tab, activeChat, onSelectItem}) => {
+const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem: Function, rooms:chats}> = ({tab, activeChat, onSelectItem, rooms}) => {
     const navigate = useNavigate();
-    let chats: any = Chats;
+
+    const class_socket = useContext(SocketContext);
+
     if (tab === chatTabs.joinedGroups)
     {
-        chats = joinedGroups;
+        return (<>{rooms.rooms.map((room : info_room, index: any) => 
+            <ChatRoomItem
+                key={index}
+                isChannel={true}
+                joined={true}
+                avatar={null}
+                fullName={room.name}
+                lastMsg={room.lst_msg}
+                nbNotifs={room.unread}
+                timeLastMsg={room.lst_msg_ts}
+                active={true}
+                onClick={() => {
+                    class_socket.get_messages({id : room.id});
+                    onSelectItem();
+                    navigate({
+                        pathname: '/chat',
+                        search: `?id=${room.id}`,
+                    }, {replace: true});
+                }}
+            />)}</>);
     }
     else if (tab === chatTabs.otherGroups)
     {
-        chats = [];
+        return (<>{rooms.others.map((other : others, index: any) => 
+            <ChatRoomItem
+                key={index}
+                isChannel={true}
+                joined={false}
+                avatar={null}
+                fullName={other.name}
+                lastMsg={null}
+                nbNotifs={null}
+                timeLastMsg={null}
+                active={true}
+                onClick={() => {
+                    class_socket.get_messages({id : other.id});
+                    onSelectItem();
+                    navigate({
+                        pathname: '/chat',
+                        search: `?id=${other.id}`,
+                    }, {replace: true});
+                }}
+            />)}</>);
     }
-    if (chats.length === 0)
+    if ((rooms && rooms.dms.length === 0) || rooms == undefined)
     {
         return (
             <div className="noConversations">
@@ -45,28 +84,27 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
             </div>
         );
     }
-    return (<>{chats.map((chat: any, index: any) => 
+    return (<>{rooms.dms.map((dms : dms, index: any) => 
             <ChatRoomItem
                 key={index}
-                isChannel={chatTabs.chats !== tab}
-                joined={chatTabs.chats === tab}
-                avatar={chat.image}
-                fullName={chat.username}
-                lastMsg={chatTabs.chats !== tab ? `${(index + 2) * 5} members` :  chat.last_msg}
-                nbNotifs={chat.nbr_msg_not_read}
-                timeLastMsg={chat.time_last_msg}
-                active={chat.id === activeChat}
+                isChannel={false}
+                joined={true}
+                avatar={dms.user.imageUrl}
+                fullName={dms.user.fullName}
+                lastMsg={dms.room.lst_msg}
+                nbNotifs={dms.room.unread}
+                timeLastMsg={(!dms.room.lst_msg_ts) ? new Date() : dms.room.lst_msg_ts}
+                active={dms.room.id === activeChat}
                 onClick={() => {
+                    class_socket.get_messages({id : dms.room.id});
                     onSelectItem();
                     navigate({
                         pathname: '/chat',
-                        search: `?id=${chat.id}`,
+                        search: `?id=${dms.room.id}`,
                     }, {replace: true});
                 }}
             />)}</>);
 }
-
-const class_socket =new Socket(); //test
 
 
 export const Chat:React.FC = () => {
@@ -74,82 +112,82 @@ export const Chat:React.FC = () => {
     const [showNewChatForm, setShowNewChatForm] = useState<boolean>(false);
     const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState<chatTabs>(chatTabs.chats);
+    const class_socket = useContext(SocketContext);
+    const [chatRooms, setchatRooms] = useState<chats>()
 
 
     //test -----
     useEffect(() => {
-        class_socket.socket.on("chats", (data : chats)=>{ //done
-            console.log("chats : ");
-            console.log(data)
+        class_socket.socket.on("chats", (data : chats)=>{ //done 2
+            setchatRooms(data);
         })
-        class_socket.socket.on("receive_message", (data : receive_message)=>{ //done
-            console.log("receive_message");
-            console.log(data)
+        class_socket.socket.once("receive_message", (data : receive_message)=>{ //done 2
+            class_socket.get_chats();
+            if (searchParams.get("id") != null && searchParams.get("id") == data.room.id)
+                class_socket.get_messages({id : data.room.id});
         })
 
-        class_socket.socket.on("room_created", (data : room_created)=>{ //done
+        class_socket.socket.once("room_created", (data : room_created)=>{ //done
             console.log("room_created");
             console.log(data)
         })
 
-        class_socket.socket.on("user_left", (data : user_left)=>{ //done
+
+        
+        class_socket.socket.once("user_left", (data : user_left)=>{ //done
             console.log("user_left");
             console.log(data)
         })
 
-        class_socket.socket.on("user_joined", (data : user_joined)=>{ //done
+        class_socket.socket.once("user_joined", (data : user_joined)=>{ //done
             console.log("user_joined");
             console.log(data)
         })
-        class_socket.socket.on("room_deleted", (data : {id : string})=>{ //done
+        class_socket.socket.once("room_deleted", (data : {id : string})=>{ //done
             console.log("room_deleted");
             console.log(data.id)
         })
-        class_socket.socket.on("password_set", (data : management_password)=>{ //done
+        class_socket.socket.once("password_set", (data : management_password)=>{ //done
             console.log("password_set");
             console.log(data)
         })
-        class_socket.socket.on("password_removed", (data : management_password)=>{ //done
+        class_socket.socket.once("password_removed", (data : management_password)=>{ //done
             console.log("password_removed");
             console.log(data)
         })
-        class_socket.socket.on("dm_started", (data : dm_started)=>{ //done
+        class_socket.socket.once("dm_started", (data : dm_started)=>{ //done
             console.log("dm_started");
             console.log(data)
         })
-        class_socket.socket.on("admin_added", (data : management_memeber)=>{ //done
+        class_socket.socket.once("admin_added", (data : management_memeber)=>{ //done
             console.log("admin_added");
             console.log(data)
         })
-        class_socket.socket.on("admin_removed", (data : management_memeber)=>{ //done
+        class_socket.socket.once("admin_removed", (data : management_memeber)=>{ //done
             console.log("admin_removed");
             console.log(data)
         })
-        class_socket.socket.on("user_banned", (data : management_memeber)=>{ //done
+        class_socket.socket.once("user_banned", (data : management_memeber)=>{ //done
             console.log("user_banned");
             console.log(data)
         })
-        class_socket.socket.on("user_unbanned", (data : user_unbanned)=>{ //done
+        class_socket.socket.once("user_unbanned", (data : user_unbanned)=>{ //done
             console.log("user_unbanned");
             console.log(data)
         })
-        class_socket.socket.on("user_muted", (data : user_muted)=>{//done
+        class_socket.socket.once("user_muted", (data : user_muted)=>{//done
             console.log("user_muted");
             console.log(data)
         })
-        class_socket.socket.on("user_unmuted", (data : management_memeber)=>{//done
+        class_socket.socket.once("user_unmuted", (data : management_memeber)=>{//done
             console.log("user_unmuted");
             console.log(data)
         })
-        class_socket.socket.on("message_deleted", (data : message_deleted)=>{ //done
+        class_socket.socket.once("message_deleted", (data : message_deleted)=>{ //done
             console.log("message_deleted");
             console.log(data)
         })
-        class_socket.socket.on("messages", (data : messages[])=>{ //done
-            console.log("messages");
-            console.log(data)
-        })
-        class_socket.socket.on("members", (data : user_info[])=>{ //done
+        class_socket.socket.once("members", (data : user_info[])=>{ //done
             console.log("members");
             console.log(data)
         })
@@ -159,23 +197,25 @@ export const Chat:React.FC = () => {
 
 
     useEffect(() => {
+        class_socket.get_chats();
+
         //on mount
         window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
     }, []);
 
     return (
         <main id="chatPage">
-            {/* <button style={{color: `black`}}onClick={() =>{
-                class_socket.start_dm("cl4motzn00033r8sleqn0c4a8");
+             <button style={{color: `black`}}onClick={() =>{
+                class_socket.start_dm("cl70q6ioo8992l3u8m9htcb0g");
             }}>start_dm</button>
             <button style={{color: `black`}} onClick={() =>{
                 class_socket.get_chats();
             }}>get_chats</button>
             <button style={{color: `black`}} onClick={() =>{
-                class_socket.send_message({rid : "cl4mowo080112r8sl1ydozsbf", msg :"Hello1"});
+                class_socket.send_message({rid : "cl70q7x029144l3u81chjqn0o", msg :"jgfgfgfgfg b"});
             }}>send_message</button>
             <button style={{color: `black`}} onClick={() =>{
-                class_socket.create_room({name : "walidroom",is_private:false, uids :["cl4lebw5j0133yrsms9le0c75"]});
+                class_socket.create_room({name : "hicham room",is_private:false, uids :[]});
             }}>create room</button>
             <button style={{color: `black`}} onClick={() =>{
                 class_socket.delete_room({id : "cl4jv5f3d0369ohsmoae83lyo"});
@@ -230,8 +270,8 @@ export const Chat:React.FC = () => {
             }}>get_members</button>
 
             <button style={{color: `black`}} onClick={() =>{
-                class_socket.get_messages({id : "cl4lidmy50103ojsm2ftzgyw4"});
-            }}>get_messages</button> */}
+                class_socket.get_messages({id : "cl6xxzbo80577v4u8i67s9xcz"});
+            }}>get_messages</button> 
         
 
 
@@ -271,13 +311,14 @@ export const Chat:React.FC = () => {
                             <ListChats
                                 tab={activeTab}
                                 onSelectItem={() => setShowNewChatForm(false)}
-                                activeChat={searchParams.get("id")}/>
+                                activeChat={searchParams.get("id")}
+                                rooms={chatRooms}/>
                         </div>
                     </div>}
                     {((screenWidth < 767.98 && (showNewChatForm || searchParams.get("id") !== null))
                         || screenWidth >= 767.98) && <div className="col room">
                         {!showNewChatForm && searchParams.get("id") === null && <ChatHome onClick={() => setShowNewChatForm(true)}/>}
-                        {!showNewChatForm && searchParams.get("id") !== null && <ChatRoom roomId={searchParams.get("id")!}/>}
+                        {!showNewChatForm && searchParams.get("id") !== null && <ChatRoom roomId={searchParams.get("id")!} />}
                         {showNewChatForm && <CreateNewChat onClose={() => setShowNewChatForm(false)}/>}
                     </div>}
                 </div>

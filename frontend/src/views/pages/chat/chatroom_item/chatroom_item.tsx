@@ -25,7 +25,7 @@ export const ChatRoomItem = (Props : Props) => {
       <div className='dataColumn'>
         <div className='dataRow'>
           <h6 className='userName'>{Props.fullName}</h6>
-          {Props.joined && <ReactTimeAgo className='time' date={Props.timeLastMsg} locale="en-US"/>}
+          {Props.joined && <ReactTimeAgo className='time' date={new Date(Props.timeLastMsg)} locale="en-US"/>}
           {!Props.joined && <button className='joinChannel'>Join</button>}
         </div>
         <div className='dataRow'>
