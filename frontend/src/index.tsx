@@ -1,13 +1,12 @@
 import React, { createContext, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Login } from 'views/pages/login/login';
-import { Routes, Route, unstable_HistoryRouter as Router, useNavigate } from 'react-router-dom'
+import { Routes, Route, unstable_HistoryRouter as Router } from 'react-router-dom'
 import { Home } from 'views/pages/home/home';
 import { Chat } from 'views/pages/chat/chat';
 import { LeaderBoard } from 'views/pages/leader_board/leader_board';
 import { Profile } from 'views/pages/profile/profile';
 import { NotFound } from 'views/pages/not_found/not_found';
-import "views/style/index.scss";
 import { Checkpoint } from 'views/pages/checkpoint/checkpoint';
 import { GamePlayer } from 'views/pages/game/game_player/game_player';
 import { GameWatcher } from 'views/pages/game/game_watcher/game_watcher';
@@ -17,6 +16,7 @@ import { Notif } from 'views/components/notif/notif';
 import { Loading } from 'views/components/loading/loading';
 import { NavBar } from 'views/components/navbar/navbar';
 import { Socket } from "socket";
+import "views/style/index.scss";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -25,14 +25,12 @@ const root = ReactDOM.createRoot(
 export const SocketContext = createContext(null); //create socket context
 const class_socket = new Socket();  //create object in socket class
 
+export const history = createBrowserHistory();
+
 const PongApp:React.FC = () => {
-    const history = createBrowserHistory();
     const [loading, setLoading] = useState<boolean>(true);
     const [user, setUser] = useState<any>(null);
     const [hideNavBar, setHideNavBar] = useState<boolean>(true);
-
-    
-    
 
     const authCheck = async (path) => {
       setHideNavBar(false);

@@ -49,7 +49,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     tab = new Map;
 
     constructor(private prisma: PrismaService, private jwt: ChatService){}
-    
+    //task 
+    //emit vues for all !!!! 
     async handleDisconnect(client: Socket)
     {
         console.log('Client Disconnect with ID: ' + client.id);
@@ -137,8 +138,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                     console.log("handleDisconnect Prisma Failed !!");
                 }
             }
-            this.server.to(client.data.obj.roomId).emit("leaveTheGame"); // to all watcher leave the game when on of player left the game !! -- for aimad
             this.server.to(client.data.obj.roomId).emit("youWin");
+            this.server.to(client.data.obj.roomId).emit("leaveTheGame"); // to all watcher leave the game when on of player left the game !! -- for aimad
         }
         else
             client.leave(client.data.obj.roomId); /// a watcher leave the room 
@@ -274,6 +275,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                     }
                 });
                 /// emit restart 
+                let win = (d.rscore === client.data.obj.bestOf) ? this.tab[d.roomId].user2.userId: this.tab[d.roomId].user1.userId;
+                this.server.to(d.roomId).emit("matchWinner", win); /// a watcher leave the room  -- for aimad
                 client.emit('restart', d.status);
                 return ;
             }
@@ -282,8 +285,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 console.log(d);
             }
         }
-        let winner = (d.rscore === client.data.obj.bestOf) ? this.tab[d.roomId].user2.userId: this.tab[d.roomId].user1.userId;
-        client.emit("watcherEndMatch", winner); /// a watcher leave the room  -- for aimad
+        client.emit("watcherEndMatch");
+
     }
 
     @SubscribeMessage('sendToWatcher')
@@ -470,6 +473,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             userId: user.id,
             mapUrl: this.tab[roomId].mapUrl,
         });
+
         client.emit("joinStream", {
             p1: this.tab[roomId].user1.user,
             p2: this.tab[roomId].user2.user,
