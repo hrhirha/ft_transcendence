@@ -1,5 +1,7 @@
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { get_friends } from "controller/user/friends";
+import { User } from "controller/user/user";
 import React, { useState, useEffect } from "react";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 
@@ -27,12 +29,26 @@ export const UserSearchForm:React.FC<{callback: Function}> = ({callback}) => {
     const [suggestions, setSuggestions] = useState<any[]>([]);
     const [userSelected, setUserSelected] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [friends, setFriends] = useState<User[]>();
 
     useEffect(() => {
         if (userSelected !== null) {
             callback(userSelected);
         }
     }, [userSelected]);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const users: User[] = await get_friends();
+                setFriends(users)
+            }
+            catch (error) {
+
+            }
+        })
+    }, []);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setShowSuggestions(false);
         if (e.target.value.trim().length > 0) {

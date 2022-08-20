@@ -29,6 +29,18 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
 
     const class_socket = useContext(SocketContext);
 
+    if ((tab === chatTabs.chats && ((rooms && rooms.dms.length === 0) || rooms == undefined)) 
+        || (tab === chatTabs.joinedGroups && ((rooms && rooms.rooms.length === 0) || rooms == undefined))
+        || (tab === chatTabs.otherGroups && ((rooms && rooms.others.length === 0) || rooms == undefined)))
+    {
+        return (
+            <div className="noConversations">
+                <img src={NoConversations} alt="empty chat"/>
+                <span>No Conversations Here</span>
+            </div>
+        );
+    }
+
     if (tab === chatTabs.joinedGroups)
     {
         return (<>{rooms.rooms.map((room : info_room, index: any) => 
@@ -43,7 +55,6 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
                 timeLastMsg={room.lst_msg_ts}
                 active={true}
                 onClick={() => {
-                    class_socket.get_messages({id : room.id});
                     onSelectItem();
                     navigate({
                         pathname: '/chat',
@@ -66,7 +77,6 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
                 timeLastMsg={null}
                 active={true}
                 onClick={() => {
-                    class_socket.get_messages({id : other.id});
                     onSelectItem();
                     navigate({
                         pathname: '/chat',
@@ -74,15 +84,6 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
                     }, {replace: true});
                 }}
             />)}</>);
-    }
-    if ((rooms && rooms.dms.length === 0) || rooms == undefined)
-    {
-        return (
-            <div className="noConversations">
-                <img src={NoConversations} alt="empty chat"/>
-                <span>No Conversations Here</span>
-            </div>
-        );
     }
     return (<>{rooms.dms.map((dms : dms, index: any) => 
             <ChatRoomItem
@@ -96,7 +97,6 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
                 timeLastMsg={(!dms.room.lst_msg_ts) ? new Date() : dms.room.lst_msg_ts}
                 active={dms.room.id === activeChat}
                 onClick={() => {
-                    class_socket.get_messages({id : dms.room.id});
                     onSelectItem();
                     navigate({
                         pathname: '/chat',
@@ -121,73 +121,72 @@ export const Chat:React.FC = () => {
         class_socket.socket.on("chats", (data : chats)=>{ //done 2
             setchatRooms(data);
         })
-        class_socket.socket.once("receive_message", (data : receive_message)=>{ //done 2
+        class_socket.socket.on("receive_message", (data : receive_message)=>{ //done 2
             class_socket.get_chats();
             if (searchParams.get("id") != null && searchParams.get("id") == data.room.id)
                 class_socket.get_messages({id : data.room.id});
         })
 
-        class_socket.socket.once("room_created", (data : room_created)=>{ //done
+
+
+        class_socket.socket.on("room_created", (data : room_created)=>{ //done
             console.log("room_created");
             console.log(data)
         })
-
-
-        
-        class_socket.socket.once("user_left", (data : user_left)=>{ //done
+        class_socket.socket.on("user_left", (data : user_left)=>{ //done
             console.log("user_left");
             console.log(data)
         })
 
-        class_socket.socket.once("user_joined", (data : user_joined)=>{ //done
+        class_socket.socket.on("user_joined", (data : user_joined)=>{ //done
             console.log("user_joined");
             console.log(data)
         })
-        class_socket.socket.once("room_deleted", (data : {id : string})=>{ //done
+        class_socket.socket.on("room_deleted", (data : {id : string})=>{ //done
             console.log("room_deleted");
             console.log(data.id)
         })
-        class_socket.socket.once("password_set", (data : management_password)=>{ //done
+        class_socket.socket.on("password_set", (data : management_password)=>{ //done
             console.log("password_set");
             console.log(data)
         })
-        class_socket.socket.once("password_removed", (data : management_password)=>{ //done
+        class_socket.socket.on("password_removed", (data : management_password)=>{ //done
             console.log("password_removed");
             console.log(data)
         })
-        class_socket.socket.once("dm_started", (data : dm_started)=>{ //done
+        class_socket.socket.on("dm_started", (data : dm_started)=>{ //done
             console.log("dm_started");
             console.log(data)
         })
-        class_socket.socket.once("admin_added", (data : management_memeber)=>{ //done
+        class_socket.socket.on("admin_added", (data : management_memeber)=>{ //done
             console.log("admin_added");
             console.log(data)
         })
-        class_socket.socket.once("admin_removed", (data : management_memeber)=>{ //done
+        class_socket.socket.on("admin_removed", (data : management_memeber)=>{ //done
             console.log("admin_removed");
             console.log(data)
         })
-        class_socket.socket.once("user_banned", (data : management_memeber)=>{ //done
+        class_socket.socket.on("user_banned", (data : management_memeber)=>{ //done
             console.log("user_banned");
             console.log(data)
         })
-        class_socket.socket.once("user_unbanned", (data : user_unbanned)=>{ //done
+        class_socket.socket.on("user_unbanned", (data : user_unbanned)=>{ //done
             console.log("user_unbanned");
             console.log(data)
         })
-        class_socket.socket.once("user_muted", (data : user_muted)=>{//done
+        class_socket.socket.on("user_muted", (data : user_muted)=>{//done
             console.log("user_muted");
             console.log(data)
         })
-        class_socket.socket.once("user_unmuted", (data : management_memeber)=>{//done
+        class_socket.socket.on("user_unmuted", (data : management_memeber)=>{//done
             console.log("user_unmuted");
             console.log(data)
         })
-        class_socket.socket.once("message_deleted", (data : message_deleted)=>{ //done
+        class_socket.socket.on("message_deleted", (data : message_deleted)=>{ //done
             console.log("message_deleted");
             console.log(data)
         })
-        class_socket.socket.once("members", (data : user_info[])=>{ //done
+        class_socket.socket.on("members", (data : user_info[])=>{ //done
             console.log("members");
             console.log(data)
         })
@@ -206,7 +205,7 @@ export const Chat:React.FC = () => {
     return (
         <main id="chatPage">
              <button style={{color: `black`}}onClick={() =>{
-                class_socket.start_dm("cl70q6ioo8992l3u8m9htcb0g");
+                class_socket.start_dm("cl71t41qe23023ndu6vw56kdmf");
             }}>start_dm</button>
             <button style={{color: `black`}} onClick={() =>{
                 class_socket.get_chats();
@@ -215,7 +214,7 @@ export const Chat:React.FC = () => {
                 class_socket.send_message({rid : "cl70q7x029144l3u81chjqn0o", msg :"jgfgfgfgfg b"});
             }}>send_message</button>
             <button style={{color: `black`}} onClick={() =>{
-                class_socket.create_room({name : "hicham room",is_private:false, uids :[]});
+                class_socket.create_room({name : "hicham room",is_private:false, uids :["cl71rzju21859ndu603271qm1"]});
             }}>create room</button>
             <button style={{color: `black`}} onClick={() =>{
                 class_socket.delete_room({id : "cl4jv5f3d0369ohsmoae83lyo"});

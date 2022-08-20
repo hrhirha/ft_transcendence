@@ -95,7 +95,7 @@ export const ChatRoom:React.FC<{roomId: string}> = ({roomId}) => {
     useEffect(() => {
         if (roomId != null)
             class_socket.get_messages({id : roomId});
-    },[])
+    },[roomId])
     
 
     return (

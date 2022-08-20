@@ -23,6 +23,7 @@ const root = ReactDOM.createRoot(
 );
 
 export const SocketContext = createContext(null); //create socket context
+const class_socket = new Socket();  //create object in socket class
 
 const PongApp:React.FC = () => {
     const history = createBrowserHistory();
@@ -30,7 +31,7 @@ const PongApp:React.FC = () => {
     const [user, setUser] = useState<any>(null);
     const [hideNavBar, setHideNavBar] = useState<boolean>(true);
 
-    const class_socket = new Socket();  //create object in socket class
+    
     
 
     const authCheck = async (path) => {
