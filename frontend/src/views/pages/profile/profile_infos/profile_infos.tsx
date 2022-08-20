@@ -34,7 +34,6 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
     const username = useParams();
     const navigate = useNavigate();
 
-
     const updateAvatar = () => {
         var f = document.createElement('input');
         f.style.display='none';
@@ -48,7 +47,6 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
         });
         f.click();
     }
-
 
     const editProfile = async ()  => {
         try {

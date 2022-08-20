@@ -19,13 +19,18 @@ export async function patch_edit_fullname(user_fullName : string) {
 }
 
 export async function patch_avatar_upload(image : File) {
-    const formData = new FormData();
-    formData.append("file", image);
-    api.patch('user/edit/avatar', formData, {
-        headers: {
-        'Content-Type': 'multipart/form-data'
-        }
-    })
+    try {
+        const formData = new FormData();
+        formData.append("file", image);
+        const res  =  await api.patch('user/edit/avatar', formData, {
+            headers: {
+            'Content-Type': 'multipart/form-data'
+            }
+        });
+        return res.data;
+    } catch(e: any) {
+        throw (e.response.data);
+    }
 }
 
 
