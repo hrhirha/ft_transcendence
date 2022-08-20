@@ -974,7 +974,7 @@ export class ChatService {
                 room: {
                     user_rooms: {
                         some: {
-                            uid, rid,
+                            uid,
                             is_banned: false,
                         },
                     },
@@ -996,14 +996,23 @@ export class ChatService {
                 },
                 room: {
                     select: {
+                        id: true,
+                        name: true,
+                        type: true,
+                        is_channel: true,
                         user_rooms: {
-                            where: {
-                                uid, rid
-                            },
+                            // where: { uid },
                             select: {
+                                uid: true,
                                 joined_time: true,
-                                is_banned: true,
-                                bans: true
+                                user: {
+                                    select: {
+                                        id: true,
+                                        username: true,
+                                        fullName: true,
+                                        imageUrl: true,
+                                    }
+                                }
                             }
                         }
                     }
@@ -1021,29 +1030,24 @@ export class ChatService {
             }
         });
     
-        // filter messages sent before the user joined the room, or while he was banned
-        
-        const jt = messages[0].room.user_rooms[0].joined_time;
-        const bans = messages[0].room.user_rooms[0].bans;
+        // filter messages sent before the user joined the room
+        const room = messages[0].room;
+
+        const my_ur = room.user_rooms.find(ur => ur.uid === uid);
+        let other: UserDto;
+        if (!room.is_channel)
+        {
+            room['user'] = room.user_rooms.find(ur => ur.uid !== uid).user;
+        }
+
+        const jt = my_ur.joined_time;
         const msgs = messages.filter((message) => {
-            let snd: Boolean = true;
-            const ts = message.timestamp;
-
-            for (let ban of bans)
-            {
-                if (ts >= ban.start && (!ban.end || ts < ban.end))
-                {
-                    snd = false;
-                    break ;
-                }
-            }
-
-            return ts > jt && snd;
+            delete message.room;
+            return message.timestamp > jt;
         });
 
-        for (let msg of msgs)
-            delete msg.room;
-        return msgs;
+        delete room.user_rooms;
+        return { room, msgs };
     }
 
     // public helpers
