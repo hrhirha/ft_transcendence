@@ -49,11 +49,11 @@ const PongApp:React.FC = () => {
       setLoading(false);
     }
     
-    history.listen(async ({ action, location }) => {
-      await authCheck(location.pathname);
-      console.log(action, location.pathname);
-    });
     useEffect(() => {
+      history.listen(async ({ action, location }) => {
+        await authCheck(location.pathname);
+        console.log(action, location.pathname);
+      });
       authCheck(history.location.pathname);
     }, []);
 
