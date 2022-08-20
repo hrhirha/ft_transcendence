@@ -134,16 +134,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 }
                 catch
                 {
-                    console.log("here");
+                    console.log("handleDisconnect Prisma Failed !!");
                 }
             }
+            this.server.to(client.data.obj.roomId).emit("leaveTheGame"); // to all watcher leave the game when on of player left the game !! -- for aimad
             this.server.to(client.data.obj.roomId).emit("youWin");
         }
         else
-        {
-            client.emit("leaveTheGame"); // emit end match to watcher for go to next match -- For Aimad
             client.leave(client.data.obj.roomId); /// a watcher leave the room 
-        }
     }
 
     async handleConnection(client: Socket, ...args: any[]) {
@@ -285,7 +283,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             }
         }
         let winner = (d.rscore === client.data.obj.bestOf) ? this.tab[d.roomId].user2.userId: this.tab[d.roomId].user1.userId;
-        client.emit("watcherEndMatch", winner); /// a watcher leave the room 
+        client.emit("watcherEndMatch", winner); /// a watcher leave the room  -- for aimad
     }
 
     @SubscribeMessage('sendToWatcher')
@@ -447,7 +445,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         client.data.obj.roomId = d.newRoom;
         client.leave(d.oldData.roomId);
         client.join(d.newRoom);
-        client.emit("keepWatching"); // keep watching emit to the front end to remove the Winner panel -- For Aimad
+        client.emit("keepWatching"); // keep watching emit to the front end to remove the Winner panel -- aimad
         client.emit("restartGame");
     }
 

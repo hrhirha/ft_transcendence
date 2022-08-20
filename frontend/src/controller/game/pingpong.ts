@@ -285,7 +285,7 @@ export default class PingPong extends Phaser.Scene
                 this.scene.stop();
             });
 
-            this.soc.on("watcherEndMatch", () => {
+            this.soc.on("watcherEndMatch", (arg: any) => {
                 this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 150 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.4);
                 this.leave = this.add.text(this.w / 2 , this.h / 2 + 150 , "exit", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
 
@@ -442,7 +442,7 @@ export default class PingPong extends Phaser.Scene
 
         this.ball.x = d.ballx;
         this.ball.y = d.bally; 
-    
+
         this.enemy.y = d.rpaddle;
         this.paddle.y = d.lpaddle;
 
