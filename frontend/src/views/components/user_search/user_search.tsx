@@ -46,7 +46,7 @@ export const UserSearchForm:React.FC<{callback: Function}> = ({callback}) => {
             catch (error) {
 
             }
-        })
+        })();
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
