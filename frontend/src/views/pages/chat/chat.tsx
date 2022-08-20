@@ -27,8 +27,6 @@ const ChatHome:React.FC<{onClick: Function}> = ({onClick}) => {
 const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem: Function, rooms:chats}> = ({tab, activeChat, onSelectItem, rooms}) => {
     const navigate = useNavigate();
 
-    const class_socket = useContext(SocketContext);
-
     if ((tab === chatTabs.chats && ((rooms && rooms.dms.length === 0) || rooms == undefined)) 
         || (tab === chatTabs.joinedGroups && ((rooms && rooms.rooms.length === 0) || rooms == undefined))
         || (tab === chatTabs.otherGroups && ((rooms && rooms.others.length === 0) || rooms == undefined)))
@@ -120,13 +118,11 @@ export const Chat:React.FC = () => {
     useEffect(() => {
         class_socket.socket.on("chats", (data : chats)=>{ //done 2
             setchatRooms(data);
+            console.log(data)
         })
-        class_socket.socket.on("receive_message", (data : receive_message)=>{ //done 2
-            class_socket.get_chats();
-            if (searchParams.get("id") != null && searchParams.get("id") == data.room.id)
-                class_socket.get_messages({id : data.room.id});
+        class_socket.socket.on("dm_started", (data : dm_started)=>{
+            window.open(`/chat?id=${data.room.id}`, "_self")
         })
-
 
 
         class_socket.socket.on("room_created", (data : room_created)=>{ //done
@@ -154,10 +150,7 @@ export const Chat:React.FC = () => {
             console.log("password_removed");
             console.log(data)
         })
-        class_socket.socket.on("dm_started", (data : dm_started)=>{ //done
-            console.log("dm_started");
-            console.log(data)
-        })
+        
         class_socket.socket.on("admin_added", (data : management_memeber)=>{ //done
             console.log("admin_added");
             console.log(data)
@@ -190,7 +183,7 @@ export const Chat:React.FC = () => {
             console.log("members");
             console.log(data)
         })
-        return () => class_socket.socket.removeAllListeners();
+        //return () => class_socket.socket.removeAllListeners();
     },[class_socket.socket])
     //test -----
 

@@ -143,12 +143,25 @@ export interface message_deleted {
 
 //----------------------- messages ------------
 
-export interface messages {
+export interface msgs {
     id : string,
     msg : string,
     timestamp : string,
     type : string,
     user : user_info,
+}
+
+export interface room_msgs {
+    id : string,
+    is_channel : boolean,
+    name : string,
+    type : string,
+    user : user_info,
+}
+
+export interface messages {
+    msgs : msgs[],
+    room : room_msgs,
 }
 //-----------------------------------------------------
 

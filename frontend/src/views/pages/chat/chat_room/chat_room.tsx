@@ -7,7 +7,7 @@ import { Chat_msg } from "views/pages/chat/chat_msg/chat_msg";
 import { BgVectors } from "assets";
 import { useContext, useEffect, useState } from "react";
 import { ChatRoomSettings } from "views/pages/chat/chat_room_settings/chat_room_settings";
-import {messages, receive_message } from "socket/interface";
+import {messages, msgs, receive_message, room_msgs } from "socket/interface";
 import { SocketContext } from "index";
 
 
@@ -36,12 +36,12 @@ const ChatRoomHeader = (Props : HeaderProps) => {
     );
 }
 
-const ChatRoomBody:React.FC<{messages: messages[]}> = ({messages}) => {
+const ChatRoomBody:React.FC<{messages: messages}> = ({messages}) => {
     return <div id="chatRoomBody" style={{backgroundImage: `url(${BgVectors})`}}>
-        { messages && messages.map ((message : messages, k ) => 
+        { messages && messages.msgs.map ((message : msgs, k ) => 
             <Chat_msg
                 key={k}
-                display_image={(messages[k - 1] && messages[k].user.id === messages[k - 1].user.id) ? true : false }
+                display_image={(messages.msgs[k - 1] && messages.msgs[k].user.id === messages.msgs[k - 1].user.id) ? true : false }
                 sender_user={message.user.id}
                 image = {message.user.imageUrl}
                 msg={message.msg}
@@ -75,20 +75,21 @@ export const ChatRoom:React.FC<{roomId: string}> = ({roomId}) => {
     const navigate = useNavigate();
     
     const class_socket = useContext(SocketContext);
-    const [messages, setmessages] = useState<messages[]>();
+    const [messages, setmessages] = useState<messages>();
+    const [roominfo, setRoominfo] = useState<room_msgs>();
 
     useEffect(() => {
 
-        class_socket.socket.on("messages", (data : messages[])=>{ 
+        class_socket.socket.on("messages", (data : messages)=>{
             setmessages(data)
+            setRoominfo(data.room)
         })
 
         class_socket.socket.on("receive_message", (data : receive_message)=>{
+            class_socket.get_chats();
             if (roomId != null && roomId == data.room.id)
                 class_socket.get_messages({id : data.room.id});
         })
-
-        return () => class_socket.socket.removeAllListeners();
 
     },[class_socket.socket])
 
@@ -103,9 +104,9 @@ export const ChatRoom:React.FC<{roomId: string}> = ({roomId}) => {
         {showSettings && <ChatRoomSettings roomId={roomId} onClose={() => setShowSettings(false)}/>}
         {!showSettings && <section id="chatRoom">
             <ChatRoomHeader
-                username="Jhon don"
-                image="https://staticg.sportskeeda.com/editor/2022/01/f1c08-16420302985959-1920.jpg"
-                status="last seen yesterday 2.30 PM"
+                username={roominfo && ((roominfo.is_channel) ? roominfo.name :roominfo.user.fullName)}
+                image= {roominfo && ((roominfo.is_channel) ? null :roominfo.user.imageUrl)}
+                status= {roominfo && ((roominfo.is_channel) ? "Channel" :roominfo.user.status)}
                 onClose={() => navigate("/chat", {replace : true})}
                 showSettings={() => setShowSettings(true)}
             />

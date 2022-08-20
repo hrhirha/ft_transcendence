@@ -1,8 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faClose, faKey, faLock, faLockOpen, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { UserSearchForm } from "views/components/user_search/user_search";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
+import { User } from "controller/user/user";
+import { SocketContext } from "index";
 
 enum chatTypes {
     public, private, protected, direct, none
@@ -19,20 +21,25 @@ const UserCheckedCard:React.FC<{avatar: string, fullName: string, onRemove: Func
 }
 
 const DirectMessage:React.FC<{onClose: Function}> = ({onClose}) => {
-    const [userSelected, setUserSelected] = useState<any>(null);
+    const [userSelected, setUserSelected] = useState<User>(null);
+    const class_socket = useContext(SocketContext);
+    
     return (
     <form id="newDirectMessage" className="creatChatForm">
         <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
         <h5><FontAwesomeIcon icon={faLock}/>Private Chat</h5>
-        {userSelected === null && <UserSearchForm callback={(selectedUser: any) => setUserSelected(selectedUser)}/>}
+        {userSelected === null && <UserSearchForm callback={(selectedUser: User) => setUserSelected(selectedUser)}/>}
         {userSelected !== null
             && <UserCheckedCard
                 onRemove={() => setUserSelected(null)}
-                avatar={userSelected.avatar}
+                avatar={userSelected.imageUrl}
                 fullName={userSelected.fullName}
             />}
         {userSelected !== null
-            && <button id="submitChat" onClick={() => {}}>
+            && <button id="submitChat" onClick={(e) => {
+                e.preventDefault();
+                class_socket.start_dm(userSelected.id)
+            }}>
                 <FontAwesomeIcon icon={faCheck}/>
                 Submit
             </button>}
@@ -41,23 +48,23 @@ const DirectMessage:React.FC<{onClose: Function}> = ({onClose}) => {
 }
 
 const PrivateChannel:React.FC<{onClose: Function}> = ({onClose}) => {
-    const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
+    const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     return (
     <form id="newPrivateChannel" className="creatChatForm">
         <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
         <h5><FontAwesomeIcon icon={faLockOpen}/>Private channel</h5>
         <input id="chatTitle" className="textInput" type="text" placeholder="channel title" autoComplete="off"/>
-        <UserSearchForm callback={(userSelected: any) => {
+        <UserSearchForm callback={(userSelected: User) => {
             console.log(selectedUsers);
             if (selectedUsers.length === 0 || !selectedUsers.find(user => user.id === userSelected.id)) {
                 setSelectedUsers(prvUsers => [...prvUsers, userSelected]);
             }
         }}/>
         <div className="usersAdded">
-            {selectedUsers.length > 0 && selectedUsers.map((user: any, k: number) => <UserCheckedCard
+            {selectedUsers.length > 0 && selectedUsers.map((user: User, k: number) => <UserCheckedCard
                 key={k}
-                onRemove={() => setSelectedUsers(prvResults => prvResults.filter((u: any) => u.id !== user.id))}
-                avatar={user.avatar}
+                onRemove={() => setSelectedUsers(prvResults => prvResults.filter((u: User) => u.id !== user.id))}
+                avatar={user.imageUrl}
                 fullName={user.fullName}
             />)}
         </div>
@@ -71,23 +78,23 @@ const PrivateChannel:React.FC<{onClose: Function}> = ({onClose}) => {
 }
 
 const PublicChannel:React.FC<{onClose: Function}> = ({onClose}) => {
-    const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
+    const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     return (
     <form id="newPublicChannel" className="creatChatForm">
         <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
         <h5><FontAwesomeIcon icon={faLockOpen}/>Public channel</h5>
         <input id="chatTitle" className="textInput" type="text" placeholder="channel title" autoComplete="off"/>
-        <UserSearchForm callback={(userSelected: any) => {
+        <UserSearchForm callback={(userSelected: User) => {
             console.log(selectedUsers);
             if (selectedUsers.length === 0 || !selectedUsers.find(user => user.id === userSelected.id)) {
                 setSelectedUsers(prvUsers => [...prvUsers, userSelected]);
             }
         }}/>
         <div className="usersAdded">
-            {selectedUsers.length > 0 && selectedUsers.map((user: any, k: number) => <UserCheckedCard
+            {selectedUsers.length > 0 && selectedUsers.map((user: User, k: number) => <UserCheckedCard
                 key={k}
-                onRemove={() => setSelectedUsers(prvResults => prvResults.filter((u: any) => u.id !== user.id))}
-                avatar={user.avatar}
+                onRemove={() => setSelectedUsers(prvResults => prvResults.filter((u: User) => u.id !== user.id))}
+                avatar={user.imageUrl}
                 fullName={user.fullName}
             />)}
         </div>
@@ -101,24 +108,24 @@ const PublicChannel:React.FC<{onClose: Function}> = ({onClose}) => {
 }
 
 const ProtectedChannel:React.FC<{onClose: Function}> = ({onClose}) => {
-    const [selectedUsers, setSelectedUsers] = useState<any[]>([]);
+    const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     return (
     <form id="newProtectedChannel" className="creatChatForm">
         <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
         <h5><FontAwesomeIcon icon={faKey}/>Protected channel</h5>
         <input id="chatTitle" className="textInput" type="text" placeholder="channel title" autoComplete="off"/>
         <input id="chatKey" className="textInput" type="password" placeholder="password" autoComplete="off"/>
-        <UserSearchForm callback={(userSelected: any) => {
+        <UserSearchForm callback={(userSelected: User) => {
             console.log(selectedUsers);
             if (selectedUsers.length === 0 || !selectedUsers.find(user => user.id === userSelected.id)) {
                 setSelectedUsers(prvUsers => [...prvUsers, userSelected]);
             }
         }}/>
         <div className="usersAdded">
-            {selectedUsers.length > 0 && selectedUsers.map((user: any, k: number) => <UserCheckedCard
+            {selectedUsers.length > 0 && selectedUsers.map((user: User, k: number) => <UserCheckedCard
                 key={k}
-                onRemove={() => setSelectedUsers(prvResults => prvResults.filter((u: any) => u.id !== user.id))}
-                avatar={user.avatar}
+                onRemove={() => setSelectedUsers(prvResults => prvResults.filter((u: User) => u.id !== user.id))}
+                avatar={user.imageUrl}
                 fullName={user.fullName}
             />)}
         </div>
