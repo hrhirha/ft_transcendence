@@ -10,9 +10,6 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
 import { ArgumentMetadata, HttpException, UsePipes, ValidationPipe } from '@nestjs/common';
-import { userInfo } from 'os';
-import { User } from '@prisma/client';
-import { urlencoded } from 'express';
 export class WsValidationPipe extends ValidationPipe
 {
     async transform(value: any, metadata: ArgumentMetadata) {
@@ -143,7 +140,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             this.server.to(client.data.obj.roomId).emit("youWin");
         }
         else
+        {
+            client.emit("leaveTheGame"); // emit end match to watcher for go to next match -- For Aimad
             client.leave(client.data.obj.roomId); /// a watcher leave the room 
+        }
     }
 
     async handleConnection(client: Socket, ...args: any[]) {
@@ -214,7 +214,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         }
         if (client.data.obj && client.data.obj.isPlayer)
         {
-            console.log(d);
             try
             {
                 let factor = (client.data.bestOf == 5) ? { facWin: 5, losFac: 2 } : { facWin: 15, losFac: 5};
@@ -285,7 +284,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 console.log(d);
             }
         }
-        client.emit("watcherEndMatch"); /// a watcher leave the room 
+        let winner = (d.rscore === client.data.obj.bestOf) ? this.tab[d.roomId].user2.userId: this.tab[d.roomId].user1.userId;
+        client.emit("watcherEndMatch", winner); /// a watcher leave the room 
     }
 
     @SubscribeMessage('sendToWatcher')
@@ -447,6 +447,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         client.data.obj.roomId = d.newRoom;
         client.leave(d.oldData.roomId);
         client.join(d.newRoom);
+        client.emit("keepWatching"); // keep watching emit to the front end to remove the Winner panel -- For Aimad
         client.emit("restartGame");
     }
 
@@ -462,6 +463,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         client.data.obj = {
             roomId,
             isPlayer: false,
+            bestOf: (this.tab[roomId].mapUrl === "normalField") ? 5 : 3,
         };
         client.emit("saveData", {
             roomId,
