@@ -314,7 +314,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
 
     @SubscribeMessage('normaleQue')
-    async normaleQuee(client: Socket)
+    async normaleQuee(client: Socket, obj: {
+        private: boolean,
+        userId: string
+    })
     {
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
@@ -324,7 +327,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         }
         if (client.data.obj)
             client.leave(client.data.obj.roomId);
+
         client.data.bestOf = 5;
+        if (obj.private)
+        {
+            this.privateGame(client, "normaleQue", user, obj.userId);
+            return ;
+        }
         //  user1 save info /////////////////////
         if (!this.normaleQue || this.normaleQue.user.id == user.id)
         {
@@ -375,8 +384,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         this.server.to(connection.id).emit('startGame');
 
     }
+
     @SubscribeMessage('ultimateQue')
-    async ultimateQuee(client: Socket)
+    async ultimateQuee(client: Socket, obj: {
+        private: boolean,
+        userId: string
+    })
     {
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
@@ -387,6 +400,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         if (client.data.obj)
             client.leave(client.data.obj.roomId);
         client.data.bestOf = 3;
+
+        if (obj.private)
+        {
+            this.privateGame(client, "ultimateQue", user, obj.userId);
+            return ;
+        }
+        
         //  user1 save info /////////////////////
         if (!this.ultimateQue || this.ultimateQue.user.id == user.id)
         {
@@ -454,6 +474,56 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         client.emit("restartGame");
     }
 
+    async privateGame (client: Socket, type: string, newUser: any , userId: string )
+    {
+        /////////////////////////////////////////
+        var soc: any = (await this.server.fetchSockets()).filter((s) => {
+            if (s.data.usrId == userId)
+                return s;
+        });
+        if (!soc.length)
+        {
+            client.emit("waiting", {
+                p1: newUser,
+                p2: null,
+            });
+            return ;
+        }
+
+        const user =(await this.jwt.getUserFromSocket(soc[0]));
+        client.emit("joined", {
+            p1: user,
+            p2: newUser,
+        });
+        soc[0].emit("joined", {
+            p1: user,
+            p2: newUser, 
+        });
+
+        
+        let mapUrl: string = (user.score > newUser.score) ? user.rank.field: newUser.rank.field;
+        mapUrl = (type === "ultimateQue") ? mapUrl: "normalField" ;
+        let connection =  await this.prisma.game.create({
+            data: {
+                map: mapUrl,
+                user_game:
+                {
+                    createMany: {
+                        data:
+                        [
+                            { uid: user.id },
+                            { uid: newUser.id    }
+                        ]
+                    }
+                }
+            },
+            select: {
+                id: true,
+            }
+        });
+        this.insertSocketData(soc[0], user, "player1", connection.id, mapUrl);
+        this.insertSocketData(client, user, "player2", connection.id, mapUrl);
+    }
     @SubscribeMessage('watcher')
     async newWatcher(client: Socket, roomId: string)
     {

@@ -55,14 +55,22 @@ export default class PingPong extends Phaser.Scene
     roomId: string = undefined;
     mapUrl: string = undefined;
     endMatchSprite: Phaser.GameObjects.Sprite;
+    typeGame: {
+        private: boolean,
+        userId: string
+    }
     
-    constructor(msoc: Socket, type:string, isPlayer: boolean, roomId: string)
+    constructor(msoc: Socket, type:string, isPlayer: boolean, roomId: string, Game: {
+        private: boolean,
+        userId: string
+    })
     {
         super("");
         this.roomId = roomId;
         this.isPlayer = isPlayer;
         this.type = type;
         this.soc = msoc;
+        this.typeGame = Game;
     };
     
     addSprites ()
@@ -468,7 +476,7 @@ export default class PingPong extends Phaser.Scene
                 newEmit: true,
             });
             this.connection = false;
-            this.soc.emit(this.type);
+            this.soc.emit(this.type, this.typeGame);
         }
         else if (this.re)
         {
