@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { NormalField, UltimateField, Ball, Paddle, YouWin, YouLose, RedButton, NormalButton } from "assets";
+import { NormalField, UltimateField, Ball, Paddle, YouWin, YouLose, RedButton, NormalButton, EndMatch } from "assets";
 import { Socket } from "socket.io-client";
 
 export default class PingPong extends Phaser.Scene
@@ -22,22 +22,18 @@ export default class PingPong extends Phaser.Scene
     soc: Socket;
     enemy?: Phaser.GameObjects.Sprite;
     cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
-    status?: Phaser.GameObjects.Image;
     posx: number = 0;
     eposx: number = 0;
     posy: number = 0;
     restart: boolean = true;
     data!: any;
     End: boolean = false;
-    sprite?: any;
     re: boolean = false;
     counter?: Phaser.GameObjects.Text;
     timedEvent?: Phaser.Time.TimerEvent;
     initialTime :number = 5;
     goal: boolean = false;
     gameIsStarted: boolean = false;
-    win?: Phaser.GameObjects.Image;
-    lose?: Phaser.GameObjects.Image;
     exit?: Phaser.GameObjects.Image;
     setupListners = true;
     
@@ -58,13 +54,11 @@ export default class PingPong extends Phaser.Scene
     map: boolean = false;
     roomId: string = undefined;
     mapUrl: string = undefined;
+    endMatchSprite: Phaser.GameObjects.Sprite;
     
     constructor(msoc: Socket, type:string, isPlayer: boolean, roomId: string)
     {
         super("");
-        // console.log("type = " + type);
-        // console.log("roomId = " + roomId);
-        // console.log("isPlayer = " + isPlayer);
         this.roomId = roomId;
         this.isPlayer = isPlayer;
         this.type = type;
@@ -88,6 +82,7 @@ export default class PingPong extends Phaser.Scene
         this.load.image('redButton', RedButton);
         this.load.image('youwin', YouWin);
         this.load.image('youlose', YouLose);
+        this.load.image('endMatch', EndMatch);
         if (this.setupListners)
         {
             this.setupListners = false;
@@ -167,11 +162,10 @@ export default class PingPong extends Phaser.Scene
             this.soc.on("newRoom", (id: string) => 
             {
                 this.restartClick = false;
-                if (!this.data.is_player)
-                    if (this.win)
-                        this.win.destroy();       
-                    if (this.lose)
-                        this.lose.destroy();
+                if (this.waiting)
+                    this.waiting.destroy();
+                if (this.endMatchSprite)
+                    this.endMatchSprite.destroy();
                 this.soc.emit("join", {
                     oldData: this.data,
                     newRoom: id
@@ -286,30 +280,8 @@ export default class PingPong extends Phaser.Scene
             });
 
             this.soc.on("watcherEndMatch", () => {
-                if (this.isPlayer)
-                    return ;
-                this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 150 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.4);
-                this.leave = this.add.text(this.w / 2 , this.h / 2 + 150 , "exit", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-
-                this.buttonBg.on('pointerdown', () =>
-                {
-                    this.leaveFunc();
-                }, this);
-                this.leave.on('pointerdown', () =>
-                {
-                    this.leaveFunc();
-                }, this);
-                let right = this.w - (this.w / 4);
-                let left = this.w / 4;
-                if (this.rightScore === this.bestOf)
-                {
-                    this.win = this.add.image(right, this.h/2, "youwin").setOrigin(0.5, 0.5).setScale(0.3);
-                    this.lose = this.add.image(left, this.h/2, "youlose").setOrigin(0.5, 0.5).setScale(0.3)
-                    return ;
-                }
-                this.win = this.add.image(left, this.h/2, "youwin").setOrigin(0.5, 0.5).setScale(0.3);
-                this.lose = this.add.image(right, this.h/2, "youlose").setOrigin(0.5, 0.5).setScale(0.3);
-
+                this.endMatchSprite = this.add.sprite(this.w / 2 , this.h / 2, 'endMatch').setOrigin(0.5, 0.5).setScale(0.8);
+                this.waiting = this.add.text(this.w / 2 , this.h / 2 + 150 , "Waiting ...", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
             });
 
             this.soc.on("restart", (img) => {

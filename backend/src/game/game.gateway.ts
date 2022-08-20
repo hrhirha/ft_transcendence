@@ -49,8 +49,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
     tab = new Map;
 
     constructor(private prisma: PrismaService, private jwt: ChatService){}
-    //task 
-    //emit vues for all !!!! 
     async handleDisconnect(client: Socket)
     {
         console.log('Client Disconnect with ID: ' + client.id);
@@ -142,7 +140,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             this.server.to(client.data.obj.roomId).emit("leaveTheGame"); // to all watcher leave the game when on of player left the game !! -- for aimad
         }
         else
+        {
+            this.tab[client.data.obj.roomId].vues -= 1,
+            this.server.to(client.data.obj.roomId).emit("vues", this.tab[client.data.obj.roomId].vues);
             client.leave(client.data.obj.roomId); /// a watcher leave the room 
+        }
     }
 
     async handleConnection(client: Socket, ...args: any[]) {
@@ -461,6 +463,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
+        this.tab[roomId].vues += 1;
+        
         client.data.obj = {
             roomId,
             isPlayer: false,
@@ -472,8 +476,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             is_player: false,
             userId: user.id,
             mapUrl: this.tab[roomId].mapUrl,
-        });
-
+        });        
+        
         client.emit("joinStream", {
             p1: this.tab[roomId].user1.user,
             p2: this.tab[roomId].user2.user,
@@ -481,6 +485,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             score2: this.tab[roomId].user1.client.data.obj.rScore,
         });
         client.join(roomId);
+        this.server.to(client.data.obj.roomId).emit("vues", this.tab[client.data.obj.roomId].vues); // -- vues for the watcher !!! 
     }
 
     insertSocketData(client: Socket, usr: any, player: string, room: string, mapUrl: string)
@@ -505,6 +510,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 },
                 endGame: false,
                 mapUrl,
+                vues: 0,
             }
         }
         else
