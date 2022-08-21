@@ -307,8 +307,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 score2: d.rScore,
             });
         }
-        client.data.obj.lScore = d.lScore;
-        client.data.obj.rScore = d.rScore;
+        if (client.data.obj)
+        {
+            client.data.obj.lScore = d.lScore;
+            client.data.obj.rScore = d.rScore;
+        }
         if (!d.newEmit)
             this.server.to(d.roomId).emit('Watchers', d);
     }
