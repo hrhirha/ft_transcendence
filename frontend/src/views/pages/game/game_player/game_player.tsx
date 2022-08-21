@@ -59,7 +59,7 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
             <div className="row">
                 <div className="col-12 col-md-9">
                     {matchData && <MatchCard match={matchData}/>}
-                    <GameView gameSocket={socket} isUltimate={ultimateGame} watcher={false} roomId={""}/>
+                    <GameView gameSocket={socket} isUltimate={ultimateGame} watcher={false} roomId={""} isPrivate={false} vsPID="" />
                 </div>
             </div>
         </main>

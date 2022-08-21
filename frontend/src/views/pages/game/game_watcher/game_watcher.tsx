@@ -6,7 +6,7 @@ import { MatchCard } from "views/components/match_card/match_card";
 import { GameView } from "views/pages/game/game_view/game_view";
 
 export const GameWatcher:React.FC = () =>  {
-    const socket = io("ws://127.0.0.1:3001/game", {withCredentials: true});
+    const [socket] = useState(io("ws://127.0.0.1:3001/game", {withCredentials: true}));
     const [ongoingMatchs, setMatchs] = useState<Array<Match>>([]);
     const [currentMatch, setCurrentMatch] = useState<number>(0);
     useEffect(() => {
@@ -45,7 +45,7 @@ export const GameWatcher:React.FC = () =>  {
                 <div className="col-12 col-md-9">
                     {ongoingMatchs.length === 0 && <img className="noLiveGames" src={WatchEmptyState}/>}
                     {ongoingMatchs.length > 0 && <MatchCard match={ongoingMatchs[currentMatch]}/>}
-                    {ongoingMatchs.length > 0 && <GameView gameSocket={socket} isUltimate={false} watcher={true} roomId={ongoingMatchs[currentMatch]?.id}/>}
+                    {ongoingMatchs.length > 0 && <GameView gameSocket={socket} isUltimate={false} watcher={true} roomId={ongoingMatchs[currentMatch]?.id} isPrivate={false} vsPID="" />}
                 </div>
             </div>
         </section>

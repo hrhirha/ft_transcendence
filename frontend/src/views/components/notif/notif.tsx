@@ -74,6 +74,7 @@ export const Notif:React.FC<{children: ReactNode}> = ({children}) => {
             setTimer(setInterval(() => {
                 setNotifs(notifs.filter(n => {
                     n.time -= 1000;
+                    console.log(n.time);
                     return n.time >= 0;
                 }));
             }, 500));

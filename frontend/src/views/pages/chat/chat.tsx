@@ -27,9 +27,9 @@ const ChatHome:React.FC<{onClick: Function}> = ({onClick}) => {
 const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem: Function, rooms:chats}> = ({tab, activeChat, onSelectItem, rooms}) => {
     const navigate = useNavigate();
 
-    if ((tab === chatTabs.chats && ((rooms && rooms.dms.length === 0) || rooms == undefined)) 
-        || (tab === chatTabs.joinedGroups && ((rooms && rooms.rooms.length === 0) || rooms == undefined))
-        || (tab === chatTabs.otherGroups && ((rooms && rooms.others.length === 0) || rooms == undefined)))
+    if ((tab === chatTabs.chats && ((rooms && rooms.dms.length === 0) || rooms === undefined)) 
+        || (tab === chatTabs.joinedGroups && ((rooms && rooms.rooms.length === 0) || rooms === undefined))
+        || (tab === chatTabs.otherGroups && ((rooms && rooms.others.length === 0) || rooms === undefined)))
     {
         return (
             <div className="noConversations">

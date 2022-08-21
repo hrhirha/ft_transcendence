@@ -24,10 +24,10 @@ const config: Phaser.Types.Core.GameConfig = {
     }
 }
 
-export const GameView:React.FC<{gameSocket: Socket, isUltimate: boolean, watcher: boolean, roomId: string}> = ({gameSocket, isUltimate, watcher, roomId}) => {
+export const GameView:React.FC<{gameSocket: Socket, isUltimate: boolean, watcher: boolean, roomId: string, isPrivate: boolean, vsPID: string}> = ({gameSocket, isUltimate, watcher, roomId, isPrivate, vsPID}) => {
     useEffect(() => {
         const game: Phaser.Game = new Phaser.Game(config);
-        game.scene.add("PingPong",new PingPong(gameSocket, isUltimate ? "ultimateQue" : "normaleQue", !watcher, roomId));
+        game.scene.add("PingPong",new PingPong(gameSocket, isUltimate ? "ultimateQue" : "normaleQue", !watcher, roomId, {private: isPrivate, userId: vsPID}));
         game.scene.start("PingPong");
     }, []);
     return (

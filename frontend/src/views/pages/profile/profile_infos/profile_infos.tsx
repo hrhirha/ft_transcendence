@@ -40,7 +40,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
         f.type='file';
         f.name='file';
         f.accept='.jpg,.jpeg,.png,.gif';
-        f.addEventListener("change", async (e : any) => {
+        f.addEventListener("change", (e : any) => {
             const [file] = e.target.files;
             setUserImage(file);
             setUpdates({avatar: true, name: detectUpdates.name});
@@ -59,6 +59,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
             if (detectUpdates.avatar || detectUpdates.name)
             {
                 await getUserData();
+                setUpdates({avatar: false, name: false});
                 pushNotif({
                     id: "UPDATEPROFILESUCCESS",
                     type: "success",
@@ -66,7 +67,6 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                     title: "Success",
                     description: "Profile updated successfully!"
                 });
-                setUpdates({avatar: false, name: false});
             }
         }
         catch(e: any) {
