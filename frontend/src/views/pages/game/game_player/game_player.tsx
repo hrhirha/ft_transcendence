@@ -56,7 +56,7 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
             }).on("joined", (players) => {
                 console.log(players);
                 setMatchData(oldData => ({...oldData, p1: players.p1, p2: players.p2}));
-            }).removeAllListeners("connect");
+            });
         }
     }, [socket]);
     return (

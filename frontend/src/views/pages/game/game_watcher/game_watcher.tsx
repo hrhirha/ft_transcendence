@@ -41,7 +41,7 @@ export const GameWatcher:React.FC = () =>  {
                     }
                     return m;
                 }));
-            }).removeAllListeners("connect");
+            });
         }
     }, [socket]);
 
