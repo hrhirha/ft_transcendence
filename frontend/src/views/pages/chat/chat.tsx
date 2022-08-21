@@ -112,79 +112,87 @@ export const Chat:React.FC = () => {
     const [activeTab, setActiveTab] = useState<chatTabs>(chatTabs.chats);
     const class_socket = useContext(SocketContext);
     const [chatRooms, setchatRooms] = useState<chats>()
-
+    const [is_listening , setIslistening ] = useState<boolean>(false);
 
     //test -----
     useEffect(() => {
+
+        console.log("socket event2");
+
         class_socket.socket.on("chats", (data : chats)=>{ //done 2
+            console.log("chats2")
             setchatRooms(data);
-            console.log(data)
         })
         class_socket.socket.on("dm_started", (data : dm_started)=>{
             window.open(`/chat?id=${data.room.id}`, "_self")
         })
-
-
-        class_socket.socket.on("room_created", (data : room_created)=>{ //done
-            console.log("room_created");
-            console.log(data)
-        })
-        class_socket.socket.on("user_left", (data : user_left)=>{ //done
-            console.log("user_left");
-            console.log(data)
-        })
-
-        class_socket.socket.on("user_joined", (data : user_joined)=>{ //done
-            console.log("user_joined");
-            console.log(data)
-        })
-        class_socket.socket.on("room_deleted", (data : {id : string})=>{ //done
-            console.log("room_deleted");
-            console.log(data.id)
-        })
-        class_socket.socket.on("password_set", (data : management_password)=>{ //done
-            console.log("password_set");
-            console.log(data)
-        })
-        class_socket.socket.on("password_removed", (data : management_password)=>{ //done
-            console.log("password_removed");
-            console.log(data)
+        class_socket.socket.on("receive_message", (data : receive_message)=>{
+            console.log("receive_message2");
+            class_socket.get_chats();
         })
         
-        class_socket.socket.on("admin_added", (data : management_memeber)=>{ //done
-            console.log("admin_added");
-            console.log(data)
-        })
-        class_socket.socket.on("admin_removed", (data : management_memeber)=>{ //done
-            console.log("admin_removed");
-            console.log(data)
-        })
-        class_socket.socket.on("user_banned", (data : management_memeber)=>{ //done
-            console.log("user_banned");
-            console.log(data)
-        })
-        class_socket.socket.on("user_unbanned", (data : user_unbanned)=>{ //done
-            console.log("user_unbanned");
-            console.log(data)
-        })
-        class_socket.socket.on("user_muted", (data : user_muted)=>{//done
-            console.log("user_muted");
-            console.log(data)
-        })
-        class_socket.socket.on("user_unmuted", (data : management_memeber)=>{//done
-            console.log("user_unmuted");
-            console.log(data)
-        })
-        class_socket.socket.on("message_deleted", (data : message_deleted)=>{ //done
-            console.log("message_deleted");
-            console.log(data)
-        })
-        class_socket.socket.on("members", (data : user_info[])=>{ //done
-            console.log("members");
-            console.log(data)
-        })
+        return () => class_socket.socket.removeAllListeners();
+
+        //class_socket.socket.on("room_created", (data : room_created)=>{ //done
+        //    console.log("room_created");
+        //    console.log(data)
+        //})
+        //class_socket.socket.on("user_left", (data : user_left)=>{ //done
+        //    console.log("user_left");
+        //    console.log(data)
+        //})
+//
+        //class_socket.socket.on("user_joined", (data : user_joined)=>{ //done
+        //    console.log("user_joined");
+        //    console.log(data)
+        //})
+        //class_socket.socket.on("room_deleted", (data : {id : string})=>{ //done
+        //    console.log("room_deleted");
+        //    console.log(data.id)
+        //})
+        //class_socket.socket.on("password_set", (data : management_password)=>{ //done
+        //    console.log("password_set");
+        //    console.log(data)
+        //})
+        //class_socket.socket.on("password_removed", (data : management_password)=>{ //done
+        //    console.log("password_removed");
+        //    console.log(data)
+        //})
+        //
+        //class_socket.socket.on("admin_added", (data : management_memeber)=>{ //done
+        //    console.log("admin_added");
+        //    console.log(data)
+        //})
+        //class_socket.socket.on("admin_removed", (data : management_memeber)=>{ //done
+        //    console.log("admin_removed");
+        //    console.log(data)
+        //})
+        //class_socket.socket.on("user_banned", (data : management_memeber)=>{ //done
+        //    console.log("user_banned");
+        //    console.log(data)
+        //})
+        //class_socket.socket.on("user_unbanned", (data : user_unbanned)=>{ //done
+        //    console.log("user_unbanned");
+        //    console.log(data)
+        //})
+        //class_socket.socket.on("user_muted", (data : user_muted)=>{//done
+        //    console.log("user_muted");
+        //    console.log(data)
+        //})
+        //class_socket.socket.on("user_unmuted", (data : management_memeber)=>{//done
+        //    console.log("user_unmuted");
+        //    console.log(data)
+        //})
+        //class_socket.socket.on("message_deleted", (data : message_deleted)=>{ //done
+        //    console.log("message_deleted");
+        //    console.log(data)
+        //})
+        //class_socket.socket.on("members", (data : user_info[])=>{ //done
+        //    console.log("members");
+        //    console.log(data)
+        //})
         //return () => class_socket.socket.removeAllListeners();
-    },[class_socket.socket])
+    },[])
     //test -----
 
 

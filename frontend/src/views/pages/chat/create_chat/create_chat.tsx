@@ -79,11 +79,15 @@ const PrivateChannel:React.FC<{onClose: Function}> = ({onClose}) => {
 
 const PublicChannel:React.FC<{onClose: Function}> = ({onClose}) => {
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+    const class_socket = useContext(SocketContext);
+    const [channeltitle, setChanneltitle] = useState<string>("");
+    const [ids, setIds] = useState<string[]>([]);
+
     return (
     <form id="newPublicChannel" className="creatChatForm">
         <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
         <h5><FontAwesomeIcon icon={faLockOpen}/>Public channel</h5>
-        <input id="chatTitle" className="textInput" type="text" placeholder="channel title" autoComplete="off"/>
+        <input id="chatTitle" className="textInput" type="text" value={channeltitle}  onChange={(handleChange)=>{setChanneltitle(handleChange.target.value)}} placeholder="channel title" autoComplete="off"/>
         <UserSearchForm callback={(userSelected: User) => {
             console.log(selectedUsers);
             if (selectedUsers.length === 0 || !selectedUsers.find(user => user.id === userSelected.id)) {
@@ -98,8 +102,20 @@ const PublicChannel:React.FC<{onClose: Function}> = ({onClose}) => {
                 fullName={user.fullName}
             />)}
         </div>
-        {selectedUsers.length > 0
-            && <button id="submitChat" onClick={() => {}}>
+        {selectedUsers.length > 0 && channeltitle.trim() != ""
+            && <button id="submitChat" onClick={(e) => {
+                e.preventDefault();
+
+                setIds([]);
+                selectedUsers.map((u: User) =>{
+                    console.log(u)
+                    setIds([...ids, u.id]);
+                })
+                console.log(ids)
+
+                //class_socket.create_room({name : "hicham room",is_private:false, uids :["cl71rzju21859ndu603271qm1"]});
+                
+            }}>
                 <FontAwesomeIcon icon={faCheck}/>
                 Submit
             </button>}

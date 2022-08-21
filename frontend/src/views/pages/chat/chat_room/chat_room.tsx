@@ -77,21 +77,27 @@ export const ChatRoom:React.FC<{roomId: string}> = ({roomId}) => {
     const class_socket = useContext(SocketContext);
     const [messages, setmessages] = useState<messages>();
     const [roominfo, setRoominfo] = useState<room_msgs>();
+    const [is_listening , setIslistening ] = useState<boolean>(false);
 
     useEffect(() => {
 
+        console.log("socket event1");
+
+
         class_socket.socket.on("messages", (data : messages)=>{
+            console.log("messages1")
             setmessages(data)
             setRoominfo(data.room)
         })
 
         class_socket.socket.on("receive_message", (data : receive_message)=>{
-            class_socket.get_chats();
+            console.log("receive_message1")
             if (roomId != null && roomId == data.room.id)
                 class_socket.get_messages({id : data.room.id});
         })
-
-    },[class_socket.socket])
+        
+        return () => class_socket.socket.removeAllListeners();
+    },[])
 
     useEffect(() => {
         if (roomId != null)

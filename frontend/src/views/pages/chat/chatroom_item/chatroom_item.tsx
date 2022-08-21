@@ -30,7 +30,7 @@ export const ChatRoomItem = (Props : Props) => {
         </div>
         <div className='dataRow'>
           <p className='lastMsg'>{Props.lastMsg}</p>
-          {Props.joined && Props.nbNotifs > 0 && <span className='nbNotifs'>{Props.nbNotifs}</span>}
+          {!Props.active && Props.joined && Props.nbNotifs > 0 && <span className='nbNotifs'>{Props.nbNotifs}</span>}
         </div>
       </div>
     </div>
