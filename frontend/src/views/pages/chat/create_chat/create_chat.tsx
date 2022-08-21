@@ -25,7 +25,11 @@ const DirectMessage:React.FC<{onClose: Function}> = ({onClose}) => {
     const class_socket = useContext(SocketContext);
     
     return (
-    <form id="newDirectMessage" className="creatChatForm">
+    <form id="newDirectMessage" className="creatChatForm" onSubmit={(e) => {
+        e.preventDefault();
+            class_socket.start_dm(userSelected.id);
+            setUserSelected(null);
+        }}>
         <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
         <h5><FontAwesomeIcon icon={faLock}/>Private Chat</h5>
         {userSelected === null && <UserSearchForm callback={(selectedUser: User) => setUserSelected(selectedUser)}/>}
@@ -36,10 +40,7 @@ const DirectMessage:React.FC<{onClose: Function}> = ({onClose}) => {
                 fullName={userSelected.fullName}
             />}
         {userSelected !== null
-            && <button id="submitChat" onClick={(e) => {
-                e.preventDefault();
-                class_socket.start_dm(userSelected.id)
-            }}>
+            && <button id="submitChat" type="submit">
                 <FontAwesomeIcon icon={faCheck}/>
                 Submit
             </button>}
@@ -50,7 +51,10 @@ const DirectMessage:React.FC<{onClose: Function}> = ({onClose}) => {
 const PrivateChannel:React.FC<{onClose: Function}> = ({onClose}) => {
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     return (
-    <form id="newPrivateChannel" className="creatChatForm">
+    <form id="newPrivateChannel" className="creatChatForm" onSubmit={(e) => {
+            //
+            setSelectedUsers([]);
+        }}>
         <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
         <h5><FontAwesomeIcon icon={faLockOpen}/>Private channel</h5>
         <input id="chatTitle" className="textInput" type="text" placeholder="channel title" autoComplete="off"/>
@@ -69,7 +73,7 @@ const PrivateChannel:React.FC<{onClose: Function}> = ({onClose}) => {
             />)}
         </div>
         {selectedUsers.length > 0
-            && <button id="submitChat" onClick={() => {}}>
+            && <button id="submitChat" type="submit">
                 <FontAwesomeIcon icon={faCheck}/>
                 Submit
             </button>}
@@ -81,10 +85,12 @@ const PublicChannel:React.FC<{onClose: Function}> = ({onClose}) => {
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     const class_socket = useContext(SocketContext);
     const [channeltitle, setChanneltitle] = useState<string>("");
-    const [ids, setIds] = useState<string[]>([]);
 
     return (
-    <form id="newPublicChannel" className="creatChatForm">
+    <form id="newPublicChannel" className="creatChatForm" onSubmit={(e) => {
+            class_socket.create_room({name : channeltitle.trim() ,is_private:false, uids : selectedUsers.map((u: User) => u.id)});    
+            setSelectedUsers([]);
+        }}>
         <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
         <h5><FontAwesomeIcon icon={faLockOpen}/>Public channel</h5>
         <input id="chatTitle" className="textInput" type="text" value={channeltitle}  onChange={(handleChange)=>{setChanneltitle(handleChange.target.value)}} placeholder="channel title" autoComplete="off"/>
@@ -103,19 +109,7 @@ const PublicChannel:React.FC<{onClose: Function}> = ({onClose}) => {
             />)}
         </div>
         {selectedUsers.length > 0 && channeltitle.trim() != ""
-            && <button id="submitChat" onClick={(e) => {
-                e.preventDefault();
-
-                setIds([]);
-                selectedUsers.map((u: User) =>{
-                    console.log(u)
-                    setIds([...ids, u.id]);
-                })
-                console.log(ids)
-
-                //class_socket.create_room({name : "hicham room",is_private:false, uids :["cl71rzju21859ndu603271qm1"]});
-                
-            }}>
+            && <button id="submitChat" type="submit">
                 <FontAwesomeIcon icon={faCheck}/>
                 Submit
             </button>}
@@ -126,7 +120,10 @@ const PublicChannel:React.FC<{onClose: Function}> = ({onClose}) => {
 const ProtectedChannel:React.FC<{onClose: Function}> = ({onClose}) => {
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     return (
-    <form id="newProtectedChannel" className="creatChatForm">
+    <form id="newProtectedChannel" className="creatChatForm"  onSubmit={(e) => {
+                //
+                setSelectedUsers([]);
+            }}>
         <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
         <h5><FontAwesomeIcon icon={faKey}/>Protected channel</h5>
         <input id="chatTitle" className="textInput" type="text" placeholder="channel title" autoComplete="off"/>
@@ -146,11 +143,7 @@ const ProtectedChannel:React.FC<{onClose: Function}> = ({onClose}) => {
             />)}
         </div>
         {selectedUsers.length > 0
-            && <button id="submitChat" onClick={(e) => {
-                e.preventDefault();
-                console.log(document.getElementById("chatKey")!.nodeValue);
-                console.log(document.getElementById("chatTitle")!.getAttribute("value"));
-            }}>
+            && <button id="submitChat" type="submit">
                 <FontAwesomeIcon icon={faCheck}/>
                 Submit
             </button>}

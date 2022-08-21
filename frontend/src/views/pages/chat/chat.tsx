@@ -51,7 +51,7 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
                 lastMsg={room.lst_msg}
                 nbNotifs={room.unread}
                 timeLastMsg={room.lst_msg_ts}
-                active={true}
+                active={room.id === activeChat}
                 onClick={() => {
                     onSelectItem();
                     navigate({
@@ -73,7 +73,7 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
                 lastMsg={null}
                 nbNotifs={null}
                 timeLastMsg={null}
-                active={true}
+                active={other.id === activeChat}
                 onClick={() => {
                     onSelectItem();
                     navigate({
@@ -112,31 +112,37 @@ export const Chat:React.FC = () => {
     const [activeTab, setActiveTab] = useState<chatTabs>(chatTabs.chats);
     const class_socket = useContext(SocketContext);
     const [chatRooms, setchatRooms] = useState<chats>()
-    const [is_listening , setIslistening ] = useState<boolean>(false);
+    const navigate = useNavigate();
 
     //test -----
     useEffect(() => {
 
         console.log("socket event2");
-
+        
+        
         class_socket.socket.on("chats", (data : chats)=>{ //done 2
             console.log("chats2")
             setchatRooms(data);
+            if(searchParams.get("id") != null)
+            {
+                if(data.dms.find(d => d.room.id === searchParams.get("id")))
+                    setActiveTab(chatTabs.chats)
+                else if(data.rooms.find(d => d.id === searchParams.get("id")))
+                    setActiveTab(chatTabs.joinedGroups)
+                else if(data.others.find(d => d.id === searchParams.get("id")))
+                    setActiveTab(chatTabs.otherGroups)
+
+            }
         })
-        class_socket.socket.on("dm_started", (data : dm_started)=>{
-            window.open(`/chat?id=${data.room.id}`, "_self")
-        })
+      
         class_socket.socket.on("receive_message", (data : receive_message)=>{
             console.log("receive_message2");
             class_socket.get_chats();
         })
         
+        //on mount
+        window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
         return () => class_socket.socket.removeAllListeners();
-
-        //class_socket.socket.on("room_created", (data : room_created)=>{ //done
-        //    console.log("room_created");
-        //    console.log(data)
-        //})
         //class_socket.socket.on("user_left", (data : user_left)=>{ //done
         //    console.log("user_left");
         //    console.log(data)
@@ -195,13 +201,26 @@ export const Chat:React.FC = () => {
     },[])
     //test -----
 
-
     useEffect(() => {
         class_socket.get_chats();
 
-        //on mount
-        window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
-    }, []);
+        class_socket.socket.on("dm_started", (data : dm_started)=>{
+            setShowNewChatForm(false);
+            navigate({
+                pathname: '/chat',
+                search: `?id=${data.room.id}`,
+            }, {replace: true});
+        })
+        
+        class_socket.socket.on("room_created", (data : room_created)=>{
+            console.log(data);
+            setShowNewChatForm(false);
+            navigate({
+                pathname: '/chat',
+                search: `?id=${data.id}`,
+            }, {replace: true});
+        })
+    },[class_socket.socket])
 
     return (
         <main id="chatPage">

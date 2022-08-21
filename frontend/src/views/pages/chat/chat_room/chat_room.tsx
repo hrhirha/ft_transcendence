@@ -23,7 +23,7 @@ const ChatRoomHeader = (Props : HeaderProps) => {
     return (
     <div id="chatRoomHeader">
         <div className="userInfos" onClick={() => Props.showSettings()}>
-            <CircleAvatar avatarURL={Props.image} dimensions={45} showStatus={true}/>
+            <CircleAvatar avatarURL={Props.image} dimensions={45} showStatus={(Props.status != "Channel")}/>
             <div className='dataRow'>
                 <span className='userName'>{Props.username}</span>
                 <span className='status'>{Props.status}</span>
@@ -77,7 +77,6 @@ export const ChatRoom:React.FC<{roomId: string}> = ({roomId}) => {
     const class_socket = useContext(SocketContext);
     const [messages, setmessages] = useState<messages>();
     const [roominfo, setRoominfo] = useState<room_msgs>();
-    const [is_listening , setIslistening ] = useState<boolean>(false);
 
     useEffect(() => {
 
