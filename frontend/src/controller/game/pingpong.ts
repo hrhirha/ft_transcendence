@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { NormalField, UltimateField, Ball, Paddle, YouWin, YouLose, RedButton, NormalButton, EndMatch } from "assets";
 import { Socket } from "socket.io-client";
+import { throws } from "assert";
 
 export default class PingPong extends Phaser.Scene
 {
@@ -288,11 +289,11 @@ export default class PingPong extends Phaser.Scene
             });
 
             this.soc.on("watcherEndMatch", () => {
-                this.endMatchSprite = this.add.sprite(this.w / 2 , this.h / 2, 'endMatch').setOrigin(0.5, 0.5).setScale(0.8);
-                this.waiting = this.add.text(this.w / 2 , this.h / 2 + 150 , "Waiting ...", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+                this.endMatchSprite = this.add.sprite(this.w / 2 , this.h / 2, 'endMatch').setOrigin(0.5, 0.5).setScale(0.3);
+                this.waiting = this.add.text(this.w / 2 , this.h / 2 + 150 , "Waiting ...", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setOrigin(0.5);
             });
-
             this.soc.on("restart", (img) => {
+                console.log("hererer");
                 this.add.image(this.w/2, this.h/2 - 100, img).setOrigin(0.5).setScale(0.4);
                 this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 85, 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
                 this.restartText = this.add.text(this.w / 2 , this.h / 2 + 85 , "Replay", { fontSize: "35px",
@@ -635,12 +636,13 @@ export default class PingPong extends Phaser.Scene
 
     update () : void
     {
-        if (this.soc.disconnected)
-        {
-            this.add.text(this.w / 2, this.h / 2.5, 'the Server Is Down !!', { fontSize: "60px", 
-            fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
-            this.scene.pause();
-        }
+        
+        // if (this.soc.disconnected)
+        // {
+        //     this.add.text(this.w / 2, this.h / 2.5, 'the Server Is Down !!', { fontSize: "60px", 
+        //     fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
+        //     this.scene.pause();
+        // }
         if (this.exitEmited || this.goal || !this.gameIsStarted || !this.isPlayer || this.map)
             return ;
 

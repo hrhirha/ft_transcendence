@@ -38,7 +38,7 @@ section.matchCard {
             }
             animation: loadingsk 1s linear infinite alternate;
         }
-        .avatar {
+        .avatar {   
             animation: loadingsk 1s linear infinite alternate;
             border: .25rem solid rgba($dark3, .65);
             border-radius: 100%;
@@ -67,6 +67,12 @@ section.matchCard {
         .avatar {
             @include _flex(column, center, center);
             position: relative;
+            img.winner_crown {
+                width: 80%;
+                position: absolute;
+                top: -30%;
+                z-index: 2;
+            }
             #circleAvatar {
                 border: .25rem solid $dark3;
                 @media (max-width: $lg)
@@ -85,6 +91,10 @@ section.matchCard {
             }
             .achievment {
                 @include _achievment($dimensions_factor: .4, $bottom: 0rem);
+                @media (max-width: $sm)
+                {
+                    @include _achievment($dimensions_factor: .2, $bottom: 0rem);
+                }
             }
         }
         .fullName {

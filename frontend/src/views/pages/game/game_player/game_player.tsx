@@ -8,9 +8,11 @@ import { MatchCard } from "views/components/match_card/match_card";
 import { useNotif } from "views/components/notif/notif";
 import { GameView } from "views/pages/game/game_view/game_view";
 
+const socket = io("ws://127.0.0.1:3001/game", {withCredentials: true});
+
 export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) =>  {
-    const [socket] = useState(io("ws://127.0.0.1:3001/game", {withCredentials: true}));
     const pushNotif = useNotif();
+    const [winner, setWinner] = useState<string>("");
     const [matchData, setMatchData] = useState<Match>({
         is_ultimate: ultimateGame,
         p1: null,
@@ -43,22 +45,25 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
     }, []);
 
     useEffect(() => {
-        socket.on("updateScore", (score) => {
-            setMatchData(oldData => ({...oldData, score: {p1: score.score1, p2: score.score2}}));
-        });
-        socket.on("waiting", (players) => {
-            setMatchData(oldData => ({...oldData, p1: players.p1}));
-        });
-        socket.on("joined", (players) => {
-            setMatchData(oldData => ({...oldData, p1: players.p1, p2: players.p2}));
-        });
-        
+        if (socket.connected)
+        {
+            socket.on("matchWinner", (win) => {
+                setWinner(win);
+            }).on("updateScore", (score) => {
+                setMatchData(oldData => ({...oldData, score: {p1: score.score1, p2: score.score2}}));
+            }).on("waiting", (players) => {
+                setMatchData(oldData => ({...oldData, p1: players.p1}));
+            }).on("joined", (players) => {
+                console.log(players);
+                setMatchData(oldData => ({...oldData, p1: players.p1, p2: players.p2}));
+            }).removeAllListeners("connect");
+        }
     }, [socket]);
     return (
         <main id="gamePage" className="container">
             <div className="row">
                 <div className="col-12 col-md-9">
-                    {matchData && <MatchCard match={matchData}/>}
+                    {matchData && <MatchCard match={matchData} winnerId={winner}/>}
                     <GameView gameSocket={socket} isUltimate={ultimateGame} watcher={false} roomId={""} isPrivate={false} vsPID="" />
                 </div>
             </div>
