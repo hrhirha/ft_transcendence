@@ -42,7 +42,7 @@ export const UserSearchForm:React.FC<{callback: Function}> = ({callback}) => {
         if (e.target.value.trim().length > 0) {
             setShowSuggestions(true);
             setSuggestions([]);
-            //get results from server
+            setUserSelected(null);
             friends.forEach((user: any, key: number) => {
                 if (user.username.toLowerCase().includes(e.target.value.toLowerCase()))
                 {

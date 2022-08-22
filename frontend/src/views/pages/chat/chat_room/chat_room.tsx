@@ -13,6 +13,7 @@ import { SocketContext } from "index";
 
 interface HeaderProps {
     username: string,
+    fullName: string,
     image: string,
     status: string,
     showSettings: Function,
@@ -20,12 +21,18 @@ interface HeaderProps {
 }
 
 const ChatRoomHeader = (Props : HeaderProps) => {
+    const navigate = useNavigate();
     return (
     <div id="chatRoomHeader">
-        <div className="userInfos" onClick={() => Props.showSettings()}>
+        <div className="userInfos" onClick={() => {
+            if (Props.status == "Channel")
+                Props.showSettings()
+            else
+                navigate(`/u/${Props.username}`);
+            }}>
             <CircleAvatar avatarURL={Props.image} dimensions={45} showStatus={(Props.status != "Channel")}/>
             <div className='dataRow'>
-                <span className='userName'>{Props.username}</span>
+                <span className='userName'>{Props.fullName}</span>
                 <span className='status'>{Props.status}</span>
             </div>
         </div>
@@ -36,12 +43,12 @@ const ChatRoomHeader = (Props : HeaderProps) => {
     );
 }
 
-const ChatRoomBody:React.FC<{messages: messages}> = ({messages}) => {
+const ChatRoomBody:React.FC<{messages: msgs[]}> = ({messages}) => {
     return <div id="chatRoomBody" style={{backgroundImage: `url(${BgVectors})`}}>
-        { messages && messages.msgs.map ((message : msgs, k ) => 
+        { messages && messages.map ((message : msgs, k ) => 
             <Chat_msg
                 key={k}
-                display_image={(messages.msgs[k - 1] && messages.msgs[k].user.id === messages.msgs[k - 1].user.id) ? true : false }
+                display_image={(messages[k - 1] && messages[k].user.id === messages[k - 1].user.id) ? true : false }
                 sender_user={message.user.id}
                 image = {message.user.imageUrl}
                 msg={message.msg}
@@ -75,27 +82,26 @@ export const ChatRoom:React.FC<{roomId: string}> = ({roomId}) => {
     const navigate = useNavigate();
     
     const class_socket = useContext(SocketContext);
-    const [messages, setmessages] = useState<messages>();
+    const [messages, setmessages] = useState<msgs[]>();
     const [roominfo, setRoominfo] = useState<room_msgs>();
 
     useEffect(() => {
 
-        console.log("socket event1");
-
-
         class_socket.socket.on("messages", (data : messages)=>{
-            console.log("messages1")
-            setmessages(data)
+            setmessages(data.msgs)
             setRoominfo(data.room)
         })
 
         class_socket.socket.on("receive_message", (data : receive_message)=>{
-            console.log("receive_message1")
             if (roomId != null && roomId == data.room.id)
-                class_socket.get_messages({id : data.room.id});
+            {
+                if(messages != null)
+                    setmessages(oldData => [...oldData, data]);
+                else
+                    class_socket.get_messages({id : roomId});
+            }
         })
         
-        return () => class_socket.socket.removeAllListeners();
     },[])
 
     useEffect(() => {
@@ -109,7 +115,8 @@ export const ChatRoom:React.FC<{roomId: string}> = ({roomId}) => {
         {showSettings && <ChatRoomSettings roomId={roomId} onClose={() => setShowSettings(false)}/>}
         {!showSettings && <section id="chatRoom">
             <ChatRoomHeader
-                username={roominfo && ((roominfo.is_channel) ? roominfo.name :roominfo.user.fullName)}
+                username={roominfo && ((roominfo.is_channel) ? roominfo.name :roominfo.user.username)}
+                fullName={roominfo && ((roominfo.is_channel) ? roominfo.name :roominfo.user.fullName)}
                 image= {roominfo && ((roominfo.is_channel) ? null :roominfo.user.imageUrl)}
                 status= {roominfo && ((roominfo.is_channel) ? "Channel" :roominfo.user.status)}
                 onClose={() => navigate("/chat", {replace : true})}

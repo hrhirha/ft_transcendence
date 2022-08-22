@@ -10,6 +10,10 @@ enum chatTypes {
     public, private, protected, direct, none
 }
 
+const validTitel = (title: string) => {
+    return  title.trim() != "" && /^([\w]+ ?(\-?[\w]+)*\.?)+$/.test(title);
+}
+
 const UserCheckedCard:React.FC<{avatar: string, fullName: string, onRemove: Function}> = ({avatar, fullName, onRemove}) => {
     return <div className="userCheckedCard">
         <span className="userInfos">
@@ -26,7 +30,7 @@ const DirectMessage:React.FC<{onClose: Function}> = ({onClose}) => {
     
     return (
     <form id="newDirectMessage" className="creatChatForm" onSubmit={(e) => {
-        e.preventDefault();
+            e.preventDefault();
             class_socket.start_dm(userSelected.id);
             setUserSelected(null);
         }}>
@@ -50,16 +54,19 @@ const DirectMessage:React.FC<{onClose: Function}> = ({onClose}) => {
 
 const PrivateChannel:React.FC<{onClose: Function}> = ({onClose}) => {
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+    const class_socket = useContext(SocketContext);
+    const [channeltitle, setChanneltitle] = useState<string>("");
+
     return (
     <form id="newPrivateChannel" className="creatChatForm" onSubmit={(e) => {
-            //
+            e.preventDefault();
+            class_socket.create_room({name : channeltitle.trim() ,is_private:true, uids : selectedUsers.map((u: User) => u.id)});
             setSelectedUsers([]);
         }}>
         <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
-        <h5><FontAwesomeIcon icon={faLockOpen}/>Private channel</h5>
-        <input id="chatTitle" className="textInput" type="text" placeholder="channel title" autoComplete="off"/>
+        <h5><FontAwesomeIcon icon={faLock}/>Private channel</h5>
+        <input id="chatTitle" className={`textInput ${channeltitle === "" || validTitel(channeltitle) ? "" : "error"}`} type="text" value={channeltitle}  onChange={(handleChange)=>{setChanneltitle(handleChange.target.value)}} placeholder="channel title" autoComplete="off"/>
         <UserSearchForm callback={(userSelected: User) => {
-            console.log(selectedUsers);
             if (selectedUsers.length === 0 || !selectedUsers.find(user => user.id === userSelected.id)) {
                 setSelectedUsers(prvUsers => [...prvUsers, userSelected]);
             }
@@ -72,7 +79,7 @@ const PrivateChannel:React.FC<{onClose: Function}> = ({onClose}) => {
                 fullName={user.fullName}
             />)}
         </div>
-        {selectedUsers.length > 0
+        {selectedUsers.length > 0 &&  validTitel(channeltitle)
             && <button id="submitChat" type="submit">
                 <FontAwesomeIcon icon={faCheck}/>
                 Submit
@@ -88,14 +95,14 @@ const PublicChannel:React.FC<{onClose: Function}> = ({onClose}) => {
 
     return (
     <form id="newPublicChannel" className="creatChatForm" onSubmit={(e) => {
+            e.preventDefault();
             class_socket.create_room({name : channeltitle.trim() ,is_private:false, uids : selectedUsers.map((u: User) => u.id)});    
             setSelectedUsers([]);
         }}>
         <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
         <h5><FontAwesomeIcon icon={faLockOpen}/>Public channel</h5>
-        <input id="chatTitle" className="textInput" type="text" value={channeltitle}  onChange={(handleChange)=>{setChanneltitle(handleChange.target.value)}} placeholder="channel title" autoComplete="off"/>
+        <input id="chatTitle" className={`textInput ${channeltitle === "" || validTitel(channeltitle) ? "" : "error"}`} type="text" value={channeltitle}  onChange={(handleChange)=>{setChanneltitle(handleChange.target.value)}} placeholder="channel title" autoComplete="off"/>
         <UserSearchForm callback={(userSelected: User) => {
-            console.log(selectedUsers);
             if (selectedUsers.length === 0 || !selectedUsers.find(user => user.id === userSelected.id)) {
                 setSelectedUsers(prvUsers => [...prvUsers, userSelected]);
             }
@@ -108,7 +115,7 @@ const PublicChannel:React.FC<{onClose: Function}> = ({onClose}) => {
                 fullName={user.fullName}
             />)}
         </div>
-        {selectedUsers.length > 0 && channeltitle.trim() != ""
+        {selectedUsers.length > 0 && validTitel(channeltitle)
             && <button id="submitChat" type="submit">
                 <FontAwesomeIcon icon={faCheck}/>
                 Submit
@@ -119,17 +126,21 @@ const PublicChannel:React.FC<{onClose: Function}> = ({onClose}) => {
 
 const ProtectedChannel:React.FC<{onClose: Function}> = ({onClose}) => {
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+    const class_socket = useContext(SocketContext);
+    const [channeltitle, setChanneltitle] = useState<string>("");
+    const [channelpassword, setChannelpassword] = useState<string>("");
+
     return (
     <form id="newProtectedChannel" className="creatChatForm"  onSubmit={(e) => {
-                //
-                setSelectedUsers([]);
-            }}>
+            e.preventDefault();
+            class_socket.create_room({name : channeltitle.trim() ,is_private:false,password : channelpassword, uids : selectedUsers.map((u: User) => u.id)});    
+            setSelectedUsers([]);
+        }}>
         <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
         <h5><FontAwesomeIcon icon={faKey}/>Protected channel</h5>
-        <input id="chatTitle" className="textInput" type="text" placeholder="channel title" autoComplete="off"/>
-        <input id="chatKey" className="textInput" type="password" placeholder="password" autoComplete="off"/>
+        <input id="chatTitle" className={`textInput ${channeltitle === "" || validTitel(channeltitle) ? "" : "error"}`} type="text" value={channeltitle}  onChange={(handleChange)=>{setChanneltitle(handleChange.target.value)}} placeholder="channel title" autoComplete="off"/>
+        <input id="chatKey" className={`textInput ${channelpassword === "" || /[\!\@\#\$\&\*\?\-\=\+]+/.test(channelpassword) ? "" : "error"}`} type="password" placeholder="password" value={channelpassword}  onChange={(handleChange)=>{setChannelpassword(handleChange.target.value)}} autoComplete="off"/>
         <UserSearchForm callback={(userSelected: User) => {
-            console.log(selectedUsers);
             if (selectedUsers.length === 0 || !selectedUsers.find(user => user.id === userSelected.id)) {
                 setSelectedUsers(prvUsers => [...prvUsers, userSelected]);
             }
@@ -142,7 +153,7 @@ const ProtectedChannel:React.FC<{onClose: Function}> = ({onClose}) => {
                 fullName={user.fullName}
             />)}
         </div>
-        {selectedUsers.length > 0
+        {selectedUsers.length > 0 && channelpassword !=="" && validTitel(channeltitle) && (/[\!\@\#\$\&\*\?\-\=\+]+/.test(channelpassword))
             && <button id="submitChat" type="submit">
                 <FontAwesomeIcon icon={faCheck}/>
                 Submit

@@ -7,7 +7,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChatHomeVector, NoConversations } from "assets";
 import { management_memeber, chats, dm_started, management_password, receive_message, room_created, user_joined, user_left, user_unbanned, user_muted, message_deleted, user_info, messages, dms, info_room, others } from "socket/interface";
-import { SocketContext } from "index";
+import { history, SocketContext } from "index";
 
 
 enum chatTabs {
@@ -117,32 +117,47 @@ export const Chat:React.FC = () => {
     //test -----
     useEffect(() => {
 
-        console.log("socket event2");
-        
-        
-        class_socket.socket.on("chats", (data : chats)=>{ //done 2
-            console.log("chats2")
-            setchatRooms(data);
-            if(searchParams.get("id") != null)
-            {
-                if(data.dms.find(d => d.room.id === searchParams.get("id")))
-                    setActiveTab(chatTabs.chats)
-                else if(data.rooms.find(d => d.id === searchParams.get("id")))
-                    setActiveTab(chatTabs.joinedGroups)
-                else if(data.others.find(d => d.id === searchParams.get("id")))
-                    setActiveTab(chatTabs.otherGroups)
+        class_socket.get_chats();
 
-            }
+        class_socket.socket.on("dm_started", (data : dm_started)=>{
+           
+            setShowNewChatForm(false);
+            navigate({
+                pathname: '/chat',
+                search: `?id=${data.room.id}`,
+            }, {replace: true});
+            searchParams.set("id", data.room.id);
+            class_socket.get_chats();
         })
+        
+        class_socket.socket.on("room_created", (data : room_created)=>{
+            setShowNewChatForm(false);
+            navigate({
+                pathname: '/chat',
+                search: `?id=${data.id}`,
+            }, {replace: true});
+            searchParams.set("id", data.id);
+            class_socket.get_chats();
+            
+        })
+        
+        class_socket.socket.on("chats", (data : chats)=>{ 
+            setchatRooms(data);
+            if(data.dms.find(d => d.room.id === searchParams.get("id")))
+                setActiveTab(chatTabs.chats)
+            else if(data.rooms.find(d => d.id === searchParams.get("id")))
+                setActiveTab(chatTabs.joinedGroups)
+            else if(data.others.find(d => d.id === searchParams.get("id")))
+                setActiveTab(chatTabs.otherGroups)
+            })
       
         class_socket.socket.on("receive_message", (data : receive_message)=>{
-            console.log("receive_message2");
             class_socket.get_chats();
         })
         
         //on mount
         window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
-        return () => class_socket.socket.removeAllListeners();
+        //return () => class_socket.socket.removeAllListeners();
         //class_socket.socket.on("user_left", (data : user_left)=>{ //done
         //    console.log("user_left");
         //    console.log(data)
@@ -199,28 +214,6 @@ export const Chat:React.FC = () => {
         //})
         //return () => class_socket.socket.removeAllListeners();
     },[])
-    //test -----
-
-    useEffect(() => {
-        class_socket.get_chats();
-
-        class_socket.socket.on("dm_started", (data : dm_started)=>{
-            setShowNewChatForm(false);
-            navigate({
-                pathname: '/chat',
-                search: `?id=${data.room.id}`,
-            }, {replace: true});
-        })
-        
-        class_socket.socket.on("room_created", (data : room_created)=>{
-            console.log(data);
-            setShowNewChatForm(false);
-            navigate({
-                pathname: '/chat',
-                search: `?id=${data.id}`,
-            }, {replace: true});
-        })
-    },[class_socket.socket])
 
     return (
         <main id="chatPage">
