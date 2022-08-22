@@ -1011,6 +1011,7 @@ export class ChatService {
                                         username: true,
                                         fullName: true,
                                         imageUrl: true,
+                                        status: true,
                                     }
                                 }
                             }
