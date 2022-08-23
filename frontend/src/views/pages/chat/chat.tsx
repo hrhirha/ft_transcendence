@@ -111,8 +111,24 @@ export const Chat:React.FC = () => {
     const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState<chatTabs>(chatTabs.chats);
     const class_socket = useContext(SocketContext);
-    const [chatRooms, setchatRooms] = useState<chats>()
+    const [chatRooms, setchatRooms] = useState<chats>();
+    const [filteredrooms, setFilteredRooms] = useState<chats>();
     const navigate = useNavigate();
+
+
+
+    const filterSearch = (e) =>{
+        e.preventDefault();
+        setFilteredRooms(() => {
+            if(e.target.value.trim() == "")
+                return null;
+            return {
+               dms: chatRooms.dms.filter(chat => chat.user.fullName.toLowerCase().includes(e.target.value.toLowerCase())),
+               rooms: chatRooms.rooms.filter(chat => chat.name.toLowerCase().includes(e.target.value.toLowerCase())), 
+               others: chatRooms.others.filter(chat => chat.name.toLowerCase().includes(e.target.value.toLowerCase()))
+            }
+        })
+    }
 
     //test -----
     useEffect(() => {
@@ -294,8 +310,8 @@ export const Chat:React.FC = () => {
                     {((screenWidth < 767.98 && !showNewChatForm && searchParams.get("id") === null)
                         || screenWidth >= 767.98) && <div className="col-sm-12 col-md-5 col-lg-4 chats">
                         <div className="chatOptions">
-                            <form id="chatSearch">
-                                <input type="text" placeholder="Search for chat"/>
+                            <form id="chatSearch" onSubmit={(e) => e.preventDefault()}>
+                                <input type="text" placeholder="Search for chat"  onChange={(e) => filterSearch(e)}/>
                                 <FontAwesomeIcon icon={faSearch}/>
                             </form>
                             <button id="newMessage" title="New chat" onClick={() => setShowNewChatForm(true)}>
@@ -324,7 +340,7 @@ export const Chat:React.FC = () => {
                                 tab={activeTab}
                                 onSelectItem={() => setShowNewChatForm(false)}
                                 activeChat={searchParams.get("id")}
-                                rooms={chatRooms}/>
+                                rooms={(filteredrooms != null) ? filteredrooms :chatRooms }/>
                         </div>
                     </div>}
                     {((screenWidth < 767.98 && (showNewChatForm || searchParams.get("id") !== null))
