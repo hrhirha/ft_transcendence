@@ -14,6 +14,10 @@ const validTitel = (title: string) => {
     return  title.trim() != "" && /^([\w]+ ?(\-?[\w]+)*\.?)+$/.test(title);
 }
 
+const validPassword = (password: string) => {
+    return  password.trim() != "" && /[A-Z]+/.test(password) && /\w{5,}/.test(password) && /[\!\@\#\$\&\*\?\-\=\+]+/.test(password) && /\d+/.test(password);
+}
+
 const UserCheckedCard:React.FC<{avatar: string, fullName: string, onRemove: Function}> = ({avatar, fullName, onRemove}) => {
     return <div className="userCheckedCard">
         <span className="userInfos">
@@ -139,7 +143,7 @@ const ProtectedChannel:React.FC<{onClose: Function}> = ({onClose}) => {
         <span className="closeForm" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
         <h5><FontAwesomeIcon icon={faKey}/>Protected channel</h5>
         <input id="chatTitle" className={`textInput ${channeltitle === "" || validTitel(channeltitle) ? "" : "error"}`} type="text" value={channeltitle}  onChange={(handleChange)=>{setChanneltitle(handleChange.target.value)}} placeholder="channel title" autoComplete="off"/>
-        <input id="chatKey" className={`textInput ${channelpassword === "" || /[\!\@\#\$\&\*\?\-\=\+]+/.test(channelpassword) ? "" : "error"}`} type="password" placeholder="password" value={channelpassword}  onChange={(handleChange)=>{setChannelpassword(handleChange.target.value)}} autoComplete="off"/>
+        <input id="chatKey" className={`textInput ${channelpassword === "" || validPassword(channelpassword) ? "" : "error"}`} type="password" placeholder="password" value={channelpassword}  onChange={(handleChange)=>{setChannelpassword(handleChange.target.value)}} autoComplete="off"/>
         <UserSearchForm callback={(userSelected: User) => {
             if (selectedUsers.length === 0 || !selectedUsers.find(user => user.id === userSelected.id)) {
                 setSelectedUsers(prvUsers => [...prvUsers, userSelected]);
@@ -153,7 +157,7 @@ const ProtectedChannel:React.FC<{onClose: Function}> = ({onClose}) => {
                 fullName={user.fullName}
             />)}
         </div>
-        {selectedUsers.length > 0 && channelpassword !=="" && validTitel(channeltitle) && (/[\!\@\#\$\&\*\?\-\=\+]+/.test(channelpassword))
+        {selectedUsers.length > 0 && channelpassword !=="" && validTitel(channeltitle) && validPassword(channelpassword)
             && <button id="submitChat" type="submit">
                 <FontAwesomeIcon icon={faCheck}/>
                 Submit

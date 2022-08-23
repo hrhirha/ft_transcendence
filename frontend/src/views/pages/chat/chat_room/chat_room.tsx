@@ -88,6 +88,8 @@ export const ChatRoom:React.FC<{roomId: string}> = ({roomId}) => {
     useEffect(() => {
 
         class_socket.socket.on("messages", (data : messages)=>{
+            console.log("messages")
+            console.log(data)
             setmessages(data.msgs)
             setRoominfo(data.room)
         })
