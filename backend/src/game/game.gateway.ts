@@ -118,13 +118,15 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                         }
                     })).user;
     
-                    const u_rank = (ranks.filter(r => { u.score >= r.require }));
+                    const u_rank = (ranks.filter(r => u.score >= r.require ));
+                    console.log(u_rank.length);
     
                     if (u_rank.length !== 0)
                     {
                         await this.prisma.user.update({
                             where: { id: u.id },
                             data: {
+                                // rank: { connect: {id: u_rank[u_rank.length - 1].id }}
                                 rank_id: u_rank[u_rank.length - 1].id
                             }
                         }); 
@@ -264,20 +266,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                         }
                     })).user;
 
-                    const u_rank = (ranks.filter(r => { u.score >= r.require }));
+                    const u_rank = (ranks.filter(r =>  u.score >= r.require ));
 
                     if (u_rank.length !== 0)
                     {
                         await this.prisma.user.update({
                             where: { id: u.id },
                             data: {
+                                // rank: { connect: {id: u_rank[u_rank.length - 1].id }}
                                 rank_id: u_rank[u_rank.length - 1].id
                             }
                         });
                     }
                 });
                 /// emit restart 
-                let win = (d.rscore === client.data.obj.bestOf) ? this.tab[d.roomId].user2.userId: this.tab[d.roomId].user1.userId;
+                let win = (d.rscore === client.data.bestOf) ? this.tab[d.roomId].user2.userId: this.tab[d.roomId].user1.userId;
                 this.server.to(d.roomId).emit("matchWinner", win); /// a watcher leave the room  -- for aimad
                 client.emit('restart', d.status);
                 return ;
@@ -538,6 +541,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         }
         this.tab[roomId].vues += 1;
         
+        console.log(this.tab[roomId].mapUrl);
         client.data.obj = {
             roomId,
             isPlayer: false,

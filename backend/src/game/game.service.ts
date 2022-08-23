@@ -62,6 +62,9 @@ export class GameService
                         score: true,
                     }
                 }
+            },
+            orderBy: {
+                createdAt: 'desc'
             }
         });
 

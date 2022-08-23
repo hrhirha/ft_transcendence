@@ -735,6 +735,9 @@ export class ChatService {
     async getJoinedRooms(user: UserDto)
     {
         const rooms = await this._prismaS.room.findMany({
+            orderBy: {
+                lst_msg_ts: 'desc'
+            },
             where: {
                 is_channel: true,
                 user_rooms: {
@@ -809,6 +812,9 @@ export class ChatService {
     async getDms(user: UserDto)
     {
         const rooms = await this._prismaS.room.findMany({
+            orderBy: {
+                lst_msg_ts: 'desc'
+            },
             where: {
                 is_channel: false,
                 user_rooms: {
@@ -908,6 +914,9 @@ export class ChatService {
     async getRooms(u: UserDto)
     {
         return await this._prismaS.room.findMany({
+            orderBy: {
+                lst_msg_ts: 'desc'
+            },
             where: {
                 is_channel: true,
                 type: room_type.PUBLIC || room_type.PROTECTED,
