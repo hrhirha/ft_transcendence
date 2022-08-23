@@ -977,61 +977,57 @@ export class ChatService {
 
     async getRoomMessages(uid: string, rid: string)
     {
-        const messages = await this._prismaS.message.findMany({
+        const room = await this._prismaS.room.findUnique({
             where: {
-                rid,
-                room: {
-                    user_rooms: {
-                        some: {
-                            uid,
-                            is_banned: false,
-                        },
-                    },
-                },
+                id: rid,
             },
             select: {
                 id: true,
-                msg: true,
-                timestamp: true,
+                name: true,
                 type: true,
-                user: {
+                is_channel: true,
+                user_rooms: {
                     select: {
-                        id: true,
-                        username: true,
-                        fullName: true,
-                        imageUrl: true,
-                        status: true,
-                    }
-                },
-                room: {
-                    select: {
-                        id: true,
-                        name: true,
-                        type: true,
-                        is_channel: true,
-                        user_rooms: {
-                            // where: { uid },
+                        uid: true,
+                        joined_time: true,
+                        user: {
                             select: {
-                                uid: true,
-                                joined_time: true,
-                                user: {
-                                    select: {
-                                        id: true,
-                                        username: true,
-                                        fullName: true,
-                                        imageUrl: true,
-                                        status: true,
-                                    }
-                                }
+                                id: true,
+                                username: true,
+                                fullName: true,
+                                imageUrl: true,
+                                status: true,
                             }
                         }
                     }
+                },
+                messages: {
+                    where: {
+                        rid,
+                        room: {
+                            user_rooms: {
+                                some: { uid, is_banned: false, }
+                            }
+                        }
+                    },
+                    select: {
+                        id: true,
+                        msg: true,
+                        timestamp: true,
+                        type: true,
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                fullName: true,
+                                imageUrl: true,
+                                status: true,
+                            }
+                        },
+                    }
                 }
-            },
-            orderBy:{ timestamp: 'asc', },
+            }
         });
-        if (messages.length === 0)
-            throw new ForbiddenException('no messages were found');
 
         await this._prismaS.userRoom.update({
             data: { unread: 0 },
@@ -1041,22 +1037,21 @@ export class ChatService {
         });
     
         // filter messages sent before the user joined the room
-        const room = messages[0].room;
+        // const room = messages[0].room;
 
         const my_ur = room.user_rooms.find(ur => ur.uid === uid);
-        let other: UserDto;
         if (!room.is_channel)
         {
             room['user'] = room.user_rooms.find(ur => ur.uid !== uid).user;
         }
 
         const jt = my_ur.joined_time;
-        const msgs = messages.filter((message) => {
-            delete message.room;
+        const msgs = room.messages.filter((message) => {
             return message.timestamp > jt;
         });
 
         delete room.user_rooms;
+        delete room.messages;
         return { room, msgs };
     }
 
