@@ -160,6 +160,8 @@ export const Chat:React.FC = () => {
 
         class_socket.socket.on("status_update", () =>{
             class_socket.get_chats();
+            if(searchParams.get("id") !== null)
+                class_socket.get_messages({id : searchParams.get("id")});
         })
         
         

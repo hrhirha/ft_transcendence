@@ -80,8 +80,8 @@ export class ChatService {
             delete r.user_rooms;
             return {room: r, usernames};
         });
-        await this._add_msg_to_db(user.id, {rid: ret.room.id, msg: `${user.username} created this room`}, msg_type.NOTIF);
-        return ret;
+        const m = await this._add_msg_to_db(user.id, {rid: ret.room.id, msg: `${user.username} created this room`}, msg_type.NOTIF);
+        return {ret, m};
     }
     
     async deleteRoom(user: UserDto, room: OldRoomDto)

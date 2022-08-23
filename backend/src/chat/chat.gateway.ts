@@ -95,11 +95,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
             sockets.forEach((s)=> {
                 console.log(`${s.data.username} joined`);
-                r.usernames.includes(s.data.username) && s.join(r.room.id);
+                r.ret.usernames.includes(s.data.username) && s.join(r.ret.room.id);
             });
 
             // this.server.to(r.room.id).emit('room_created', r.room);
-            client.emit('room_created', r.room);
+            client.emit('room_created', r.ret.room);
+            client.broadcast.to(r.ret.room.id).emit('receive_message', r.m);
         }
         catch (e)
         {
