@@ -5,9 +5,8 @@ import { io } from "socket.io-client";
 import { MatchCard } from "views/components/match_card/match_card";
 import { GameView } from "views/pages/game/game_view/game_view";
 
-const socket = io("ws://127.0.0.1:3001/game", {withCredentials: true});
-
 export const GameWatcher:React.FC = () =>  {
+    const [socket] = useState(io("ws://127.0.0.1:3001/game", {withCredentials: true}));
     const [ongoingMatchs, setMatchs] = useState<Array<Match>>([]);
     const [winner, setWinner] = useState<string>("");
     const [currentMatch, setCurrentMatch] = useState<number>(0);

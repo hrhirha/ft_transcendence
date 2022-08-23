@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
@@ -64,11 +64,11 @@ const ChatRoomFooter:React.FC<{send_message : Function}> = ({send_message}) => {
 
     return <div id="chatRoomFooter">
        <form id="messageForm">
-            <input type="text" placeholder="Type your Message Here" value={msg} onChange={(e)=>setMsg(e.target.value)}/>
+            <input type="text" placeholder="Type your Message Here" value={msg} onChange={(e)=>setMsg(e.target.value.trim() !== "" ? e.target.value : "")}/>
             <button id="sendMessage" onClick={(e) =>{
                 e.preventDefault();
-                send_message(msg);
-                setMsg("")
+                    send_message(msg.trim());
+                    setMsg("");
             }}>
                 <FontAwesomeIcon icon={faPaperPlane}/>
                 Send
@@ -80,25 +80,26 @@ const ChatRoomFooter:React.FC<{send_message : Function}> = ({send_message}) => {
 export const ChatRoom:React.FC<{roomId: string}> = ({roomId}) => {
     const [showSettings, setShowSettings] = useState(false);
     const navigate = useNavigate();
-    
     const class_socket = useContext(SocketContext);
-    const [messages, setmessages] = useState<msgs[]>();
+    const [messages, setmessages] = useState<msgs[]>([]);
     const [roominfo, setRoominfo] = useState<room_msgs>();
 
     useEffect(() => {
 
         class_socket.socket.on("messages", (data : messages)=>{
-            console.log("messages")
+            console.log("messages");
             console.log(data)
-            setmessages(data.msgs)
-            setRoominfo(data.room)
+            setmessages(data.msgs);
+            setRoominfo(data.room);
         })
 
         class_socket.socket.on("receive_message", (data : receive_message)=>{
             if (roomId != null && roomId == data.room.id)
             {
+                console.log("receive_message", data);
+                
                 if(messages != null)
-                    setmessages(oldData => [...oldData, data]);
+                    setmessages(oldData => [...oldData, data].sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp) ));
                 else
                     class_socket.get_messages({id : roomId});
             }

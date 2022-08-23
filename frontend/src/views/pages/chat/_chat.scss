@@ -133,7 +133,7 @@ main#chatPage {
         }
         
         .chatRooms {
-            overflow-y: scroll;
+            overflow-y: auto;
             max-height: calc(100vh - 17rem);
             margin-bottom: .5rem;
             

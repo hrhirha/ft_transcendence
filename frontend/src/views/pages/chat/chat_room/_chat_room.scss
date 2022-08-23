@@ -52,7 +52,7 @@ section#chatRoom {
         width: 100%;
         height: 100%;
         max-height: calc(100vh - 19.5rem);
-        overflow-y: scroll;
+        overflow-y: auto;
         padding-bottom: 1rem;
         @media (max-width: $xs) {
             max-height: none;

@@ -33,7 +33,6 @@ export const history = createBrowserHistory();
 
 const PongApp:React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
-    const [user, setUser] = useState<any>(null);
     const [hideNavBar, setHideNavBar] = useState<boolean>(true);
     const pushNotif = useNotif();
 
@@ -41,7 +40,7 @@ const PongApp:React.FC = () => {
       setHideNavBar(false);
       try {
           const me: User = await get_me();
-          setUser(me);
+          window.localStorage.setItem("user", JSON.stringify(me));
           if (history.location.pathname === "/login"
             || history.location.pathname === "/checkpoint")
             history.replace("/");
@@ -86,7 +85,7 @@ const PongApp:React.FC = () => {
     return (
       <SocketContext.Provider value={class_socket}>
           <Router history={history}>
-              {!hideNavBar && <NavBar user={user}/>}
+              {!hideNavBar && <NavBar/>}
               <Routes>
                   <Route path="/login" element={<Login/>}/>
                   <Route path="/checkpoint" element={<Checkpoint/>} />

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition, faHouse, faRankingStar, faComments, faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import { Brand } from "views/components/brand/brand";
@@ -84,7 +84,8 @@ const Menu:React.FC<{user: User}> = ({user}) => {
     );
 }
 
-export const NavBar:React.FC<{user: User}> = ({user}) => {
+export const NavBar:React.FC = () => {
+    const [user] = useState(JSON.parse(window.localStorage.getItem("user")));
     return (
         <header id="navbar" className="container-fluid">
             <div className="container">

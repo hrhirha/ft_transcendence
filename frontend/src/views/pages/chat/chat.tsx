@@ -4,11 +4,10 @@ import {faCommentMedical, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CreateNewChat } from "views/pages/chat/create_chat/create_chat";
 import { useContext, useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ChatHomeVector, NoConversations } from "assets";
 import { management_memeber, chats, dm_started, management_password, receive_message, room_created, user_joined, user_left, user_unbanned, user_muted, message_deleted, user_info, messages, dms, info_room, others } from "socket/interface";
 import { history, SocketContext } from "index";
-
 
 enum chatTabs {
     chats,
@@ -109,14 +108,12 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
 export const Chat:React.FC = () => {
     const [screenWidth, setScreenWidth] = useState<number>(window.innerWidth);
     const [showNewChatForm, setShowNewChatForm] = useState<boolean>(false);
-    const [searchParams] = useSearchParams();
     const [activeTab, setActiveTab] = useState<chatTabs>(chatTabs.chats);
     const class_socket = useContext(SocketContext);
     const [chatRooms, setchatRooms] = useState<chats>();
     const [filteredrooms, setFilteredRooms] = useState<chats>();
     const navigate = useNavigate();
-
-
+    const [activeChatId, setActiveChatId] = useState<string | null>(null);
 
     const filterSearch = (e) =>{
         e.preventDefault();
@@ -130,20 +127,24 @@ export const Chat:React.FC = () => {
             }
         })
     }
-
+    useEffect(() => {
+        if (history.location.search)
+        {
+            if (history.location.search.split("=")[0] === "?id")
+                setActiveChatId(history.location.search.split("=")[1]);
+        }
+    }, [history.location.search])
     //test -----
     useEffect(() => {
 
         class_socket.get_chats();
 
         class_socket.socket.on("dm_started", (data : dm_started)=>{
-           
             setShowNewChatForm(false);
             navigate({
                 pathname: '/chat',
                 search: `?id=${data.room.id}`,
             }, {replace: true});
-            searchParams.set("id", data.room.id);
             class_socket.get_chats();
         })
         
@@ -153,25 +154,24 @@ export const Chat:React.FC = () => {
                 pathname: '/chat',
                 search: `?id=${data.id}`,
             }, {replace: true});
-            searchParams.set("id", data.id);
             class_socket.get_chats();
             
         })
 
         class_socket.socket.on("status_update", () =>{
             class_socket.get_chats();
-            if(searchParams.get("id") !== null)
-                class_socket.get_messages({id : searchParams.get("id")});
+            if(activeChatId !== null)
+                class_socket.get_messages({id : activeChatId});
         })
         
         
         class_socket.socket.on("chats", (data : chats)=>{ 
             setchatRooms(data);
-            if(data.dms.find(d => d.room.id === searchParams.get("id")))
+            if(data.dms.find(d => d.room.id === activeChatId))
                 setActiveTab(chatTabs.chats)
-            else if(data.rooms.find(d => d.id === searchParams.get("id")))
+            else if(data.rooms.find(d => d.id === activeChatId))
                 setActiveTab(chatTabs.joinedGroups)
-            else if(data.others.find(d => d.id === searchParams.get("id")))
+            else if(data.others.find(d => d.id === activeChatId))
                 setActiveTab(chatTabs.otherGroups)
             })
       
@@ -315,7 +315,7 @@ export const Chat:React.FC = () => {
             
             <div className='container'>
                 <div className="row chat">
-                    {((screenWidth < 767.98 && !showNewChatForm && searchParams.get("id") === null)
+                    {((screenWidth < 767.98 && !showNewChatForm && activeChatId === null)
                         || screenWidth >= 767.98) && <div className="col-sm-12 col-md-5 col-lg-4 chats">
                         <div className="chatOptions">
                             <form id="chatSearch" onSubmit={(e) => e.preventDefault()}>
@@ -347,14 +347,14 @@ export const Chat:React.FC = () => {
                             <ListChats
                                 tab={activeTab}
                                 onSelectItem={() => setShowNewChatForm(false)}
-                                activeChat={searchParams.get("id")}
+                                activeChat={activeChatId}
                                 rooms={(filteredrooms != null) ? filteredrooms :chatRooms }/>
                         </div>
                     </div>}
-                    {((screenWidth < 767.98 && (showNewChatForm || searchParams.get("id") !== null))
+                    {((screenWidth < 767.98 && (showNewChatForm || activeChatId !== null))
                         || screenWidth >= 767.98) && <div className="col room">
-                        {!showNewChatForm && searchParams.get("id") === null && <ChatHome onClick={() => setShowNewChatForm(true)}/>}
-                        {!showNewChatForm && searchParams.get("id") !== null && <ChatRoom roomId={searchParams.get("id")!} />}
+                        {!showNewChatForm && activeChatId === null && <ChatHome onClick={() => setShowNewChatForm(true)}/>}
+                        {!showNewChatForm && activeChatId !== null && <ChatRoom roomId={activeChatId} />}
                         {showNewChatForm && <CreateNewChat onClose={() => setShowNewChatForm(false)}/>}
                     </div>}
                 </div>
