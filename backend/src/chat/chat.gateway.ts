@@ -60,6 +60,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             client.data.username = user.username;
             const rooms = await this._chat.newConnection(user);
             client.join(rooms);
+            client.broadcast.emit('status_update');
         }
         catch (e)
         {
@@ -77,6 +78,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             return;
 
         await this._userS.updateStatus(user.id, user_status.OFFLINE);
+        client.broadcast.emit('status_update');
     }
 
     @SubscribeMessage('create_room') // _add_msg_to_db(msg_type.NOTIF);

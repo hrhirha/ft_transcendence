@@ -167,7 +167,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
             </button>}
             <div className="profileData">
                 <div className="avatar">
-                    <CircleAvatar avatarURL={(userImage && URL.createObjectURL(userImage)) || userInfos?.imageUrl} dimensions={120} showStatus={false}/>
+                    <CircleAvatar avatarURL={(userImage && URL.createObjectURL(userImage)) || userInfos?.imageUrl} dimensions={120} status={null}/>
                     <span className="achievement"><img src={userInfos.rank.icon} title={userInfos.rank.title} alt="achievement" /></span>
                     {editMode && <span className="editAvatar" title="Change Your Avatar" onClick={updateAvatar}>
                         <FontAwesomeIcon icon={faCameraRotate}/>

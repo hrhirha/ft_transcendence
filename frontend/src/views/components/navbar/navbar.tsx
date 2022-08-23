@@ -54,7 +54,7 @@ const ProfileNavBtn:React.FC<{picture: string}> = ({picture}) => {
                 id="profileNavBtn"
                 className={location.pathname === "/profile" ? "active" : undefined}
                 title="Profile" to="/profile">
-                    <CircleAvatar avatarURL={picture} dimensions={45} showStatus={false}/>
+                    <CircleAvatar avatarURL={picture} dimensions={45} status = {null}/>
             </NavLink>
             <FontAwesomeIcon onClick={() => {
                 pushNotif({

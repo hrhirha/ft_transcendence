@@ -18,7 +18,7 @@ const PlayerData:React.FC<{player: User, left: boolean, winner: boolean}> = ({pl
             {!left && <h6 className="fullName">{player.fullName}</h6>}
             <div className="avatar">
                 {winner && <img src={WinnerCrown} alt="winner" className="winner_crown"/>}
-                <CircleAvatar avatarURL={player.imageUrl} dimensions={60} showStatus={false}/>
+                <CircleAvatar avatarURL={player.imageUrl} dimensions={60} status = {null}/>
                 <span className="achievment" title={player.rank.title}>
                     <img src={player.rank.icon} alt={player.rank.title}/>
                 </span>

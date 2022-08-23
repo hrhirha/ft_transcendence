@@ -16,12 +16,13 @@ interface Props {
     joined: boolean,
     active: boolean,
     onClick: Function,
+    status?: string,
 }
 
 export const ChatRoomItem = (Props : Props) => {
   return (
     <div id='chatRoomItem' onClick={() => Props.onClick()} className={Props.active ? 'active' : undefined}>
-      <CircleAvatar avatarURL={Props.avatar} dimensions={40} showStatus={!Props.isChannel}/>
+      <CircleAvatar avatarURL={Props.avatar} dimensions={40} status ={Props.status}/>
       <div className='dataColumn'>
         <div className='dataRow'>
           <h6 className='userName'>{Props.fullName}</h6>

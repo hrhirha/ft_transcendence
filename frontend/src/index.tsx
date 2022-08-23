@@ -12,11 +12,15 @@ import { GamePlayer } from 'views/pages/game/game_player/game_player';
 import { GameWatcher } from 'views/pages/game/game_watcher/game_watcher';
 import { createBrowserHistory } from "history";
 import { get_me, User } from 'controller/user/user';
-import { Notif } from 'views/components/notif/notif';
+import { Notif, useNotif } from 'views/components/notif/notif';
 import { Loading } from 'views/components/loading/loading';
 import { NavBar } from 'views/components/navbar/navbar';
 import { Socket } from "socket";
 import "views/style/index.scss";
+import { receive_message } from 'socket/interface';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faClose } from '@fortawesome/free-solid-svg-icons';
+import { CircleAvatar } from 'views/components/circle_avatar/circle_avatar';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -31,6 +35,7 @@ const PongApp:React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [user, setUser] = useState<any>(null);
     const [hideNavBar, setHideNavBar] = useState<boolean>(true);
+    const pushNotif = useNotif();
 
     const authCheck = async (path) => {
       setHideNavBar(false);
@@ -55,13 +60,31 @@ const PongApp:React.FC = () => {
         console.log(action, location.pathname);
       });
       authCheck(history.location.pathname);
+
+
+    class_socket.socket.on("receive_message", (data : receive_message)=>{
+      if (history.location.pathname !== "/chat")
+      {
+        console.log(data.user.status);
+        pushNotif({
+          id: data.room.id,
+          type: "info",
+          icon: data.room.is_channel ? <FontAwesomeIcon icon={faClose}/> : <CircleAvatar avatarURL={data.user.imageUrl} dimensions={15} status={"ONLINE"} />,
+          title: (data.room.is_channel ? "Channel" : data.user.fullName),
+          description: data.msg,
+          actions: [
+            {title: "Show Message", color: "#6970d4", action: () => history.replace(`/chat?id=${data.room.id}`)},
+          ]
+      });
+      }
+    })
+    
     }, []);
 
     if (loading)
       return <Loading width="100vw" height="100vh"/>;
     return (
       <SocketContext.Provider value={class_socket}>
-        <Notif>
           <Router history={history}>
               {!hideNavBar && <NavBar user={user}/>}
               <Routes>
@@ -78,11 +101,13 @@ const PongApp:React.FC = () => {
                   <Route path="*" element={<NotFound/>} />
               </Routes>
           </Router>
-        </Notif>
       </SocketContext.Provider>
     );
 }
 
 root.render(
-  <PongApp />
+
+  <Notif>
+    <PongApp />
+  </Notif>
 );

@@ -13,7 +13,7 @@ export const ChatRoomSettings:React.FC<{roomId: string, onClose: Function}> = ({
             <div className="roomSettings">
                 <span className="closeSettings" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
                 <div className="chatInfos user" onClick={() => alert(`Go To Profile`)}>
-                    <CircleAvatar avatarURL="https://i.pravatar.cc/100" dimensions={100} showStatus={false}/>
+                    <CircleAvatar avatarURL="https://i.pravatar.cc/100" dimensions={100} status={null}/>
                     <input type="text" placeholder="Channel title" disabled className="channelTitle" value="Channel Title"/>
                     {/* <input type="password" placeholder="Channel password" className="channelTitle"/> */}
                     <p>

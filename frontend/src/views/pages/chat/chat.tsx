@@ -87,6 +87,7 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
             <ChatRoomItem
                 key={index}
                 isChannel={false}
+                status = {dms.user.status}
                 joined={true}
                 avatar={dms.user.imageUrl}
                 fullName={dms.user.fullName}
@@ -156,6 +157,11 @@ export const Chat:React.FC = () => {
             class_socket.get_chats();
             
         })
+
+        class_socket.socket.on("status_update", () =>{
+            class_socket.get_chats();
+        })
+        
         
         class_socket.socket.on("chats", (data : chats)=>{ 
             setchatRooms(data);

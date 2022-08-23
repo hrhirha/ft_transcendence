@@ -7,7 +7,7 @@ import { useNotif } from "views/components/notif/notif";
 
 const SuggestionCard:React.FC<{avatar: string, fullName: string, username: string, status: string, onClick: Function}> = ({avatar, fullName, username, status, onClick}) => {
     return <div className="suggestionCard" onClick={() => onClick()}>
-        <CircleAvatar dimensions={42} avatarURL={avatar} showStatus={false}/>
+        <CircleAvatar dimensions={42} avatarURL={avatar} status={null}/>
         <div className="userInfos">
             <h6>{fullName}</h6>
             <span>@{username}</span>

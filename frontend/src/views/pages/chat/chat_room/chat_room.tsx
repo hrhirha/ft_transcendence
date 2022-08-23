@@ -30,7 +30,7 @@ const ChatRoomHeader = (Props : HeaderProps) => {
             else
                 navigate(`/u/${Props.username}`);
             }}>
-            <CircleAvatar avatarURL={Props.image} dimensions={45} showStatus={(Props.status != "Channel")}/>
+            <CircleAvatar avatarURL={Props.image} dimensions={45} status={(Props.status !== "Channel" ? Props.status : null)}/>
             <div className='dataRow'>
                 <span className='userName'>{Props.fullName}</span>
                 <span className='status'>{Props.status}</span>

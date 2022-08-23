@@ -8,7 +8,7 @@ import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 
 const SuggestionCard:React.FC<{avatar: string, fullName: string, onClick: Function}> = ({avatar, fullName, onClick}) => {
     return <div className="suggestionCard" onClick={() => onClick()}>
-        <CircleAvatar dimensions={20} avatarURL={avatar} showStatus={false}/>
+        <CircleAvatar dimensions={20} avatarURL={avatar} status = {null}/>
         <h6>{fullName}</h6>
     </div>;
 }

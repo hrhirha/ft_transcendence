@@ -21,7 +21,7 @@ const validPassword = (password: string) => {
 const UserCheckedCard:React.FC<{avatar: string, fullName: string, onRemove: Function}> = ({avatar, fullName, onRemove}) => {
     return <div className="userCheckedCard">
         <span className="userInfos">
-            <CircleAvatar dimensions={25} avatarURL={avatar} showStatus={false}/>
+            <CircleAvatar dimensions={25} avatarURL={avatar} status={null}/>
             <h4>{fullName}</h4>
         </span>
         <FontAwesomeIcon icon={faClose} onClick={() => onRemove()} />

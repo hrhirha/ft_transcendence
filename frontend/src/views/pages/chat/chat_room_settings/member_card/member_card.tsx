@@ -14,7 +14,7 @@ export const  MemeberCard:React.FC<{
   return (
       <div className="memberCard">
          <div className='userData' onClick={() => onClick()}>
-            <CircleAvatar avatarURL={avatar} dimensions={45} showStatus={true}/>
+            <CircleAvatar avatarURL={avatar} dimensions={45} status={null}/>
             <div className="dataRow">
                 <span className="fullName">
                     {fullName}
@@ -29,11 +29,11 @@ export const  MemeberCard:React.FC<{
               <SettingsOption icon={faGamepad} title="Play Match"
                   subOptions={[
                       <div onClick={() => alert("Play Normal Game")} title="Normal Game" >
-                          <CircleAvatar avatarURL={DefaultGame} dimensions={20} showStatus={false}/>
+                          <CircleAvatar avatarURL={DefaultGame} dimensions={20} status={null}/>
                           Normal Game
                       </div>,
                       <div onClick={() => alert("Play Ultimate Game")} title="Ultimate Game" >
-                          <CircleAvatar avatarURL={UltimateGame} dimensions={20} showStatus={false}/>
+                          <CircleAvatar avatarURL={UltimateGame} dimensions={20} status={null}/>
                           Ultimate Game
                       </div>
                   ]}/>

@@ -6,7 +6,7 @@ interface Props {
     dimensions: number,
     borderWidth?: number,
     borderColor?: string,
-    showStatus: boolean,
+    status?: string,
 }
 
 export const CircleAvatar:React.FC<Props> = (Props) => {
@@ -16,5 +16,5 @@ export const CircleAvatar:React.FC<Props> = (Props) => {
     maxWidth: Props.dimensions,
     maxHeight: Props.dimensions,
     borderWidth: Props.borderWidth,
-    borderColor: Props.borderColor}}>{Props.showStatus && <i className="status online"></i>}</span>);
+    borderColor: Props.borderColor}}>{Props.status && <i className={`status ${Props.status.toLowerCase()}`}></i>}</span>);
 }
