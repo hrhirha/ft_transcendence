@@ -475,6 +475,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
+        this.server.to(client.data.obj.roomId).emit("updateScore", {
+            score1: 0,
+            score2: 0,
+        });
         client.data.obj.roomId = d.newRoom;
         client.leave(d.oldData.roomId);
         client.join(d.newRoom);

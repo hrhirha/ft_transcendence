@@ -339,14 +339,9 @@ export default class PingPong extends Phaser.Scene
                     }
                     if (this.ball && this.data.player === "player2")
                     {
-                        this.ball.x = data.ballx;
-                        this.ball.y = data.bally;
+                        this.ball.x = data.ballx + 20;
+                        this.ball.y = data.bally + 20;
                     }
-                    // if (this.data.player === "player2" && (this.rightScore !== data.rScore || this.leftScore !== data.lScore))
-                    // {
-                    //     this.rightScore = data.rScore;
-                    //     this.leftScore = data.lScore;
-                    // }
                 }
             });
         }
@@ -442,7 +437,6 @@ export default class PingPong extends Phaser.Scene
             this.imgbg = (this.type === "normaleQue") ? "normalField" : "ultimateField";
         this.imgbg = ( this.mapUrl ) ? "backGround": this.imgbg;
         this.bg = this.add.image(this.w / 2, this.h / 2, this.imgbg);
-        console.log(this.bg.width, this.bg.height);
         /////////////////////////////// text ////////////////////////
 
         if (!this.isPlayer && this.connection)
@@ -542,10 +536,10 @@ export default class PingPong extends Phaser.Scene
             if (this.isPlayer)
                 this.mobile = true;
         // loading a ball add sprite to the 
-        this.posx = (this.data.player === "player1") ? 30: this.w - (145 * this.paddleScale) - 30 ;
-        this.eposx = (this.data.player !== "player1") ? 30: this.w - (145 * this.paddleScale) - 30 ;
+        this.posx = (this.data.player === "player1") ? 30 : this.w - (100 * this.paddleScale) - 30 ;
+        this.eposx = (this.data.player !== "player1") ? 30 : this.w - (100 * this.paddleScale) - 30 ;
         this.posy = ( ( (this.h / 2) - (this.h / 3) ) / 2) + (this.h / 3);
-
+        
         this.createBall();
         if (this.data.player === "player1")
             this.paddle = this.add.sprite(this.posx, this.posy, 'paddle').setOrigin(0,0);
@@ -553,10 +547,13 @@ export default class PingPong extends Phaser.Scene
             this.paddle = this.add.sprite((this.w - (100 * this.paddleScale) - 30) , this.posy, 'paddle').setOrigin(0,0);
         this.paddle.setScale(this.paddleScale); // scale the sprit
         this.physics.add.existing(this.paddle, true); // set the physicss to paddle !!
-        this.physics.add.collider(this.paddle, this.ball); // set the collider with paddle and the ball 
+        this.physics.add.collider(this.paddle, this.ball, function () {
+            console.log("paddle");
+       }); // set the collider with paddle and the ball
+
         // create enemy 
         this.createEnemy(this.paddle.width);
-        // get the input from the user using "phaser-user-input-system"
+
     }
 
     createEnemy(w: number) : void
@@ -567,7 +564,9 @@ export default class PingPong extends Phaser.Scene
             this.enemy = this.add.sprite(30, this.posy, 'paddle').setOrigin(0,0);
         this.enemy.setScale(this.paddleScale); // scale the sprit
         this.physics.add.existing(this.enemy, true); // set the physicss to paddle !!
-        this.physics.add.collider(this.enemy, this.ball);
+        this.physics.add.collider(this.enemy, this.ball, function () {
+            console.log("enemy");
+        });
     }
     
     resetball() : void
@@ -636,16 +635,14 @@ export default class PingPong extends Phaser.Scene
 
     update () : void
     {
-        
         // if (this.soc.disconnected)
         // {
-        //     this.add.text(this.w / 2, this.h / 2.5, 'the Server Is Down !!', { fontSize: "60px", 
-        //     fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
-        //     this.scene.pause();
+            //     this.add.text(this.w / 2, this.h / 2.5, 'the Server Is Down !!', { fontSize: "60px", 
+            //     fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
+            //     this.scene.pause();
         // }
         if (this.exitEmited || this.goal || !this.gameIsStarted || !this.isPlayer || this.map)
             return ;
-
         // ///// check For the  movment ////////////////
         if (this.desktop && !this.End)
         {
