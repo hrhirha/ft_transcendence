@@ -442,7 +442,7 @@ export default class PingPong extends Phaser.Scene
             this.imgbg = (this.type === "normaleQue") ? "normalField" : "ultimateField";
         this.imgbg = ( this.mapUrl ) ? "backGround": this.imgbg;
         this.bg = this.add.image(this.w / 2, this.h / 2, this.imgbg);
-
+        console.log(this.bg.width, this.bg.height);
         /////////////////////////////// text ////////////////////////
 
         if (!this.isPlayer && this.connection)
@@ -573,12 +573,12 @@ export default class PingPong extends Phaser.Scene
     resetball() : void
     {
         this.ball.setPosition(this.w / 2, this.h / 2)
+        this.ball.setCollideWorldBounds(true, 1, 1); // set the bounce with world
         if (this.data.player === "player1")
         {
             const arr= [45, -45, 135, -135];
             const ran = Phaser.Math.Between(0, 3);
             this.ball.setBounce(1, 1); // set the bounce effect to the ball 
-            this.ball.setCollideWorldBounds(true, 1, 1); // set the bounce with world
             const vec = this.physics.velocityFromAngle(arr[ran], this.ballspeed);
             this.ball.body.setVelocity(vec.x, vec.y); // set the velocity to the ball
             // this.physics.accelerateTo(this.ball, this.ball.x, this.ball.y,this.ballspeed + 100);
