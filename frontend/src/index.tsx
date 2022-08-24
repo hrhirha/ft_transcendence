@@ -15,9 +15,9 @@ import { get_me, User } from 'controller/user/user';
 import { Notif, useNotif } from 'views/components/notif/notif';
 import { Loading } from 'views/components/loading/loading';
 import { NavBar } from 'views/components/navbar/navbar';
-import { Socket } from "socket";
+import { ChatSocket } from "chat_socket";
 import "views/style/index.scss";
-import { receive_message } from 'socket/interface';
+import { receive_message } from 'chat_socket/interface';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClose } from '@fortawesome/free-solid-svg-icons';
 import { CircleAvatar } from 'views/components/circle_avatar/circle_avatar';
@@ -27,9 +27,14 @@ const root = ReactDOM.createRoot(
 );
 
 export const SocketContext = createContext(null); //create socket context
-const class_socket = new Socket();  //create object in socket class
-
 export const history = createBrowserHistory();
+const class_socket = new ChatSocket();
+
+export const getIDQuery = () => {
+  const searchParams = new URLSearchParams(history.location.search);
+  return searchParams.get('id');
+}
+
 
 const PongApp:React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -44,40 +49,37 @@ const PongApp:React.FC = () => {
           if (history.location.pathname === "/login"
             || history.location.pathname === "/checkpoint")
             history.replace("/");
-          }
+      }
       catch(err: any) {
           if (path !== "/login" && path !== "/checkpoint")
-            window.open("/login", '_self');
+            history.replace("/login");
           setHideNavBar(true);
       }
       setLoading(false);
     }
     
     useEffect(() => {
+      authCheck(history.location.pathname);
       history.listen(async ({ action, location }) => {
         await authCheck(location.pathname);
         console.log(action, location.pathname);
       });
-      authCheck(history.location.pathname);
-
-
-    class_socket.socket.on("receive_message", (data : receive_message)=>{
-      if (history.location.pathname !== "/chat")
-      {
-        console.log(data.user.status);
-        pushNotif({
-          id: data.room.id,
-          type: "info",
-          icon: data.room.is_channel ? <FontAwesomeIcon icon={faClose}/> : <CircleAvatar avatarURL={data.user.imageUrl} dimensions={15} status={"ONLINE"} />,
-          title: (data.room.is_channel ? "Channel" : data.user.fullName),
-          description: data.msg,
-          actions: [
-            {title: "Show Message", color: "#6970d4", action: () => history.replace(`/chat?id=${data.room.id}`)},
-          ]
-      });
-      }
-    })
-    
+      class_socket.socket.on("receive_message", (data : receive_message)=>{
+        if (history.location.pathname !== "/chat")
+        {
+          console.log(data.user.status);
+          pushNotif({
+            id: data.room.id,
+            type: "info",
+            icon: data.room.is_channel ? <FontAwesomeIcon icon={faClose}/> : <CircleAvatar avatarURL={data.user.imageUrl} dimensions={15} status={"ONLINE"} />,
+            title: (data.room.is_channel ? "Channel" : data.user.fullName),
+            description: data.msg,
+            actions: [
+              {title: "Show Conversation", color: "#6970d4", action: () => history.replace(`/chat?id=${data.room.id}`)},
+            ]
+        });
+        }
+      })
     }, []);
 
     if (loading)
@@ -105,7 +107,6 @@ const PongApp:React.FC = () => {
 }
 
 root.render(
-
   <Notif>
     <PongApp />
   </Notif>

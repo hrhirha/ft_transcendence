@@ -168,9 +168,8 @@ section.matchCard {
             }
         }
         .score {
-            font-size: $fsize * 1.75;
+            font-size: $fsize * 1.5;
             font-family: $BFont;
-            margin: auto 1rem;
             width: 2rem;
             text-align: center;
             @media (max-width: $lg)

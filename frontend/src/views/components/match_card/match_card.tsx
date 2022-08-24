@@ -29,6 +29,7 @@ const PlayerData:React.FC<{player: User, left: boolean, winner: boolean}> = ({pl
 }
 
 export const MatchCard:React.FC<{match: Match, winnerId?: string}> = ({match, winnerId}) => {
+    console.log(match.is_ultimate);
     return (
     <section className="matchCard" id={match.id}>
 

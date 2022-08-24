@@ -1,4 +1,4 @@
-import io from "socket.io-client";
+import io, { Socket } from "socket.io-client";
 
 interface info_create_room {
     name:  string,
@@ -49,8 +49,8 @@ interface remove_password {
     old_password : string,
 }
 
-export class Socket {
-    socket : any;
+export class ChatSocket {
+    socket : Socket;
     
     constructor() {
         this.socket = io("ws://127.0.0.1:3001/chat",{

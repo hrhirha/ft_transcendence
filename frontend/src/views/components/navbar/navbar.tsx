@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition, faHouse, faRankingStar, faComments, faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import { Brand } from "views/components/brand/brand";
-import { NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { User } from "controller/user/user";
 import { useNotif } from "views/components/notif/notif";
 import { logout } from "controller/auth/auth";
+import { SocketContext } from "index";
 
 interface NavButtonData {
     icon: IconDefinition,
@@ -36,26 +37,26 @@ const NavButton:React.FC<{element: NavButtonData}> = ({element}) => {
     const location = useLocation();
 
     return (
-        <NavLink replace={true} to={element.url} id="navBtn" className={location.pathname === element.url ? "active" : undefined} title={element.title} >
+        <Link to={element.url} id="navBtn" className={location.pathname === element.url ? "active" : undefined} title={element.title} >
             <FontAwesomeIcon icon={element.icon}/>
             <h3>{element.title}</h3>
-        </NavLink>
+        </Link>
     );
 }
 
 const ProfileNavBtn:React.FC<{picture: string}> = ({picture}) => {
     const location = useLocation();
     const pushNotif = useNotif();
-
+    const class_socket = useContext(SocketContext);
 
     return (
         <div className="logoutAndProfile">
-            <NavLink
+            <Link
                 id="profileNavBtn"
                 className={location.pathname === "/profile" ? "active" : undefined}
                 title="Profile" to="/profile">
                     <CircleAvatar avatarURL={picture} dimensions={45} status = {null}/>
-            </NavLink>
+            </Link>
             <FontAwesomeIcon onClick={() => {
                 pushNotif({
                     id: "LOGOUTCONFIRMATION",
@@ -65,6 +66,7 @@ const ProfileNavBtn:React.FC<{picture: string}> = ({picture}) => {
                     description:"Are you sure want to logout ?",
                     actions: [{title: "Logout now", color: "#6970d4", action: async () => {
                         await logout();
+                        class_socket.socket.disconnect();
                         document.location = "/";
                     }}] 
                 });
@@ -91,9 +93,9 @@ export const NavBar:React.FC = () => {
             <div className="container">
                 <div className="row">
                     <span id="brand" className='col col-md-3'>
-                        <NavLink  replace={true} to="/" >
+                        <Link to="/" >
                             <Brand/>
-                        </NavLink>
+                        </Link>
                     </span>
                     <nav id="Menu" className='col'>
                         <Menu user={user}/>

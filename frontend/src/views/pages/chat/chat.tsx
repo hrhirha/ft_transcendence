@@ -3,11 +3,11 @@ import  {ChatRoomItem }  from "views/pages/chat/chatroom_item/chatroom_item";
 import {faCommentMedical, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CreateNewChat } from "views/pages/chat/create_chat/create_chat";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChatHomeVector, NoConversations } from "assets";
-import { management_memeber, chats, dm_started, management_password, receive_message, room_created, user_joined, user_left, user_unbanned, user_muted, message_deleted, user_info, messages, dms, info_room, others } from "socket/interface";
-import { history, SocketContext } from "index";
+import { management_memeber, chats, dm_started, management_password, receive_message, room_created, user_joined, user_left, user_unbanned, user_muted, message_deleted, user_info, messages, dms, info_room, others } from "chat_socket/interface";
+import { getIDQuery, history, SocketContext } from "index";
 
 enum chatTabs {
     chats,
@@ -113,7 +113,6 @@ export const Chat:React.FC = () => {
     const [chatRooms, setchatRooms] = useState<chats>();
     const [filteredrooms, setFilteredRooms] = useState<chats>();
     const navigate = useNavigate();
-    const [activeChatId, setActiveChatId] = useState<string | null>(null);
 
     const filterSearch = (e) =>{
         e.preventDefault();
@@ -127,13 +126,6 @@ export const Chat:React.FC = () => {
             }
         })
     }
-    useEffect(() => {
-        if (history.location.search)
-        {
-            if (history.location.search.split("=")[0] === "?id")
-                setActiveChatId(history.location.search.split("=")[1]);
-        }
-    }, [history.location.search])
     //test -----
     useEffect(() => {
 
@@ -160,23 +152,22 @@ export const Chat:React.FC = () => {
 
         class_socket.socket.on("status_update", () =>{
             class_socket.get_chats();
-            if(activeChatId !== null)
-                class_socket.get_messages({id : activeChatId});
+            if(getIDQuery() !== null)
+                class_socket.get_messages({id : getIDQuery()});
         })
         
         
         class_socket.socket.on("chats", (data : chats)=>{ 
             setchatRooms(data);
-            if(data.dms.find(d => d.room.id === activeChatId))
-                setActiveTab(chatTabs.chats)
-            else if(data.rooms.find(d => d.id === activeChatId))
-                setActiveTab(chatTabs.joinedGroups)
-            else if(data.others.find(d => d.id === activeChatId))
-                setActiveTab(chatTabs.otherGroups)
-            })
-      
+            if(data.dms.find(d => d.room.id ===  getIDQuery()))
+                setActiveTab(chatTabs.chats);
+            else if(data.rooms.find(d => d.id ===  getIDQuery()))
+                setActiveTab(chatTabs.joinedGroups);
+            else if(data.others.find(d => d.id ===  getIDQuery()))
+                setActiveTab(chatTabs.otherGroups);
+        })
         class_socket.socket.on("receive_message", (data : receive_message)=>{
-            class_socket.get_chats();
+             class_socket.get_chats();
         })
         
         //on mount
@@ -315,7 +306,7 @@ export const Chat:React.FC = () => {
             
             <div className='container'>
                 <div className="row chat">
-                    {((screenWidth < 767.98 && !showNewChatForm && activeChatId === null)
+                    {((screenWidth < 767.98 && !showNewChatForm &&  getIDQuery() === null)
                         || screenWidth >= 767.98) && <div className="col-sm-12 col-md-5 col-lg-4 chats">
                         <div className="chatOptions">
                             <form id="chatSearch" onSubmit={(e) => e.preventDefault()}>
@@ -347,14 +338,14 @@ export const Chat:React.FC = () => {
                             <ListChats
                                 tab={activeTab}
                                 onSelectItem={() => setShowNewChatForm(false)}
-                                activeChat={activeChatId}
+                                activeChat={ getIDQuery()}
                                 rooms={(filteredrooms != null) ? filteredrooms :chatRooms }/>
                         </div>
                     </div>}
-                    {((screenWidth < 767.98 && (showNewChatForm || activeChatId !== null))
+                    {((screenWidth < 767.98 && (showNewChatForm ||  getIDQuery() !== null))
                         || screenWidth >= 767.98) && <div className="col room">
-                        {!showNewChatForm && activeChatId === null && <ChatHome onClick={() => setShowNewChatForm(true)}/>}
-                        {!showNewChatForm && activeChatId !== null && <ChatRoom roomId={activeChatId} />}
+                        {!showNewChatForm &&  getIDQuery() === null && <ChatHome onClick={() => setShowNewChatForm(true)}/>}
+                        {!showNewChatForm &&  getIDQuery() !== null && <ChatRoom/>}
                         {showNewChatForm && <CreateNewChat onClose={() => setShowNewChatForm(false)}/>}
                     </div>}
                 </div>

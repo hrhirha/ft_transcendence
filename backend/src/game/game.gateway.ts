@@ -369,6 +369,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         let connection =  await this.prisma.game.create({
             data: {
                 map: "normalField",
+                is_ultimate: false,
                 user_game:
                 {
                     createMany: {
@@ -443,6 +444,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         let connection =  await this.prisma.game.create({
             data: {
                 map: mapUrl,
+                is_ultimate: true,
                 user_game:
                 {
                     createMany: {
@@ -512,6 +514,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         let connection =  await this.prisma.game.create({
             data: {
                 map: mapUrl,
+                is_ultimate: (type === "ultimateQue") ? true: false,
                 user_game:
                 {
                     createMany: {

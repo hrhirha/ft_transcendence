@@ -24,6 +24,7 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
     });
     
     useEffect(() => {
+        socket.connect();
         const unblock = history.block((tx) => {
             pushNotif({
                 id: "LEAVEGAME",
@@ -45,19 +46,23 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
     }, []);
 
     useEffect(() => {
-        if (socket.connected)
-        {
-            socket.on("matchWinner", (win) => {
-                setWinner(win);
-            }).on("updateScore", (score) => {
-                setMatchData(oldData => ({...oldData, score: {p1: score.score1, p2: score.score2}}));
-            }).on("waiting", (players) => {
-                setMatchData(oldData => ({...oldData, p1: players.p1}));
-            }).on("joined", (players) => {
-                console.log(players);
-                setMatchData(oldData => ({...oldData, p1: players.p1, p2: players.p2}));
-            });
-        }
+        socket.on("matchWinner", (win) => {
+            setWinner(win);
+        })
+        .on("leaveTheGame", () => {
+            
+        })
+        .on("keepWatching", () => {
+            setWinner("");
+        })
+        .on("updateScore", (score) => {
+            setMatchData(oldData => ({...oldData, score: {p1: score.score1, p2: score.score2}}));
+        }).on("waiting", (players) => {
+            setMatchData(oldData => ({...oldData, p1: players.p1}));
+        }).on("joined", (players) => {
+            console.log(players);
+            setMatchData(oldData => ({...oldData, p1: players.p1, p2: players.p2}));
+        });
     }, [socket]);
     return (
         <main id="gamePage" className="container">
