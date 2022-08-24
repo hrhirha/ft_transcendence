@@ -293,7 +293,6 @@ export default class PingPong extends Phaser.Scene
                 this.waiting = this.add.text(this.w / 2 , this.h / 2 + 150 , "Waiting ...", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setOrigin(0.5);
             });
             this.soc.on("restart", (img) => {
-                console.log("hererer");
                 this.add.image(this.w/2, this.h/2 - 100, img).setOrigin(0.5).setScale(0.4);
                 this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 85, 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
                 this.restartText = this.add.text(this.w / 2 , this.h / 2 + 85 , "Replay", { fontSize: "35px",
@@ -366,9 +365,9 @@ export default class PingPong extends Phaser.Scene
     {
         if (this.replayClick)
             return ;
-        // this.soc.removeAllListeners();
         this.replayClick = true;
         this.gameIsStarted = false;
+        this.End = false;
         this.rightScore = 4;
         this.leftScore = 4;
         this.connection = true;
@@ -448,6 +447,7 @@ export default class PingPong extends Phaser.Scene
 
         if (!this.isPlayer && this.connection)
         {
+            this.End = false;
             this.connection = false;
             this.soc.emit("watcher", this.roomId);
         }
@@ -549,8 +549,8 @@ export default class PingPong extends Phaser.Scene
         this.createBall();
         if (this.data.player === "player1")
             this.paddle = this.add.sprite(this.posx, this.posy, 'paddle').setOrigin(0,0);
-        else 
-            this.paddle = this.add.sprite((this.w - (44 * this.paddleScale) - 30) , this.posy, 'paddle').setOrigin(0,0);
+        else
+            this.paddle = this.add.sprite((this.w - (100 * this.paddleScale) - 30) , this.posy, 'paddle').setOrigin(0,0);
         this.paddle.setScale(this.paddleScale); // scale the sprit
         this.physics.add.existing(this.paddle, true); // set the physicss to paddle !!
         this.physics.add.collider(this.paddle, this.ball); // set the collider with paddle and the ball 
@@ -740,8 +740,9 @@ export default class PingPong extends Phaser.Scene
             });
         }
         //////       check For the goals    //////////
-        if ( this.data.is_player && !this.End && this.ball && (this.ball.x < 0 ||   (this.data.player === "player2" && (this.ball.x - 20 ) < 0 )))
+        if ( this.data.is_player && !this.End && this.ball && (this.ball.x < 0 || (this.data.player === "player2" && (this.ball.x - 20 ) < 0 )))
         {
+
             /******************* add score for the leftUser *******************************/
             this.rightScore += 1;
             /******************************************************************************/
