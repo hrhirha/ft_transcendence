@@ -49,9 +49,6 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
         socket.on("matchWinner", (win) => {
             setWinner(win);
         })
-        .on("leaveTheGame", () => {
-            
-        })
         .on("keepWatching", () => {
             setWinner("");
         })

@@ -10,13 +10,15 @@ export const GameWatcher:React.FC = () =>  {
     const [ongoingMatchs, setMatchs] = useState<Array<Match>>([]);
     const [winner, setWinner] = useState<string>("");
     const [currentMatch, setCurrentMatch] = useState<number>(0);
+
+    const updateMatche  = async () => {
+        try {
+            const _matchs: Array<Match> = await get_ongoing_matchs();
+            setMatchs(_matchs);
+        } catch(e: any) {}
+    };
     useEffect(() => {
-        (async () => {
-            try {
-                const _matchs: Array<Match> = await get_ongoing_matchs();
-                setMatchs(_matchs);
-            } catch(e: any) {}
-        })();
+        updateMatche();
     },[]);
 
     useEffect(() => {
@@ -25,17 +27,18 @@ export const GameWatcher:React.FC = () =>  {
         }).on("updateScore", (score) => {
             setMatchs(oldMatches => oldMatches.map((m, i) => {
                 if (i === currentMatch)
-                {
                     return {...m, score: {p1: score.score1, p2: score.score2}};
-                }
                 return m;
             }));
+        }).on("leaveTheGame", () => {
+            if (ongoingMatchs.length > 1)
+                setCurrentMatch(currentMatch + 1);
+            else
+                updateMatche();
         }).on("joinStream", ({p1, p2, score1, score2}) => {
             setMatchs(oldMatches => oldMatches.map((m, i) => {
                 if (i === currentMatch)
-                {
                     return {...m, p1: p1, p2: p2, score: {p1: score1, p2: score2}};
-                }
                 return m;
             }));
         });
