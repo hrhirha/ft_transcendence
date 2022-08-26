@@ -232,18 +232,9 @@ export const Chat:React.FC = () => {
 
     return (
         <main id="chatPage">
-             <button style={{color: `black`}}onClick={() =>{
-                class_socket.start_dm("cl71t41qe23023ndu6vw56kdmf");
-            }}>start_dm</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.get_chats();
-            }}>get_chats</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.send_message({rid : "cl70q7x029144l3u81chjqn0o", msg :"jgfgfgfgfg b"});
-            }}>send_message</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.create_room({name : "hicham room",is_private:false, uids :["cl71rzju21859ndu603271qm1"]});
-            }}>create room</button>
+            
+           
+
             <button style={{color: `black`}} onClick={() =>{
                 class_socket.delete_room({id : "cl4jv5f3d0369ohsmoae83lyo"});
             }}>delete_room</button>

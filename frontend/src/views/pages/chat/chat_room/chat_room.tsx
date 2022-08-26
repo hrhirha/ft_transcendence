@@ -112,7 +112,7 @@ export const ChatRoom:React.FC = () => {
 
     return (
         <>
-        {showSettings && <ChatRoomSettings roomId={getIDQuery()} onClose={() => setShowSettings(false)}/>}
+        {showSettings && <ChatRoomSettings fullName= {roominfo.name} roomId={getIDQuery()} onClose={() => setShowSettings(false)}/>}
         {!showSettings && <section id="chatRoom">
             <ChatRoomHeader
                 username={roominfo && ((roominfo.is_channel) ? roominfo.name :roominfo.user.username)}

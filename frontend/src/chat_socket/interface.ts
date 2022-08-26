@@ -5,9 +5,12 @@ export interface user_info {
     fullName : string,
     imageUrl :string,
     status: string, // 'ONLINE', 'OFFLINE', 'INGAME'
+    is_admin?: boolean,
+    is_owner?: boolean,
 }
 interface room {
     id:  string,
+    name?:  string,
     is_channel:  boolean,
 }
 
