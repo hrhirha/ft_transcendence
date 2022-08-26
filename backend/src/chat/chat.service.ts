@@ -376,25 +376,19 @@ export class ChatService {
 
     async leaveRoom(user: UserDto, room: OldRoomDto)
     {
-        console.log({room});
-        const r = await this._prismaS.room.update({
-            where: { id: room.id },
-            data: {
-                user_rooms: {
-                    delete: {
-                        uid_rid: {
-                            uid: user.id,
-                            rid: room.id,
-                        }
-                    },
-                }
+        const ur = await this._prismaS.userRoom.deleteMany({
+            where: {
+                uid: user.id,
+                rid: room.id,
+                is_owner: false,
             },
-            select: {
-                id: true,   
-            }
         });
-        const msg = await this._add_msg_to_db(user.id, {rid: r.id, msg: `${user.username} left`}, msg_type.NOTIF);
-        return {room: r, msg};
+
+        console.log({ur});
+        if (ur.count === 0)
+            throw new WsException('owner can not leave');
+        const msg = await this._add_msg_to_db(user.id, {rid: room.id, msg: `${user.username} left`}, msg_type.NOTIF);
+        return {room, msg};
     }
 
     async addUser(user: UserDto, member: UserRoomDto)
@@ -950,6 +944,8 @@ export class ChatService {
                 user_rooms: {
                     select: {
                         is_banned: true,
+                        is_admin: true,
+                        is_owner: true,
                         user: {
                             select: {
                                 id: true,
@@ -969,6 +965,8 @@ export class ChatService {
         let members = [];
         for (let ur of rs[0].user_rooms)
         {
+            ur.user['is_admin'] = ur.is_admin;
+            ur.user['is_owner'] = ur.is_owner;
             members.push({...ur.user, is_banned: ur.is_banned});
         }
 
@@ -1194,6 +1192,7 @@ export class ChatService {
                         room: {
                             select: {
                                 id: true,
+                                name: true,
                                 is_channel: true,
                             }
                         }
