@@ -156,7 +156,6 @@ export const Chat:React.FC = () => {
                 class_socket.get_messages({id : getIDQuery()});
         })
         
-        
         class_socket.socket.on("chats", (data : chats)=>{ 
             setchatRooms(data);
             if(data.dms.find(d => d.room.id ===  getIDQuery()))
@@ -166,13 +165,22 @@ export const Chat:React.FC = () => {
             else if(data.others.find(d => d.id ===  getIDQuery()))
                 setActiveTab(chatTabs.otherGroups);
         })
+
         class_socket.socket.on("receive_message", (data : receive_message)=>{
              class_socket.get_chats();
+        })
+
+        class_socket.socket.on("room_deleted", (data : {id : string})=> {
+            console.log("room_deleted")
+            if(getIDQuery() !== null && getIDQuery() === data.id)
+                navigate(`/chat`, {replace: true})
+            class_socket.get_chats();
         })
         
         //on mount
         window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
         //return () => class_socket.socket.removeAllListeners();
+
         //class_socket.socket.on("user_left", (data : user_left)=>{ //done
         //    console.log("user_left");
         //    console.log(data)
@@ -182,10 +190,7 @@ export const Chat:React.FC = () => {
         //    console.log("user_joined");
         //    console.log(data)
         //})
-        //class_socket.socket.on("room_deleted", (data : {id : string})=>{ //done
-        //    console.log("room_deleted");
-        //    console.log(data.id)
-        //})
+   
         //class_socket.socket.on("password_set", (data : management_password)=>{ //done
         //    console.log("password_set");
         //    console.log(data)

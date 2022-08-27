@@ -17,7 +17,7 @@ export const ChatRoomSettings:React.FC<{fullName : string, roomId: string, onClo
     const navigate = useNavigate();
     const class_socket = useContext(SocketContext);
     const [members, setMembers] = useState<user_info[]>([]);
-    const [owner, setOwner] = useState<user_info>();
+    const [owner, setOwner] = useState<boolean>(false);
     const pushNotif = useNotif();
 
     //JSON.parse(window.localStorage.getItem("user")).id 
@@ -28,10 +28,42 @@ export const ChatRoomSettings:React.FC<{fullName : string, roomId: string, onClo
 
         class_socket.socket.on("members", (data : user_info[])=>{
             setMembers(data);
-            setOwner(data.find((u) => u.is_owner === true))
+            setOwner(data.find((u) => u.is_owner === true && u.id === JSON.parse(window.localStorage.getItem("user")).id ) !== undefined)
         })
 
     },[])
+
+    const leaveChannel = () => {
+        pushNotif({
+            id: roomId,
+            type: "info",
+            icon: <FontAwesomeIcon icon={faArrowRightFromBracket}/> ,
+            title: "Leave Channel",
+            description: "Are you sure want to leave this channel",
+            actions: [
+                {title: "Leave Channel", color: "#6970d4", action: () => {
+                    class_socket.leave_room({id : roomId})
+                    navigate(`/chat`, {replace: true})
+                }},
+            ]
+        });
+    }
+
+    const deleteChannel = () => {
+        pushNotif({
+            id: roomId,
+            type: "info",
+            icon: <FontAwesomeIcon icon={faArrowRightFromBracket}/> ,
+            title: "Delete Channel",
+            description: "Are you sure want to Delete this channel",
+            actions: [
+                {title: "Delete Channel", color: "#6970d4", action: () => {
+                    class_socket.delete_room({id : roomId})
+                }},
+            ]
+        });
+    }
+
 
     return (
         <section id="chatRoomSettings">
@@ -48,24 +80,9 @@ export const ChatRoomSettings:React.FC<{fullName : string, roomId: string, onClo
                 </div>
                 <div className="channelOptions options">
                     <SettingsOption icon={faPenToSquare} title="Edit Channel" onClick={() => alert("EDIT CHANNEL")}/>
-                    <SettingsOption icon={faTrash} title="Delete Channel" onClick={() => alert("DELETE CHANNEL")}/>
-                    <SettingsOption icon={faArrowRightFromBracket} title="Leave Channel" onClick={() => {
-                            pushNotif({
-                                id: roomId,
-                                type: "info",
-                                icon: <FontAwesomeIcon icon={faArrowRightFromBracket}/> ,
-                                title: "Leave Channel",
-                                description: "Are you sure want to leave this channel",
-                                actions: [
-                                    {title: "Leave Channel", color: "#6970d4", action: () => {
-                                        class_socket.leave_room({id : roomId})
-                                        navigate(`/chat`, {replace: true})
-                                    }},
-                                ]
-                            });
+                    {owner && <SettingsOption icon={faTrash} title="Delete Channel" onClick={() => deleteChannel()}/>}
+                    {!owner &&<SettingsOption icon={faArrowRightFromBracket} title="Leave Channel" onClick={() => leaveChannel()}/>}
 
-                        }
-                    }/>
                 </div>
                 <h6><FontAwesomeIcon icon={faUsers} />Group Memebers</h6>
                 <div className="members">
