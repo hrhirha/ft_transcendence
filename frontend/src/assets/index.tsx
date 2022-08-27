@@ -15,6 +15,8 @@ export {default as GroupAvatar} from "assets/images/groupAvatar.svg"
 export {default as NotFound404} from "assets/images/404.svg"
 export {default as WatchEmptyState} from "assets/images/watchEmptyState.svg"
 export {default as Background} from "assets/images/bg.svg"
+export {default as GroupIcon} from "assets/images/group_icon.svg"
+export {default as UserIcon} from "assets/images/user_icon.svg"
 //Game Assets
 export {default as NormalField} from "assets/images/normal_game_field.svg"
 export {default as UltimateField} from "assets/images/ultimate_game_field.svg"

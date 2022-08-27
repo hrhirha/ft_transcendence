@@ -3,10 +3,10 @@ import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
 import { Chat_msg } from "views/pages/chat/chat_msg/chat_msg";
-import { BgVectors } from "assets";
+import { BgVectors, GroupIcon } from "assets";
 import { useContext, useEffect, useState } from "react";
 import { ChatRoomSettings } from "views/pages/chat/chat_room_settings/chat_room_settings";
-import {messages, msgs, receive_message, room_msgs } from "chat_socket/interface";
+import {chats, messages, msgs, receive_message, room_msgs } from "chat_socket/interface";
 import { getIDQuery, history, SocketContext } from "index";
 
 
@@ -29,7 +29,7 @@ const ChatRoomHeader = (Props : HeaderProps) => {
             else
                 navigate(`/u/${Props.username}`);
             }}>
-            <CircleAvatar avatarURL={Props.image} dimensions={45} status={(Props.status !== "Channel" ? Props.status : null)}/>
+            <CircleAvatar avatarURL={Props.status !== "Channel" ? Props.image : GroupIcon} dimensions={45} status={(Props.status !== "Channel" ? Props.status : null)}/>
             <div className='dataRow'>
                 <span className='userName'>{Props.fullName}</span>
                 <span className='status'>{Props.status}</span>
@@ -80,17 +80,15 @@ export const ChatRoom:React.FC = () => {
     const [showSettings, setShowSettings] = useState(false);
     const navigate = useNavigate();
     const class_socket = useContext(SocketContext);
-    const [messages, setmessages] = useState<msgs[]>([]);
+    const [messages, setmessages] = useState<msgs[]>();
     const [roominfo, setRoominfo] = useState<room_msgs>();
 
     useEffect(() => {
 
         class_socket.socket.on("messages", (data : messages)=>{
-            console.log("messages");
-            console.log(data)
             setmessages(data.msgs);
             setRoominfo(data.room);
-        })
+        });
 
         class_socket.socket.on("receive_message", (data : receive_message)=>{
             if (getIDQuery() != null && getIDQuery() == data.room.id)
@@ -101,14 +99,21 @@ export const ChatRoom:React.FC = () => {
                     class_socket.get_messages({id : getIDQuery()});
             }
         })
-        
     },[])
 
     useEffect(() => {
         if (getIDQuery() != null)
             class_socket.get_messages({id : getIDQuery()});
     },[history.location.search])
-    
+    console.log(messages, roominfo)
+    if (roominfo !== undefined && messages === undefined)
+        return (
+            <>Not Joined</>
+        );
+    if (roominfo === undefined)
+        return (
+            <>Not found</>
+        );
 
     return (
         <>

@@ -913,7 +913,9 @@ export class ChatService {
             },
             where: {
                 is_channel: true,
-                type: room_type.PUBLIC || room_type.PROTECTED,
+                OR: [
+                    {type: room_type.PUBLIC},{type: room_type.PROTECTED}
+                ],
                 user_rooms: {
                     none: {
                         uid: u.id,
@@ -1027,6 +1029,16 @@ export class ChatService {
                 }
             }
         });
+        if (!room)
+            throw new WsException('room not found');
+
+        const my_ur = room.user_rooms.find(ur => ur.uid === uid);
+        if (!my_ur)
+        {
+            delete room.user_rooms;
+            delete room.messages;
+            return { room };
+        }
 
         await this._prismaS.userRoom.update({
             data: { unread: 0 },
@@ -1034,11 +1046,9 @@ export class ChatService {
                 uid_rid: { uid, rid }
             }
         });
-    
-        // filter messages sent before the user joined the room
-        // const room = messages[0].room;
 
-        const my_ur = room.user_rooms.find(ur => ur.uid === uid);
+        // filter messages sent before the user joined the room
+
         if (!room.is_channel)
         {
             room['user'] = room.user_rooms.find(ur => ur.uid !== uid).user;

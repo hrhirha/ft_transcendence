@@ -1,6 +1,6 @@
 import { faArrowRightFromBracket, faClose, faGamepad, faPenToSquare, faTrash, faUser, faUsers, faUserSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { DefaultGame, UltimateGame } from "assets";
+import { DefaultGame, GroupIcon, UltimateGame } from "assets";
 import { user_info } from "chat_socket/interface";
 import { SocketContext } from "index";
 import { useContext, useEffect, useState } from "react";
@@ -69,7 +69,7 @@ export const ChatRoomSettings:React.FC<{fullName : string, roomId: string, onClo
             <div className="roomSettings">
                 <span className="closeSettings" onClick={() => onClose()}><FontAwesomeIcon icon={faClose}/></span>
                 <div className="chatInfos user" onClick={() => alert(`Go To Profile`)}>
-                    <CircleAvatar avatarURL="" dimensions={100} status={null}/>
+                    <CircleAvatar avatarURL={GroupIcon} dimensions={100} status={null}/>
                     <input type="text" placeholder="Channel title" disabled className="channelTitle" value={fullName}/>
                     {/* <input type="password" placeholder="Channel password" className="channelTitle"/> */}
                     <p>

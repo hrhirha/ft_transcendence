@@ -24,7 +24,7 @@ const NotifCard:React.FC<{props: Props, onClose: Function, setNotifs: Function}>
         <span className="icon">{props.icon}</span>
         <div className="infos">
             <h6 className="title">{props.title}</h6>
-            <p className="description" dangerouslySetInnerHTML={{ __html: props.description }}/>
+            <p className="description" dangerouslySetInnerHTML={{ __html: props.description.substr(0, 150)+(props.description.length > 150 ? "..." : "")}}/>
             {props.actions && <ul className="actions">
                 {props.actions.map((a, k) => {
                     return (k < 2)

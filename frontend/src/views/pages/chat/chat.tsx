@@ -51,6 +51,7 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
                 nbNotifs={room.unread}
                 timeLastMsg={room.lst_msg_ts}
                 active={room.id === activeChat}
+                type={room.type}
                 onClick={() => {
                     onSelectItem();
                     navigate({

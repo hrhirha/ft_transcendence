@@ -562,7 +562,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
         catch (e)
         {
-            console.log({error: e.message});
+            // console.log({error: e.message});
             throw new WsException('failed to get chatrooms');
         }
     }
