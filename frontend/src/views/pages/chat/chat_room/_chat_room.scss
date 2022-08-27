@@ -22,6 +22,13 @@ section#chatRoom {
                     font-family: $BFont;
                     color: $light1;
                     font-size: $fsize * .85;
+                    @include _textOverflow(30rem);
+                    @media (max-width: $md) {
+                        @include _textOverflow(15rem);
+                    }
+                    @media (max-width: $xs) {
+                        @include _textOverflow(10rem);
+                    }
                 }
                 .status {
                     @include _textOverflow(10rem);
@@ -105,5 +112,31 @@ section#chatRoom {
                 font-size: $fsize;
             }
         }
+    }
+}
+
+.chatNotFound {
+    @include _flex(column, center, center);
+    width: 100%;
+    height: 100%;
+    img {
+        max-width: 25rem;
+        @media (max-width: $sm) {
+            max-width: 20rem;
+        }
+    }
+    p {
+        font-size: $fsize;
+        color: $light3;
+        font-family: $LFont;
+        max-width: 20rem;
+        text-align: center;
+    }
+    svg {
+        margin-right: .5rem;
+    }
+    button {
+        @include _roundedButtonStyle($bgcolor1: $purple, $bgcolor2: rgba($purple, .5));
+        margin-top: 1rem;
     }
 }

@@ -44,29 +44,25 @@ main#chatPage {
             height: calc(100vh - 10.5rem);
             border-left: .5px solid $dark3;
         }
-        .chats {
-        }
         .chatOptions {
             @include _flex(row, space-between, center);
             padding: 1rem 0;
-
             #chatSearch {
                 @include _flex(row, flex-start, center);
                 width: 100%;
-
                 input {
                     width: 100%;
                     display: block;
                     padding: .5rem 1rem;
                     padding-left: 2rem;
                     background-color: $dark3;
-                    border: none;
                     border-radius: 50rem;
+                    border: none;
                     outline: none;
                     font-size: $fsize * .9;
                 }
                 ::placeholder {
-                    color: $light5;
+                    color: rgba($light3, .5);
                 }
                 svg {
                     position: absolute;

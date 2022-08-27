@@ -1,12 +1,12 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClose, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
+import { faClose, faComment, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
 import { Chat_msg } from "views/pages/chat/chat_msg/chat_msg";
-import { BgVectors, GroupIcon } from "assets";
+import { BgVectors, GroupIcon, NoConversations } from "assets";
 import { useContext, useEffect, useState } from "react";
 import { ChatRoomSettings } from "views/pages/chat/chat_room_settings/chat_room_settings";
-import {chats, messages, msgs, receive_message, room_msgs } from "chat_socket/interface";
+import { messages, msgs, receive_message, room_msgs } from "chat_socket/interface";
 import { getIDQuery, history, SocketContext } from "index";
 
 
@@ -17,6 +17,14 @@ interface HeaderProps {
     status: string,
     showSettings: Function,
     onClose: Function,
+}
+
+const JoinChat:React.FC<{room :room_msgs}> = ({room}) => {
+    
+    return (
+        <>
+        </>
+    );
 }
 
 const ChatRoomHeader = (Props : HeaderProps) => {
@@ -107,12 +115,17 @@ export const ChatRoom:React.FC = () => {
     },[history.location.search])
     console.log(messages, roominfo)
     if (roominfo !== undefined && messages === undefined)
-        return (
-            <>Not Joined</>
-        );
+        return (<JoinChat room={roominfo}/>);
     if (roominfo === undefined)
         return (
-            <>Not found</>
+            <div className="chatNotFound">
+                <img src={NoConversations}/>
+                <p>This chat cannot be accessed right now. Please try again later</p>
+                <button onClick={() => navigate("/chat", {replace : true})}>
+                    <FontAwesomeIcon icon={faComment}/>
+                    Home Chat
+                </button>
+            </div>
         );
 
     return (

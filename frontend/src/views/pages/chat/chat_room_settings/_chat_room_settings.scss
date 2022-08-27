@@ -34,7 +34,7 @@ section#chatRoomSettings {
         .chatInfos {
             @include _flex(column, center, center);
             position: relative;
-            top: -2.5rem;
+            top: -1.5rem;
             #circleAvatar {
                 border: .25rem solid $dark3;
             }
@@ -45,23 +45,18 @@ section#chatRoomSettings {
                 background: rgba($dark1, .5);
                 font-family: $BFont;
                 font-size: $fsize;
-                padding: .2rem 1rem;
+                padding: .5rem 1rem;
                 border-radius: 5rem;
                 outline: none;
                 text-align: center;
                 margin: .5rem auto;
+                &::placeholder {
+                    color: $light4;
+                }
             }
             input:disabled {
                 background: transparent;
                 max-width: auto;
-            }
-            p {
-                font-size: $fsize * .85;
-                font-family: $LFont;
-                color: $light3;
-                svg {
-                    margin-right: .5rem;
-                }
             }
         }
         .options {

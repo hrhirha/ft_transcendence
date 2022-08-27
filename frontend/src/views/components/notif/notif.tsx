@@ -47,39 +47,21 @@ const NotifCard:React.FC<{props: Props, onClose: Function, setNotifs: Function}>
 
 export const Notif:React.FC<{children: ReactNode}> = ({children}) => {
     const [notifs, setNotifs] = useState<Array<Props>>([]);
-    const [timer, setTimer] = useState<any>();
     const pushNotif = (newNotif: Props) => {
-        if (notifs.find(n => n.id === newNotif.id))
+        console.log(notifs, newNotif, notifs.find(n => n.id !== newNotif.id));
+        if (notifs.length === 0 || notifs.find(n => n.id !== newNotif.id))
         {
-            setNotifs(oldNotifs => oldNotifs.map((n) => {
-                if (n.id === newNotif.id)
-                    return newNotif;
-                return n;
-            }));
             if (newNotif.time === undefined)
                 newNotif.time = 5000;
-            return;
+            if (notifs.length > 4)
+                setNotifs(oldNotifs => oldNotifs.splice(0, 4));
+            else
+                setNotifs(oldNotifs => [newNotif, ...oldNotifs]);
+            setTimeout(() => {
+                setNotifs(oldNotifs => oldNotifs.filter((notif) => notif.id !== newNotif.id));
+            }, newNotif.time);
         }
-        if (newNotif.time === undefined)
-            newNotif.time = 5000;
-        if (notifs.length > 4)
-            setNotifs(oldNotifs => oldNotifs.splice(0, 4));
-        else
-            setNotifs(oldNotifs => [newNotif, ...oldNotifs]);
     }
-    useEffect(() => {
-        if (notifs.length > 0)
-        {
-            setTimer(setInterval(() => {
-                setNotifs(notifs.filter(n => {
-                    n.time -= 1000;
-                    return n.time >= 0;
-                }));
-            }, 500));
-        }
-        if (notifs.length >= 0)
-            clearInterval(timer);
-    }, [notifs]);
 
     return (
         <NotifContext.Provider value={pushNotif}>

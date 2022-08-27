@@ -2,9 +2,9 @@ div#chatRoomItem {
     @include _flex(row, space-between, center);
     @include _selectionOff();
     cursor: pointer;
-    padding: 0.25rem;
+    padding: .25rem .5rem;
     margin: .2rem;
-    border-radius: 0.5rem;
+    border-radius: .5rem;
     #circleAvatar {
         @media (max-width: $xs) {
             @include _square(2.25rem);

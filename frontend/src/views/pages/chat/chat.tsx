@@ -238,9 +238,6 @@ export const Chat:React.FC = () => {
 
     return (
         <main id="chatPage">
-            
-           
-
             <button style={{color: `black`}} onClick={() =>{
                 class_socket.delete_room({id : "cl4jv5f3d0369ohsmoae83lyo"});
             }}>delete_room</button>
