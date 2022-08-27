@@ -3,7 +3,7 @@
 section#gameWatcher {
     @include _flex(column, center, center);
     @include _selectionOff();
-    height: calc(100vh - 10rem);
+    min-height: calc(100vh - 10rem);
     @media (max-width: $sm) {
         width: auto;
     }
@@ -12,6 +12,23 @@ section#gameWatcher {
         .noLiveGames {
             max-width: 100%;
             opacity: .75;
+        }
+        .navGames {
+            @include _flex(row, center, center);
+            @include _selectionOff();
+            .navButton {
+                cursor: pointer;
+                font-size: 2rem;
+                @media (max-width: $sm) {
+                    font-size: 1.5rem;
+                }
+                @media (max-width: $xs) {
+                    font-size: .75rem;
+                }
+                .path {
+                    color: $purple!important;
+                }
+            }
         }
     }
 }

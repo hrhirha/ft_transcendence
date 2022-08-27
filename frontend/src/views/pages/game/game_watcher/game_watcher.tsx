@@ -1,3 +1,5 @@
+import { faChevronCircleLeft, faChevronCircleRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { WatchEmptyState } from "assets";
 import { get_ongoing_matchs, Match } from "controller/user/matchs";
 import React, { useEffect, useState } from "react";
@@ -42,6 +44,9 @@ export const GameWatcher:React.FC = () =>  {
                 return m;
             }));
         });
+        document.addEventListener("visibilitychange", event => {
+            socket.emit("isActive", (document.visibilityState === "visible"));
+        });
     }, [socket]);
 
     return (
@@ -49,7 +54,11 @@ export const GameWatcher:React.FC = () =>  {
             <div className="row">
                 <div className="col-12 col-md-9">
                     {ongoingMatchs.length === 0 && <img className="noLiveGames" src={WatchEmptyState}/>}
-                    {ongoingMatchs.length > 0 && <MatchCard match={ongoingMatchs[currentMatch]} winnerId={winner}/>}
+                    {ongoingMatchs.length > 0 && <div className="navGames">
+                        {currentMatch == 0 && <FontAwesomeIcon icon={faChevronCircleLeft} className="navButton" title="Next game" onClick={() => setCurrentMatch((m) => m + 1)}/>}
+                        <MatchCard match={ongoingMatchs[currentMatch]} winnerId={winner}/>
+                        {ongoingMatchs.length - 1 > currentMatch && <FontAwesomeIcon icon={faChevronCircleRight} className="navButton" title="Previous game"  onClick={() => setCurrentMatch((m) => m - 1)}/>}
+                    </div>}
                     {ongoingMatchs.length > 0 && <GameView gameSocket={socket} isUltimate={false} watcher={true} roomId={ongoingMatchs[currentMatch]?.id} isPrivate={false} vsPID="" />}
                 </div>
             </div>
