@@ -944,6 +944,7 @@ export class ChatService {
                 user_rooms: {
                     select: {
                         is_banned: true,
+                        is_muted: true,
                         is_admin: true,
                         is_owner: true,
                         user: {

@@ -64,7 +64,6 @@ export const ChatRoomSettings:React.FC<{fullName : string, roomId: string, onClo
         });
     }
 
-
     return (
         <section id="chatRoomSettings">
             <div className="roomSettings">
@@ -79,9 +78,9 @@ export const ChatRoomSettings:React.FC<{fullName : string, roomId: string, onClo
                     </p>
                 </div>
                 <div className="channelOptions options">
-                    <SettingsOption icon={faPenToSquare} title="Edit Channel" onClick={() => alert("EDIT CHANNEL")}/>
                     {owner && <SettingsOption icon={faTrash} title="Delete Channel" onClick={() => deleteChannel()}/>}
                     {!owner &&<SettingsOption icon={faArrowRightFromBracket} title="Leave Channel" onClick={() => leaveChannel()}/>}
+                    {owner && <SettingsOption icon={faPenToSquare} title="Edit Channel" onClick={() => alert("EDIT CHANNEL")}/>}
 
                 </div>
                 <h6><FontAwesomeIcon icon={faUsers} />Group Memebers</h6>
@@ -90,11 +89,14 @@ export const ChatRoomSettings:React.FC<{fullName : string, roomId: string, onClo
                         members.map((member, k) => 
                             <MemeberCard 
                                 key={k}
-                                
+                                permession={1}
+                                owner={member.is_owner} //Bddl
                                 avatar={member.imageUrl} 
                                 admin={member.is_admin} 
                                 username={member.username} 
                                 fullName={member.fullName} 
+                                banned={member.is_banned} //Bddl
+                                muted={member.is_muted} //Bddl
                                 onClick={
                                     () => navigate(`/u/${member.username}`, {replace: true})}
                             />

@@ -14,16 +14,26 @@ section#gameWatcher {
             opacity: .75;
         }
         .navGames {
+            position: relative;
             @include _flex(row, center, center);
             @include _selectionOff();
             .navButton {
+                position: absolute;
                 cursor: pointer;
                 font-size: 2rem;
+                left: -0.75rem;
+                z-index: 5;
+                @media (max-width: $md) {
+                    font-size: 1.15rem;
+                    left: -.5rem;
+                }
                 @media (max-width: $sm) {
-                    font-size: 1.5rem;
+                    font-size: 1.25rem;
+                    left: -.5rem;
                 }
                 @media (max-width: $xs) {
-                    font-size: .75rem;
+                    font-size: 1rem;
+                    left: -.25rem;
                 }
                 .path {
                     color: $purple!important;

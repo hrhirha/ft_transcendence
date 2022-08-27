@@ -11,6 +11,7 @@ div.settingsOption {
         background-color: $light4;
         font-size: $fsize * 1.25;
         color: $light2;
+        z-index: 5;
         &:hover {
             background-color: $light5;
             color: $light2;
@@ -25,17 +26,18 @@ div.settingsOption {
         background-color: $light4;
         border-radius: 1rem;
         overflow: hidden;
-        width: min-content;
+        min-width: 5rem;
         padding: 0;
         .subOptionItem {
             div {
                 @include _flex(row, flex-start, center);
+                cursor: pointer;
                 padding: .25rem .5rem;
-                font-size: $fsize * .75;
+                font-size: $fsize * .65;
                 white-space: pre;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                width: 100%;
+                width: 7rem;
                 margin: 0;
                 &:hover {
                     background-color: $light5;
@@ -43,6 +45,10 @@ div.settingsOption {
                 #circleAvatar {
                     background-color: transparent;
                     margin-right: .5rem;
+                }
+                svg {
+                    margin-right: .5rem;
+                    width: .75rem;
                 }
             }
         }

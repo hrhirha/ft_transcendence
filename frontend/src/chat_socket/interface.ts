@@ -7,6 +7,8 @@ export interface user_info {
     status: string, // 'ONLINE', 'OFFLINE', 'INGAME'
     is_admin?: boolean,
     is_owner?: boolean,
+    is_banned?: boolean,
+    is_muted?: boolean,
 }
 interface room {
     id:  string,

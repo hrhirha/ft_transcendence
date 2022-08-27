@@ -48,6 +48,23 @@ div.memberCard {
                 top: 1.25rem;
                 left: -7.7rem;
                 z-index: 2;
+                .hasOptions {
+                    @include _flex(column, center, center);
+                    &:hover {
+                        background: $light4;
+                    }
+                    .moreOptions {
+                        list-style: none;
+                        font-size: $fsize * .6;
+                        li {
+                            border-radius: 5rem;
+                            padding: .1rem .5rem;
+                            &:hover {
+                                background: $light5;
+                            }
+                        }
+                    }
+                }
             }
         }
     }
