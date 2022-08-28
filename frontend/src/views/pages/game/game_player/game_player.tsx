@@ -43,6 +43,9 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
                     ] 
                 });
           });
+        document.addEventListener("visibilitychange", event => {
+            socket.emit("isActive", (document.visibilityState === "visible"));
+        });
     }, []);
 
     useEffect(() => {
