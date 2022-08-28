@@ -18,19 +18,19 @@ div.memberCard {
             .fullName {
                 font-size: $fsize * .8;
                 font-family: $BFont;
-                line-height: 1;
+                line-height: 1.5;
+            }
+            .userName {
+                font-size: $fsize * .7;
+                font-family: $LFont;
+                line-height: 1.5;
                 svg {
-                    font-size: $fsize * .75;
+                    font-size: $fsize * .6;
                     margin-left: .25rem;
                     path {
                         color: $light3;
                     }
                 }
-            }
-            .userName {
-                font-size: $fsize * .7;
-                font-family: $LFont;
-                line-height: 1;
             }
         }
     }

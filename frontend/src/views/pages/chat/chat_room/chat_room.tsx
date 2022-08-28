@@ -69,6 +69,7 @@ const ChatRoomHeader = (Props : HeaderProps) => {
 }
 
 const ChatRoomBody:React.FC<{messages: msgs[], roomId: string}> = ({messages, roomId}) => {
+    console.log(messages)
     return <div id="chatRoomBody" style={{backgroundImage: `url(${BgVectors})`}}>
         { messages && messages.map ((message : msgs, k: number ) => 
             <Chat_msg
@@ -80,6 +81,7 @@ const ChatRoomBody:React.FC<{messages: msgs[], roomId: string}> = ({messages, ro
                 image = {message.user.imageUrl}
                 msg={message.msg}
                 time={message.timestamp}
+                type={message.type}
             />
         )}
     </div>;
@@ -150,7 +152,7 @@ export const ChatRoom:React.FC = () => {
 
     return (
         <>
-        {showSettings && <ChatRoomSettings fullName= {roominfo.name} roomId={getIDQuery()} onClose={() => setShowSettings(false)}/>}
+        {showSettings && <ChatRoomSettings room= {roominfo} onClose={() => setShowSettings(false)}/>}
         {!showSettings && <section id="chatRoom">
             <ChatRoomHeader
                 username={roominfo && ((roominfo.is_channel) ? roominfo.name :roominfo.user.username)}

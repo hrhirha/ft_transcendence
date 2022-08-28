@@ -26,22 +26,22 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
     useEffect(() => {
         socket.connect();
         const unblock = history.block((tx) => {
-            pushNotif({
-                id: "LEAVEGAME",
-                type: "info",
-                time: 15000,
-                icon: <FontAwesomeIcon icon={faGamepad}/>,
-                title: "Confirmation",
-                description: "Are you sure you want to leave the game?",
-                actions: [
-                    {title: "Cancle", color: "#6970d4", action: null},
-                    {title: "Leave the game", color: "#313348", action: () => {
-                        socket.disconnect();
-                        unblock();
-                        tx.retry();
-                    }}
-                ] 
-            });
+                pushNotif({
+                    id: "LEAVEGAME",
+                    type: "info",
+                    time: 15000,
+                    icon: <FontAwesomeIcon icon={faGamepad}/>,
+                    title: "Confirmation",
+                    description: "Are you sure you want to leave the game?",
+                    actions: [
+                        {title: "Cancel", color: "#6970d4", action: null},
+                        {title: "Leave the game", color: "#313348", action: () => {
+                            socket.disconnect();
+                            unblock();
+                            tx.retry();
+                        }}
+                    ] 
+                });
           });
     }, []);
 
