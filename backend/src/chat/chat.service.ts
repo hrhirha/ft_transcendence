@@ -1003,6 +1003,9 @@ export class ChatService {
                     }
                 },
                 messages: {
+                    orderBy: {
+                        timestamp: 'asc',
+                    },
                     where: {
                         rid,
                         room: {
