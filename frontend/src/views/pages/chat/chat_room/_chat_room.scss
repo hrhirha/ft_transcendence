@@ -140,3 +140,42 @@ section#chatRoom {
         margin-top: 1rem;
     }
 }
+
+.joinChat {
+    @include _flex(column, center, center);
+    width: 100%;
+    height: 100%;
+    background: $dark2;
+    .channelInfos {
+        @include _flex(column, center, center);
+        padding: 1.5rem;
+        background-color: $dark3;
+        border-radius: 1rem;
+        min-width: 12rem;
+        max-width: 15rem;
+        h3 {
+            margin: .75rem auto;
+            font-size: $fsize * .85;
+            color: $light1;
+            font-family: $BFont;
+            @include _textOverflow(20rem);
+        }
+        input {
+            padding: .5rem;
+            background-color: $dark2;
+            border-radius: 5rem;
+            border: none;
+            outline: none;
+            width: 95%;
+            text-align: center;
+            margin-bottom: .5rem;
+            &::placeholder {
+                color: rgba($light3, .75);
+            }
+        }
+        button.joinBtn {
+            @include _roundedButtonStyle($bgcolor1: $purple, $bgcolor2: rgba($purple, .5));
+            margin-top: .5rem;
+        }
+    }
+}

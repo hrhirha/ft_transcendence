@@ -1,6 +1,6 @@
 import { faArrowRightFromBracket, faCheck, faClose, faGamepad, faPenToSquare, faTrash, faUser, faUsers, faUserSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { DefaultGame, GroupIcon, UltimateGame } from "assets";
+import { GroupIcon } from "assets";
 import { user_info } from "chat_socket/interface";
 import { SocketContext } from "index";
 import { useContext, useEffect, useState } from "react";

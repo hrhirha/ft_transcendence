@@ -8,6 +8,7 @@ import { useContext, useEffect, useState } from "react";
 import { ChatRoomSettings } from "views/pages/chat/chat_room_settings/chat_room_settings";
 import { messages, msgs, receive_message, room_msgs } from "chat_socket/interface";
 import { getIDQuery, history, SocketContext } from "index";
+import { validPassword } from "../create_chat/create_chat";
 
 
 interface HeaderProps {
@@ -20,10 +21,27 @@ interface HeaderProps {
 }
 
 const JoinChat:React.FC<{room :room_msgs}> = ({room}) => {
-    
+    const [isProtected, setIsProtected] = useState<boolean>();
+    const [channelPassword, setPassword] = useState<string>("");
+    const class_socket = useContext(SocketContext);
+
+    useEffect(() => {
+        setIsProtected(room.type === "PROTECTED");
+    }, [room]);
+
+    const joinNow = () => {
+        class_socket.join_room({id : room.id, password : channelPassword === "" ? null : channelPassword});
+    }
+
     return (
-        <>
-        </>
+        <div className="joinChat">
+            <div className="channelInfos">
+                <CircleAvatar avatarURL={GroupIcon} dimensions={100} status={null}/>
+                <h3>{room.name}</h3>
+                {isProtected && <input type="password" className={validPassword(channelPassword) ? "" : "error"} value={channelPassword} onChange={(e) => setPassword(e.target.value)} placeholder="Channel password"/>}
+                <button className="joinBtn" onClick={() => joinNow()}>Join Now</button>
+            </div>
+        </div>
     );
 }
 

@@ -14,7 +14,7 @@ const validTitel = (title: string) => {
     return  title.trim() != "" && /^([\w]+ ?(\-?[\w]+)*\.?)+$/.test(title);
 }
 
-const validPassword = (password: string) => {
+export const validPassword = (password: string) => {
     return  password.trim() != "" && /[A-Z]+/.test(password) && /\w{5,}/.test(password) && /[\!\@\#\$\&\*\?\-\=\+]+/.test(password) && /\d+/.test(password);
 }
 
