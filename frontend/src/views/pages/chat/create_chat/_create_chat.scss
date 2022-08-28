@@ -57,12 +57,16 @@ section#createNewChat {
         input.textInput {
             padding: .5rem 1rem;
             font-size: $fsize * .75;
-            border: none;
+            border: 2px solid $light4;
             background-color: $light4;
             border-radius: 1rem;
             outline: none;
             width: 85%;
             margin: .15rem 0;
+        }
+        input.error {
+            border-color: $red;
+            background: $light4;
         }
         ::placeholder {
             color: $light3;

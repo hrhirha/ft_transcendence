@@ -267,7 +267,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
             sockets.forEach((s) => {
                 edit.members.forEach(member => {
-                    s.data.username === member.username && s.join(data.rid);
+                    if (s.data.username === member.username) s.join(data.rid);
                 });
             });
             edit.messages.forEach(message => this.server.to(data.rid).emit('receive_message', message));
