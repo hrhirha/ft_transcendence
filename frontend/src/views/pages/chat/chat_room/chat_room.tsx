@@ -131,9 +131,11 @@ export const ChatRoom:React.FC = () => {
         }); 
     },[])
 
+
     useEffect(() => {
         if (getIDQuery() != null)
             class_socket.get_messages({id : getIDQuery()});
+        setShowSettings(false);
     },[history.location.search])
     console.log(messages, roominfo)
     if (roominfo !== undefined && messages === undefined)
