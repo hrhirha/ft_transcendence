@@ -2,7 +2,7 @@ import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, OnGatew
 import {  } from '@nestjs/platform-socket.io'
 import { ArgumentMetadata, HttpException, Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { AddMessageDto, ChangePasswordDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, RemovePasswordDto, SetPasswordDto, UserRoomDto } from './dto';
+import { AddMessageDto, ChangePasswordDto, DeleteMessageDto, EditRoomDto, MuteUserDto, NewRoomDto, OldRoomDto, RemovePasswordDto, SetPasswordDto, UserRoomDto } from './dto';
 import { ChatService } from './chat.service';
 import { UserService } from 'src/user/user.service';
 import { HOST, user_status } from 'src/utils';
@@ -267,29 +267,58 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
     }
 
-    @SubscribeMessage('add_member') // _add_msg_to_db(msg_type.NOTIF);
-    async addUser(@ConnectedSocket() client: Socket, @MessageBody() member: UserRoomDto)
+    @SubscribeMessage('edit_room') // _add_msg_to_db(msg_type.NOTIF);
+    async addUser(@ConnectedSocket() client: Socket, @MessageBody() data: EditRoomDto)
     {
         let user = await this._chat.getUserFromSocket(client);
         if (!user)
             throw new WsException('you must login first');
         try
         {
-            const ur = await this._chat.addUser(user, member);
+            const room = await this._chat.editRoom(user, data);
             const sockets = await this.server.fetchSockets();
 
             sockets.forEach((s) => {
-                s.data.username === ur.ur.user.username && s.join(member.rid);
+                room.members.forEach(member => {
+                    s.data.username === member.username && s.join(data.rid);
+                });
             });
-            this.server.to(member.rid).emit('user_joined', ur.ur);
-            this.server.to(member.rid).emit('receive_message', ur.msg);
+            // this.server.to(data.rid).emit('user_joined', ur.ur);
+            this.server.to(data.rid).emit('receive_message', room.msg);
+            delete room.msg;
+            client.emit('room_edited', room);
         }
         catch (e)
         {
             console.log({code: e.code, message: e.message});
-            throw new WsException('failed to add user');
+            throw new WsException('failed to edit room');
         }
     }
+
+    // @SubscribeMessage('add_member') // _add_msg_to_db(msg_type.NOTIF);
+    // async addUser(@ConnectedSocket() client: Socket, @MessageBody() member: UserRoomDto)
+    // {
+    //     let user = await this._chat.getUserFromSocket(client);
+    //     if (!user)
+    //         throw new WsException('you must login first');
+    //     try
+    //     {
+    //         const ur = await this._chat.addUser(user, member);
+    //         const sockets = await this.server.fetchSockets();
+
+    //         sockets.forEach((s) => {
+    //             s.data.username === ur.ur.user.username && s.join(member.rid);
+    //         });
+    //         this.server.to(member.rid).emit('user_joined', ur.ur);
+    //         this.server.to(member.rid).emit('receive_message', ur.msg);
+    //     }
+    //     catch (e)
+    //     {
+    //         console.log({code: e.code, message: e.message});
+    //         throw new WsException('failed to add user');
+    //     }
+    // }
+
     @SubscribeMessage('remove_member') // _add_msg_to_db(msg_type.NOTIF);
     async removeUser(@ConnectedSocket() client: Socket, @MessageBody() member: UserRoomDto)
     {

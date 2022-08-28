@@ -51,6 +51,28 @@ export class OldRoomDto
     password?: string;
 }
 
+export class EditRoomDto
+{
+    @IsNotEmpty()
+    @IsString()
+    @Matches(/^c[a-z0-9]{20,}$/)
+    rid: string;
+
+    @IsDefined()
+    @IsNotEmpty()
+    @IsString()
+    @Matches(/^([\w]+ ?(\-?[\w]+)*\.?)+$/, { message: "channel name can only contain a-z A-Z 0-9 - . SP" })
+    name: string;
+
+    @IsDefined()
+    @IsArray()
+    @ArrayMinSize(1)
+    @IsNotEmpty({each:true})
+    @IsString({each:true})
+    @Matches(/^c[a-z0-9]{20,}$/, {each: true})
+    uids: string[]
+}
+
 export class SetPasswordDto
 {
     @IsNotEmpty()

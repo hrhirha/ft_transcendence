@@ -7,7 +7,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { UserDto, UserIdDto } from 'src/user/dto';
 import { UserService } from 'src/user/user.service';
 import { friend_status, msg_type, relation_status, room_type, user_status } from 'src/utils';
-import { AddMessageDto, ChangePasswordDto, DeleteMessageDto, MuteUserDto, NewRoomDto, OldRoomDto, RemovePasswordDto, SetPasswordDto, UserRoomDto } from './dto';
+import { AddMessageDto, ChangePasswordDto, DeleteMessageDto, EditRoomDto, MuteUserDto, NewRoomDto, OldRoomDto, RemovePasswordDto, SetPasswordDto, UserRoomDto } from './dto';
 
 @Injectable()
 export class ChatService {
@@ -391,38 +391,110 @@ export class ChatService {
         return {room, msg};
     }
 
-    async addUser(user: UserDto, member: UserRoomDto)
+    async editRoom(user: UserDto, data: EditRoomDto)
     {
-        await this._is_owner(user.id, member.rid);
-
-        const ur = await this._prismaS.userRoom.create({
+        await this._is_owner(user.id, data.rid);
+        
+        const room = await this._prismaS.room.update({
+            where: {
+                id: data.rid,
+            },
             data: {
-                uid: member.uid,
-                rid: member.rid,
+                name: data.name,
             },
             select: {
-                room: {
+                id: true,
+                name: true,
+                type: true,
+                user_rooms: {
                     select: {
-                        id: true,
-                        name: true,
-                        type: true,
-                        is_channel: true,
-                    }
-                },
-                user: {
-                    select: {
-                        id: true,
-                        username: true,
-                        fullName: true,
-                        imageUrl: true,
-                        status: true,
+                        is_owner: true,
+                        is_admin: true,
+                        is_banned: true,
+                        is_muted: true,
+                        user: {
+                            select: {
+                                id: true,
+                                username: true,
+                                fullName: true,
+                                imageUrl: true,
+                                status: true,
+                            }
+                        }
                     }
                 }
             }
         });
-        const msg = await this._add_msg_to_db(user.id, {rid: ur.room.id, msg: `${user.username} added ${ur.user.username}`}, msg_type.NOTIF);
-        return {ur, msg};
+        data.uids.forEach(async uid => {
+            try
+            {
+                await this._prismaS.userRoom.create({
+                    data: {
+                        uid,
+                        rid: data.rid,
+                    }
+                });
+            }
+            catch {}
+        });
+        let members = [];
+        let new_members = [];
+        room.user_rooms.forEach(ur => {
+            ur.user.id in data.uids && new_members.push(ur.user.username);
+            ur.user['is_owner'] = ur.is_owner;
+            ur.user['is_admin'] = ur.is_admin;
+            ur.user['is_banned'] = ur.is_banned,
+            ur.user['is_muted'] = ur.is_muted,
+            members.push(ur.user);
+        });
+        delete room.user_rooms;
+
+        const addedUsers = () => {
+            let str = "";
+            for (let i = 0; i < new_members.length; i++)
+            {
+                str += new_members[i].username + (i === new_members.length-1 ? '.' : ', ');
+            }
+            return msg;
+        }
+
+        const msg = await this._add_msg_to_db(user.id, {rid: data.rid, msg: `${user.username} added ${addedUsers}`}, msg_type.NOTIF);
+
+        return {...room, members, msg}
     }
+
+    // async addUser(user: UserDto, member: UserRoomDto)
+    // {
+    //     await this._is_owner(user.id, member.rid);
+
+    //     const ur = await this._prismaS.userRoom.create({
+    //         data: {
+    //             uid: member.uid,
+    //             rid: member.rid,
+    //         },
+    //         select: {
+    //             room: {
+    //                 select: {
+    //                     id: true,
+    //                     name: true,
+    //                     type: true,
+    //                     is_channel: true,
+    //                 }
+    //             },
+    //             user: {
+    //                 select: {
+    //                     id: true,
+    //                     username: true,
+    //                     fullName: true,
+    //                     imageUrl: true,
+    //                     status: true,
+    //                 }
+    //             }
+    //         }
+    //     });
+    //     const msg = await this._add_msg_to_db(user.id, {rid: ur.room.id, msg: `${user.username} added ${ur.user.username}`}, msg_type.NOTIF);
+    //     return {ur, msg};
+    // }
 
     async removeUser(user: UserDto, member: UserRoomDto)
     {
@@ -945,10 +1017,10 @@ export class ChatService {
                 is_channel: true,
                 user_rooms: {
                     select: {
+                        is_owner: true,
+                        is_admin: true,
                         is_banned: true,
                         is_muted: true,
-                        is_admin: true,
-                        is_owner: true,
                         user: {
                             select: {
                                 id: true,
@@ -966,12 +1038,13 @@ export class ChatService {
             throw new ForbiddenException('room not found | you are not a member');
 
         let members = [];
-        for (let ur of rs[0].user_rooms)
-        {
-            ur.user['is_admin'] = ur.is_admin;
+        rs[0].user_rooms.forEach(ur => {
             ur.user['is_owner'] = ur.is_owner;
-            members.push({...ur.user, is_banned: ur.is_banned});
-        }
+            ur.user['is_admin'] = ur.is_admin;
+            ur.user['is_banned'] = ur.is_banned,
+            ur.user['is_muted'] = ur.is_muted,
+            members.push(ur.user);
+        });
 
         return {is_channel: rs[0].is_channel, members};
     }
