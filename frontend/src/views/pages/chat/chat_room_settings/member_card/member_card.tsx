@@ -43,7 +43,7 @@ export const  MemeberCard:React.FC<{
                         Ultimate Game
                     </div>
                 ]}/>
-             <SettingsOption icon={faGear} title="Options"
+             {(permession === 1 || permession === 2) && <SettingsOption icon={faGear} title="Options"
                   subOptions={[
                     !banned && <div onClick={() => alert("Ban user")} title="Ban user" >
                         <FontAwesomeIcon icon={faBan}/>
@@ -83,7 +83,7 @@ export const  MemeberCard:React.FC<{
                         <FontAwesomeIcon icon={faUserXmark}/>
                         Remove user
                     </div>
-                  ]}/>
+                  ]}/>}
           </div>
       </div>
   );

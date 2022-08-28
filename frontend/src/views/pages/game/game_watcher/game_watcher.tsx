@@ -24,6 +24,14 @@ export const GameWatcher:React.FC = () =>  {
     },[]);
 
     useEffect(() => {
+        socket.disconnect();
+        updateMatche();
+        socket.removeAllListeners();
+        socket.connect();
+        console.log(ongoingMatchs, currentMatch, ongoingMatchs[currentMatch], ongoingMatchs[currentMatch]?.id)
+    },[currentMatch]);
+
+    useEffect(() => {
         socket.on("matchWinner", (win) => {
             setWinner(win);
         }).on("updateScore", (score) => {
@@ -34,7 +42,7 @@ export const GameWatcher:React.FC = () =>  {
             }));
         }).on("leaveTheGame", () => {
             if (ongoingMatchs.length > 1)
-                setCurrentMatch(currentMatch + 1);
+                setCurrentMatch(curr => curr + 1);
             else
                 updateMatche();
         }).on("joinStream", ({p1, p2, score1, score2}) => {
@@ -56,11 +64,11 @@ export const GameWatcher:React.FC = () =>  {
                 <div className="col-12 col-md-9">
                     {ongoingMatchs.length === 0 && <img className="noLiveGames" src={WatchEmptyState}/>}
                     {ongoingMatchs.length > 0 && <div className="navGames">
-                        {currentMatch == 0 && <FontAwesomeIcon icon={faChevronCircleLeft} className="navButton" title="Next game" onClick={() => setCurrentMatch((m) => m + 1)}/>}
+                        {ongoingMatchs.length - 1 > currentMatch && <FontAwesomeIcon icon={faChevronCircleRight} className="navButton next" title="Next game" onClick={() => setCurrentMatch((m) => m + 1)}/>}
                         <MatchCard match={ongoingMatchs[currentMatch]} winnerId={winner}/>
-                        {ongoingMatchs.length - 1 > currentMatch && <FontAwesomeIcon icon={faChevronCircleRight} className="navButton" title="Previous game"  onClick={() => setCurrentMatch((m) => m - 1)}/>}
+                        {currentMatch > 0 && <FontAwesomeIcon icon={faChevronCircleLeft} className="navButton" title="Previous game"  onClick={() => setCurrentMatch((m) => m - 1)}/>}
                     </div>}
-                    {ongoingMatchs.length > 0 && <GameView gameSocket={socket} isUltimate={false} watcher={true} roomId={ongoingMatchs[currentMatch]?.id} isPrivate={false} vsPID="" />}
+                    {ongoingMatchs.length > 0 && <GameView gameSocket={socket} watcher={true} roomId={ongoingMatchs[currentMatch]?.id}/>}
                 </div>
             </div>
         </section>

@@ -1,7 +1,7 @@
 import { faArrowRightFromBracket, faCheck, faClose, faGamepad, faKey, faLockOpen, faPenToSquare, faTrash, faTrashCan, faUser, faUsers, faUserSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GroupIcon } from "assets";
-import { room_msgs, user_info } from "chat_socket/interface";
+import { management_password, room_msgs, user_info } from "chat_socket/interface";
 import { getIDQuery, SocketContext } from "index";
 import { useContext, useEffect, useState } from "react";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
@@ -12,7 +12,7 @@ import { useNotif } from "views/components/notif/notif";
 import { Numeral } from "views/components/numeral/numeral";
 import { UserSearchForm } from "views/components/user_search/user_search";
 import { User } from "controller/user/user";
-import { UserCheckedCard } from "../create_chat/create_chat";
+import { UserCheckedCard, validPassword } from "../create_chat/create_chat";
 
 
 const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>, onSubmit: Function}> = ({room, members, onSubmit}) => {
@@ -22,41 +22,70 @@ const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>,
     const [channelTitle, setChannelTitle] = useState<string>(room.name);
     const [oldPassword, setOldPassword] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
+    const class_socket = useContext(SocketContext);
+    const pushNotif = useNotif();
 
     useEffect(() => {
         setExceptUsers(members.map(u => u.id).concat(selectedUsers.map(u => u.id)));
     }, [selectedUsers]);
 
-    
-    const removePassword = () => {
-        //remove password
-    }
-    const setPassword = () => {
-        //set password
-    }
-    const rupdatePassword = () => {
-        //update password
+
+    useEffect(() => {
+        class_socket.socket.on("password_edited",(data : management_password)=>{
+            room.type = data.type;
+            setPasswordEditState(0);
+            setNewPassword("");
+            setOldPassword("");
+            pushNotif({
+                id: "password_edited",
+                type: "success",
+                icon: <FontAwesomeIcon icon={faKey}/> ,
+                title: "success",
+                description: "Password updated successfully",
+            });
+        })
+
+        class_socket.socket.on("room_edited", (data : any)=>{
+            console.log("ss", data);
+            onSubmit(data);
+        }) 
+
+    }, []);
+
+
+    const savePassword = () => {
+        if(passwordEditState === 1)
+            class_socket.set_password({id : room.id, new_password : newPassword});
+        if(passwordEditState === 3)
+            class_socket.remove_password({id : room.id,  old_password : oldPassword});
+        if(passwordEditState === 2)
+            class_socket.change_password({id : room.id, new_password : newPassword, old_password : oldPassword});
     }
 
     return (
-    <form id="manageMembers" onSubmit={(e) => {e.preventDefault();}}>
-        <input type="text" className="inputStyle" value={channelTitle} onChange={(e) => {setChannelTitle(e.target.value)}} placeholder="Channel Title" />
+    <form id="manageMembers" onSubmit={(e) => {e.preventDefault(); 
+        class_socket.edit_room({rid : room.id, name : channelTitle, uids: selectedUsers.map((u : user_info )=> u.id)});
+    }} >
+        <input type="text" className={`inputStyle`} value={channelTitle} onChange={(e) => {setChannelTitle(e.target.value)}} placeholder="Channel Title" />
         <div className="managePassword">
             {room.type === "PROTECTED" &&
                 <>
                     {passwordEditState === 0 && <span className="passwordBtn" onClick={() => setPasswordEditState(2)}><FontAwesomeIcon icon={faKey}/> Edit Password</span>}
-                    {passwordEditState === 0 && <span className="passwordBtn" onClick={() => removePassword()}><FontAwesomeIcon icon={faLockOpen}/>Remove Password</span>}
+                    {passwordEditState === 0 && <span className="passwordBtn" onClick={() => setPasswordEditState(3)}><FontAwesomeIcon icon={faLockOpen}/>Remove Password</span>}
                     {passwordEditState === 2 && <>
-                        <input type="password" placeholder="Old Password" className="inputStyle" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)}/>
-                        <input type="password" placeholder="New Password" className="inputStyle" value={newPassword} onChange={(e) => setNewPassword(e.target.value)}/>
+                        <input type="password" placeholder="Old Password"  className={`inputStyle ${validPassword(oldPassword) ? "":"error"}`} value={oldPassword} onChange={(e) => setOldPassword(e.target.value)}/>
+                        <input type="password" placeholder="New Password" className={`inputStyle ${validPassword(newPassword) ? "":"error"}`} value={newPassword} onChange={(e) => setNewPassword(e.target.value)}/>
+                    </>}
+                    {passwordEditState === 3 && <>
+                        <input type="password" placeholder="Old Password"  className={`inputStyle ${validPassword(oldPassword) ? "":"error"}`} value={oldPassword} onChange={(e) => setOldPassword(e.target.value)}/>
                     </>}
                 </>}
             {room.type === "PUBLIC" && <>
                 {passwordEditState === 0 && <span  className="passwordBtn" onClick={() => setPasswordEditState(1)}><FontAwesomeIcon icon={faKey}/> Set Password</span>}
-                {passwordEditState === 1 && <input type="password" placeholder="Password" className="inputStyle" value={newPassword} onChange={(e) => setNewPassword(e.target.value)}/>}
+                {passwordEditState === 1 && <input type="password" placeholder="Password"  className={`inputStyle ${validPassword(newPassword) ? "":"error"}`} value={newPassword} onChange={(e) => setNewPassword(e.target.value)}/>}
             </>}
             {passwordEditState !== 0 && 
-            <button onClick={() => setPassword()} className="save">
+            <button onClick={() => savePassword()} className="save">
                 <FontAwesomeIcon icon={faCheck}/>
                 Save password
             </button>}
@@ -88,8 +117,8 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
     const [owner, setOwner] = useState<boolean>(false);
     const [editable, setEditable] = useState<boolean>(false);
     const pushNotif = useNotif();
+    const [permession, setPermession] = useState<number>(0);
 
-    //JSON.parse(window.localStorage.getItem("user")).id 
 
     useEffect(() => {
         class_socket.get_members({id : getIDQuery()});
@@ -98,6 +127,13 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
         class_socket.socket.on("members", (data : user_info[])=>{
             setMembers(data);
             setOwner(data.find((u) => u.is_owner === true && u.id === JSON.parse(window.localStorage.getItem("user")).id ) !== undefined)
+            if(data.find((u) => u.is_owner === true && u.id === JSON.parse(window.localStorage.getItem("user")).id ) !== undefined)
+                setPermession(2);
+            else if(data.find((u) => u.is_admin === true && u.id === JSON.parse(window.localStorage.getItem("user")).id ) !== undefined)
+                setPermession(1);
+            else
+                setPermession(0);
+            
         })
 
     },[])
@@ -150,6 +186,12 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
         });
     }
 
+    const settingsEdit = (data: any) =>{
+        console.log("aa",data);
+        setMembers(data.members);
+        setEditable(false);
+    }
+
     return (
         <section id="chatRoomSettings">
             <div className="roomSettings">
@@ -158,7 +200,7 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
                     <CircleAvatar avatarURL={GroupIcon} dimensions={100} status={null}/>
                     {!editable && <h5 className="channelTitle">{room.name}</h5>}
                 </div>
-                {editable && <EditChatRoomSettings room={room} members={members} onSubmit={() => setEditable(false)}/>}
+                {editable && <EditChatRoomSettings room={room} members={members} onSubmit={settingsEdit}/>}
                 {!editable && <div className="channelOptions options">
                     {owner && <SettingsOption icon={faTrash} title="Delete Channel" onClick={() => deleteChannel()}/>}
                     {!owner &&<SettingsOption icon={faArrowRightFromBracket} title="Leave Channel" onClick={() => leaveChannel()}/>}
@@ -170,7 +212,7 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
                         members.map((member, k) => 
                             <MemeberCard 
                                 key={k}
-                                permession={1}//bddl
+                                permession={permession}//bddl
                                 owner={member.is_owner}
                                 avatar={member.imageUrl} 
                                 admin={member.is_admin} 

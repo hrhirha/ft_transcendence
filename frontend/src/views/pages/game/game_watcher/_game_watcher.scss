@@ -39,6 +39,22 @@ section#gameWatcher {
                     color: $purple!important;
                 }
             }
+            .navButton.next {
+                right: -0.75rem;
+                left: auto!important;
+                @media (max-width: $md) {
+                    font-size: 1.15rem;
+                    right: -.5rem;
+                }
+                @media (max-width: $sm) {
+                    font-size: 1.25rem;
+                    right: -.5rem;
+                }
+                @media (max-width: $xs) {
+                    font-size: 1rem;
+                    right: -.25rem;
+                }
+            }
         }
     }
 }

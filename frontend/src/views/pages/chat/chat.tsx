@@ -240,9 +240,6 @@ export const Chat:React.FC = () => {
             <button style={{color: `black`}} onClick={() =>{
                 class_socket.leave_room({id : "cl4lidmy50103ojsm2ftzgyw4"});
             }}>leave_room</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.add_member({uid : "cl4lebw5j0133yrsms9le0c75", rid : "cl4lidmy50103ojsm2ftzgyw4"});
-            }}>add_member</button>
 
             <button style={{color: `black`}} onClick={() =>{
                 class_socket.set_password({id : "cl4juxk0d0176ohsm1x6d39sn", new_password : "Walidbensaid123$"});

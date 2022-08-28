@@ -396,7 +396,8 @@ export class ChatService {
         const old_room = await this._is_owner(user.id, data.rid);
         
         let messages = [];
-        data.uids.forEach(async uid => {
+        for (let uid of data.uids)
+        {
             try
             {
                 const ur = await this._prismaS.userRoom.create({
@@ -414,7 +415,7 @@ export class ChatService {
                 messages.push(msg);
             }
             catch {}
-        });
+        }
 
         const room = await this._prismaS.room.update({
             where: {
@@ -452,13 +453,14 @@ export class ChatService {
             messages.push(msg);
         }
         let members = [];
-        room.user_rooms.forEach(ur => {
+        for (let ur of room.user_rooms)
+        {
             ur.user['is_owner'] = ur.is_owner;
             ur.user['is_admin'] = ur.is_admin;
             ur.user['is_banned'] = ur.is_banned,
             ur.user['is_muted'] = ur.is_muted,
             members.push(ur.user);
-        });
+        }
         delete room.user_rooms;
 
         return {...room, members, messages}

@@ -49,6 +49,13 @@ interface remove_password {
     old_password : string,
 }
 
+
+interface info_edit_room {
+    rid:  string,
+    name : string,
+    uids : string[],
+}
+
 export class ChatSocket {
     socket : Socket;
     
@@ -92,12 +99,12 @@ export class ChatSocket {
         this.socket.emit("leave_room", info_room);
     }
 
-    add_member(member :info_management_member) {
+    edit_room(member : info_edit_room) {
         if(member.rid.length === 0)
             return new Error("error : rid must not be empty");
-        if(member.uid.length === 0)
-            return new Error("error : uid must not be empty");
-        this.socket.emit("add_member", member);
+        if(member.name.length === 0)
+            return new Error("error : name must not be empty");
+        this.socket.emit("edit_room", member);
     }
 
     remove_member(member :info_management_member) {

@@ -93,6 +93,9 @@ section#chatRoomSettings {
                     color: $light4;
                 }
             }
+            .error {
+                border: 2px solid $red;
+            }
             input:disabled {
                 background: transparent;
                 max-width: auto;
