@@ -77,39 +77,39 @@ section#chatRoom {
         }
         form#messageForm {
             @include _flex(row, flex-end, center);
-                width: 100%;
-                margin: 1rem;
-                input {
-                    width: 100%;
-                    display: block;
-                    padding: .75rem 1.25rem;
-                    padding-right: 6rem;
-                    font-size: $fsize;
-                    background-color: $dark3;
-                    border: none;
-                    border-radius: 50rem;
-                    outline: none;
-                    font-size: $fsize * .9;
-                }
-                ::placeholder {
-                    color: $light3;
-                }
-        }
-        button#sendMessage {
-            @include _flex(row, space-evenly, center);
-            cursor: pointer;
-            border: none;
-            background-color: $purple;
-            font-family: $BFont;
-            padding: .5rem;
+            background-color: $dark3;
+            width: 100%;
+            margin: 1rem;
+            padding: .1rem;
             border-radius: 50rem;
-            min-width: 5.25rem;
-            min-height: 2.3rem;
-            margin-left: .5rem;
-            position: absolute;
-            margin-right: .25rem;
-            svg {
+            input {
+                display: block;
+                width: 100%;
+                padding: .75rem;
+                padding-right: 0;
                 font-size: $fsize;
+                border: none;
+                outline: none;
+                font-size: $fsize * .9;
+                background: transparent;
+            }
+            button#sendMessage {
+                @include _flex(row, space-evenly, center);
+                cursor: pointer;
+                border: none;
+                background-color: $purple;
+                font-family: $BFont;
+                padding: .5rem;
+                border-radius: 50rem;
+                min-width: 5.25rem;
+                min-height: 2.3rem;
+                margin-right: .25rem;
+                svg {
+                    font-size: $fsize;
+                }
+            }
+            ::placeholder {
+                color: $light3;
             }
         }
     }

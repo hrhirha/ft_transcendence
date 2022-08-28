@@ -50,11 +50,13 @@ const ChatRoomHeader = (Props : HeaderProps) => {
     );
 }
 
-const ChatRoomBody:React.FC<{messages: msgs[]}> = ({messages}) => {
+const ChatRoomBody:React.FC<{messages: msgs[], roomId: string}> = ({messages, roomId}) => {
     return <div id="chatRoomBody" style={{backgroundImage: `url(${BgVectors})`}}>
-        { messages && messages.map ((message : msgs, k ) => 
+        { messages && messages.map ((message : msgs, k: number ) => 
             <Chat_msg
-                key={k}
+                key={message.id}
+                msgId={message.id}
+                roomId={roomId}
                 display_image={(messages[k - 1] && messages[k].user.id === messages[k - 1].user.id) ? true : false }
                 sender_user={message.user.id}
                 image = {message.user.imageUrl}
@@ -96,9 +98,7 @@ export const ChatRoom:React.FC = () => {
         class_socket.socket.on("messages", (data : messages)=>{
             setmessages(data.msgs);
             setRoominfo(data.room);
-        });
-
-        class_socket.socket.on("receive_message", (data : receive_message)=>{
+        }).on("receive_message", (data : receive_message)=>{
             if (getIDQuery() != null && getIDQuery() == data.room.id)
             {
                 if(messages != null)
@@ -106,7 +106,9 @@ export const ChatRoom:React.FC = () => {
                 else
                     class_socket.get_messages({id : getIDQuery()});
             }
-        })
+        }).on("message_deleted", ()=>{
+            class_socket.get_messages({id : getIDQuery()});
+        }); 
     },[])
 
     useEffect(() => {
@@ -140,7 +142,7 @@ export const ChatRoom:React.FC = () => {
                 onClose={() => navigate("/chat", {replace : true})}
                 showSettings={() => setShowSettings(true)}
             />
-            <ChatRoomBody messages={messages} />
+            <ChatRoomBody messages={messages} roomId={roominfo.id}/>
             <ChatRoomFooter send_message={(msg : string) => class_socket.send_message({rid : getIDQuery(), msg :msg})}/>
         </section>}
     </>

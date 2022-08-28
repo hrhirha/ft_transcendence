@@ -139,9 +139,7 @@ export const Chat:React.FC = () => {
                 search: `?id=${data.room.id}`,
             }, {replace: true});
             class_socket.get_chats();
-        })
-        
-        class_socket.socket.on("room_created", (data : room_created)=>{
+        }).on("room_created", (data : room_created)=>{
             setShowNewChatForm(false);
             navigate({
                 pathname: '/chat',
@@ -149,15 +147,11 @@ export const Chat:React.FC = () => {
             }, {replace: true});
             class_socket.get_chats();
             
-        })
-
-        class_socket.socket.on("status_update", () =>{
+        }).on("status_update", () =>{
             class_socket.get_chats();
             if(getIDQuery() !== null)
                 class_socket.get_messages({id : getIDQuery()});
-        })
-        
-        class_socket.socket.on("chats", (data : chats)=>{ 
+        }).on("chats", (data : chats)=>{ 
             setchatRooms(data);
             if(data.dms.find(d => d.room.id ===  getIDQuery()))
                 setActiveTab(chatTabs.chats);
@@ -165,13 +159,9 @@ export const Chat:React.FC = () => {
                 setActiveTab(chatTabs.joinedGroups);
             else if(data.others.find(d => d.id ===  getIDQuery()))
                 setActiveTab(chatTabs.otherGroups);
-        })
-
-        class_socket.socket.on("receive_message", (data : receive_message)=>{
+        }).on("receive_message", (data : receive_message)=>{
              class_socket.get_chats();
-        })
-
-        class_socket.socket.on("room_deleted", (data : {id : string})=> {
+        }).on("room_deleted", (data : {id : string})=> {
             console.log("room_deleted")
             if(getIDQuery() !== null && getIDQuery() === data.id)
                 navigate(`/chat`, {replace: true})

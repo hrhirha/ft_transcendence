@@ -1,0 +1,4 @@
+rm: /dev/null: Permission denied
+rm: /dev/null: Permission denied
+m [-f | -i] [-dPRrvW] file ...
+       unlink file

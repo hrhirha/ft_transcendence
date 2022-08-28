@@ -1,7 +1,6 @@
 .Me {
     margin: .4rem;
     @include _flex(row-reverse, right, flex-start);
-
     span.msg, span.first_msg {
         padding: 0.5rem .75rem;
         max-width: 69%;
@@ -19,6 +18,24 @@
     span.first_msg {
         margin-right: 2.75rem;
         border-radius: 1rem;
+    }
+
+    i {
+        @include _flex(row, center, center);
+        @include _square(1.75rem);
+        cursor: pointer;
+        display: none;
+        position: relative;
+        right: -.5rem;
+        top: -.5rem; 
+        border: .2rem solid $dark3;
+        font-size: $fsize * .75;
+        background-color: $purple;
+        border-radius: 5rem;
+    }
+
+    &:hover > i {
+        display: flex;
     }
 }
 
