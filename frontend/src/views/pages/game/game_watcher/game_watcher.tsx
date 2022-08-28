@@ -45,6 +45,7 @@ export const GameWatcher:React.FC = () =>  {
             }));
         });
         document.addEventListener("visibilitychange", event => {
+            console.log("heree");
             socket.emit("isActive", (document.visibilityState === "visible"));
         });
     }, [socket]);

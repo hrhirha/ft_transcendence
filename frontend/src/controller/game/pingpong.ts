@@ -60,6 +60,7 @@ export default class PingPong extends Phaser.Scene
         private: boolean,
         userId: string
     }
+    onfocus: boolean = true;
     
     constructor(msoc: Socket, type:string, isPlayer: boolean, roomId: string, Game: {
         private: boolean,
@@ -97,7 +98,6 @@ export default class PingPong extends Phaser.Scene
             this.setupListners = false;
             this.soc.on("saveData", (data: { player: string, is_player: boolean, roomId: string, userId: string, mapUrl: string } ) =>
             {
-                console.log(data);
                 this.data = data;
                 if (data.player === "player1")
                 {
@@ -135,7 +135,7 @@ export default class PingPong extends Phaser.Scene
                         this.leave.destroy();
                     this.replayClick = false;
                 }
-                this.goalTime();
+                this.goalTime(3);
             });
 
 
@@ -165,7 +165,7 @@ export default class PingPong extends Phaser.Scene
                         this.buttonBg.destroy();
                     if (this.leave)
                         this.leave.destroy();
-                this.goalTime();
+                this.goalTime(3);
             });
             
             this.soc.on("newRoom", (id: string) => 
@@ -191,6 +191,8 @@ export default class PingPong extends Phaser.Scene
 
             this.soc.on("youWin", () => 
             {
+                if (this.waiting)
+                    this.waiting.destroy();
                 this.exitEmited = true;
                 if (this.End && this.data.is_player)
                 {
@@ -212,7 +214,7 @@ export default class PingPong extends Phaser.Scene
                             this.restartText.destroy();
                         return ;
                     }
-                    this.leave = this.add.text(this.w / 2 , this.h / 1.20 , "One Of players left the Game", { fontSize: "35px",
+                    this.leave = this.add.text(this.w / 2 , this.h / 2.1 , "Second Player Left The Game", { fontSize: "35px",
                     fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
                     const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 170 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
                     this.leave = this.add.text(this.w / 2 , this.h / 2 + 170 , "Exit", { fontSize: "35px",
@@ -374,7 +376,6 @@ export default class PingPong extends Phaser.Scene
         if (this.re)
             return ;
         this.re = true;
-        // this.soc.removeAllListeners();
         this.scene.restart();
     }
 ////////////////////////.................////////////////////////
@@ -450,7 +451,7 @@ export default class PingPong extends Phaser.Scene
             this.map = false;
             if (this.data.is_player)
             {
-                this.goalTime();
+                this.goalTime(3);
                 return ;
             }
         }
@@ -475,6 +476,7 @@ export default class PingPong extends Phaser.Scene
         }
         else if (this.re)
         {
+            this.waiting = this.add.text(this.w / 2 , this.h / 2 , "Waiting ...", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setOrigin(0.5);
             this.re = false;
             this.restartClick = true;
             this.soc.emit('restart', this.data); 
@@ -488,7 +490,7 @@ export default class PingPong extends Phaser.Scene
         }
         else if  (!this.End && this.goal && !this.re && (this.leftScore || this.rightScore))
         {
-            this.goalTime();
+            this.goalTime(3);
         }
         
     }
@@ -526,15 +528,18 @@ export default class PingPong extends Phaser.Scene
     startGame() : void
     {
         this.gameIsStarted = true;
+        if (this.isPlayer)
+                this.mobile = true;
         if (this.sys.game.device.os.desktop)
+        {
             if (this.isPlayer)
             {
+                this.mobile = false;
                 this.desktop = true;
                 this.cursors =  this.input.keyboard.createCursorKeys();
             }
-        else
-            if (this.isPlayer)
-                this.mobile = true;
+        }
+
         // loading a ball add sprite to the 
         this.posx = (this.data.player === "player1") ? 30 : this.w - (100 * this.paddleScale) - 30 ;
         this.eposx = (this.data.player !== "player1") ? 30 : this.w - (100 * this.paddleScale) - 30 ;
@@ -547,9 +552,7 @@ export default class PingPong extends Phaser.Scene
             this.paddle = this.add.sprite((this.w - (100 * this.paddleScale) - 30) , this.posy, 'paddle').setOrigin(0,0);
         this.paddle.setScale(this.paddleScale); // scale the sprit
         this.physics.add.existing(this.paddle, true); // set the physicss to paddle !!
-        this.physics.add.collider(this.paddle, this.ball, function () {
-            console.log("paddle");
-       }); // set the collider with paddle and the ball
+        this.physics.add.collider(this.paddle, this.ball); // set the collider with paddle and the ball
 
         // create enemy 
         this.createEnemy(this.paddle.width);
@@ -564,9 +567,7 @@ export default class PingPong extends Phaser.Scene
             this.enemy = this.add.sprite(30, this.posy, 'paddle').setOrigin(0,0);
         this.enemy.setScale(this.paddleScale); // scale the sprit
         this.physics.add.existing(this.enemy, true); // set the physicss to paddle !!
-        this.physics.add.collider(this.enemy, this.ball, function () {
-            console.log("enemy");
-        });
+        this.physics.add.collider(this.enemy, this.ball);
     }
     
     resetball() : void
@@ -624,9 +625,9 @@ export default class PingPong extends Phaser.Scene
         }
     }
     
-    goalTime()
+    goalTime(time)
     {
-        this.initialTime = 3;
+        this.initialTime = time;
         this.counter = this.add.text(this.w / 2, this.h / 2, '' + this.formatTime(this.initialTime), { fontSize: "60px", 
         fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
         // Each 1000 ms call onEvent
@@ -635,12 +636,6 @@ export default class PingPong extends Phaser.Scene
 
     update () : void
     {
-        // if (this.soc.disconnected)
-        // {
-            //     this.add.text(this.w / 2, this.h / 2.5, 'the Server Is Down !!', { fontSize: "60px", 
-            //     fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
-            //     this.scene.pause();
-        // }
         if (this.exitEmited || this.goal || !this.gameIsStarted || !this.isPlayer || this.map)
             return ;
         // ///// check For the  movment ////////////////
@@ -648,7 +643,6 @@ export default class PingPong extends Phaser.Scene
         {
             if (this.cursors && this.cursors.up.isDown && ( this.paddle.y - 10) >= 0)
             {
-
                 this.paddle.y -= 10;
                 if('updateFromGameObject' in this.paddle.body) {
                     this.paddle.body.updateFromGameObject();

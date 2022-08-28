@@ -465,7 +465,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         this.ultimateQue = null;
     }
 
-
     @SubscribeMessage('join')
     async joinNewRoom(client: Socket, d: any)
     {
@@ -616,8 +615,32 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             roomId: room,
             userId: usr.id,
             mapUrl,
+            onFocus: true,
         });
         client.join(room);
+    }
+
+    @SubscribeMessage('isActive')
+    async OnFocus(client: Socket, focus: boolean)
+    {
+        console.log(focus);
+        const user =(await this.jwt.getUserFromSocket(client));
+        if (!user)
+        {
+            client.disconnect();
+            return user;
+        }
+        if (client.data.obj.isPlayer && !focus)
+        {
+            client.data.obj.onFocus = false;
+            client.broadcast.to(client.data.obj.roomId).emit("focus", false);
+        }
+        if (client.data.obj.isPlayer && focus && !client.data.obj.onFocus)
+        {
+            client.data.obj.onFocus = true;
+            client.broadcast.to(client.data.obj.roomId).emit("focus", true);
+        }
+
     }
 
     @SubscribeMessage('move')
