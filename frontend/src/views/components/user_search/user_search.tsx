@@ -13,7 +13,7 @@ const SuggestionCard:React.FC<{avatar: string, fullName: string, onClick: Functi
     </div>;
 }
 
-export const UserSearchForm:React.FC<{callback: Function}> = ({callback}) => {
+export const UserSearchForm:React.FC<{callback: Function, exceptUsers?: Array<String>}> = ({callback, exceptUsers}) => {
     const [suggestions, setSuggestions] = useState<any[]>([]);
     const [userSelected, setUserSelected] = useState(null);
     const [showSuggestions, setShowSuggestions] = useState(false);
@@ -43,7 +43,10 @@ export const UserSearchForm:React.FC<{callback: Function}> = ({callback}) => {
             setShowSuggestions(true);
             setSuggestions([]);
             setUserSelected(null);
+            console.log(friends, exceptUsers);
             friends.forEach((user: any, key: number) => {
+                if (exceptUsers && exceptUsers.find(uid => uid === user.id) !== undefined)
+                    return;
                 if (user.username.toLowerCase().includes(e.target.value.toLowerCase()))
                 {
                     setSuggestions(prvSugges => [...prvSugges,<SuggestionCard onClick={() => {

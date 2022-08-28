@@ -137,14 +137,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const r = await this._chat.setPassword(user, dto);
-            const usernames = await this._chat.getUnjoinedUsers(dto.id);
-            const sockets = await this.server.fetchSockets();
-
-            let ids = [];
-            sockets.forEach((s) => {
-                usernames.includes(s.data.username) && ids.push(s.id);
-            });
-            this.server.to(ids).emit('password_set', r);
+            client.emit('password_edited', r);
         }
         catch (e)
         {
@@ -161,7 +154,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('you must login first');
         try
         {
-            await this._chat.changePassword(user, dto);
+            const r = await this._chat.changePassword(user, dto);
+            client.emit('password_edited', r);
         }
         catch (e)
         {
@@ -179,14 +173,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const r = await this._chat.removePassword(user, dto);
-            const usernames = await this._chat.getUnjoinedUsers(dto.id);
-            const sockets = await this.server.fetchSockets();
-
-            let ids = [];
-            sockets.forEach((s) => {
-                usernames.includes(s.data.username) && ids.push(s.id);
-            });
-            this.server.to(ids).emit('password_removed', r);
+            client.emit('password_edited', r);
         }
         catch (e)
         {

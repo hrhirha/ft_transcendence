@@ -1,7 +1,7 @@
-import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faBan, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SocketContext } from 'index';
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { CircleAvatar } from 'views/components/circle_avatar/circle_avatar'
 import { useNotif } from 'views/components/notif/notif';
 
@@ -13,11 +13,14 @@ interface Props {
     image: string,
     msg: string,
     time: string,
+    type: string,
 }
 
 export const Chat_msg = (Props : Props) => {
   const class_socket = useContext(SocketContext);
   const pushNotif = useNotif();
+  const myMessage = Props.sender_user === JSON.parse(window.localStorage.getItem("user")).id;
+  const notifMsg = Props.type === "NOTIFICATION";
 
   const removeMessage = () => {
     pushNotif({
@@ -36,10 +39,10 @@ export const Chat_msg = (Props : Props) => {
   }
 
   return (
-    <div className={(!Props.display_image ? "mtop " : "") + (Props.sender_user === JSON.parse(window.localStorage.getItem("user")).id ? "Me" : "User")}>
-        {!Props.display_image && <CircleAvatar avatarURL={Props.image} dimensions={30} status = {null}/>}
-        <span className={Props.display_image? "first_msg" : "msg"}>{Props.msg}</span>
-        {Props.sender_user === JSON.parse(window.localStorage.getItem("user")).id
+    <div className={notifMsg ? "msgNotif" : (!Props.display_image ? "mtop " : "") + ( myMessage ? "Me" : "User")}>
+        {!notifMsg && !Props.display_image && <CircleAvatar avatarURL={Props.image} dimensions={30} status = {null}/>}
+        <span className={Props.display_image? "first_msg" : "msg"}>{Props.msg === "deleted" ? <span className='deleted'><FontAwesomeIcon icon={faBan}/> this message has been deleted</span> : Props.msg}</span>
+        {!notifMsg && myMessage && Props.msg !== "deleted"
           && <i onClick={() => removeMessage()}>
               <FontAwesomeIcon icon={faTrashCan} />
             </i>}

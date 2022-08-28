@@ -24,6 +24,7 @@
 }
 
 @mixin _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $purple, $bgcolor2: $light4, $font: $MFont, $bradius: 5rem) {
+    @include _flex(row, center, center);
     @include _gradientBg($bgcolor1, $bgcolor2, 170);
     cursor: pointer;
     font-family: $font;

@@ -18,7 +18,7 @@ export const validPassword = (password: string) => {
     return  password.trim() != "" && /[A-Z]+/.test(password) && /\w{5,}/.test(password) && /[\!\@\#\$\&\*\?\-\=\+]+/.test(password) && /\d+/.test(password);
 }
 
-const UserCheckedCard:React.FC<{avatar: string, fullName: string, onRemove: Function}> = ({avatar, fullName, onRemove}) => {
+export const UserCheckedCard:React.FC<{avatar: string, fullName: string, onRemove: Function}> = ({avatar, fullName, onRemove}) => {
     return <div className="userCheckedCard">
         <span className="userInfos">
             <CircleAvatar dimensions={25} avatarURL={avatar} status={null}/>

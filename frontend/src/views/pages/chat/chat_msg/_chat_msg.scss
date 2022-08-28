@@ -65,3 +65,25 @@
 .mtop {
     margin-top: 1.5rem;
 }
+
+span.deleted {
+    @include _selectionOff();
+    color: $light3;
+    svg path {
+        fill: $light3;
+    }
+    font-size: $fsize * .75;
+}
+
+.msgNotif {
+    @include _selectionOff();
+    margin: .75rem auto;
+    font-size: $fsize * .8;
+    padding: .25rem 1rem;
+    background-color: rgba($dark2, .75);
+    max-width: max-content;
+    border-radius: 5rem;
+    span {
+        color: $light3;
+    }
+}

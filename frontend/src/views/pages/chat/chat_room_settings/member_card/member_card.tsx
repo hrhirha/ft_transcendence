@@ -24,11 +24,11 @@ export const  MemeberCard:React.FC<{
          <div className='userData' onClick={() => onClick()}>
             <CircleAvatar avatarURL={avatar} dimensions={45} status={null}/>
             <div className="dataRow">
-                <span className="fullName">
-                    {fullName}
+                <span className="fullName">{fullName}</span>
+                <span className="userName">
+                    {username}
                     {admin && <FontAwesomeIcon icon={faUserGear} title="Admin"/>}
                 </span>
-                <span className="userName">{username}</span>
             </div>
          </div>
           <div className="memberOptions">
