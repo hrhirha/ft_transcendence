@@ -268,25 +268,24 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('edit_room') // _add_msg_to_db(msg_type.NOTIF);
-    async addUser(@ConnectedSocket() client: Socket, @MessageBody() data: EditRoomDto)
+    async editRoom(@ConnectedSocket() client: Socket, @MessageBody() data: EditRoomDto)
     {
         let user = await this._chat.getUserFromSocket(client);
         if (!user)
             throw new WsException('you must login first');
         try
         {
-            const room = await this._chat.editRoom(user, data);
+            const edit = await this._chat.editRoom(user, data);
             const sockets = await this.server.fetchSockets();
 
             sockets.forEach((s) => {
-                room.members.forEach(member => {
+                edit.members.forEach(member => {
                     s.data.username === member.username && s.join(data.rid);
                 });
             });
-            // this.server.to(data.rid).emit('user_joined', ur.ur);
-            this.server.to(data.rid).emit('receive_message', room.msg);
-            delete room.msg;
-            client.emit('room_edited', room);
+            edit.messages.forEach(message => this.server.to(data.rid).emit('receive_message', message));
+            delete edit.messages;
+            client.emit('room_edited', edit);
         }
         catch (e)
         {
@@ -294,30 +293,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('failed to edit room');
         }
     }
-
-    // @SubscribeMessage('add_member') // _add_msg_to_db(msg_type.NOTIF);
-    // async addUser(@ConnectedSocket() client: Socket, @MessageBody() member: UserRoomDto)
-    // {
-    //     let user = await this._chat.getUserFromSocket(client);
-    //     if (!user)
-    //         throw new WsException('you must login first');
-    //     try
-    //     {
-    //         const ur = await this._chat.addUser(user, member);
-    //         const sockets = await this.server.fetchSockets();
-
-    //         sockets.forEach((s) => {
-    //             s.data.username === ur.ur.user.username && s.join(member.rid);
-    //         });
-    //         this.server.to(member.rid).emit('user_joined', ur.ur);
-    //         this.server.to(member.rid).emit('receive_message', ur.msg);
-    //     }
-    //     catch (e)
-    //     {
-    //         console.log({code: e.code, message: e.message});
-    //         throw new WsException('failed to add user');
-    //     }
-    // }
 
     @SubscribeMessage('remove_member') // _add_msg_to_db(msg_type.NOTIF);
     async removeUser(@ConnectedSocket() client: Socket, @MessageBody() member: UserRoomDto)

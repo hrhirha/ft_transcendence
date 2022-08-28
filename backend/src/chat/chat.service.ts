@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import * as argon2 from 'argon2'
 import { Socket } from 'socket.io';
@@ -393,8 +393,29 @@ export class ChatService {
 
     async editRoom(user: UserDto, data: EditRoomDto)
     {
-        await this._is_owner(user.id, data.rid);
+        const old_room = await this._is_owner(user.id, data.rid);
         
+        let messages = [];
+        data.uids.forEach(async uid => {
+            try
+            {
+                const ur = await this._prismaS.userRoom.create({
+                    data: {
+                        uid,
+                        rid: data.rid,
+                    },
+                    select: {
+                        user: {
+                            select: { username: true, }
+                        }
+                    }
+                });
+                const msg = await this._add_msg_to_db(user.id, {rid: data.rid, msg: `${user.username} added ${ur.user.username}`}, msg_type.NOTIF);
+                messages.push(msg);
+            }
+            catch {}
+        });
+
         const room = await this._prismaS.room.update({
             where: {
                 id: data.rid,
@@ -425,22 +446,13 @@ export class ChatService {
                 }
             }
         });
-        data.uids.forEach(async uid => {
-            try
-            {
-                await this._prismaS.userRoom.create({
-                    data: {
-                        uid,
-                        rid: data.rid,
-                    }
-                });
-            }
-            catch {}
-        });
+        if (room.name !== old_room.name)
+        {
+            const msg = await this._add_msg_to_db(user.id, {rid: data.rid, msg: `${user.username} changed this channel's name to ${room.name}`}, msg_type.NOTIF);
+            messages.push(msg);
+        }
         let members = [];
-        let new_members = [];
         room.user_rooms.forEach(ur => {
-            ur.user.id in data.uids && new_members.push(ur.user.username);
             ur.user['is_owner'] = ur.is_owner;
             ur.user['is_admin'] = ur.is_admin;
             ur.user['is_banned'] = ur.is_banned,
@@ -449,52 +461,8 @@ export class ChatService {
         });
         delete room.user_rooms;
 
-        const addedUsers = () => {
-            let str = "";
-            for (let i = 0; i < new_members.length; i++)
-            {
-                str += new_members[i].username + (i === new_members.length-1 ? '.' : ', ');
-            }
-            return msg;
-        }
-
-        const msg = await this._add_msg_to_db(user.id, {rid: data.rid, msg: `${user.username} added ${addedUsers}`}, msg_type.NOTIF);
-
-        return {...room, members, msg}
+        return {...room, members, messages}
     }
-
-    // async addUser(user: UserDto, member: UserRoomDto)
-    // {
-    //     await this._is_owner(user.id, member.rid);
-
-    //     const ur = await this._prismaS.userRoom.create({
-    //         data: {
-    //             uid: member.uid,
-    //             rid: member.rid,
-    //         },
-    //         select: {
-    //             room: {
-    //                 select: {
-    //                     id: true,
-    //                     name: true,
-    //                     type: true,
-    //                     is_channel: true,
-    //                 }
-    //             },
-    //             user: {
-    //                 select: {
-    //                     id: true,
-    //                     username: true,
-    //                     fullName: true,
-    //                     imageUrl: true,
-    //                     status: true,
-    //                 }
-    //             }
-    //         }
-    //     });
-    //     const msg = await this._add_msg_to_db(user.id, {rid: ur.room.id, msg: `${user.username} added ${ur.user.username}`}, msg_type.NOTIF);
-    //     return {ur, msg};
-    // }
 
     async removeUser(user: UserDto, member: UserRoomDto)
     {
@@ -543,7 +511,7 @@ export class ChatService {
             },
         });
         if (ur.count === 0)
-            throw new ForbiddenException('addAdmin failed');
+            throw new WsException('addAdmin failed');
         return {success: true}
     }
 
@@ -567,7 +535,7 @@ export class ChatService {
             },
         });
         if (ur.count === 0)
-            throw new ForbiddenException('removeAdmin failed');
+            throw new WsException('removeAdmin failed');
         return {success: true}
     }
 
@@ -575,9 +543,9 @@ export class ChatService {
     {
         const ur0 = await this._get_ur_if_admin(user, user_room);
         if (!ur0)
-            throw new ForbiddenException('user not found | room not found | you are not an admin');
+            throw new WsException('user not found | room not found | you are not an admin');
         if (ur0.is_banned)
-            throw new ForbiddenException('user already banned');
+            throw new WsException('user already banned');
 
         const ur = await this._prismaS.userRoom.update({
             data: {
@@ -627,9 +595,9 @@ export class ChatService {
     {
         const ur0 = await this._get_ur_if_admin(user, user_room);
         if (!ur0)
-            throw new ForbiddenException('user not found | room not found | you are not an admin');
+            throw new WsException('user not found | room not found | you are not an admin');
         if (!ur0.is_banned)
-            throw new ForbiddenException('user already unbanned');
+            throw new WsException('user already unbanned');
 
         const mid = ur0.bans[0].id;
         const ur = await this._prismaS.userRoom.update({
@@ -1035,7 +1003,7 @@ export class ChatService {
             }
         });
         if (rs.length === 0)
-            throw new ForbiddenException('room not found | you are not a member');
+            throw new WsException('room not found | you are not a member');
 
         let members = [];
         rs[0].user_rooms.forEach(ur => {
@@ -1111,6 +1079,8 @@ export class ChatService {
         const my_ur = room.user_rooms.find(ur => ur.uid === uid);
         if (!my_ur)
         {
+            if (room.type === room_type.PRIVATE)
+                throw new WsException('room not found');
             delete room.user_rooms;
             delete room.messages;
             return { room };
@@ -1324,10 +1294,16 @@ export class ChatService {
             select: {
                 uid: true,
                 rid: true,
+                room: {
+                    select: {
+                        name: true,
+                    }
+                }
             }
         });
         if (ur.length === 0)
             throw new WsException('room not found | you are not the owner');
+        return ur[0].room;
     }
 
     private async _get_ur_if_admin(u: UserDto, ur: UserRoomDto)

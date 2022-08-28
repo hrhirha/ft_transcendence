@@ -66,7 +66,6 @@ export class EditRoomDto
 
     @IsDefined()
     @IsArray()
-    @ArrayMinSize(1)
     @IsNotEmpty({each:true})
     @IsString({each:true})
     @Matches(/^c[a-z0-9]{20,}$/, {each: true})
