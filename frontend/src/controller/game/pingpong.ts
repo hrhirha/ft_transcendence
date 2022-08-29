@@ -1,7 +1,6 @@
 import Phaser from "phaser";
 import { NormalField, UltimateField, Ball, Paddle, YouWin, YouLose, RedButton, NormalButton, EndMatch } from "assets";
 import { Socket } from "socket.io-client";
-import { throws } from "assert";
 
 export default class PingPong extends Phaser.Scene
 {
@@ -60,7 +59,6 @@ export default class PingPong extends Phaser.Scene
         private: boolean,
         userId: string
     }
-    onfocus: boolean = true;
     
     constructor(msoc: Socket, type:string, isPlayer: boolean, roomId: string, Game: {
         private: boolean,
@@ -153,6 +151,13 @@ export default class PingPong extends Phaser.Scene
 
             });
 
+            this.soc.on("focus", (focus) => {
+                if (focus)
+                    this.scene.wake();
+                else
+                    this.scene.sleep();
+            });
+
             this.soc.on("restartGame", () => {
                 this.leftScore = 0;
                 this.rightScore = 0;
@@ -191,6 +196,13 @@ export default class PingPong extends Phaser.Scene
 
             this.soc.on("youWin", () => 
             {
+                if (this.scene.isSleeping())
+                {
+                    this.scene.wake();
+                    this.paddle.destroy();
+                    this.enemy.destroy();
+                    this.ball.destroy();
+                }
                 if (this.waiting)
                     this.waiting.destroy();
                 this.exitEmited = true;
