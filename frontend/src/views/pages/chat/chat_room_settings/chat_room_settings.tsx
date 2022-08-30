@@ -224,7 +224,7 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
                         )
                     }
                 </div></>}
-            </div>ban
+            </div>
         </section>
     );
 }
