@@ -71,7 +71,7 @@ const ChatRoomHeader = (Props : HeaderProps) => {
 const ChatRoomBody:React.FC<{messages: msgs[], roomId: string, chatRef: React.LegacyRef<HTMLDivElement>}> = ({messages, roomId, chatRef}) => {
 
     const displayUserImage = (prevMsg, msg) => {
-        return (prevMsg && (prevMsg.type === "NOTIFICATION" || prevMsg.user.id !== msg.user.id));
+        return ((prevMsg && (prevMsg.type === "NOTIFICATION" || prevMsg.user.id !== msg.user.id)) || !prevMsg);
     }
 
     return <div id="chatRoomBody" style={{backgroundImage: `url(${BgVectors})`}}>
