@@ -15,7 +15,6 @@ main#homePage {
         }
         @include _flex(column, center, center);
         min-height: calc(100vh - 10rem);
-        margin-top: 2rem;
         @media (max-width: $xs) {
             justify-content: flex-start;
         }

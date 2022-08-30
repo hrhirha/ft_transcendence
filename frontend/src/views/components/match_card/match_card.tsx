@@ -16,7 +16,7 @@ const PlayerData:React.FC<{player: User, left: boolean, winner: boolean}> = ({pl
     return (
         <div className={`player ${left ? "left" : "right"}`} onClick={() => navigate(`/u/${player.username}`, {replace: true})}>
             {!left && <h6 className="fullName">{player.fullName}</h6>}
-            <div className="avatar">
+            <div className={`avatar ${winner ? "winner" : ""}`}>
                 {winner && <img src={WinnerCrown} alt="winner" className="winner_crown"/>}
                 <CircleAvatar avatarURL={player.imageUrl} dimensions={60} status = {null}/>
                 <span className="achievment" title={player.rank.title}>

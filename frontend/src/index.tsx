@@ -19,7 +19,7 @@ import { ChatSocket } from "chat_socket";
 import "views/style/index.scss";
 import { receive_message } from 'chat_socket/interface';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClose } from '@fortawesome/free-solid-svg-icons';
+import { faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import { CircleAvatar } from 'views/components/circle_avatar/circle_avatar';
 
 const root = ReactDOM.createRoot(
@@ -71,8 +71,8 @@ const PongApp:React.FC = () => {
           pushNotif({
             id: data.room.id,
             type: "info",
-            icon: data.room.is_channel ? <FontAwesomeIcon icon={faClose}/> : <CircleAvatar avatarURL={data.user.imageUrl} dimensions={15} status={"ONLINE"} />,
-            title: (data.room.is_channel ? "Channel" : data.user.fullName),
+            icon: data.room.is_channel ? <FontAwesomeIcon icon={faUserGroup}/> : <CircleAvatar avatarURL={data.user.imageUrl} dimensions={15} status={"ONLINE"} />,
+            title: (data.room.is_channel ? data.room.name : data.user.fullName),
             description: data.msg,
             actions: [
               {title: "Show Conversation", color: "#6970d4", action: () => history.replace(`/chat?id=${data.room.id}`)},
