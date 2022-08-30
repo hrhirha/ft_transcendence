@@ -212,6 +212,7 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
                         members.map((member, k) => 
                             <MemeberCard 
                                 key={k}
+                                id={member.id}
                                 permession={permession}//bddl
                                 owner={member.is_owner}
                                 avatar={member.imageUrl} 

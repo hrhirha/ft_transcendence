@@ -4,9 +4,10 @@ import { faBan, faCommentSlash, faGamepad, faGear, faUserGear, faUserXmark } fro
 import { DefaultGame, UltimateGame } from 'assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useState } from 'react';
-
+import { getIDQuery } from 'index';
 
 export const  MemeberCard:React.FC<{
+        id: string,
         avatar: string,
         username: string,
         fullName: string,
@@ -15,10 +16,10 @@ export const  MemeberCard:React.FC<{
         banned: boolean,
         muted: boolean,
         permession: number,
-        onClick: Function}> = ({permession, avatar, username, fullName, admin, owner, banned, muted, onClick}) => {
+        onClick: Function}> = ({permession, id, avatar, username, fullName, admin, owner, banned, muted, onClick}) => {
 
         const [showMoreOptions, setShowMoreOptions] = useState(false);
-
+    console.log(getIDQuery())
   return (
       <div className="memberCard">
          <div className='userData' onClick={() => onClick()}>
@@ -43,7 +44,7 @@ export const  MemeberCard:React.FC<{
                         Ultimate Game
                     </div>
                 ]}/>
-             {(permession === 1 || permession === 2) && <SettingsOption icon={faGear} title="Options"
+             {((permession === 1 || permession === 2) && getIDQuery() !== id) && <SettingsOption icon={faGear} title="Options"
                   subOptions={[
                     !banned && <div onClick={() => alert("Ban user")} title="Ban user" >
                         <FontAwesomeIcon icon={faBan}/>
