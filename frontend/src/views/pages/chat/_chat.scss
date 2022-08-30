@@ -28,7 +28,7 @@ main#chatPage {
         @media (max-width: $xs) {
             margin: 0;
             max-height: 100%!important;
-            min-height: 100%!important;
+            min-height: calc(100vh - 12rem) !important;
         }
 
         min-height: calc(100vh - 10rem);

@@ -46,7 +46,7 @@
     span.msg, span.first_msg {
         padding: 0.5rem .75rem;
         max-width: 69%;
-        background-color: $light4;
+        background-color: rgba($purple, .75);
         font-size: $fsize * .9;
         font-family: $MFont;
         border-radius: .25rem 1rem 1rem 1rem;

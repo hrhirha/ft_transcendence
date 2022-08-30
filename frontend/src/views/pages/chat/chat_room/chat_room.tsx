@@ -1,12 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClose, faComment, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
+import { faClose, faComments, faCommentSlash, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
 import { Chat_msg } from "views/pages/chat/chat_msg/chat_msg";
-import { BgVectors, GroupIcon, NoConversations } from "assets";
+import { BannedFromChat, BgVectors, GroupIcon, NoConversations } from "assets";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { ChatRoomSettings } from "views/pages/chat/chat_room_settings/chat_room_settings";
-import { management_memeber, messages, msgs, receive_message, room_msgs } from "chat_socket/interface";
+import { messages, msgs, receive_message, room_msgs } from "chat_socket/interface";
 import { getIDQuery, history, SocketContext } from "index";
 import { validPassword } from "../create_chat/create_chat";
 
@@ -93,11 +93,11 @@ const ChatRoomBody:React.FC<{messages: msgs[], roomId: string, chatRef: React.Le
 }
 
 
-const ChatRoomFooter:React.FC<{send_message : Function}> = ({send_message}) => {
+const ChatRoomFooter:React.FC<{muted: boolean, send_message : Function}> = ({muted, send_message}) => {
     const [msg, setMsg] = useState<string>("");
 
     return <div id="chatRoomFooter">
-       <form id="messageForm">
+       {!muted && <form id="messageForm">
             <input type="text" placeholder="Type your Message Here" value={msg} onChange={(e)=>setMsg(e.target.value.trim() !== "" ? e.target.value : "")}/>
             <button id="sendMessage" onClick={(e) =>{
                 e.preventDefault();
@@ -107,7 +107,8 @@ const ChatRoomFooter:React.FC<{send_message : Function}> = ({send_message}) => {
                 <FontAwesomeIcon icon={faPaperPlane}/>
                 Send
             </button>
-        </form>
+        </form>}
+        {muted && <div id="muted"><FontAwesomeIcon icon={faCommentSlash} />You are muted, you can't send messages</div>}
     </div>;
 }
 
@@ -138,20 +139,30 @@ export const ChatRoom:React.FC = () => {
             setScrollOff(true);
             class_socket.get_messages({id : getIDQuery()});
         })
-    },[])
-
+    },[]);
 
     useEffect(() => {
         if (getIDQuery() != null)
             class_socket.get_messages({id : getIDQuery()});
         setShowSettings(false);
-    },[history.location.search])
+    },[history.location.search]);
 
     useEffect(() => {
         if (lastChat.current !== null && !scrollOff)
             lastChat.current.scrollIntoView({behavior: "smooth"});
-    },[messages])
+    },[messages]);
 
+    if (roominfo !== undefined && roominfo.is_banned)
+        return (
+            <div className="bannedFromChat">
+                <img src={BannedFromChat}/>
+                <p>Sorry! you are banned from this channel</p>
+                <button onClick={() => navigate("/chat", {replace : true})}>
+                    <FontAwesomeIcon icon={faComments}/>
+                    Browse Chats
+                </button>
+            </div>
+        );
     if (roominfo !== undefined && messages === undefined)
         return (<JoinChat room={roominfo}/>);
     if (roominfo === undefined)
@@ -160,8 +171,8 @@ export const ChatRoom:React.FC = () => {
                 <img src={NoConversations}/>
                 <p>This chat cannot be accessed right now. Please try again later</p>
                 <button onClick={() => navigate("/chat", {replace : true})}>
-                    <FontAwesomeIcon icon={faComment}/>
-                    Home Chat
+                    <FontAwesomeIcon icon={faComments}/>
+                    Browse Chats
                 </button>
             </div>
         );
@@ -179,7 +190,7 @@ export const ChatRoom:React.FC = () => {
                 showSettings={() => setShowSettings(true)}
             />
             <ChatRoomBody messages={messages} roomId={roominfo.id} chatRef={lastChat}/>
-            <ChatRoomFooter send_message={(msg : string) => class_socket.send_message({rid : getIDQuery(), msg :msg})}/>
+            <ChatRoomFooter muted={roominfo.is_muted } send_message={(msg : string) => class_socket.send_message({rid : getIDQuery(), msg :msg})}/>
         </section>}
     </>
     );
