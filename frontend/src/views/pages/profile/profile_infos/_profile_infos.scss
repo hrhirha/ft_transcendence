@@ -1,6 +1,6 @@
 section#profileInfos {
     @include _flex(row, space-between, center);
-    @include _gradientBg($dark3, rgba($dark1, 0), 180);
+    @include _gradientBg($dark3, transparent, 180);
     position: relative;
     padding: 1rem;
     border-radius: 1rem;
