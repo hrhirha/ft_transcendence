@@ -349,12 +349,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('you must login first');
         try
         {
-            const ur0 = await this._chat.banUser(u, ur);
+            const ban = await this._chat.banUser(u, ur);
             const sockets = await this.server.fetchSockets();
             
-            this.server.to(ur.rid).emit('user_banned', ur);
+            this.server.to(ur.rid).emit('receive_message', ban.msg);
+            // client.emit('user_banned', ur);
             sockets.forEach((s) => {
-                ur0.user.username === s.data.username && s.leave(ur.rid);
+                ban.ur.user.username === s.data.username && s.leave(ur.rid);
             });
         }
         catch (e)
@@ -530,7 +531,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         try
         {
             const members = (await this._chat.getRoomMembers(u.id, room.id)).members;
-            for (let m of members) delete m.is_banned
             client.emit('members', members);
         }
         catch (e)

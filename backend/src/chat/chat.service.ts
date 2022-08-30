@@ -589,8 +589,8 @@ export class ChatService {
 
         if (!ur)
             throw new WsException('ban operation failed');
-        await this._add_msg_to_db(user.id, {rid: user_room.rid, msg: `${ur.user.username} is banned`}, msg_type.NOTIF);
-        return ur
+        const msg = await this._add_msg_to_db(user.id, {rid: user_room.rid, msg: `${ur.user.username} is banned`}, msg_type.NOTIF);
+        return {ur, msg}
     }
 
     async unbanUser(user: UserDto, user_room: UserRoomDto)

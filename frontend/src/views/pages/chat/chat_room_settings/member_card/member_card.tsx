@@ -3,11 +3,12 @@ import { SettingsOption } from 'views/pages/chat/chat_room_settings/settings_opt
 import { faBan, faCommentSlash, faGamepad, faGear, faUserGear, faUserXmark } from '@fortawesome/free-solid-svg-icons';
 import { DefaultGame, UltimateGame } from 'assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useState } from 'react';
-import { getIDQuery } from 'index';
+import { useContext, useState } from 'react';
+import { SocketContext } from 'index';
 
 export const  MemeberCard:React.FC<{
         id: string,
+        roomId: string,
         avatar: string,
         username: string,
         fullName: string,
@@ -16,10 +17,20 @@ export const  MemeberCard:React.FC<{
         banned: boolean,
         muted: boolean,
         permession: number,
-        onClick: Function}> = ({permession, id, avatar, username, fullName, admin, owner, banned, muted, onClick}) => {
+        onClick: Function}> = ({permession, id, roomId, avatar, username, fullName, admin, owner, banned, muted, onClick}) => {
 
         const [showMoreOptions, setShowMoreOptions] = useState(false);
-    console.log(getIDQuery())
+        const class_socket = useContext(SocketContext);
+
+        console.log("banned", banned)
+        const banUser = ()=> {
+            class_socket.ban_user({uid : id,  rid : roomId});
+        }
+
+        const unbanUser = ()=> {
+            class_socket.unban_user({uid : id,  rid : roomId});
+        }
+
   return (
       <div className="memberCard">
          <div className='userData' onClick={() => onClick()}>
@@ -33,7 +44,7 @@ export const  MemeberCard:React.FC<{
             </div>
          </div>
           <div className="memberOptions">
-            <SettingsOption icon={faGamepad} title="Play Match"
+            {(JSON.parse(window.localStorage.getItem("user")).id !== id) && <SettingsOption icon={faGamepad} title="Play Match"
                 subOptions={[
                     <div onClick={() => alert("Play Normal Game")} title="Normal Game" >
                         <CircleAvatar avatarURL={DefaultGame} dimensions={20} status={null}/>
@@ -43,14 +54,14 @@ export const  MemeberCard:React.FC<{
                         <CircleAvatar avatarURL={UltimateGame} dimensions={20} status={null}/>
                         Ultimate Game
                     </div>
-                ]}/>
-             {((permession === 1 || permession === 2) && getIDQuery() !== id) && <SettingsOption icon={faGear} title="Options"
+                ]}/>}
+             {((permession === 1 || permession === 2) && JSON.parse(window.localStorage.getItem("user")).id !== id) && <SettingsOption icon={faGear} title="Options"
                   subOptions={[
-                    !banned && <div onClick={() => alert("Ban user")} title="Ban user" >
+                    !banned && <div onClick={() => banUser()} title="Ban user" >
                         <FontAwesomeIcon icon={faBan}/>
                         Ban user
                     </div>,
-                    banned && <div onClick={() => alert("Unban user")} title="Unban user" >
+                    banned && <div onClick={() => unbanUser()} title="Unban user" >
                         <FontAwesomeIcon icon={faBan}/>
                         Unban user
                     </div>,

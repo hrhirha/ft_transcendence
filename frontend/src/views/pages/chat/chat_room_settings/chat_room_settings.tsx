@@ -126,6 +126,7 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
 
         class_socket.socket.on("members", (data : user_info[])=>{
             setMembers(data);
+
             setOwner(data.find((u) => u.is_owner === true && u.id === JSON.parse(window.localStorage.getItem("user")).id ) !== undefined)
             if(data.find((u) => u.is_owner === true && u.id === JSON.parse(window.localStorage.getItem("user")).id ) !== undefined)
                 setPermession(2);
@@ -187,7 +188,6 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
     }
 
     const settingsEdit = (data: any) =>{
-        console.log("aa",data);
         setMembers(data.members);
         setEditable(false);
     }
@@ -212,6 +212,7 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
                         members.map((member, k) => 
                             <MemeberCard 
                                 key={k}
+                                roomId={room.id}
                                 id={member.id}
                                 permession={permession}//bddl
                                 owner={member.is_owner}
