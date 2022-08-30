@@ -70,13 +70,18 @@ const ChatRoomHeader = (Props : HeaderProps) => {
 
 const ChatRoomBody:React.FC<{messages: msgs[], roomId: string}> = ({messages, roomId}) => {
     console.log(messages)
+
+    const displayUserImage = (prevMsg, msg) => {
+        return (prevMsg && (prevMsg.type === "NOTIFICATION" || prevMsg.user.id !== msg.user.id));
+    }
+
     return <div id="chatRoomBody" style={{backgroundImage: `url(${BgVectors})`}}>
         { messages && messages.map ((message : msgs, k: number ) => 
             <Chat_msg
                 key={message.id}
                 msgId={message.id}
                 roomId={roomId}
-                display_image={(messages[k - 1] && messages[k].user.id === messages[k - 1].user.id) ? true : false }
+                display_image={displayUserImage(messages[k - 1], message)}
                 sender_user={message.user.id}
                 image = {message.user.imageUrl}
                 msg={message.msg}

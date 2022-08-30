@@ -20,6 +20,7 @@ interface room {
 
 export interface receive_message {
     id:  string,
+    name?: string,
     msg : string,
     timestamp : string,
     type: string,

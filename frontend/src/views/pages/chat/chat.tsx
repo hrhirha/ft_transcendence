@@ -228,7 +228,7 @@ export const Chat:React.FC = () => {
 
     return (
         <main id="chatPage">
-            <button style={{color: `black`}} onClick={() =>{
+            {/* <button style={{color: `black`}} onClick={() =>{
                 class_socket.delete_room({id : "cl4jv5f3d0369ohsmoae83lyo"});
             }}>delete_room</button>
             <button style={{color: `black`}} onClick={() =>{
@@ -280,7 +280,7 @@ export const Chat:React.FC = () => {
             <button style={{color: `black`}} onClick={() =>{
                 class_socket.get_messages({id : "cl6xxzbo80577v4u8i67s9xcz"});
             }}>get_messages</button> 
-        
+         */}
 
 
 

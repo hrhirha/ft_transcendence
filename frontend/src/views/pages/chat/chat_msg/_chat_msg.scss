@@ -1,4 +1,4 @@
-.Me {
+.sent {
     margin: .4rem;
     @include _flex(row-reverse, right, flex-start);
     span.msg, span.first_msg {
@@ -22,12 +22,12 @@
 
     i {
         @include _flex(row, center, center);
-        @include _square(1.75rem);
+        @include _square(1.5rem);
         cursor: pointer;
         display: none;
         position: relative;
         right: -.5rem;
-        top: -.5rem; 
+        top: -.25rem; 
         border: .2rem solid $dark3;
         font-size: $fsize * .75;
         background-color: $purple;
@@ -39,7 +39,7 @@
     }
 }
 
-.User {
+.receive {
     margin: .4rem;
     @include _flex(row, left, flex-start);
 

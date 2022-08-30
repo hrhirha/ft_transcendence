@@ -97,6 +97,12 @@ section.matchCard {
                 }
             }
         }
+        div.winner {
+            span#circleAvatar {
+                border-color: $yellow;
+                box-shadow: 0 0 2rem $yellow;
+            }
+        }
         .fullName {
             font-size: $fsize * 1.1;
             display: -webkit-box;
