@@ -332,7 +332,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             return user;
         }
         if (client.data.obj)
+        {
+            this.server.to(client.data.obj.roomId).emit("updateScore", {
+                score1: 0,
+                score2: 0,
+            });
             client.leave(client.data.obj.roomId);
+        }
 
         client.data.bestOf = 5;
         if (obj.private)
@@ -405,7 +411,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             return user;
         }
         if (client.data.obj)
+        {
+            this.server.to(client.data.obj.roomId).emit("updateScore", {
+                score1: 0,
+                score2: 0,
+            });
             client.leave(client.data.obj.roomId);
+        }
         client.data.bestOf = 3;
 
         if (obj.private)
@@ -629,6 +641,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
+
+
         if (client.data.obj.isPlayer && !focus)
         {
             client.data.obj.onFocus = false;

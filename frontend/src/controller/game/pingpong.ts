@@ -59,6 +59,7 @@ export default class PingPong extends Phaser.Scene
         private: boolean,
         userId: string
     }
+    focus: boolean = true;
     
     constructor(msoc: Socket, type:string, isPlayer: boolean, roomId: string, Game: {
         private: boolean,
@@ -152,10 +153,12 @@ export default class PingPong extends Phaser.Scene
             });
 
             this.soc.on("focus", (focus) => {
-                if (focus)
-                    this.scene.wake();
-                else
-                    this.scene.sleep();
+                this.focus = focus;
+                if (this.isPlayer)
+                {
+                    this.input.keyboard.enabled = focus;
+                    this.ball.body.enable = focus;
+                }
             });
 
             this.soc.on("restartGame", () => {
@@ -363,11 +366,12 @@ export default class PingPong extends Phaser.Scene
 //////////////////////// listeners Func '////////////////////////
     leaveFunc() : void
     {
-        this.leave.text = "";
-        this.soc.disconnect();
-        this.scene.stop();
-        if (this.buttonBg)
-            this.buttonBg.destroy();
+        // this.soc.disconnect();
+        window.location.href = "/";
+        // this.leave.text = "";
+        // this.scene.stop();
+        // if (this.buttonBg)
+        //     this.buttonBg.destroy();
     }
 
     replayGame() : void
@@ -377,8 +381,8 @@ export default class PingPong extends Phaser.Scene
         this.replayClick = true;
         this.gameIsStarted = false;
         this.End = false;
-        this.rightScore = 4;
-        this.leftScore = 4;
+        this.rightScore = 0;
+        this.leftScore = 0;
         this.connection = true;
         this.scene.restart();
     }
@@ -469,8 +473,6 @@ export default class PingPong extends Phaser.Scene
         }
         else if (this.isPlayer && this.connection)
         {
-            this.rightScore = 0;
-            this.leftScore = 0;
             this.soc.emit('sendToWatcher', {
                 roomId: this.data.roomId,
                 lpaddle: 0,
@@ -521,7 +523,7 @@ export default class PingPong extends Phaser.Scene
     {
         if (this.initialTime <= 0)
             return ;
-        this.initialTime -= 1; // One second
+        this.initialTime -= (this.focus) ? 1 : 0; // One second
         this.counter.setText('' + this.formatTime(this.initialTime)).setOrigin(0.5);
         if (this.initialTime <= 0)
         {
@@ -670,7 +672,7 @@ export default class PingPong extends Phaser.Scene
                 }
             }
         }
-        else if (this.mobile && !this.End)
+        else if (this.mobile && this.focus && !this.End)
         {
             if(!this.input.activePointer.isDown && this.isClicking === true) {
                 if(Math.abs(this.input.activePointer.upY - this.input.activePointer.downY) >= 50) {
