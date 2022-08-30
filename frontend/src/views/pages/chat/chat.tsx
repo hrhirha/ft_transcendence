@@ -153,12 +153,15 @@ export const Chat:React.FC = () => {
                 class_socket.get_messages({id : getIDQuery()});
         }).on("chats", (data : chats)=>{
             setchatRooms(data);
+
             if(data.dms.find(d => d.room.id ===  getIDQuery()))
                 setActiveTab(chatTabs.chats);
             else if(data.rooms.find(d => d.id ===  getIDQuery()))
                 setActiveTab(chatTabs.joinedGroups);
             else if(data.others.find(d => d.id ===  getIDQuery()))
                 setActiveTab(chatTabs.otherGroups);
+        }).on("messages", (data : messages)=>{
+            class_socket.get_chats();
         }).on("receive_message", (data : receive_message)=>{
              class_socket.get_chats();
         }).on("room_deleted", (data : {id : string})=> {
