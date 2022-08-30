@@ -30,7 +30,7 @@ export default class PingPong extends Phaser.Scene
     End: boolean = false;
     re: boolean = false;
     counter?: Phaser.GameObjects.Text;
-    // timedEvent?: Phaser.Time.TimerEvent;
+    timedEvent?: Phaser.Time.TimerEvent;
     initialTime :number = 5;
     goal: boolean = false;
     gameIsStarted: boolean = false;
@@ -63,6 +63,8 @@ export default class PingPong extends Phaser.Scene
     focusTimer: number = 0;
     counterTimer?: Phaser.GameObjects.Text;
     focusMode: boolean = false;
+    timedEventFocus: Phaser.Time.TimerEvent;
+    focusTxt: Phaser.GameObjects.Text;
     
     constructor(msoc: Socket, type:string, isPlayer: boolean, roomId: string, Game: {
         private: boolean,
@@ -162,9 +164,11 @@ export default class PingPong extends Phaser.Scene
                 if (this.isPlayer && !this.goal)
                 {
                     this.input.keyboard.enabled = focus;
-                    this.ball.body.enable = focus;
+                    if (!this.counter)
+                        this.ball.body.enable = focus;
                 }
-                this.goalTime(10);
+                if (!focus)
+                    this.goalTime(10);
             });
 
             this.soc.on("restartGame", () => {
@@ -527,42 +531,64 @@ export default class PingPong extends Phaser.Scene
 
     onEvent ()
     {
-        if (this.initialTime <= 0)
+        console.log(this.focusMode, this.initialTime , this.focusTimer);
+             
+        if ((!this.focusMode && this.initialTime <= 0) || (this.focusMode && this.focusTimer <= 0))
             return ;
-        if ( this.focusMode && this.focusTimer <= 0)
+        
+        this.focusTimer -=  (this.focusMode) ? 1 : 0; // One second
+        this.initialTime -= (!this.focusMode) ? 1 : 0; // One second
+        if ( !this.focusMode && this.counter)
+        this.counter.setText('' + this.formatTime(this.initialTime)).setOrigin(0.5);
+        if (this.focusMode &&  this.counterTimer)
+        this.counterTimer.setText('' + this.formatTime(this.focusTimer)).setOrigin(0.5);
+        
+        if (!this.focusMode && this.initialTime <= 0)
+        {
+            console.log("Not focusMode ")
+            this.goal = false;
+            this.counter.text = "";
+            this.counter = undefined;
+            this.timedEvent = undefined;
+            this.initialTime = 0;
+            if (this.exitEmited)
             return ;
-        this.initialTime -= (this.focus) ? 1 : 0; // One second
-        this.focusTimer -= (this.focusMode) ? 1 : 0; // One second
-        if (!this.focusMode)
-            this.counter.setText('' + this.formatTime(this.initialTime)).setOrigin(0.5);
-        if (this.focusMode)
-            this.counterTimer.setText('' + this.formatTime(this.focusTimer)).setOrigin(0.5);
+            if (this.data.is_player)
+            this.startGame();
+            else
+            this.createObjects(this.w / 2, this.h / 2, this.h / 2, this.h / 2);
+            return;
+        }
+        
         if ( this.focusMode )
         {
             if (this.focus)
             {
+                console.log("BackToFocus Mode");
+                this.focusTxt.text = "";
                 this.counterTimer.text = "";
-                this.focusMode = false;
+                
+                if (this.counter)
+                    this.counter.setText('' + this.formatTime(this.initialTime)).setOrigin(0.5);
+                this.focusTxt = undefined;
+                this.counterTimer = undefined;
+                this.timedEventFocus = undefined;
+                
                 this.focusTimer = 0;
+                this.focusMode = false;
                 return ;
             }
+            
             if (this.focusTimer <= 0)
             {
-                console.log("youWine");
-            }
-
-        }
-        if (!this.focusMode && this.initialTime <= 0)
-        {
-            this.goal = false;
-            this.counter.text = "";
-            if (this.exitEmited)
+                this.counterTimer.text = "";
+                this.counterTimer = undefined;
+                this.timedEventFocus = undefined;
+                
+                // console.log("youWine");
+                // this.scene.pause();
                 return ;
-            if (this.data.is_player)
-                this.startGame();
-            else
-                this.createObjects(this.w / 2, this.h / 2, this.h / 2, this.h / 2);
-            return;
+            }
         }
     }
 
@@ -670,21 +696,29 @@ export default class PingPong extends Phaser.Scene
     {
         if (!this.focus)
         {
-            console.log("here"); 
+            if (this.counter)
+                this.counter.text = "";
+            
             this.focusMode = true;
             this.focusTimer = time;
-            this.counterTimer = this.add.text(this.w / 2, this.h / 2.5  , '' + this.formatTime(this.initialTime), { fontSize: "60px", 
-            fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
+            
+            let player = ( this.data.player === "player1" ) ? "player2" : "player1" ; 
+            this.focusTxt = this.add.text(this.w / 2, this.h / 2.5  , player  + ' isn\'t in focus mode', { fontSize: "35px", 
+                fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
+            
+            this.counterTimer = this.add.text(this.w / 2, this.h / 2  , '' + this.formatTime(this.focusTimer), { fontSize: "60px", 
+                fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
+            this.timedEventFocus = this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });
+
         }
         if (this.focus)
         {
             this.initialTime = time;
             this.counter = this.add.text(this.w / 2, this.h / 2, '' + this.formatTime(this.initialTime), { fontSize: "60px", 
-            fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
+                fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
             // Each 1000 ms call onEvent
-            // this.timedEvent = this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });
+            this.timedEvent = this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });
         }
-        this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });
     }
 
     update () : void
