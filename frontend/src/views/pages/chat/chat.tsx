@@ -162,7 +162,6 @@ export const Chat:React.FC = () => {
         }).on("receive_message", (data : receive_message)=>{
              class_socket.get_chats();
         }).on("room_deleted", (data : {id : string})=> {
-            console.log("room_deleted")
             if(getIDQuery() !== null && getIDQuery() === data.id)
                 navigate(`/chat`, {replace: true})
             class_socket.get_chats();

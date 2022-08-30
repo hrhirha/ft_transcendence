@@ -28,7 +28,6 @@ export const GameWatcher:React.FC = () =>  {
         updateMatche();
         socket.removeAllListeners();
         socket.connect();
-        console.log(ongoingMatchs, currentMatch, ongoingMatchs[currentMatch], ongoingMatchs[currentMatch]?.id)
     },[currentMatch]);
 
     useEffect(() => {

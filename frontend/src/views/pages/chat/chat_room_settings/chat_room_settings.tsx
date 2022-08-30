@@ -46,7 +46,6 @@ const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>,
         })
 
         class_socket.socket.on("room_edited", (data : any)=>{
-            console.log("ss", data);
             onSubmit(data);
         }) 
 
@@ -122,8 +121,6 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
 
     useEffect(() => {
         class_socket.get_members({id : getIDQuery()});
-        console.log(getIDQuery());
-
         class_socket.socket.on("members", (data : user_info[])=>{
             setMembers(data);
 
@@ -140,7 +137,6 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
     },[])
 
     const editChannel = () => {
-        console.log(editable)
         if (editable) {
             // class_socket.edit_channel({id : getIDQuery(), name : fullName});
             pushNotif({

@@ -62,22 +62,20 @@ const PongApp:React.FC = () => {
       authCheck(history.location.pathname);
       history.listen(async ({ action, location }) => {
         await authCheck(location.pathname);
-        console.log(action, location.pathname);
       });
-      class_socket.socket.on("receive_message", (data : receive_message)=>{
-        if (history.location.pathname !== "/chat")
+      class_socket.socket.on("receive_message", (message : receive_message)=>{
+        if (history.location.pathname !== "/chat" && message.type !== "NOTIFICATION")
         {
-          console.log(data.user.status);
           pushNotif({
-            id: data.room.id,
+            id: message.room.id,
             type: "info",
-            icon: data.room.is_channel ? <FontAwesomeIcon icon={faUserGroup}/> : <CircleAvatar avatarURL={data.user.imageUrl} dimensions={15} status={"ONLINE"} />,
-            title: (data.room.is_channel ? data.room.name : data.user.fullName),
-            description: data.msg,
+            icon: message.room.is_channel ? <FontAwesomeIcon icon={faUserGroup}/> : <CircleAvatar avatarURL={message.user.imageUrl} dimensions={15} status={"ONLINE"} />,
+            title: (message.room.is_channel ? message.room.name : message.user.fullName),
+            description: message.room.is_channel ? `<b>${message.user.username} : </b>${message.msg}</>` : message.msg,
             actions: [
-              {title: "Show Conversation", color: "#6970d4", action: () => history.replace(`/chat?id=${data.room.id}`)},
+              {title: "Go Chat", color: "#6970d4", action: () => history.replace(`/chat?id=${message.room.id}`)},
             ]
-        });
+          });
         }
       })
     }, []);

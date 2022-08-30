@@ -14,6 +14,7 @@ interface Props {
     msg: string,
     time: string,
     type: string,
+    chatRef: React.LegacyRef<HTMLDivElement>,
 }
 
 export const Chat_msg = (Props : Props) => {
@@ -39,7 +40,7 @@ export const Chat_msg = (Props : Props) => {
   }
 
   return (
-    <div className={notifMsg ? "msgNotif" : (Props.display_image ? "mtop " : " ")+( myMessage ? "sent" : "receive")}>
+    <div ref={Props.chatRef} className={notifMsg ? "msgNotif" : (Props.display_image ? "mtop " : " ")+( myMessage ? "sent" : "receive")}>
         {!notifMsg && Props.display_image && <CircleAvatar avatarURL={Props.image} dimensions={30} status = {null}/>}
         <span className={!Props.display_image ? "first_msg" : "msg"}>{Props.msg === "deleted" ? <span className='deleted'><FontAwesomeIcon icon={faBan}/> this message has been deleted</span> : Props.msg}</span>
         {!notifMsg && myMessage && Props.msg !== "deleted"

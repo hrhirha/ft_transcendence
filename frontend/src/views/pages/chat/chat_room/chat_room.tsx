@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faComment, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
 import { Chat_msg } from "views/pages/chat/chat_msg/chat_msg";
 import { BgVectors, GroupIcon, NoConversations } from "assets";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { ChatRoomSettings } from "views/pages/chat/chat_room_settings/chat_room_settings";
 import { messages, msgs, receive_message, room_msgs } from "chat_socket/interface";
 import { getIDQuery, history, SocketContext } from "index";
@@ -68,8 +68,7 @@ const ChatRoomHeader = (Props : HeaderProps) => {
     );
 }
 
-const ChatRoomBody:React.FC<{messages: msgs[], roomId: string}> = ({messages, roomId}) => {
-    console.log(messages)
+const ChatRoomBody:React.FC<{messages: msgs[], roomId: string, chatRef: React.LegacyRef<HTMLDivElement>}> = ({messages, roomId, chatRef}) => {
 
     const displayUserImage = (prevMsg, msg) => {
         return (prevMsg && (prevMsg.type === "NOTIFICATION" || prevMsg.user.id !== msg.user.id));
@@ -78,6 +77,7 @@ const ChatRoomBody:React.FC<{messages: msgs[], roomId: string}> = ({messages, ro
     return <div id="chatRoomBody" style={{backgroundImage: `url(${BgVectors})`}}>
         { messages && messages.map ((message : msgs, k: number ) => 
             <Chat_msg
+                chatRef={chatRef}
                 key={message.id}
                 msgId={message.id}
                 roomId={roomId}
@@ -117,6 +117,8 @@ export const ChatRoom:React.FC = () => {
     const class_socket = useContext(SocketContext);
     const [messages, setmessages] = useState<msgs[]>();
     const [roominfo, setRoominfo] = useState<room_msgs>();
+    const lastChat = useRef<HTMLDivElement>(null);
+    const [scrollOff, setScrollOff] = useState(false);
 
     useEffect(() => {
 
@@ -130,8 +132,10 @@ export const ChatRoom:React.FC = () => {
                     setmessages(oldData => [...oldData, data].sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp) ));
                 else
                     class_socket.get_messages({id : getIDQuery()});
+                setScrollOff(false);
             }
         }).on("message_deleted", ()=>{
+            setScrollOff(true);
             class_socket.get_messages({id : getIDQuery()});
         }); 
     },[])
@@ -142,7 +146,12 @@ export const ChatRoom:React.FC = () => {
             class_socket.get_messages({id : getIDQuery()});
         setShowSettings(false);
     },[history.location.search])
-    console.log(messages, roominfo)
+
+    useEffect(() => {
+        if (lastChat.current !== null && !scrollOff)
+            lastChat.current.scrollIntoView({behavior: "smooth"});
+    },[messages])
+
     if (roominfo !== undefined && messages === undefined)
         return (<JoinChat room={roominfo}/>);
     if (roominfo === undefined)
@@ -169,7 +178,7 @@ export const ChatRoom:React.FC = () => {
                 onClose={() => navigate("/chat", {replace : true})}
                 showSettings={() => setShowSettings(true)}
             />
-            <ChatRoomBody messages={messages} roomId={roominfo.id}/>
+            <ChatRoomBody messages={messages} roomId={roominfo.id} chatRef={lastChat}/>
             <ChatRoomFooter send_message={(msg : string) => class_socket.send_message({rid : getIDQuery(), msg :msg})}/>
         </section>}
     </>
