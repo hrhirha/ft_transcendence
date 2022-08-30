@@ -650,8 +650,8 @@ export class ChatService {
         });
         if (!ur)
             throw new WsException('unban operation failed');
-        await this._add_msg_to_db(user.id, {rid: user_room.rid, msg: `${ur.user.username} is unbanned`}, msg_type.NOTIF);
-        return ur;
+        const msg = await this._add_msg_to_db(user.id, {rid: user_room.rid, msg: `${ur.user.username} is unbanned`}, msg_type.NOTIF);
+        return {ur, msg};
     }
 
     async muteUser(user: UserDto, user_room: MuteUserDto)
@@ -811,7 +811,7 @@ export class ChatService {
             const jt = me.joined_time;
  
             room.lst_msg_ts < jt && (room.lst_msg = "") && (room.lst_msg_ts = null);
-            me.is_banned && (room.lst_msg = 'you are banned') && (room.lst_msg_ts = null);
+            // me.is_banned && (room.lst_msg = 'you are banned') && (room.lst_msg_ts = null);
 
             room["unread"] = me.unread;
             room['owner'] = owner.uid;
@@ -986,6 +986,9 @@ export class ChatService {
             select: {
                 is_channel: true,
                 user_rooms: {
+                    orderBy: {
+                        joined_time: 'asc',
+                    },
                     select: {
                         is_owner: true,
                         is_admin: true,

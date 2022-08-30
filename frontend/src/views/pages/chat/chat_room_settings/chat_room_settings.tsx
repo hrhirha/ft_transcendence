@@ -1,7 +1,7 @@
 import { faArrowRightFromBracket, faCheck, faClose, faGamepad, faKey, faLockOpen, faPenToSquare, faTrash, faTrashCan, faUser, faUsers, faUserSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GroupIcon } from "assets";
-import { management_password, room_msgs, user_info } from "chat_socket/interface";
+import { management_memeber, management_password, room_msgs, user_info } from "chat_socket/interface";
 import { getIDQuery, SocketContext } from "index";
 import { useContext, useEffect, useState } from "react";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
@@ -113,6 +113,7 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
     const navigate = useNavigate();
     const class_socket = useContext(SocketContext);
     const [members, setMembers] = useState<user_info[]>([]);
+    //const [users, setUsers] = useState<user_info[]>([]);
     const [owner, setOwner] = useState<boolean>(false);
     const [editable, setEditable] = useState<boolean>(false);
     const pushNotif = useNotif();
@@ -131,8 +132,17 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
                 setPermession(1);
             else
                 setPermession(0);
-            
         })
+
+
+
+        class_socket.socket.on("user_banned", (data : management_memeber)=>{
+            class_socket.get_members({id : getIDQuery()});
+        })
+        class_socket.socket.on("user_unbanned", (data : management_memeber)=>{ 
+            class_socket.get_members({id : getIDQuery()});
+        })
+
 
     },[])
 

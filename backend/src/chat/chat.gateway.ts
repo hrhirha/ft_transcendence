@@ -353,7 +353,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const sockets = await this.server.fetchSockets();
             
             this.server.to(ur.rid).emit('receive_message', ban.msg);
-            // client.emit('user_banned', ur);
+            client.emit('user_banned', {uid: ban.ur.user.id, rid: ban.ur.room.id});
             sockets.forEach((s) => {
                 ban.ur.user.username === s.data.username && s.leave(ur.rid);
             });
@@ -373,13 +373,14 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('you must login first');
         try
         {
-            const ur0 = await this._chat.unbanUser(u, ur);
+            const unban = await this._chat.unbanUser(u, ur);
             const sockets = await this.server.fetchSockets();
             
             sockets.forEach((s) => {
-                ur0.user.username === s.data.username && s.join(ur.rid);
+                unban.ur.user.username === s.data.username && s.join(ur.rid);
             });
-            this.server.to(ur.rid).emit('user_unbanned', ur0);
+            this.server.to(ur.rid).emit('receive_message', unban.msg);
+            client.emit('user_unbanned', {uid: unban.ur.user.id, rid: unban.ur.room.id});
         }
         catch (e)
         {

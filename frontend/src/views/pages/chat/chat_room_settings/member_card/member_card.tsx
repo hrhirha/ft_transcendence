@@ -3,8 +3,9 @@ import { SettingsOption } from 'views/pages/chat/chat_room_settings/settings_opt
 import { faBan, faCommentSlash, faGamepad, faGear, faUserGear, faUserXmark } from '@fortawesome/free-solid-svg-icons';
 import { DefaultGame, UltimateGame } from 'assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { SocketContext } from 'index';
+import { management_memeber } from 'chat_socket/interface';
 
 export const  MemeberCard:React.FC<{
         id: string,
@@ -22,7 +23,6 @@ export const  MemeberCard:React.FC<{
         const [showMoreOptions, setShowMoreOptions] = useState(false);
         const class_socket = useContext(SocketContext);
 
-        console.log("banned", banned)
         const banUser = ()=> {
             class_socket.ban_user({uid : id,  rid : roomId});
         }
