@@ -151,7 +151,7 @@ export const Chat:React.FC = () => {
             class_socket.get_chats();
             if(getIDQuery() !== null)
                 class_socket.get_messages({id : getIDQuery()});
-        }).on("chats", (data : chats)=>{ 
+        }).on("chats", (data : chats)=>{
             setchatRooms(data);
             if(data.dms.find(d => d.room.id ===  getIDQuery()))
                 setActiveTab(chatTabs.chats);
@@ -165,125 +165,20 @@ export const Chat:React.FC = () => {
             if(getIDQuery() !== null && getIDQuery() === data.id)
                 navigate(`/chat`, {replace: true})
             class_socket.get_chats();
+        }).on("user_banned", (data : management_memeber)=>{
+            if(getIDQuery() === data.rid && JSON.parse(window.localStorage.getItem("user")).id === data.uid)
+                navigate(`/chat`, {replace: true});
+            class_socket.get_chats();
         })
         
         //on mount
         window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
         //return () => class_socket.socket.removeAllListeners();
 
-        //class_socket.socket.on("user_left", (data : user_left)=>{ //done
-        //    console.log("user_left");
-        //    console.log(data)
-        //})
-//
-        //class_socket.socket.on("user_joined", (data : user_joined)=>{ //done
-        //    console.log("user_joined");
-        //    console.log(data)
-        //})
-   
-        //class_socket.socket.on("password_set", (data : management_password)=>{ //done
-        //    console.log("password_set");
-        //    console.log(data)
-        //})
-        //class_socket.socket.on("password_removed", (data : management_password)=>{ //done
-        //    console.log("password_removed");
-        //    console.log(data)
-        //})
-        //
-        //class_socket.socket.on("admin_added", (data : management_memeber)=>{ //done
-        //    console.log("admin_added");
-        //    console.log(data)
-        //})
-        //class_socket.socket.on("admin_removed", (data : management_memeber)=>{ //done
-        //    console.log("admin_removed");
-        //    console.log(data)
-        //})
-        //class_socket.socket.on("user_banned", (data : management_memeber)=>{ //done
-        //    console.log("user_banned");
-        //    console.log(data)
-        //})
-        //class_socket.socket.on("user_unbanned", (data : user_unbanned)=>{ //done
-        //    console.log("user_unbanned");
-        //    console.log(data)
-        //})
-        //class_socket.socket.on("user_muted", (data : user_muted)=>{//done
-        //    console.log("user_muted");
-        //    console.log(data)
-        //})
-        //class_socket.socket.on("user_unmuted", (data : management_memeber)=>{//done
-        //    console.log("user_unmuted");
-        //    console.log(data)
-        //})
-        //class_socket.socket.on("message_deleted", (data : message_deleted)=>{ //done
-        //    console.log("message_deleted");
-        //    console.log(data)
-        //})
-        //class_socket.socket.on("members", (data : user_info[])=>{ //done
-        //    console.log("members");
-        //    console.log(data)
-        //})
-        //return () => class_socket.socket.removeAllListeners();
     },[])
 
     return (
-        <main id="chatPage">
-            {/* <button style={{color: `black`}} onClick={() =>{
-                class_socket.delete_room({id : "cl4jv5f3d0369ohsmoae83lyo"});
-            }}>delete_room</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.remove_member({uid : "cl4lebw5j0133yrsms9le0c75", rid : "cl4lidmy50103ojsm2ftzgyw4"});
-            }}>remove_member</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.join_room({id : "cl4lidmy50103ojsm2ftzgyw4"});
-            }}>join_room</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.leave_room({id : "cl4lidmy50103ojsm2ftzgyw4"});
-            }}>leave_room</button>
-
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.set_password({id : "cl4juxk0d0176ohsm1x6d39sn", new_password : "Walidbensaid123$"});
-            }}>set_password</button>
-            <br/>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.change_password({id : "cl4juxk0d0176ohsm1x6d39sn", new_password : "Awedfdffddfg2123$", old_password : "Walidbensaid123$"});
-            }}>change_password</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.remove_password({id : "cl4juxk0d0176ohsm1x6d39sn",  old_password : "Awedfdffddfg2123$"});
-            }}>remove_password</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.add_admin({uid : "cl4jsuwd500332tsm3kb2eyyb",  rid : "cl4k0xa1f66734xsmzhxz40gh"});
-            }}>add_admin</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.remove_admin({uid : "cl4jsuwd500332tsm3kb2eyyb",  rid : "cl4k0xa1f66734xsmzhxz40gh"});
-            }}>remove_admin</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.ban_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4"});
-            }}>ban_user</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.unban_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4"});
-            }}>unban_user</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.mute_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4", mute_period:"15M"});
-            }}>mute_user</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.unmute_user({uid : "cl4lebw5j0133yrsms9le0c75",  rid : "cl4lidmy50103ojsm2ftzgyw4"});
-            }}>unmute_user</button>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.delete_message({id : "cl4k23j4s0738ydsm45l5at7g",  rid : "cl4k0xa1f66734xsmzhxz40gh"});
-            }}>delete_message</button>
-            <br/>
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.get_members({id : "cl4jtlov200862tsmzhczxiq5"});
-            }}>get_members</button>
-
-            <button style={{color: `black`}} onClick={() =>{
-                class_socket.get_messages({id : "cl6xxzbo80577v4u8i67s9xcz"});
-            }}>get_messages</button> 
-         */}
-
-
-
-            
+        <main id="chatPage">    
             <div className='container'>
                 <div className="row chat">
                     {((screenWidth < 767.98 && !showNewChatForm &&  getIDQuery() === null)

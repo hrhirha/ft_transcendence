@@ -137,9 +137,30 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
 
 
         class_socket.socket.on("user_banned", (data : management_memeber)=>{
+            if(getIDQuery() === data.rid && JSON.parse(window.localStorage.getItem("user")).id !== data.uid)
+                class_socket.get_members({id : getIDQuery()});
+        })
+        
+        class_socket.socket.on("user_unbanned", (data : management_memeber)=>{ 
             class_socket.get_members({id : getIDQuery()});
         })
-        class_socket.socket.on("user_unbanned", (data : management_memeber)=>{ 
+
+        class_socket.socket.on("user_muted", (data : management_memeber)=>{
+            class_socket.get_members({id : getIDQuery()});
+        })
+        class_socket.socket.on("user_unmuted", (data : management_memeber)=>{
+            class_socket.get_members({id : getIDQuery()});
+        })
+
+        class_socket.socket.on("admin_added", (data : management_memeber)=>{ 
+            class_socket.get_members({id : getIDQuery()});
+        })
+
+        class_socket.socket.on("admin_removed", (data : management_memeber)=>{ 
+            class_socket.get_members({id : getIDQuery()});
+        })
+
+        class_socket.socket.on("user_removed", (data : management_memeber)=>{ 
             class_socket.get_members({id : getIDQuery()});
         })
 

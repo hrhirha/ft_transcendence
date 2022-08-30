@@ -295,7 +295,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             sockets.forEach((s) => {
                 s.data.username === ur.ur.user.username && s.join(member.rid);
             });
-            this.server.to(member.rid).emit('user_left', ur.ur);
+            client.emit('user_removed', {uid: ur.ur.user.id, rid: ur.ur.room.id});
             this.server.to(member.rid).emit('receive_message', ur.msg);
         }
         catch (e)
@@ -347,6 +347,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         let u = await this._chat.getUserFromSocket(client);
         if (!u)
             throw new WsException('you must login first');
+        if (u.id === ur.uid)
+            throw new WsException('You can not ban yourself');
         try
         {
             const ban = await this._chat.banUser(u, ur);
@@ -355,7 +357,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             this.server.to(ur.rid).emit('receive_message', ban.msg);
             client.emit('user_banned', {uid: ban.ur.user.id, rid: ban.ur.room.id});
             sockets.forEach((s) => {
-                ban.ur.user.username === s.data.username && s.leave(ur.rid);
+                if (ban.ur.user.username === s.data.username)
+                {
+                    s.emit('user_banned', {uid: ban.ur.user.id, rid: ban.ur.room.id});
+                    s.leave(ur.rid);
+                }
             });
         }
         catch (e)
@@ -371,6 +377,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         let u = await this._chat.getUserFromSocket(client);
         if (!u)
             throw new WsException('you must login first');
+        if (u.id === ur.uid)
+            throw new WsException('You can not unban yourself');
         try
         {
             const unban = await this._chat.unbanUser(u, ur);
@@ -395,10 +403,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         let u = await this._chat.getUserFromSocket(client);
         if (!u)
             throw new WsException('you must login first');
+        if (u.id === mu.uid)
+            throw new WsException('You can not mute yourself');
         try
         {
-            await this._chat.muteUser(u, mu);
-            this.server.to(mu.rid).emit('user_muted', { uid: mu.uid, rid: mu.rid });
+            const msg = await this._chat.muteUser(u, mu);
+            this.server.to(mu.rid).emit('receive_message', msg);
+            client.emit('user_muted', { uid: mu.uid, rid: mu.rid });
         }
         catch (e)
         {
@@ -413,10 +424,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         let u = await this._chat.getUserFromSocket(client);
         if (!u)
             throw new WsException('you must login first');
+        if (u.id === mu.uid)
+            throw new WsException('You can not unmute yourself');
         try
         {
-            const m = await this._chat.unmuteUser(u, mu);
-            this.server.to(mu.rid).emit('user_unmuted', mu);
+            const msg = await this._chat.unmuteUser(u, mu);
+            this.server.to(mu.rid).emit('receive_message', msg);
+            client.emit('user_unmuted', mu);
         }
         catch (e)
         {

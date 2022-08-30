@@ -318,7 +318,7 @@ export class ChatService {
         delete dm.user_rooms;
         return { room: dm, user1, user2, is_blocked };
     }
-                
+
     async joinRoom(user: UserDto, room: OldRoomDto)
     {
         let r = await this._prismaS.room.findUnique({
@@ -671,6 +671,7 @@ export class ChatService {
                 rid: user_room.rid,
                 is_muted: false,
                 is_banned: false,
+                is_owner: false,
                 room: {
                     is_channel: true,
                     user_rooms: {
@@ -685,7 +686,10 @@ export class ChatService {
         });
         if (ur.count === 0)
             throw new WsException('mute operation failed');
-        return {success: true}
+
+        const u = await this._user.getUserById(user, user_room.uid);
+        const msg = await this._add_msg_to_db(user.id, {rid: user_room.rid, msg: `${u.username} is muted`}, msg_type.NOTIF);
+        return msg;
     }
 
     async unmuteUser(user: UserDto, user_room: UserRoomDto)
@@ -700,6 +704,7 @@ export class ChatService {
                 rid: user_room.rid,
                 is_muted: true,
                 is_banned: false,
+                is_owner: false,
                 room: {
                     is_channel: true,
                     user_rooms: {
@@ -714,7 +719,9 @@ export class ChatService {
         });
         if (ur.count === 0)
             throw new WsException('mute operation failed');
-        return {success: true}
+        const u = await this._user.getUserById(user, user_room.uid);
+        const msg = await this._add_msg_to_db(user.id, {rid: user_room.rid, msg: `${u.username} is unmuted`}, msg_type.NOTIF);
+        return msg;
     }
 
     async sendMessage(user: UserDto, data: AddMessageDto)
@@ -789,6 +796,9 @@ export class ChatService {
                 lst_msg: true,
                 lst_msg_ts: true,
                 user_rooms: {
+                    where: {
+                        is_banned: false,
+                    },
                     select: {
                         uid: true,
                         is_owner: true,
@@ -805,8 +815,8 @@ export class ChatService {
         rooms.forEach((room) => {
             let owner, me;
             room.user_rooms.forEach((ur) => {
-                ur.is_owner && (owner = ur);
-                ur.uid === user.id && (me = ur);
+                if (ur.is_owner) owner = ur;
+                if (ur.uid === user.id) me = ur;
             });
             const jt = me.joined_time;
  
@@ -1037,6 +1047,7 @@ export class ChatService {
                     select: {
                         uid: true,
                         joined_time: true,
+                        is_banned: true,
                         user: {
                             select: {
                                 id: true,
@@ -1105,6 +1116,8 @@ export class ChatService {
             room['user'] = room.user_rooms.find(ur => ur.uid !== uid).user;
         }
 
+        if (my_ur.is_banned)
+                throw new WsException('room not found');
         const jt = my_ur.joined_time;
         const msgs = room.messages.filter((message) => {
             return message.timestamp > jt;
@@ -1325,6 +1338,11 @@ export class ChatService {
                             rid: ur.rid,
                             is_admin: true,
                             is_banned: false,
+                        },
+                        none: {
+                            uid: ur.uid,
+                            rid: ur.rid,
+                            is_owner: true,
                         }
                     }
                 }

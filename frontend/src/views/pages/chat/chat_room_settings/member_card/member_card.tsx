@@ -31,6 +31,25 @@ export const  MemeberCard:React.FC<{
             class_socket.unban_user({uid : id,  rid : roomId});
         }
 
+        const muteUser = (mutePeriod : string)=> {
+            class_socket.mute_user({uid : id,  rid : roomId, mute_period: mutePeriod});
+        }
+
+        const unmuteUser = ()=> {
+            class_socket.unmute_user({uid : id,  rid : roomId});
+        }
+
+        const setAdmin = ()=> {
+            class_socket.add_admin({uid : id,  rid : roomId});
+        } 
+        const unsetAdmin = ()=> {
+            class_socket.remove_admin({uid : id,  rid : roomId});
+        }
+
+        const removeMember = ()=> {
+            class_socket.remove_member({uid : id,  rid : roomId});
+        } 
+
   return (
       <div className="memberCard">
          <div className='userData' onClick={() => onClick()}>
@@ -71,27 +90,27 @@ export const  MemeberCard:React.FC<{
                             Mute user
                         </div>
                         {showMoreOptions && <ul className='moreOptions'>
-                            <li onClick={() => alert("mute fo 15m")}>For 15 Minutes</li>
-                            <li onClick={() => alert("mute fo 1h")}>For 1 Hour</li>
-                            <li onClick={() => alert("mute fo 3h")}>For 3 Hours</li>
-                            <li onClick={() => alert("mute fo 8h")}>For 8 Hours</li>
-                            <li onClick={() => alert("mute fo 24h")}>For 24 Hours</li>
-                            <li onClick={() => alert("mute fo inf")}>Until I turn it back on</li>
+                            <li onClick={() => muteUser("15M")}>For 15 Minutes</li>
+                            <li onClick={() => muteUser("1H")}>For 1 Hour</li>
+                            <li onClick={() => muteUser("3H")}>For 3 Hours</li>
+                            <li onClick={() => muteUser("8H")}>For 8 Hours</li>
+                            <li onClick={() => muteUser("24H")}>For 24 Hours</li>
+                            <li onClick={() => muteUser("inf")}>Until I turn it back on</li>
                         </ul>}
                     </div>,
-                    muted && <div onClick={() => alert("Unmute user")} title="Unmute user" >
+                    muted && <div onClick={() => unmuteUser()} title="Unmute user" >
                         <FontAwesomeIcon icon={faCommentSlash}/>
                         Unmute user
                     </div>,
-                    admin && !owner && <div onClick={() => alert("Remove admin")} title="Remove Admin" >
+                    admin && !owner && <div onClick={() => unsetAdmin()} title="Remove Admin" >
                         <FontAwesomeIcon icon={faUserGear}/>
                         Remove Admin
                     </div>,
-                    !admin && <div onClick={() => alert("Set As Admin")} title="Set As Admin" >
+                    !admin && <div onClick={() => setAdmin()} title="Set As Admin" >
                         <FontAwesomeIcon icon={faUserGear}/>
                         Set As Admin
                     </div>,
-                    !owner && <div onClick={() => alert("Remove")} title="Remove user" >
+                    !owner && <div onClick={() => removeMember()} title="Remove user" >
                         <FontAwesomeIcon icon={faUserXmark}/>
                         Remove user
                     </div>
