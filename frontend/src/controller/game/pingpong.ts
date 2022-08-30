@@ -30,7 +30,7 @@ export default class PingPong extends Phaser.Scene
     End: boolean = false;
     re: boolean = false;
     counter?: Phaser.GameObjects.Text;
-    timedEvent?: Phaser.Time.TimerEvent;
+    // timedEvent?: Phaser.Time.TimerEvent;
     initialTime :number = 5;
     goal: boolean = false;
     gameIsStarted: boolean = false;
@@ -60,6 +60,9 @@ export default class PingPong extends Phaser.Scene
         userId: string
     }
     focus: boolean = true;
+    focusTimer: number = 0;
+    counterTimer?: Phaser.GameObjects.Text;
+    focusMode: boolean = false;
     
     constructor(msoc: Socket, type:string, isPlayer: boolean, roomId: string, Game: {
         private: boolean,
@@ -154,11 +157,14 @@ export default class PingPong extends Phaser.Scene
 
             this.soc.on("focus", (focus) => {
                 this.focus = focus;
-                if (this.isPlayer)
+                if (this.End)
+                    return ;
+                if (this.isPlayer && !this.goal)
                 {
                     this.input.keyboard.enabled = focus;
                     this.ball.body.enable = focus;
                 }
+                this.goalTime(10);
             });
 
             this.soc.on("restartGame", () => {
@@ -523,9 +529,30 @@ export default class PingPong extends Phaser.Scene
     {
         if (this.initialTime <= 0)
             return ;
+        if ( this.focusMode && this.focusTimer <= 0)
+            return ;
         this.initialTime -= (this.focus) ? 1 : 0; // One second
-        this.counter.setText('' + this.formatTime(this.initialTime)).setOrigin(0.5);
-        if (this.initialTime <= 0)
+        this.focusTimer -= (this.focusMode) ? 1 : 0; // One second
+        if (!this.focusMode)
+            this.counter.setText('' + this.formatTime(this.initialTime)).setOrigin(0.5);
+        if (this.focusMode)
+            this.counterTimer.setText('' + this.formatTime(this.focusTimer)).setOrigin(0.5);
+        if ( this.focusMode )
+        {
+            if (this.focus)
+            {
+                this.counterTimer.text = "";
+                this.focusMode = false;
+                this.focusTimer = 0;
+                return ;
+            }
+            if (this.focusTimer <= 0)
+            {
+                console.log("youWine");
+            }
+
+        }
+        if (!this.focusMode && this.initialTime <= 0)
         {
             this.goal = false;
             this.counter.text = "";
@@ -641,11 +668,23 @@ export default class PingPong extends Phaser.Scene
     
     goalTime(time)
     {
-        this.initialTime = time;
-        this.counter = this.add.text(this.w / 2, this.h / 2, '' + this.formatTime(this.initialTime), { fontSize: "60px", 
-        fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
-        // Each 1000 ms call onEvent
-        this.timedEvent = this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });
+        if (!this.focus)
+        {
+            console.log("here"); 
+            this.focusMode = true;
+            this.focusTimer = time;
+            this.counterTimer = this.add.text(this.w / 2, this.h / 2.5  , '' + this.formatTime(this.initialTime), { fontSize: "60px", 
+            fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
+        }
+        if (this.focus)
+        {
+            this.initialTime = time;
+            this.counter = this.add.text(this.w / 2, this.h / 2, '' + this.formatTime(this.initialTime), { fontSize: "60px", 
+            fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
+            // Each 1000 ms call onEvent
+            // this.timedEvent = this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });
+        }
+        this.time.addEvent({ delay: 1000, callback: this.onEvent, callbackScope: this, loop: true });
     }
 
     update () : void
