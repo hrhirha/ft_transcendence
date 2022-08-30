@@ -30,7 +30,7 @@ export const ChatRoomItem = (Props : Props) => {
       <div className='dataColumn'>
         <div className='dataRow'>
           <h6 className='userName'>{Props.fullName}</h6>
-          {Props.joined && <ReactTimeAgo className='time' date={new Date(Props.timeLastMsg)} locale="en-US"/>}
+          {Props.joined && Props.timeLastMsg && <ReactTimeAgo className='time' date={new Date(Props.timeLastMsg)} locale="en-US"/>}
           {!Props.joined && Props.type === "PROTECTED" && <FontAwesomeIcon icon={faLock}/>}
         </div>
         <div className='dataRow'>

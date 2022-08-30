@@ -166,9 +166,9 @@ export const Chat:React.FC = () => {
                 navigate(`/chat`, {replace: true})
             class_socket.get_chats();
         }).on("user_banned", (data : management_memeber)=>{
-            if(getIDQuery() === data.rid && JSON.parse(window.localStorage.getItem("user")).id === data.uid)
-                navigate(`/chat`, {replace: true});
-            class_socket.get_chats();
+            //if(getIDQuery() === data.rid && JSON.parse(window.localStorage.getItem("user")).id === data.uid)
+            //    navigate(`/chat`, {replace: true});
+            //class_socket.get_chats();
         })
         
         //on mount

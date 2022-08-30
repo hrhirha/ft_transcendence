@@ -162,6 +162,8 @@ export interface room_msgs {
     is_channel : boolean,
     name : string,
     type : string,
+    is_banned: boolean,
+    is_muted: boolean,
     user : user_info,
 }
 

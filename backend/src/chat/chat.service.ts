@@ -796,9 +796,6 @@ export class ChatService {
                 lst_msg: true,
                 lst_msg_ts: true,
                 user_rooms: {
-                    where: {
-                        is_banned: false,
-                    },
                     select: {
                         uid: true,
                         is_owner: true,
@@ -821,7 +818,7 @@ export class ChatService {
             const jt = me.joined_time;
  
             room.lst_msg_ts < jt && (room.lst_msg = "") && (room.lst_msg_ts = null);
-            // me.is_banned && (room.lst_msg = 'you are banned') && (room.lst_msg_ts = null);
+            me.is_banned && (room.lst_msg = 'you are banned') && (room.lst_msg_ts = null);
 
             room["unread"] = me.unread;
             room['owner'] = owner.uid;
@@ -1048,6 +1045,7 @@ export class ChatService {
                         uid: true,
                         joined_time: true,
                         is_banned: true,
+                        is_muted: true,
                         user: {
                             select: {
                                 id: true,
@@ -1116,8 +1114,8 @@ export class ChatService {
             room['user'] = room.user_rooms.find(ur => ur.uid !== uid).user;
         }
 
-        if (my_ur.is_banned)
-                throw new WsException('room not found');
+        room['is_banned'] = my_ur.is_banned;
+        room['is_muted'] = my_ur.is_muted;
         const jt = my_ur.joined_time;
         const msgs = room.messages.filter((message) => {
             return message.timestamp > jt;

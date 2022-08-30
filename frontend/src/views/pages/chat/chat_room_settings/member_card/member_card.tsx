@@ -74,7 +74,7 @@ export const  MemeberCard:React.FC<{
                         Ultimate Game
                     </div>
                 ]}/>}
-             {((permession === 1 || permession === 2) && JSON.parse(window.localStorage.getItem("user")).id !== id) && <SettingsOption icon={faGear} title="Options"
+             {((permession === 1 || permession === 2) && JSON.parse(window.localStorage.getItem("user")).id !== id) && !owner && <SettingsOption icon={faGear} title="Options"
                   subOptions={[
                     !banned && <div onClick={() => banUser()} title="Ban user" >
                         <FontAwesomeIcon icon={faBan}/>
@@ -102,15 +102,15 @@ export const  MemeberCard:React.FC<{
                         <FontAwesomeIcon icon={faCommentSlash}/>
                         Unmute user
                     </div>,
-                    admin && !owner && <div onClick={() => unsetAdmin()} title="Remove Admin" >
+                    permession === 2 && admin && !owner && <div onClick={() => unsetAdmin()} title="Remove Admin" >
                         <FontAwesomeIcon icon={faUserGear}/>
                         Remove Admin
                     </div>,
-                    !admin && <div onClick={() => setAdmin()} title="Set As Admin" >
+                    permession === 2 && !admin && <div onClick={() => setAdmin()} title="Set As Admin" >
                         <FontAwesomeIcon icon={faUserGear}/>
                         Set As Admin
                     </div>,
-                    !owner && <div onClick={() => removeMember()} title="Remove user" >
+                    permession === 2 && !owner && <div onClick={() => removeMember()} title="Remove user" >
                         <FontAwesomeIcon icon={faUserXmark}/>
                         Remove user
                     </div>
