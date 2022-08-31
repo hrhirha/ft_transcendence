@@ -642,7 +642,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             return user;
         }
 
-
+        if (client.data.obj && this.tab[client.data.obj.roomId].endGame)
+            client.emit("Bye");
         if (client.data.obj.isPlayer && !focus)
         {
             client.data.obj.onFocus = false;

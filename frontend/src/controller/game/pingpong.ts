@@ -65,6 +65,7 @@ export default class PingPong extends Phaser.Scene
     focusMode: boolean = false;
     timedEventFocus: Phaser.Time.TimerEvent;
     focusTxt: Phaser.GameObjects.Text;
+    who: string;
     
     constructor(msoc: Socket, type:string, isPlayer: boolean, roomId: string, Game: {
         private: boolean,
@@ -127,6 +128,15 @@ export default class PingPong extends Phaser.Scene
                 }
             });
 
+            this.soc.on("Bye", () => {
+                
+                if (this.End)
+                    return ;
+                this.rightScore = (this.data.player === "player1") ? this.bestOf: this.rightScore;
+                this.leftScore = (this.data.player === "player2") ? this.bestOf: this.leftScore;
+                this.scene.restart();
+            });
+
             this.soc.on("startGame", () => {
                 if (this.waiting || this.buttonBg || this.leave)
                 {
@@ -139,6 +149,8 @@ export default class PingPong extends Phaser.Scene
                         this.leave.destroy();
                     this.replayClick = false;
                 }
+
+                this.focus = true;
                 this.goalTime(3);
             });
 
@@ -158,9 +170,9 @@ export default class PingPong extends Phaser.Scene
             });
 
             this.soc.on("focus", (focus) => {
-                this.focus = focus;
                 if (this.End)
                     return ;
+                this.focus = focus;
                 if (this.isPlayer && !this.goal)
                 {
                     this.input.keyboard.enabled = focus;
@@ -176,6 +188,7 @@ export default class PingPong extends Phaser.Scene
                 this.rightScore = 0;
                 this.End = false;
                 this.goal = false;
+                this.focus = true;
                 if (this.data.is_player)
                     this.input.keyboard.enabled = true;
                 else
@@ -209,13 +222,6 @@ export default class PingPong extends Phaser.Scene
 
             this.soc.on("youWin", () => 
             {
-                if (this.scene.isSleeping())
-                {
-                    this.scene.wake();
-                    this.paddle.destroy();
-                    this.enemy.destroy();
-                    this.ball.destroy();
-                }
                 if (this.waiting)
                     this.waiting.destroy();
                 this.exitEmited = true;
@@ -509,6 +515,20 @@ export default class PingPong extends Phaser.Scene
         {
             this.gameIsStarted = false;
             this.End = true;
+            this.goal = false;
+            if (this.focusMode)
+            {
+                this.focusTxt = undefined;
+                this.counterTimer = undefined;
+                this.timedEventFocus = undefined;
+                
+                this.focusTimer = 0;
+                this.focusMode = false;
+                this.counter = undefined;
+                this.timedEvent = undefined;
+                this.initialTime = 0;
+            }
+            this.focus = true;
             const msg = ((this.leftScore >= this.bestOf && this.data.player === "player1") || (this.rightScore >= this.bestOf && this.data.player === "player2")) ? "youwin" : "youlose";
             this.winner(msg);
         }
@@ -552,11 +572,11 @@ export default class PingPong extends Phaser.Scene
             this.timedEvent = undefined;
             this.initialTime = 0;
             if (this.exitEmited)
-            return ;
+                return ;
             if (this.data.is_player)
-            this.startGame();
+                this.startGame();
             else
-            this.createObjects(this.w / 2, this.h / 2, this.h / 2, this.h / 2);
+                this.createObjects(this.w / 2, this.h / 2, this.h / 2, this.h / 2);
             return;
         }
         
@@ -581,12 +601,10 @@ export default class PingPong extends Phaser.Scene
             
             if (this.focusTimer <= 0)
             {
-                this.counterTimer.text = "";
-                this.counterTimer = undefined;
-                this.timedEventFocus = undefined;
-                
-                // console.log("youWine");
-                // this.scene.pause();
+                this.rightScore = (this.who === "player1") ? this.bestOf: this.rightScore ;
+                this.leftScore = (this.who === "player2") ? this.bestOf: this.leftScore ;
+                console.log("youWine");
+                this.scene.restart();
                 return ;
             }
         }
@@ -702,8 +720,8 @@ export default class PingPong extends Phaser.Scene
             this.focusMode = true;
             this.focusTimer = time;
             
-            let player = ( this.data.player === "player1" ) ? "player2" : "player1" ; 
-            this.focusTxt = this.add.text(this.w / 2, this.h / 2.5  , player  + ' isn\'t in focus mode', { fontSize: "35px", 
+            this.who = ( this.data.player === "player1" ) ? "player2" : "player1" ; 
+            this.focusTxt = this.add.text(this.w / 2, this.h / 2.5  , this.who  + ' isn\'t in focus mode', { fontSize: "35px", 
                 fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
             
             this.counterTimer = this.add.text(this.w / 2, this.h / 2  , '' + this.formatTime(this.focusTimer), { fontSize: "60px", 
