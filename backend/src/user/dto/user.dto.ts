@@ -1,4 +1,4 @@
-import { IsDefined, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, MaxLength } from "class-validator";
+import { IsBoolean, IsDefined, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, MaxLength } from "class-validator";
 
 export interface UserDto
 {
@@ -25,6 +25,23 @@ export class UserIdDto
     @IsNotEmpty()
     @Matches(/^c[a-z0-9]{20,}$/, {message: "Invalid id format"})
     id: string;
+}
+
+export class ChallengeDto
+{
+    @IsDefined()
+    @IsString()
+    @IsNotEmpty()
+    @Matches(/^c[a-z0-9]{20,}$/, {message: "Invalid id format"})
+    id: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @Matches(/^normaleQue|ultimateQue$/)
+    type: string;
+
+    @IsBoolean()
+    invite: boolean;
 }
 
 export class EditUsernameDto {

@@ -4,7 +4,7 @@ import * as argon2 from 'argon2'
 import { Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UserDto, UserIdDto } from 'src/user/dto';
+import { ChallengeDto, UserDto, UserIdDto } from 'src/user/dto';
 import { UserService } from 'src/user/user.service';
 import { friend_status, msg_type, relation_status, room_type, user_status } from 'src/utils';
 import { AddMessageDto, ChangePasswordDto, DeleteMessageDto, EditRoomDto, MuteUserDto, NewRoomDto, OldRoomDto, RemovePasswordDto, SetPasswordDto, UserRoomDto } from './dto';
@@ -762,9 +762,9 @@ export class ChatService {
         return {success: true}
     }
 
-    async getOpponent(user: UserDto, opponent: UserIdDto)
+    async getOpponent(user: UserDto, dto: ChallengeDto)
     {
-        const u = await this._user.getUserById(user, opponent.id);
+        const u = await this._user.getUserById(user, dto.id);
 
         if (u.relation === relation_status.BLOCKED)
             throw new WsException('your friend status is blocked');

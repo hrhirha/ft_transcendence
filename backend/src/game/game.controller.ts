@@ -2,6 +2,7 @@ import { Controller, ForbiddenException, Get, Param, UseGuards } from '@nestjs/c
 import { User } from '@prisma/client';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
 import { GetUser } from 'src/user/decorator';
+import { UserDto } from 'src/user/dto';
 import { GameService } from './game.service';
 
 @UseGuards(Jwt2FAAuthGuard)
@@ -41,11 +42,11 @@ export class GameController
     }
 
     @Get('ongoing')
-    async ongoingGames()
+    async ongoingGames(@GetUser() user: UserDto)
     {
         try
         {
-            return await this._game.ongoingGames();
+            return await this._game.ongoingGames(user);
         }
         catch (e)
         {

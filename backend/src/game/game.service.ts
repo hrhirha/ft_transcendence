@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UserDto } from 'src/user/dto';
 
 @Injectable()
 export class GameService
@@ -84,11 +85,16 @@ export class GameService
         return hist;
     }
 
-    async ongoingGames()
+    async ongoingGames(user: UserDto)
     {
         const games = await this._prisma.game.findMany({
             where: {
                 ongoing: true,
+                user_game: {
+                    none: {
+                        uid: user.id,
+                    }
+                }
             },
             select: {
                 id: true,

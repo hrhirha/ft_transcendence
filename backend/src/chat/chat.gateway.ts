@@ -1,12 +1,12 @@
 import { WebSocketGateway, SubscribeMessage, MessageBody, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, WebSocketServer, ConnectedSocket, WsException } from '@nestjs/websockets'
 import {  } from '@nestjs/platform-socket.io'
-import { ArgumentMetadata, HttpException, Logger, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ArgumentMetadata, Get, HttpException, Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { AddMessageDto, ChangePasswordDto, DeleteMessageDto, EditRoomDto, MuteUserDto, NewRoomDto, OldRoomDto, RemovePasswordDto, SetPasswordDto, UserRoomDto } from './dto';
+import { AddMessageDto, ChangePasswordDto, DeleteMessageDto, EditRoomDto, MuteUserDto, NewRoomDto, OldRoomDto, RemovePasswordDto, SetPasswordDto, UserIdDto, UserRoomDto } from './dto';
 import { ChatService } from './chat.service';
 import { UserService } from 'src/user/user.service';
 import { HOST, user_status } from 'src/utils';
-import { UserIdDto } from 'src/user/dto';
+import { ChallengeDto } from 'src/user/dto';
 
 export class WsValidationPipe extends ValidationPipe
 {
@@ -497,18 +497,18 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
 
     @SubscribeMessage('challenge')
-    async inviteToGame(@ConnectedSocket() client: Socket, @MessageBody() opponent: UserIdDto)
+    async inviteToGame(@ConnectedSocket() client: Socket, @MessageBody() dto: ChallengeDto)
     {
         let u = await this._chat.getUserFromSocket(client);
         if (!u)
             throw new WsException('you must login first');
         try
         {
-            const d = await this._chat.getOpponent(u, opponent);
+            const d = await this._chat.getOpponent(u, dto);
             const sockets = await this.server.fetchSockets();
 
             const so = sockets.find(s=>{ return s.data.username === d.username });
-            so && this.server.to(so.id).emit('challenge_requested', u);
+            so && this.server.to(so.id).emit('challenge_requested', { user: u, type: dto.type, invite: dto.invite });
         }
         catch (e)
         {
