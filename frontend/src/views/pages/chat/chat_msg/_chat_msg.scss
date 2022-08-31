@@ -2,6 +2,7 @@
     margin: .4rem;
     @include _flex(row-reverse, right, flex-start);
     span.msg, span.first_msg {
+        overflow: hidden;
         padding: 0.5rem .75rem;
         max-width: 69%;
         background-color: $light6;
@@ -42,10 +43,10 @@
 .receive {
     margin: .4rem;
     @include _flex(row, left, flex-start);
-
     span.msg, span.first_msg {
         padding: 0.5rem .75rem;
         max-width: 69%;
+        overflow: hidden;
         background-color: rgba($purple, .75);
         font-size: $fsize * .9;
         font-family: $MFont;
