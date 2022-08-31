@@ -1,46 +1,12 @@
-section#invitePlayer {
+section#searchForUser {
     @include _flex(column, center, center);
     @include _selectionOff();
     position: relative;
     margin: .5rem auto;
+    margin-bottom: 1rem;
     width: 100%;
-    .sectionTitle {
-            @include _flex(row, center, center);
-            max-width: 15rem;
-            margin: 1.5rem auto;
-            svg {
-                font-size: $fsize * 3;
-                path {
-                    color: $gold;
-                }
-            }
-            h2 {
-                margin-left: .5rem;
-                font-family: $XBFont;
-                color: $light3;
-                text-transform: uppercase;
-                font-size: $fsize * 2.2;
-                line-height: .8;
-                width: min-content;
-                b {
-                    font-family: $XBFont;
-                    color: $light3;
-                    line-height: 1;
-                    font-size: $fsize * 1.56;
-                }
-            }
-            @media (max-width: $sm) {
-                margin-bottom: 1rem;
-                h2 {
-                    font-size: $fsize * 1.5;
-                }
-                svg {
-                    font-size: $fsize * 2.25;
-                }
-            }
-        }
     .searchFrom {
-        width: 100%;
+        width: 99%;
         background: $dark3;
         border-radius: 1rem;
         position: relative;
@@ -85,8 +51,8 @@ section#invitePlayer {
             box-shadow: 0 0 1rem -1px $dark1;
             span.emptyResults {
                 @include _flex(row, center, center);
-                padding: 1.5rem;
                 text-align: center;
+                padding: 1.5rem;
                 font-family: $BFont;
                 font-size: $fsize * 1.2;
                 color: rgba($light3, .65)
@@ -132,24 +98,6 @@ section#invitePlayer {
                                 color: $light3;
                             }
                         }
-                        .status {
-                            font-size: $fsize * .55;
-                            text-transform: uppercase;
-                            font-family: $BFont;
-                            background-color: $dark3;
-                            padding: .1rem .5rem;
-                            border-radius: 10rem;
-                        }
-                        .status.OFFLINE {
-                            color: rgba($light3, .5);
-                        }
-                        .status.INGAME {
-                            color: $gold;
-                            animation: flash 1.75s linear infinite;
-                        }
-                        .status.ONLINE {
-                            color: $green;
-                        }
                     }
                     :hover {
                         background-color: $light6;
@@ -158,7 +106,6 @@ section#invitePlayer {
             }
         }
     }
-    z-index: 10;
 }
 
 @keyframes flash {

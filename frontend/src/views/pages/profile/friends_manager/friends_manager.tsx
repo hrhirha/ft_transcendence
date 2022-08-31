@@ -6,6 +6,7 @@ import { get_friendreqs_received, get_friendreqs_sent } from "controller/user/fr
 import { get_friends, get_friends_blocked } from "controller/user/friends";
 import { FriendCard } from "views/pages/profile/friend_card/friend_card";
 import { User } from "controller/user/user";
+import { SearchUserForm } from "./serach_user/search_user";
 
 
 
@@ -77,6 +78,7 @@ export const FriendsManager:React.FC = () => {
     }, [activeTab]);
     return (
         <section id="friendsManager">
+            <SearchUserForm/>
             <nav className="headerNav">
                 <NavBar activeTab={activeTab} onChange={(active: tabs) => {
                     setActiveTab(active);

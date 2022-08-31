@@ -9,6 +9,7 @@ interface Props {
     title: string,
     description: string,
     time: number,
+    interval: any,
     actions?: Array<{title: string, color: string, action: Function}>
 }
 
@@ -48,7 +49,6 @@ const NotifCard:React.FC<{props: Props, onClose: Function, setNotifs: Function}>
 export const Notif:React.FC<{children: ReactNode}> = ({children}) => {
     const [notifs, setNotifs] = useState<Array<Props>>([]);
     const pushNotif = (newNotif: Props) => {
-        console.log(notifs, newNotif, notifs.find(n => n.id !== newNotif.id));
         if (notifs.length === 0 || notifs.find(n => n.id !== newNotif.id))
         {
             if (newNotif.time === undefined)
@@ -57,8 +57,9 @@ export const Notif:React.FC<{children: ReactNode}> = ({children}) => {
                 setNotifs(oldNotifs => oldNotifs.splice(0, 4));
             else
                 setNotifs(oldNotifs => [newNotif, ...oldNotifs]);
-            setTimeout(() => {
+            newNotif.interval = setInterval(() => {
                 setNotifs(oldNotifs => oldNotifs.filter((notif) => notif.id !== newNotif.id));
+                clearInterval(newNotif.interval);
             }, newNotif.time);
         }
     }

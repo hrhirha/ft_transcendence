@@ -101,8 +101,10 @@ const ChatRoomFooter:React.FC<{muted: boolean, send_message : Function}> = ({mut
             <input type="text" placeholder="Type your Message Here" value={msg} onChange={(e)=>setMsg(e.target.value.trim() !== "" ? e.target.value : "")}/>
             <button id="sendMessage" onClick={(e) =>{
                 e.preventDefault();
+                if (msg.trim() !== "") {
                     send_message(msg.trim());
-                    setMsg("");
+                }
+                setMsg("");
             }}>
                 <FontAwesomeIcon icon={faPaperPlane}/>
                 Send

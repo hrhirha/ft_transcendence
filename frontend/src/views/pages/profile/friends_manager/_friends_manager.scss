@@ -1,3 +1,5 @@
+@import "./serach_user/search_user";
+
 section#friendsManager {
     @include _flex(column, center, center);
     nav.headerNav {
@@ -37,7 +39,7 @@ section#friendsManager {
             height: 100%;
             padding: .5rem;
             .empty {
-                @include _gradientBg(rgba($dark2, 50), rgba($dark1, 0), 180);
+                @include _gradientBg(rgba($dark3, 45), rgba($dark3, 0), 180);
                 border-radius: 1rem;
                 @include _flex(column, center, center);
                 @include _selectionOff();
@@ -46,10 +48,9 @@ section#friendsManager {
                 margin: auto;
                 img {
                     width: 45%;
-                    min-height: 20rem;
                     opacity: .6;
                     @media (max-width: $md) {
-                        width: 75%;
+                        width: 50%;
                     }
                     @media (max-width: $sm) {
                         width: 65%;
@@ -69,6 +70,10 @@ section#friendsManager {
                     max-width: 18rem;
                     text-align: center;
                     line-height: 1.2;
+                    @media (max-width: 350px) {
+                        width: 75%;
+                        font-size: $fsize * 1.1;
+                    }
                 }
             }
 
