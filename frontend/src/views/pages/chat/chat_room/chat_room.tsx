@@ -112,7 +112,6 @@ const ChatRoomFooter:React.FC<{muted: boolean, send_message : Function}> = ({mut
                 setMsg("");
             }}>
                 <FontAwesomeIcon icon={faPaperPlane}/>
-                Send
             </button>
         </form>}
         {muted && <div id="muted"><FontAwesomeIcon icon={faCommentSlash} />You are muted, you can't send messages</div>}

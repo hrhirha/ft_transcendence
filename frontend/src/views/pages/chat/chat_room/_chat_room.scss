@@ -138,14 +138,13 @@ section#chatRoom {
             }
             button#sendMessage {
                 @include _flex(row, space-evenly, center);
+                @include _square(2.3rem);
                 cursor: pointer;
                 border: none;
                 background-color: $purple;
                 font-family: $BFont;
                 padding: .5rem;
                 border-radius: 50rem;
-                min-width: 5.25rem;
-                min-height: 2.3rem;
                 margin-right: .25rem;
                 svg {
                     font-size: $fsize;
