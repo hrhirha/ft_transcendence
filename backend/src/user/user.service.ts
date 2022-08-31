@@ -63,28 +63,12 @@ export class UserService {
                 },
                 wins: true,
                 loses: true,
-                status: true,
-                // sentReq: {
-                //     where: {
-                //         rcv_id: user.id
-                //     },
-                //     select: { status: true, }
-                // },
-                // recievedReq: {
-                //     where: {
-                //         snd_id: user.id
-                //     },
-                //     select: { status: true, }
-                // },
+                // status: true,
             }
         });
         if (arr.length === 0)
             throw new ForbiddenException('no users were found');
 
-        // arr.forEach(u => {
-        //     u["relation"] = this._getFriendRelation(user, u);
-        //     delete u.sentReq && delete u.recievedReq;
-        // });
         return arr;
     }
 
@@ -481,6 +465,7 @@ export class UserService {
                         username: true,
                         fullName: true,
                         imageUrl: true,
+                        status: true,
                     },
                 },
                 receiver: {
@@ -489,6 +474,7 @@ export class UserService {
                         username: true,
                         fullName: true,
                         imageUrl: true,
+                        status: true,
                     }
                 }
             }
@@ -497,7 +483,6 @@ export class UserService {
         for (let req of freqs)
         {
             const friend = req.sender.id === id ? req.receiver : req.sender;
-            const status = req.status;
             friends.push(friend);
         }
         return friends;
