@@ -137,6 +137,7 @@ section.matchCard {
     }
     .scoreBoard {
         @include _flex(row, center, center);
+        position: relative;
         width: 20%;
         background-color: $dark3;
         border-radius: 5rem;
@@ -173,6 +174,22 @@ section.matchCard {
                 width: 2rem;
             }
         }
+        .viewers {
+            @include _flex(row, center, center);
+            position: absolute;
+            bottom: -1.25rem;
+            background: rgba($red, .75);
+            font-size: $fsize * .65;
+            font-family: $XBFont;
+            line-height: 1;
+            border-radius: 5rem;
+            min-width: 1.5rem;
+            text-align: center;
+            padding: .2rem .4rem;
+            svg {
+                margin-right: .3rem;
+            }
+          }
         .score {
             font-size: $fsize * 1.5;
             font-family: $BFont;

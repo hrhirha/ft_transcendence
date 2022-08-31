@@ -4,6 +4,9 @@ import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { useNavigate } from "react-router-dom";
 import { Match } from "controller/user/matchs";
 import { User } from "controller/user/user";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
+import { Numeral } from "../numeral/numeral";
 
 const PlayerData:React.FC<{player: User, left: boolean, winner: boolean}> = ({player, left, winner}) => {
     const navigate = useNavigate();
@@ -28,15 +31,19 @@ const PlayerData:React.FC<{player: User, left: boolean, winner: boolean}> = ({pl
     );
 }
 
-export const MatchCard:React.FC<{match: Match, winnerId?: string}> = ({match, winnerId}) => {
-    // console.log(match.is_ultimate);
+export const MatchCard:React.FC<{match: Match, winnerId?: string, viewers?: number}> = ({match, winnerId, viewers}) => {
     return (
     <section className="matchCard" id={match.id}>
 
         <PlayerData player={match.p1} left={true} winner={winnerId && match.p1.id === winnerId}/>
         <div className="scoreBoard">
             <span className="score">{match.score.p1}</span>
-            <img className="gameType" src={match.is_ultimate ? UltimateGame : DefaultGame} alt="Game Type"/>
+            <>
+                {viewers !== null && <span className="viewers"><FontAwesomeIcon icon={faEye}/>
+                <Numeral value={viewers}/>
+                </span>}
+                <img className="gameType" src={match.is_ultimate ? UltimateGame : DefaultGame} alt="Game Type"/>
+            </>
             <span className="score">{match.score.p2}</span>
         </div>
         <PlayerData player={match.p2} left={false} winner={winnerId && match.p2.id === winnerId}/>

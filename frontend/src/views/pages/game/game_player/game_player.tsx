@@ -13,6 +13,8 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
     const [socket] = useState(io("ws://127.0.0.1:3001/game", {withCredentials: true}));
     const pushNotif = useNotif();
     const [winner, setWinner] = useState<string>("");
+    const [viewers, setViewers] = useState<number>(0);
+
     const [matchData, setMatchData] = useState<Match>({
         is_ultimate: ultimateGame,
         p1: null,
@@ -54,6 +56,8 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
         })
         .on("keepWatching", () => {
             setWinner("");
+        }).on("vues", (vues) => {
+            setViewers(vues);
         })
         .on("updateScore", (score) => {
             setMatchData(oldData => ({...oldData, score: {p1: score.score1, p2: score.score2}}));
@@ -67,7 +71,7 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
         <main id="gamePage" className="container">
             <div className="row">
                 <div className="col-12 col-md-9">
-                    {matchData && <MatchCard match={matchData} winnerId={winner}/>}
+                    {matchData && <MatchCard match={matchData} winnerId={winner} viewers={viewers}/>}
                     <GameView gameSocket={socket} isUltimate={ultimateGame} watcher={false} roomId={""} isPrivate={false} vsPID="" />
                 </div>
             </div>
