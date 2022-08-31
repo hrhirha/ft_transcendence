@@ -188,7 +188,9 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
             </div>
             {!userProfile && <div className="actionButtons">
                 {buttons.map((button) => {
-                    if (userType[button.type] === userInfos?.relation) {
+                    if(userInfos?.relation === "friend" && button.type !== 5)
+                        return null;
+                    if ((userInfos?.relation === "friend" && button.type === 5) || userType[button.type] === userInfos?.relation) {
                         return (
                             <button key={`${button.text.replace(' ', '')}`} className={`btn${button.text.replace(' ', '')}`} onClick={async () => {
                                 try {

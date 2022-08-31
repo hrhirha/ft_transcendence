@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FriendsManager } from "views/pages/profile/friends_manager/friends_manager";
 import { ProfileInfos } from "views/pages/profile/profile_infos/profile_infos";
-import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faUsersGear, faHistory} from "@fortawesome/free-solid-svg-icons";
+import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faUsersGear, faHistory, faComment, faGamepad} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { post_friendreq_accept, post_friendreq_cancel, post_friendreq_decline, post_friendreq_send } from "controller/user/friendreq";
 import { post_friend_block, post_friend_unblock, post_friend_unfriend } from "controller/user/friends";
 import { MatchsHistory } from "./matchs_history/matchs_history";
+import { history, SocketContext } from "index";
+import { dm_started } from "chat_socket/interface";
 
 
 export enum userType {
@@ -13,7 +15,8 @@ export enum userType {
 	friend = 1,
 	request = 2,
 	blocked = 3,
-	pending = 4
+	pending = 4,
+    friendProfile = 5
 }
 
 export const buttons = [
@@ -60,6 +63,30 @@ export const buttons = [
             await post_friend_block(userId);
             action && action(userId);
             window.location.pathname = "/";
+        }
+    },
+    {
+        type: userType.friendProfile,
+        icon: faComment,
+        text: 'Message',
+        onClick: async (userId: string, action?: Function) => {
+            // const class_socket = useContext(SocketContext);
+            // class_socket.start_dm(userId);
+            // class_socket.socket.on("dm_started", (data : dm_started)=>{
+            //     history.replace("/chat?id" + data.room.id);
+            // });
+            action && action(userId);
+        }
+    },
+    {
+        type: userType.friendProfile,
+        icon: faGamepad,
+        text: 'Invite',
+        onClick: async (userId: string, action?: Function) => {
+            window.localStorage.setItem("privateGame", JSON.stringify({"userId": userId}));
+            //send invite to play
+            history.replace("/play");
+            action && action(userId);
         }
     },
     {

@@ -83,7 +83,7 @@
         @include _flex(column, space-evenly, center);
         @include _selectionOff();
         height: 100%;
-        .btnAccept, .btnAddFriend {
+        .btnAccept, .btnAddFriend, .btnMessage, .btnInvite {
             @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($purple, .5), $bgcolor2: $purple);
         }
         .btnDecline, .btnCancle, .btnPending {
