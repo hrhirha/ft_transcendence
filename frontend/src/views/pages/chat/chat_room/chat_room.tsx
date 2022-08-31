@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClose, faComments, faCommentSlash, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
+import { faClose, faComments, faCommentSlash, faGamepad, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
 import { Chat_msg } from "views/pages/chat/chat_msg/chat_msg";
 import { BannedFromChat, BgVectors, GroupIcon, NoConversations } from "assets";
 import React, { useContext, useEffect, useRef, useState } from "react";
@@ -50,7 +50,7 @@ const ChatRoomHeader = (Props : HeaderProps) => {
     return (
     <div id="chatRoomHeader">
         <div className="userInfos" onClick={() => {
-            if (Props.status == "Channel")
+            if (Props.status === "Channel")
                 Props.showSettings()
             else
                 navigate(`/u/${Props.username}`);
@@ -61,9 +61,14 @@ const ChatRoomHeader = (Props : HeaderProps) => {
                 <span className='status'>{Props.status}</span>
             </div>
         </div>
-        <button id="closeChatRoom" onClick={() => Props.onClose()} title="close">
-            <FontAwesomeIcon icon={faClose}/>
-        </button>
+        <div className="roomOptions">
+            {Props.status !== "Channel" && <button id="inviteToPlay" onClick={() => alert("invite to play")} title="invite to play">
+                <FontAwesomeIcon icon={faGamepad}/>
+            </button>}
+            <button id="closeChatRoom" onClick={() => Props.onClose()} title="close">
+                <FontAwesomeIcon icon={faClose}/>
+            </button>
+        </div>
     </div>
     );
 }

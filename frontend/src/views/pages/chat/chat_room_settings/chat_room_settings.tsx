@@ -6,16 +6,15 @@ import { getIDQuery, SocketContext } from "index";
 import { useContext, useEffect, useState } from "react";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { MemeberCard } from "views/pages/chat/chat_room_settings/member_card/member_card";
-import { SettingsOption } from "views/pages/chat/chat_room_settings/settings_option/settings_option";
 import { useNavigate } from "react-router-dom";
 import { useNotif } from "views/components/notif/notif";
 import { Numeral } from "views/components/numeral/numeral";
 import { UserSearchForm } from "views/components/user_search/user_search";
 import { User } from "controller/user/user";
-import { UserCheckedCard, validPassword } from "../create_chat/create_chat";
+import { UserCheckedCard, validChannelTitel, validPassword } from "../create_chat/create_chat";
 
 
-const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>, onSubmit: Function}> = ({room, members, onSubmit}) => {
+const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>, callback: Function}> = ({room, members, callback}) => {
     const [selectedUsers, setSelectedUsers] = useState<user_info[]>([]);
     const [exceptUsers, setExceptUsers] = useState<string[]>(members.map(u => u.id));
     const [passwordEditState, setPasswordEditState] = useState<number>(0);
@@ -46,11 +45,11 @@ const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>,
         })
 
         class_socket.socket.on("room_edited", (data : any)=>{
-            onSubmit(data);
+            console.log(data)
+            callback(data);
         }) 
 
     }, []);
-
 
     const savePassword = () => {
         if(passwordEditState === 1)
@@ -65,7 +64,7 @@ const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>,
     <form id="manageMembers" onSubmit={(e) => {e.preventDefault(); 
         class_socket.edit_room({rid : room.id, name : channelTitle, uids: selectedUsers.map((u : user_info )=> u.id)});
     }} >
-        <input type="text" className={`inputStyle`} value={channelTitle} onChange={(e) => {setChannelTitle(e.target.value)}} placeholder="Channel Title" />
+        <input type="text" className={`inputStyle ${validChannelTitel(channelTitle) ? "":"error"}`} value={channelTitle} onChange={(e) => {setChannelTitle(e.target.value)}} placeholder="Channel Title" />
         <div className="managePassword">
             {room.type === "PROTECTED" &&
                 <>
@@ -83,10 +82,20 @@ const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>,
                 {passwordEditState === 0 && <span  className="passwordBtn" onClick={() => setPasswordEditState(1)}><FontAwesomeIcon icon={faKey}/> Set Password</span>}
                 {passwordEditState === 1 && <input type="password" placeholder="Password"  className={`inputStyle ${validPassword(newPassword) ? "":"error"}`} value={newPassword} onChange={(e) => setNewPassword(e.target.value)}/>}
             </>}
-            {passwordEditState !== 0 && 
+            {passwordEditState === 1 && validPassword(newPassword) &&
             <button onClick={() => savePassword()} className="save">
                 <FontAwesomeIcon icon={faCheck}/>
                 Save password
+            </button>}
+            {passwordEditState === 2 && validPassword(newPassword) && validPassword(oldPassword) &&
+            <button onClick={() => savePassword()} className="save">
+                <FontAwesomeIcon icon={faPenToSquare}/>
+                Update password
+            </button>}
+            {passwordEditState === 3 && validPassword(oldPassword) &&
+            <button onClick={() => savePassword()} className="cancel">
+                <FontAwesomeIcon icon={faClose}/>
+                Remove password
             </button>}
         </div>
         <span className="addMem"><FontAwesomeIcon icon={faUsers} />Add members</span>
@@ -101,10 +110,18 @@ const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>,
                 fullName={user.fullName}
             />)}
         </div>
-        <button type="submit" className="save">
-            <FontAwesomeIcon icon={faCheck}/>
-            Save
-        </button>
+        <div className="actions">
+            <button type="button" onClick={() => {
+                callback({members, ...room});
+            }} className="cancel">
+                <FontAwesomeIcon icon={faClose}/>
+                Cancel
+            </button>
+            <button type="submit" className="save">
+                <FontAwesomeIcon icon={faCheck}/>
+                Save
+            </button>
+        </div>
     </form>);
 }
 
@@ -227,12 +244,6 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
                     <CircleAvatar avatarURL={GroupIcon} dimensions={100} status={null}/>
                     {!editable && <h5 className="channelTitle">{room.name}</h5>}
                 </div>
-                {editable && <EditChatRoomSettings room={room} members={members} onSubmit={settingsEdit}/>}
-                {!editable && <div className="channelOptions options">
-                    {owner && <SettingsOption icon={faTrash} title="Delete Channel" onClick={() => deleteChannel()}/>}
-                    {!owner &&<SettingsOption icon={faArrowRightFromBracket} title="Leave Channel" onClick={() => leaveChannel()}/>}
-                    {owner && <SettingsOption icon={faPenToSquare} title="Edit Channel" onClick={() => editChannel()}/>}
-                </div>}
                 {!editable &&<><span className="addMem"><FontAwesomeIcon icon={faUsers} />Group Memebers ({<Numeral value={members.length}/>})</span>
                 <div className="members">
                     {
@@ -255,6 +266,12 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
                         )
                     }
                 </div></>}
+                {editable && <EditChatRoomSettings room={room} members={members} callback={settingsEdit}/>}
+                {!editable && <div className="channelOptions">
+                    {owner && <span onClick={() => editChannel()}><FontAwesomeIcon icon={faPenToSquare}/>Edit Channel</span>}
+                    {owner && <span className="delete" onClick={() => deleteChannel()}><FontAwesomeIcon icon={faTrash}/>Delete Channel</span>}
+                    {!owner && <span className="leave" onClick={() => leaveChannel()}><FontAwesomeIcon icon={faArrowRightFromBracket}/>Leave Channel</span>}
+                </div>}
             </div>
         </section>
     );

@@ -45,8 +45,8 @@ div.memberCard {
                 margin: 0 .1rem;
             }
             .subOptions {
-                top: 1.25rem;
-                left: -7.7rem;
+                top: .25rem;
+                left: -8rem;
                 z-index: 2;
                 .hasOptions {
                     @include _flex(column, center, center);

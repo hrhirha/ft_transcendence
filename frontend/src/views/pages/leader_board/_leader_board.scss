@@ -48,7 +48,7 @@
     }
     table {
         @media (max-width: $sm) {
-            padding: 1rem;
+            padding: auto;
         }
         @media (max-width: 365px) {
             width: auto!important;

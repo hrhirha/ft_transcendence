@@ -29,6 +29,10 @@ section#chatRoom {
                     @media (max-width: $xs) {
                         @include _textOverflow(10rem);
                     }
+
+                    @media (max-width: 300px) {
+                        @include _textOverflow(7rem);
+                    }
                 }
                 .status {
                     @include _textOverflow(10rem);
@@ -37,19 +41,23 @@ section#chatRoom {
                 }
             }
         }
-        button#closeChatRoom {
+        .roomOptions {
             @include _flex(row, center, center);
-            cursor: pointer;
-            border: none;
-            background-color: $dark3;
-            padding: .5rem;
-            border-radius: 100%;
-            min-width: 2.3rem;
-            min-height: 2.3rem;
-            margin: auto .75rem;
-            svg {
-                font-size: $fsize;
+            button {
+                @include _flex(row, center, center);
+                cursor: pointer;
+                border: none;
+                background-color: $dark3;
+                padding: .5rem;
+                border-radius: 100%;
+                min-width: 2.3rem;
+                min-height: 2.3rem;
+                margin: auto .25rem;
+                svg {
+                    font-size: $fsize;
+                }
             }
+            margin-right: .5rem;
         }
         #closeChatRoom:hover {
             background-color: $dark2;
@@ -194,14 +202,13 @@ section#chatRoom {
     @include _flex(column, center, center);
     width: 100%;
     height: 100%;
-    background: $dark2;
+    background: $dark3;
     .channelInfos {
         @include _flex(column, center, center);
         padding: 1.5rem;
-        background-color: $dark3;
         border-radius: 1rem;
-        min-width: 12rem;
-        max-width: 15rem;
+        min-width: 10rem;
+        max-width: 12rem;
         h3 {
             margin: .75rem auto;
             font-size: $fsize * .85;
@@ -211,7 +218,7 @@ section#chatRoom {
         }
         input {
             padding: .5rem;
-            background-color: $dark2;
+            background: $dark2;
             border-radius: 5rem;
             border: none;
             outline: none;
@@ -221,10 +228,14 @@ section#chatRoom {
             &::placeholder {
                 color: rgba($light3, .75);
             }
+            &.error {
+                border: 2px solid $red;
+            }
         }
         button.joinBtn {
             @include _roundedButtonStyle($bgcolor1: $purple, $bgcolor2: rgba($purple, .5));
             margin-top: .5rem;
         }
+        
     }
 }

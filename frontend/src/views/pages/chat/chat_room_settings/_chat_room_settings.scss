@@ -1,6 +1,7 @@
 @import './settings_option/settings_option';
 @import './member_card/member_card';
 
+
 section#chatRoomSettings {
     @include _flex(column, center, center);
     width: 100%;
@@ -14,7 +15,7 @@ section#chatRoomSettings {
         padding: 1rem;
         @include _gradientBg($cradientCol_1: $dark3, $cradientCol_2: $dark2, $angle: 360);
         border-radius: 1rem;
-        min-width: 18rem;
+        min-width: 15rem;
         max-width: 20rem;
         max-height: 30rem;
         margin-top: 2.5rem 0;
@@ -58,11 +59,32 @@ section#chatRoomSettings {
                 max-width: auto;
             }
         }
-        .options {
-            @include _flex(row, space-evenly, center);
-            padding: 1rem;
-            padding-top: 0;
-            width: 75%;
+        .channelOptions {
+            @include _flex(column, center, center);
+            margin-top: .75rem;
+            span {
+                cursor: pointer;
+                text-align: center;
+                padding: .25rem 1rem;
+                margin-top: .25rem;
+                font-size: $fsize * .85;
+                color: $light2;
+                font-family: $BFont;
+                width: 9rem;
+                svg {
+                    margin-right: .5rem;
+                    font-size: $fsize;
+                    path {
+                        color: $light2;
+                    }
+                }
+            }
+            .leave, .delete {
+                color: rgba($red, .8);
+                svg path {
+                    color: rgba($red, .8);
+                }
+            }
         }
         span.addMem {
             font-size: $fsize * .85;
@@ -104,13 +126,19 @@ section#chatRoomSettings {
                 @include _flex(column, center, center);
                 margin: .5rem auto;
                 .passwordBtn {
-                    font-size: $fsize  * .75;
+                    padding: .25rem 1rem;
                     cursor: pointer;
-                    color: $light2;
+                    border-radius: 5rem;
+                    background: $dark2;
+                    font-size: $fsize  * .75;
+                    color: $light3;
+                    font-family: $BFont;
+                    width: 10rem;
+                    margin-bottom: .5rem;
                     svg {
                         margin-right: .5rem;
                         path {
-                            color: $light2;
+                            color: $light3;
                         }
                     }
                 }
@@ -141,12 +169,19 @@ section#chatRoomSettings {
                     }
                 }
             }
-            .save {
+            .actions {
+                @include _flex(row, space-between, center);
+                width: 90%;
+            }
+            .save, .cancel {
                 @include _roundedButtonStyle();
                 margin-top: .5rem;
                 svg {
                     margin-right: .5rem;
                 }
+            }
+            .cancel {
+                @include _roundedButtonStyle($bgcolor1: rgba($red, .7), $bgcolor2: rgba($red, .5));
             }
         }
     }

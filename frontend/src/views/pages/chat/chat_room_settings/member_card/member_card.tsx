@@ -84,7 +84,7 @@ export const  MemeberCard:React.FC<{
                         <FontAwesomeIcon icon={faBan}/>
                         Unban user
                     </div>,
-                    !muted && <div className='hasOptions' title="Mute user" >
+                    !banned && !muted && <div className='hasOptions' title="Mute user" >
                         <div className='switch' onClick={() => setShowMoreOptions(opt => !opt)}>
                             <FontAwesomeIcon icon={faCommentSlash}/>
                             Mute user
@@ -98,15 +98,15 @@ export const  MemeberCard:React.FC<{
                             <li onClick={() => muteUser("inf")}>Until I turn it back on</li>
                         </ul>}
                     </div>,
-                    muted && <div onClick={() => unmuteUser()} title="Unmute user" >
+                    !banned && muted && <div onClick={() => unmuteUser()} title="Unmute user" >
                         <FontAwesomeIcon icon={faCommentSlash}/>
                         Unmute user
                     </div>,
-                    permession === 2 && admin && !owner && <div onClick={() => unsetAdmin()} title="Remove Admin" >
+                    !banned && permession === 2 && admin && !owner && <div onClick={() => unsetAdmin()} title="Remove Admin" >
                         <FontAwesomeIcon icon={faUserGear}/>
                         Remove Admin
                     </div>,
-                    permession === 2 && !admin && <div onClick={() => setAdmin()} title="Set As Admin" >
+                    !banned && permession === 2 && !admin && <div onClick={() => setAdmin()} title="Set As Admin" >
                         <FontAwesomeIcon icon={faUserGear}/>
                         Set As Admin
                     </div>,

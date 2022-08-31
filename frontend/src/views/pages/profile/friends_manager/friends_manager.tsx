@@ -6,7 +6,7 @@ import { get_friendreqs_received, get_friendreqs_sent } from "controller/user/fr
 import { get_friends, get_friends_blocked } from "controller/user/friends";
 import { FriendCard } from "views/pages/profile/friend_card/friend_card";
 import { User } from "controller/user/user";
-import { SearchUserForm } from "./serach_user/search_user";
+import { SearchUserForm } from "views/pages/profile/friends_manager/serach_user/search_user";
 
 
 
