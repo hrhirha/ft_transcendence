@@ -10,6 +10,7 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
 import { ArgumentMetadata, HttpException, UsePipes, ValidationPipe } from '@nestjs/common';
+import { user_status } from 'src/utils';
 export class WsValidationPipe extends ValidationPipe
 {
     async transform(value: any, metadata: ArgumentMetadata) {
@@ -113,24 +114,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                                 select: {
                                     id: true,
                                     score: true,
+                                    rank_id: true,
                                 }
                             }
                         }
                     })).user;
     
                     const u_rank = (ranks.filter(r => u.score >= r.require ));
-                    console.log(u_rank.length);
-    
-                    if (u_rank.length !== 0)
-                    {
-                        await this.prisma.user.update({
-                            where: { id: u.id },
-                            data: {
-                                // rank: { connect: {id: u_rank[u_rank.length - 1].id }}
-                                rank_id: u_rank[u_rank.length - 1].id
-                            }
-                        }); 
-                    }
+                    this.prisma.user.update({
+                        where: { id: u.id },
+                        data: {
+                            status: user_status.ONLINE,
+                            rank_id: u_rank.length !== 0 ? u_rank[u_rank.length - 1].id : u.rank_id
+                        }
+                    })
+                    .then(() => client.broadcast.emit('status_update'))
+                    .catch(() => console.log({error: 'unable to update status'}));
                 })
                 }
                 catch
@@ -261,23 +260,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                                 select: {
                                     id: true,
                                     score: true,
+                                    rank_id: true,
                                 }
                             }
                         }
                     })).user;
 
                     const u_rank = (ranks.filter(r =>  u.score >= r.require ));
-
-                    if (u_rank.length !== 0)
-                    {
-                        await this.prisma.user.update({
-                            where: { id: u.id },
-                            data: {
-                                // rank: { connect: {id: u_rank[u_rank.length - 1].id }}
-                                rank_id: u_rank[u_rank.length - 1].id
-                            }
-                        });
-                    }
+                    this.prisma.user.update({
+                        where: { id: u.id },
+                        data: {
+                            status: user_status.ONLINE,
+                            rank_id: u_rank.length !== 0 ? u_rank[u_rank.length - 1].id : u.rank_id
+                        }
+                    })
+                    .then(() => client.broadcast.emit('status_update'))
+                    .catch(() => console.log({error: 'unable to update status'}));
                 });
                 /// emit restart 
                 let win = (d.rscore === client.data.bestOf) ? this.tab[d.roomId].user2.userId: this.tab[d.roomId].user1.userId;
@@ -391,8 +389,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 id: true,
             }
         });
-        this.insertSocketData(this.normaleQue.soc, this.normaleQue.user, "player1", connection.id, "normalField");
-        this.insertSocketData(client, user, "player2", connection.id, "normalField");
+        await this.insertSocketData(this.normaleQue.soc, this.normaleQue.user, "player1", connection.id, "normalField");
+        await this.insertSocketData(client, user, "player2", connection.id, "normalField");
         this.normaleQue = null;
         this.server.to(connection.id).emit('startGame');
 
@@ -472,8 +470,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 id: true,
             }
         });
-        this.insertSocketData(this.ultimateQue.soc, this.ultimateQue.user, "player1", connection.id, mapUrl);
-        this.insertSocketData(client, user, "player2", connection.id, mapUrl);
+        await this.insertSocketData(this.ultimateQue.soc, this.ultimateQue.user, "player1", connection.id, mapUrl);
+        await this.insertSocketData(client, user, "player2", connection.id, mapUrl);
         this.ultimateQue = null;
     }
 
@@ -545,8 +543,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                 id: true,
             }
         });
-        this.insertSocketData(soc[0], user, "player1", connection.id, mapUrl);
-        this.insertSocketData(client, user, "player2", connection.id, mapUrl);
+        await this.insertSocketData(soc[0], user, "player1", connection.id, mapUrl);
+        await this.insertSocketData(client, user, "player2", connection.id, mapUrl);
     }
     @SubscribeMessage('watcher')
     async newWatcher(client: Socket, roomId: string)
@@ -583,8 +581,16 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         this.server.to(client.data.obj.roomId).emit("vues", this.tab[client.data.obj.roomId].vues); // -- vues for the watcher !!! 
     }
 
-    insertSocketData(client: Socket, usr: any, player: string, room: string, mapUrl: string)
+    async insertSocketData(client: Socket, usr: any, player: string, room: string, mapUrl: string)
     {
+        this.prisma.user.update({
+            where: { id: usr.id },
+            data: {
+                status: user_status.INGAME
+            }
+        })
+        .then(() => client.broadcast.emit('status_update'))
+        .catch(() => console.log({error: "unable to update status"}));
         if (player == "player1")
         {
             this.tab[room] = {
