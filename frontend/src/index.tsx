@@ -17,9 +17,9 @@ import { Loading } from 'views/components/loading/loading';
 import { NavBar } from 'views/components/navbar/navbar';
 import { ChatSocket } from "chat_socket";
 import "views/style/index.scss";
-import { receive_message } from 'chat_socket/interface';
+import { challenge_data, receive_message } from 'chat_socket/interface';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserGroup } from '@fortawesome/free-solid-svg-icons';
+import { faGamepad, faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import { CircleAvatar } from 'views/components/circle_avatar/circle_avatar';
 
 const root = ReactDOM.createRoot(
@@ -77,7 +77,54 @@ const PongApp:React.FC = () => {
             ]
           });
         }
-      })
+      }).on("challenge_requested", (data: challenge_data) => {
+        console.log(data.invite);
+        if (data.invite)
+        {
+          pushNotif({
+            id: "CHALLENGE"+data.user.id,
+            type: "info",
+            time: 20000,
+            icon: <FontAwesomeIcon icon={faGamepad}/>,
+            title: "Challenge",
+            description: `<b>${data.user.fullName.split(" ")[0]}</b> invite you to play a${data.type === "ultimateQue" ? "n <b>Ultimate</b>" : " <b>Normal</b>"} game`,
+            actions: [
+              {title: "Accept", color: "#6970d4", action: () => {
+                window.localStorage.setItem("privateGame", JSON.stringify({"userId": data.user.id}));
+                class_socket.challenge({
+                  id: data.user.id,
+                  type: data.type,
+                  invite: false
+                })
+                if (data.type === "ultimateQue")
+                  history.replace("/play/ultimate");
+                else
+                  history.replace("/play");
+              }},
+              {title: "Decline", color: "#6970d4", action: () => {
+                //TODO: send decline
+              }},
+            ]
+          });
+        } else {
+          pushNotif({
+            id: "ACCEPTEDCHALLENGE"+data.user.id,
+            type: "info",
+            time: 20000,
+            icon: <FontAwesomeIcon icon={faGamepad}/>,
+            title: "Challenge",
+            description: `<b>${data.user.fullName.split(" ")[0]}</b> accepted your challenge`,
+            actions: [
+              {title: "Join him", color: "#6970d4", action: () => {
+                if (data.type === "ultimateQue")
+                  history.replace("/play/ultimate");
+                else
+                  history.replace("/play");
+              }}
+            ]
+          });
+        }
+      });
     }, []);
 
     if (loading)

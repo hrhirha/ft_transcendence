@@ -1,4 +1,5 @@
 import io, { Socket } from "socket.io-client";
+import { challenge_data } from "./interface";
 
 interface info_create_room {
     name:  string,
@@ -219,5 +220,9 @@ export class ChatSocket {
         if(remove_admin.uid.length === 0 )
             return new Error("error : id must not be empty");
         this.socket.emit("remove_admin", remove_admin);
+    }
+    challenge(challenge: {id: string, type: string, invite: boolean}) {
+        console.log(challenge)
+        this.socket.emit("challenge", challenge);
     }
   }

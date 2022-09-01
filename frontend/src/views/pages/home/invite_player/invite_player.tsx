@@ -2,7 +2,8 @@ import { faGamepad, faPingPongPaddleBall, faSearch } from "@fortawesome/free-sol
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { get_friends } from "controller/user/friends";
 import { User } from "controller/user/user";
-import React, { useState, useEffect } from "react";
+import { SocketContext } from "index";
+import React, { useState, useEffect, useContext } from "react";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { useNotif } from "views/components/notif/notif";
 
@@ -23,6 +24,7 @@ export const InvitePlayerForm:React.FC<{callback: Function}> = ({callback}) => {
     const [userSelected, setUserSelected] = useState(null);
     const [userInput, setUserInput] = useState("");
     const pushNotif = useNotif();
+    const class_socket = useContext(SocketContext);
 
     useEffect(() => {
         if (userSelected !== null) {
@@ -46,11 +48,15 @@ export const InvitePlayerForm:React.FC<{callback: Function}> = ({callback}) => {
 
     const sentInvite = (user: User, ultimate: boolean) => {
         try {
-            //sent invitation
+            class_socket.challenge({
+                id: user.id,
+                type: ultimate ? "ultimateQue" : "normaleQue",
+                invite: true
+            });
             pushNotif({
                 id: `INVITATIONSENTTO${user.id}`,
                 type: "info",
-                time: 15000,
+                time: 10000,
                 icon: <FontAwesomeIcon icon={faGamepad}/>,
                 title: "Game Invitation",
                 description: `You have invited <b>${user.fullName}</b> to play ${ultimate ? "an <b>ULTIMATE" : "a <b>NORMAL"} GAME</b>, please wait for his answer!`
@@ -59,7 +65,7 @@ export const InvitePlayerForm:React.FC<{callback: Function}> = ({callback}) => {
             pushNotif({
                 id: "GAMEINVITATIOERROR",
                 type: "info",
-                time: 15000,
+                time: 8000,
                 icon: <FontAwesomeIcon icon={faGamepad}/>,
                 title: "Game Invitation",
                 description: e.message

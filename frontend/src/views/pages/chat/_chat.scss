@@ -28,10 +28,11 @@ main#chatPage {
         @media (max-width: $xs) {
             margin: 0;
             max-height: 100%!important;
-            min-height: calc(100vh - 12rem) !important;
+            min-height: 100%!important;
         }
 
-        min-height: calc(100vh - 10rem);
+        min-height: 25rem;
+        height: calc(100vh - 10rem);
         max-height: calc(100vh - 10rem);
         background-color: $light4;
         border-radius: .75rem;
@@ -40,7 +41,7 @@ main#chatPage {
 
         .room {
             padding: 0;
-            height: calc(100vh - 10.5rem);
+            height: 100%;
             border-left: .5px solid $dark3;
         }
         .chatOptions {
@@ -129,7 +130,7 @@ main#chatPage {
         
         .chatRooms {
             overflow-y: auto;
-            max-height: calc(100vh - 17rem);
+            max-height: 100%;
             margin-bottom: .5rem;
             
             @media (max-width: $xs) {

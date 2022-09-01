@@ -1,3 +1,4 @@
+import { User } from "controller/user/user";
 
 export interface user_info {
     id:  string,
@@ -171,6 +172,12 @@ export interface messages {
     msgs : msgs[],
     room : room_msgs,
 }
+
+export interface challenge_data {
+    user: User,
+    type: string,
+    invite: boolean,
+} 
 //-----------------------------------------------------
 
 

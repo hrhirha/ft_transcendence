@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useContext, useEffect, useState } from 'react';
 import { SocketContext } from 'index';
 import { management_memeber } from 'chat_socket/interface';
+import { useNotif } from 'views/components/notif/notif';
 
 export const  MemeberCard:React.FC<{
         id: string,
@@ -21,6 +22,7 @@ export const  MemeberCard:React.FC<{
         onClick: Function}> = ({permession, id, roomId, avatar, username, fullName, admin, owner, banned, muted, onClick}) => {
 
         const [showMoreOptions, setShowMoreOptions] = useState(false);
+        const pushNotif = useNotif();
         const class_socket = useContext(SocketContext);
 
         const banUser = ()=> {
@@ -49,7 +51,32 @@ export const  MemeberCard:React.FC<{
         const removeMember = ()=> {
             class_socket.remove_member({uid : id,  rid : roomId});
         } 
-
+        const challenge = (ultimate: boolean) => {
+            try {
+                class_socket.challenge({
+                    id: id,
+                    type: ultimate ? "ultimateQue" : "normaleQue",
+                    invite: true
+                });
+                pushNotif({
+                    id: `INVITATIONSENTTO${id}`,
+                    type: "info",
+                    time: 10000,
+                    icon: <FontAwesomeIcon icon={faGamepad}/>,
+                    title: "Game Invitation",
+                    description: `You have invited <b>${fullName}</b> to play ${ultimate ? "an <b>ULTIMATE" : "a <b>NORMAL"} GAME</b>, please wait for his answer!`
+                });
+            } catch(e: any) {
+                pushNotif({
+                    id: "GAMEINVITATIOERROR",
+                    type: "info",
+                    time: 8000,
+                    icon: <FontAwesomeIcon icon={faGamepad}/>,
+                    title: "Game Invitation",
+                    description: e.message
+                });
+            }
+        }
   return (
       <div className="memberCard">
          <div className='userData' onClick={() => onClick()}>
@@ -65,11 +92,11 @@ export const  MemeberCard:React.FC<{
           <div className="memberOptions">
             {(JSON.parse(window.localStorage.getItem("user")).id !== id) && <SettingsOption icon={faGamepad} title="Play Match"
                 subOptions={[
-                    <div onClick={() => alert("Play Normal Game")} title="Normal Game" >
+                    <div onClick={() => challenge(false)} title="Normal Game" >
                         <CircleAvatar avatarURL={DefaultGame} dimensions={20} status={null}/>
                         Normal Game
                     </div>,
-                    <div onClick={() => alert("Play Ultimate Game")} title="Ultimate Game" >
+                    <div onClick={() => challenge(true)} title="Ultimate Game" >
                         <CircleAvatar avatarURL={UltimateGame} dimensions={20} status={null}/>
                         Ultimate Game
                     </div>
