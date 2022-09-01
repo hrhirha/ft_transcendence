@@ -13,7 +13,6 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
     const pushNotif = useNotif();
     const [winner, setWinner] = useState<string>("");
     const [viewers, setViewers] = useState<number>(0);
-    const [privateGame, setPrivateGame] = useState<{userId: string}>(null);
     const [matchData, setMatchData] = useState<Match>({
         is_ultimate: ultimateGame,
         p1: null,
@@ -26,10 +25,6 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
     
     useEffect(() => {
         // socket.connect();
-        if (JSON.parse(window.localStorage.getItem("privateGame")) !== null) {
-            setPrivateGame(JSON.parse(window.localStorage.getItem("privateGame")));
-            window.localStorage.removeItem("privateGame");
-        }
         const unblock = history.block((tx) => {
                 pushNotif({
                     id: "LEAVEGAME",
@@ -52,6 +47,10 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
             socket.emit("isActive", (document.visibilityState === "visible"));
         });
     }, []);
+
+    useEffect(() => {
+        window.addEventListener("beforeunload",null);
+    });
 
     useEffect(() => {
         socket.on("matchWinner", (win) => {
@@ -91,8 +90,6 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
                         isUltimate={ultimateGame}
                         watcher={false}
                         roomId={""}
-                        isPrivate={privateGame !== null}
-                        vsPID={privateGame !== null && privateGame!.userId}
                     />
                 </div>
             </div>

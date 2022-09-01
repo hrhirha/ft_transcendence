@@ -116,6 +116,7 @@ const PongApp:React.FC = () => {
             description: `<b>${data.user.fullName.split(" ")[0]}</b> accepted your challenge`,
             actions: [
               {title: "Join him", color: "#6970d4", action: () => {
+                window.localStorage.setItem("privateGame", JSON.stringify({"userId": data.user.id}));
                 if (data.type === "ultimateQue")
                   history.replace("/play/ultimate");
                 else

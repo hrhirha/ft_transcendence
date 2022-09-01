@@ -24,15 +24,21 @@ const config: Phaser.Types.Core.GameConfig = {
     }
 }
 
-export const GameView:React.FC<{gameSocket: Socket, isUltimate?: boolean, watcher?: boolean, roomId: string, isPrivate?: boolean, vsPID?: string}> = ({gameSocket, isUltimate, watcher, roomId, isPrivate, vsPID}) => {
+export const GameView:React.FC<{gameSocket: Socket, isUltimate?: boolean, watcher?: boolean, roomId: string}> = ({gameSocket, isUltimate, watcher, roomId}) => {
     const [game, setGame] = useState<Phaser.Game>();
     const setNewGame = () =>  setGame(() => {
         const newGame = new Phaser.Game(config);
+        let privateGame : {userId: string} = null;
+
+        if (JSON.parse(window.localStorage.getItem("privateGame")) !== null) {
+            privateGame = JSON.parse(window.localStorage.getItem("privateGame"));
+            window.localStorage.removeItem("privateGame");
+        }
         newGame.scene.add("PingPong",
             new PingPong(gameSocket, isUltimate === null ? "" : (isUltimate ? "ultimateQue" : "normaleQue"),
             watcher === null ? true : !watcher,
             roomId,
-            {private: isPrivate === null ? false : isPrivate, userId: vsPID !== null ? vsPID : ""}));
+            {private: privateGame !== null, userId: privateGame !== null ? privateGame.userId : ""}));
         newGame.scene.start("PingPong");
         return newGame;
     });
