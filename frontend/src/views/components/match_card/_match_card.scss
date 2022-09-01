@@ -4,7 +4,7 @@ section.matchCard {
     padding: 1rem;
     margin: .5rem auto;
     border-radius: 1rem;
-    @include _gradientBg($light4, $dark3);
+    background-color: $light4;
     @media (max-width: $lg)
     {
         padding: .5rem;
@@ -70,8 +70,8 @@ section.matchCard {
             img.winner_crown {
                 width: 80%;
                 position: absolute;
-                top: -30%;
-                z-index: 2;
+                top: -35%;
+                z-index: 20;
             }
             #circleAvatar {
                 border: .25rem solid $dark3;
