@@ -228,16 +228,19 @@ export default class PingPong extends Phaser.Scene
                 this.exitEmited = true;
                 if (this.End && this.data.is_player)
                 {
-                    const replayBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
-                    this.replay = this.add.text(this.w / 2 , this.h / 2 + 85 , "New Game", { fontSize: "35px",
-                    fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.8);
-                    replayBg.on('pointerdown', () => {
-                        this.replayGame();
-                    }, this);
-        
-                    this.replay.on('pointerdown', () =>  {
-                        this.replayGame();
-                    }, this);
+                    if (!this.typeGame.private)
+                    {
+                        const replayBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                        this.replay = this.add.text(this.w / 2 , this.h / 2 + 85 , "New Game", { fontSize: "35px",
+                        fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.8);
+                        replayBg.on('pointerdown', () => {
+                            this.replayGame();
+                        }, this);
+            
+                        this.replay.on('pointerdown', () =>  {
+                            this.replayGame();
+                        }, this);
+                    }
                     if (!this.restartClick)
                     {
                         if (this.buttonBg)
@@ -273,16 +276,19 @@ export default class PingPong extends Phaser.Scene
                     const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 170 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
                     this.leave = this.add.text(this.w / 2 , this.h / 2 + 170 , "Exit", { fontSize: "35px",
                     fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-                    const replayBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
-                    this.replay = this.add.text(this.w / 2 , this.h / 2 + 85 , "New Game", { fontSize: "35px",
-                    fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.8);
-                    replayBg.on('pointerdown', () => {
-                        this.replayGame();
-                    }, this);
-        
-                    this.replay.on('pointerdown', () =>  {
-                        this.replayGame();
-                    }, this);
+                    if (!this.typeGame.private)
+                    {
+                        const replayBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
+                        this.replay = this.add.text(this.w / 2 , this.h / 2 + 85 , "New Game", { fontSize: "35px",
+                        fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5).setScale(0.8);
+                        replayBg.on('pointerdown', () => {
+                            this.replayGame();
+                        }, this);
+            
+                        this.replay.on('pointerdown', () =>  {
+                            this.replayGame();
+                        }, this);
+                    }
                     exitBg.on('pointerdown', () => {
                         this.leaveFunc();
                     }, this);
