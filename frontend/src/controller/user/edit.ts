@@ -1,4 +1,4 @@
-import api from "api/axois";
+import api from "index";
 
 export async function patch_edit_username(user_username : string) {
     try {

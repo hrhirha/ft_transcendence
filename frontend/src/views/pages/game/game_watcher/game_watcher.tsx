@@ -2,13 +2,14 @@ import { faChevronCircleLeft, faChevronCircleRight } from "@fortawesome/free-sol
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { WatchEmptyState } from "assets";
 import { get_ongoing_matchs, Match } from "controller/user/matchs";
+import { env } from "index";
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { MatchCard } from "views/components/match_card/match_card";
 import { GameView } from "views/pages/game/game_view/game_view";
 
 export const GameWatcher:React.FC = () =>  {
-    const [socket] = useState(io("ws://127.0.0.1:3001/game", {withCredentials: true}));
+    const [socket] = useState(io(`ws://${env.apiHost}:${env.apiPort}/game`, {withCredentials: true}));
     const [ongoingMatchs, setMatchs] = useState<Array<Match>>([]);
     const [winner, setWinner] = useState<string>("");
     const [currentMatch, setCurrentMatch] = useState<number>(0);

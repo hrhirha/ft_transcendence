@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Brand } from "views/components/brand/brand";
 import { Logo1337, Logo42 } from 'assets';
+import { env } from "index";
 
 
 export const Login:React.FC = () =>  {
 
     const ConnectTo42 = async () => {
-        window.open("http://127.0.0.1:3001/auth/login", '_self');
+        window.open(`http://${env.apiHost}:${env.apiPort}/auth/login`, '_self');
     }
     
     return (

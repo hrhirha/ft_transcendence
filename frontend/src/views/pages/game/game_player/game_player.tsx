@@ -1,7 +1,7 @@
 import { faGamepad, faLeaf } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Match } from "controller/user/matchs";
-import { history } from "index";
+import { env, history } from "index";
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { MatchCard } from "views/components/match_card/match_card";
@@ -9,7 +9,7 @@ import { useNotif } from "views/components/notif/notif";
 import { GameView } from "views/pages/game/game_view/game_view";
 
 export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) =>  {
-    const [socket] = useState(io("ws://127.0.0.1:3001/game", {withCredentials: true}));
+    const [socket] = useState(io(`ws://${env.apiHost}:${env.apiPort}/game`, {withCredentials: true}));
     const pushNotif = useNotif();
     const [winner, setWinner] = useState<string>("");
     const [viewers, setViewers] = useState<number>(0);

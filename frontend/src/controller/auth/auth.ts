@@ -1,4 +1,4 @@
-import api from "api/axois";
+import api from "index";
 
 export async function enableTFA(_code : string) {
     try {

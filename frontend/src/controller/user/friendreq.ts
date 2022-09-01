@@ -1,4 +1,4 @@
-import api from "api/axois";
+import api from "index";
 import { User } from "controller/user/user";
 
 export async function post_friendreq_accept(user_id : string) {

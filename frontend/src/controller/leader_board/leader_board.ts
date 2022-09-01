@@ -1,4 +1,4 @@
-import api from "api/axois";
+import api from "index";
 
 export async function get_leader_board() {
     try {

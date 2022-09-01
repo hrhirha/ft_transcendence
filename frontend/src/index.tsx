@@ -16,11 +16,25 @@ import { Notif, useNotif } from 'views/components/notif/notif';
 import { Loading } from 'views/components/loading/loading';
 import { NavBar } from 'views/components/navbar/navbar';
 import { ChatSocket } from "chat_socket";
-import "views/style/index.scss";
 import { challenge_data, receive_message } from 'chat_socket/interface';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGamepad, faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import { CircleAvatar } from 'views/components/circle_avatar/circle_avatar';
+import "views/style/index.scss";
+import axios from "axios";
+import _ from 'lodash';
+
+export const env = _.mapKeys(_.pickBy(process.env, (value, key) => {
+  return _.startsWith(key, 'REACT_APP_');
+}), (value, key) => {
+    return _.camelCase(_.replace(key, 'REACT_APP_', ''));
+});
+
+export default axios.create({
+  baseURL : `http://${env.apiHost}:${env.apiPort}`,
+  withCredentials: true 
+});
+
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -29,18 +43,15 @@ const root = ReactDOM.createRoot(
 export const SocketContext = createContext(null); //create socket context
 export const history = createBrowserHistory();
 const class_socket = new ChatSocket();
-
 export const getIDQuery = () => {
   const searchParams = new URLSearchParams(history.location.search);
   return searchParams.get('id');
 }
 
-
 const PongApp:React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [hideNavBar, setHideNavBar] = useState<boolean>(true);
     const pushNotif = useNotif();
-
     const authCheck = async (path) => {
       setHideNavBar(false);
       try {

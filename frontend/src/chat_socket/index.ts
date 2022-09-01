@@ -1,5 +1,5 @@
+import { env } from "index";
 import io, { Socket } from "socket.io-client";
-import { challenge_data } from "./interface";
 
 interface info_create_room {
     name:  string,
@@ -61,7 +61,8 @@ export class ChatSocket {
     socket : Socket;
     
     constructor() {
-        this.socket = io("ws://127.0.0.1:3001/chat",{
+        this.socket = io(`ws://${env.apiHost}:${env.apiPort}/chat`,
+        {
             withCredentials: true
         });
     }

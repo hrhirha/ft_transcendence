@@ -1,4 +1,4 @@
-import api from "api/axois";
+import api from "index";
 import { User } from "controller/user/user";
 
 export async function get_friends() {
