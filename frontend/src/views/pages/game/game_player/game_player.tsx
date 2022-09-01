@@ -39,7 +39,7 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
                     title: "Confirmation",
                     description: "Are you sure you want to leave the game?",
                     actions: [
-                        {title: "Cancel", color: "#6970d4", action: null},
+                        {title: "Cancel", color: "#6970d4", action: () => {}},
                         {title: "Leave the game", color: "#313348", action: () => {
                             socket.disconnect();
                             unblock();
@@ -67,6 +67,15 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
         .on("updateScore", (score) => {
             setMatchData(oldData => ({...oldData, score: {p1: score.score1, p2: score.score2}}));
         }).on("waiting", (players) => {
+            setMatchData({
+                is_ultimate: ultimateGame,
+                p1: null,
+                p2: null,
+                score: {
+                    p1: 0,
+                    p2: 0
+                }
+            });
             setMatchData(oldData => ({...oldData, p1: players.p1}));
         }).on("joined", (players) => {
             setMatchData(oldData => ({...oldData, p1: players.p1, p2: players.p2}));
