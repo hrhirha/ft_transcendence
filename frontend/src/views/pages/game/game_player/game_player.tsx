@@ -8,9 +8,8 @@ import { MatchCard } from "views/components/match_card/match_card";
 import { useNotif } from "views/components/notif/notif";
 import { GameView } from "views/pages/game/game_view/game_view";
 
-
+const socket = io("ws://127.0.0.1:3001/game", {withCredentials: true});
 export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) =>  {
-    const [socket] = useState(io("ws://127.0.0.1:3001/game", {withCredentials: true}));
     const pushNotif = useNotif();
     const [winner, setWinner] = useState<string>("");
     const [viewers, setViewers] = useState<number>(0);
@@ -26,7 +25,7 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
     });
     
     useEffect(() => {
-        socket.connect();
+        // socket.connect();
         if (JSON.parse(window.localStorage.getItem("privateGame")) !== null) {
             setPrivateGame(JSON.parse(window.localStorage.getItem("privateGame")));
             window.localStorage.removeItem("privateGame");
@@ -62,6 +61,8 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
             setWinner("");
         }).on("vues", (vues) => {
             setViewers(vues);
+        }).on("leaveTheGame", () => {
+            setWinner("");
         })
         .on("updateScore", (score) => {
             setMatchData(oldData => ({...oldData, score: {p1: score.score1, p2: score.score2}}));

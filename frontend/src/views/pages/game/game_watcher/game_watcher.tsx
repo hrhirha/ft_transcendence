@@ -43,10 +43,14 @@ export const GameWatcher:React.FC = () =>  {
                 return m;
             }));
         }).on("leaveTheGame", () => {
+            setWinner("");
             if (ongoingMatchs.length > 1)
                 setCurrentMatch(curr => curr + 1);
             else
                 updateMatche();
+        })
+        .on("keepWatching", () => {
+            setWinner("");
         }).on("joinStream", ({p1, p2, score1, score2}) => {
             setMatchs(oldMatches => oldMatches.map((m, i) => {
                 if (i === currentMatch)
