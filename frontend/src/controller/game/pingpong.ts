@@ -72,6 +72,7 @@ export default class PingPong extends Phaser.Scene
         userId: string
     })
     {
+        console.log(Game);
         super("");
         this.roomId = roomId;
         this.isPlayer = isPlayer;
@@ -172,7 +173,6 @@ export default class PingPong extends Phaser.Scene
             this.soc.on("focus", (focus) => {
                 if (this.End)
                     return ;
-                console.log('herererer');
                 this.focus = focus;
                 if (this.isPlayer && !this.goal)
                 {
@@ -262,15 +262,6 @@ export default class PingPong extends Phaser.Scene
                 }
                 if (!this.End && this.data.is_player)
                 {
-                    this.soc.emit('endGame', {
-                        player: this.data.player,
-                        rscore: (this.data.player === "player2") ? this.bestOf : this.rightScore,
-                        lscore: (this.data.player === "player1") ? this.bestOf : this.leftScore, 
-                        userId: this.data.userId,
-                        roomId: this.data.roomId,
-                        status: "",
-                        forSave: false,
-                    });
                     if (this.ball)
                         this.ball.destroy();
                     if (this.paddle)
@@ -405,6 +396,16 @@ export default class PingPong extends Phaser.Scene
     {
         if (this.replayClick)
             return ;
+        console.log("hererer");
+        this.soc.emit('endGame', {
+            player: this.data.player,
+            rscore: (this.data.player === "player2") ? this.bestOf : this.rightScore,
+            lscore: (this.data.player === "player1") ? this.bestOf : this.leftScore, 
+            userId: this.data.userId,
+            roomId: this.data.roomId,
+            status: "",
+            forSave: false,
+        });
         this.replayClick = true;
         this.gameIsStarted = false;
         this.End = false;
@@ -562,7 +563,6 @@ export default class PingPong extends Phaser.Scene
 
     onEvent ()
     {
-        console.log(this.focusMode, this.initialTime , this.focusTimer);
              
         if ((!this.focusMode && this.initialTime <= 0) || (this.focusMode && this.focusTimer <= 0))
             return ;
@@ -576,7 +576,6 @@ export default class PingPong extends Phaser.Scene
         
         if (!this.focusMode && this.initialTime <= 0)
         {
-            console.log("Not focusMode ")
             this.goal = false;
             this.counter.text = "";
             this.counter = undefined;
@@ -595,7 +594,6 @@ export default class PingPong extends Phaser.Scene
         {
             if (this.focus)
             {
-                console.log("BackToFocus Mode");
                 this.focusTxt.text = "";
                 this.counterTimer.text = "";
                 
@@ -614,7 +612,6 @@ export default class PingPong extends Phaser.Scene
             {
                 this.rightScore = (this.who === "player1") ? this.bestOf: this.rightScore ;
                 this.leftScore = (this.who === "player2") ? this.bestOf: this.leftScore ;
-                console.log("youWine");
                 this.scene.restart();
                 return ;
             }
@@ -706,7 +703,7 @@ export default class PingPong extends Phaser.Scene
             userId: this.data.userId,
             roomId: this.data.roomId,
             status: img,
-            forSave: false,
+            forSave: true,
         });
     }
     updatePositions()

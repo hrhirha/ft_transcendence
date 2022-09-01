@@ -280,7 +280,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                     .catch(() => console.log({error: 'unable to update status'}));
                 });
                 /// emit restart 
-                (!d.forSave)
+                if (d.forSave)
                 {
                     let win = (d.rscore === client.data.bestOf) ? this.tab[d.roomId].user2.userId: this.tab[d.roomId].user1.userId;
                     this.server.to(d.roomId).emit("matchWinner", win); /// a watcher leave the room  -- for aimad
@@ -353,7 +353,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         if (!this.normaleQue || this.normaleQue.user.id == user.id)
         {
             if (this.normaleQue && this.normaleQue.user.id == user.id)
+            {
+                console.log("herre");
                 this.normaleQue.soc.disconnect();
+            }
             this.normaleQue = {
                 soc: client,
                 user: user,
@@ -507,6 +510,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             if (s.data.usrId == userId)
                 return s;
         });
+        console.log("Is private Game" );
         if (!soc.length)
         {
             client.emit("waiting", {
@@ -632,7 +636,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             roomId: room,
             isPlayer: true,
             onFocus: true,
-            dataIsSave: false,
         };
         client.emit("saveData", {
             player,
