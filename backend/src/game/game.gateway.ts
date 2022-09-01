@@ -71,66 +71,67 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             {
                 try
                 {
-                let factor = (client.data.bestOf == 5) ? { facWin: 5, losFac: 2 } : { facWin: 15, losFac: 5};
-                let winner = ((client.data.obj.player == "player1" && client.data.obj.lScore == client.data.bestOf)
-                || (client.data.obj.player == "player2" && client.data.obj.rScore == client.data.bestOf)) ? factor.facWin : factor.losFac;
-                this.prisma.$transaction(async () => {
-                    const ranks = await this.prisma.rank.findMany({ select: { id: true, require: true, } });
-    
-                    const u = (await this.prisma.userGame.update({
-                        data: {
-                            score: (client.data.obj.player == "player1") ? client.data.obj.rScore : client.data.obj.lScore,
-                            user: {         
-                                update: {  
-                                    score: {
-                                        increment: (client.data.obj.player  == "player1") ? client.data.obj.rScore * winner :  client.data.obj.lScore * winner,
+                    let factor = (client.data.bestOf == 5) ? { facWin: 5, losFac: 2 } : { facWin: 15, losFac: 5};
+                    let winner = ((client.data.obj.player == "player1" && client.data.obj.lScore == client.data.bestOf)
+                    || (client.data.obj.player == "player2" && client.data.obj.rScore == client.data.bestOf)) ? factor.facWin : factor.losFac;
+                    
+                    this.prisma.$transaction(async () => {
+                        const ranks = await this.prisma.rank.findMany({ select: { id: true, require: true, } });
+        
+                        const u = (await this.prisma.userGame.update({
+                            data: {
+                                score: (client.data.obj.player == "player1") ? client.data.obj.rScore : client.data.obj.lScore,
+                                user: {         
+                                    update: {  
+                                        score: {
+                                            increment: (client.data.obj.player  == "player1") ? client.data.obj.rScore * winner :  client.data.obj.lScore * winner,
+                                        },
+                                        wins: {
+                                            increment: ((client.data.obj.player == "player1" && client.data.obj.lScore == client.data.bestOf) ||
+                                                        (client.data.obj.player == "player2" && client.data.obj.rScore == client.data.bestOf)) ? 1 : 0,
+                                        },
+                                        loses: {
+                                            increment: ((client.data.obj.player == "player1" && client.data.obj.lScore != client.data.bestOf) ||
+                                                        (client.data.obj.player == "player2" && client.data.obj.rScore != client.data.bestOf)) ? 1 : 0,
+                                        }  
                                     },
-                                    wins: {
-                                        increment: ((client.data.obj.player == "player1" && client.data.obj.lScore == client.data.bestOf) ||
-                                                    (client.data.obj.player == "player2" && client.data.obj.rScore == client.data.bestOf)) ? 1 : 0,
-                                    },
-                                    loses: {
-                                        increment: ((client.data.obj.player == "player1" && client.data.obj.lScore != client.data.bestOf) ||
-                                                    (client.data.obj.player == "player2" && client.data.obj.rScore != client.data.bestOf)) ? 1 : 0,
-                                    }  
                                 },
+                                // added by hrhirha
+                                game: {
+                                    update: {
+                                        ongoing: false,
+                                    }
+                                }
+                                // end
                             },
-                            // added by hrhirha
-                            game: {
-                                update: {
-                                    ongoing: false,
+                            where: {
+                                uid_gid: {
+                                    uid: client.data.obj.userId,
+                                    gid: client.data.obj.roomId
+                                }
+                            },
+                            select: {
+                                user: {
+                                    select: {
+                                        id: true,
+                                        score: true,
+                                        rank_id: true,
+                                    }
                                 }
                             }
-                            // end
-                        },
-                        where: {
-                            uid_gid: {
-                                uid: client.data.obj.userId,
-                                gid: client.data.obj.roomId
+                        })).user;
+        
+                        const u_rank = (ranks.filter(r => u.score >= r.require ));
+                        this.prisma.user.update({
+                            where: { id: u.id },
+                            data: {
+                                status: user_status.ONLINE,
+                                rank_id: u_rank.length !== 0 ? u_rank[u_rank.length - 1].id : u.rank_id
                             }
-                        },
-                        select: {
-                            user: {
-                                select: {
-                                    id: true,
-                                    score: true,
-                                    rank_id: true,
-                                }
-                            }
-                        }
-                    })).user;
-    
-                    const u_rank = (ranks.filter(r => u.score >= r.require ));
-                    this.prisma.user.update({
-                        where: { id: u.id },
-                        data: {
-                            status: user_status.ONLINE,
-                            rank_id: u_rank.length !== 0 ? u_rank[u_rank.length - 1].id : u.rank_id
-                        }
+                        })
+                        .then(() => client.broadcast.emit('status_update'))
+                        .catch(() => console.log({error: 'unable to update status'}));
                     })
-                    .then(() => client.broadcast.emit('status_update'))
-                    .catch(() => console.log({error: 'unable to update status'}));
-                })
                 }
                 catch
                 {
@@ -147,6 +148,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.leave(client.data.obj.roomId); /// a watcher leave the room 
         }
     }
+
 
     async handleConnection(client: Socket, ...args: any[]) {
         console.log('Client Connected with ID: ' + client.id);
@@ -278,9 +280,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                     .catch(() => console.log({error: 'unable to update status'}));
                 });
                 /// emit restart 
-                let win = (d.rscore === client.data.bestOf) ? this.tab[d.roomId].user2.userId: this.tab[d.roomId].user1.userId;
-                this.server.to(d.roomId).emit("matchWinner", win); /// a watcher leave the room  -- for aimad
-                client.emit('restart', d.status);
+                (!d.forSave)
+                {
+                    let win = (d.rscore === client.data.bestOf) ? this.tab[d.roomId].user2.userId: this.tab[d.roomId].user1.userId;
+                    this.server.to(d.roomId).emit("matchWinner", win); /// a watcher leave the room  -- for aimad
+                    client.emit('restart', d.status);
+                }
                 return ;
             }
             catch
@@ -627,6 +632,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             roomId: room,
             isPlayer: true,
             onFocus: true,
+            dataIsSave: false,
         };
         client.emit("saveData", {
             player,
@@ -648,17 +654,23 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             return user;
         }
 
-        if (client.data.obj && this.tab[client.data.obj.roomId].endGame)
+        if (!client.data.obj)
+            return; 
+        
+        if (this.tab[client.data.obj.roomId].endGame)
             client.emit("Bye");
-        if (client.data.obj.isPlayer && !focus)
+        else
         {
-            client.data.obj.onFocus = false;
-            client.broadcast.to(client.data.obj.roomId).emit("focus", false);
-        }
-        if (client.data.obj.isPlayer && focus && !client.data.obj.onFocus)
-        {
-            client.data.obj.onFocus = true;
-            client.broadcast.to(client.data.obj.roomId).emit("focus", true);
+            if (client.data.obj.isPlayer && !focus)
+            {
+                client.data.obj.onFocus = false;
+                client.broadcast.to(client.data.obj.roomId).emit("focus", false);
+            }
+            if (client.data.obj.isPlayer && focus && !client.data.obj.onFocus)
+            {
+                client.data.obj.onFocus = true;
+                client.broadcast.to(client.data.obj.roomId).emit("focus", true);
+            }
         }
     }
 

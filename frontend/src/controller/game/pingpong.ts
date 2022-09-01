@@ -172,6 +172,7 @@ export default class PingPong extends Phaser.Scene
             this.soc.on("focus", (focus) => {
                 if (this.End)
                     return ;
+                console.log('herererer');
                 this.focus = focus;
                 if (this.isPlayer && !this.goal)
                 {
@@ -261,12 +262,22 @@ export default class PingPong extends Phaser.Scene
                 }
                 if (!this.End && this.data.is_player)
                 {
+                    this.soc.emit('endGame', {
+                        player: this.data.player,
+                        rscore: (this.data.player === "player2") ? this.bestOf : this.rightScore,
+                        lscore: (this.data.player === "player1") ? this.bestOf : this.leftScore, 
+                        userId: this.data.userId,
+                        roomId: this.data.roomId,
+                        status: "",
+                        forSave: false,
+                    });
                     if (this.ball)
                         this.ball.destroy();
                     if (this.paddle)
                         this.paddle.destroy();
                     if (this.enemy)
                         this.enemy.destroy();
+                    
                     this.add.image(this.w/2, this.h/2 - 100, "youwin").setOrigin(0.5).setScale(0.4);
                     const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 170 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
                     this.leave = this.add.text(this.w / 2 , this.h / 2 + 170 , "Exit", { fontSize: "35px",
@@ -694,7 +705,8 @@ export default class PingPong extends Phaser.Scene
             lscore: this.leftScore, 
             userId: this.data.userId,
             roomId: this.data.roomId,
-            status: img
+            status: img,
+            forSave: false,
         });
     }
     updatePositions()
