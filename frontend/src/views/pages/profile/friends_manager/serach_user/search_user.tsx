@@ -1,10 +1,9 @@
-import { faGamepad, faPingPongPaddleBall, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { get_all_users, User } from "controller/user/user";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
-import { useNotif } from "views/components/notif/notif";
 
 const SuggestionCard:React.FC<{avatar: string, fullName: string, username: string, status: string, onClick: Function}> = ({avatar, fullName, username, status, onClick}) => {
     return <div className="suggestionCard" onClick={() => onClick()}>
@@ -22,7 +21,6 @@ export const SearchUserForm:React.FC = () => {
     const [userSelected, setUserSelected] = useState(null);
     const [userInput, setUserInput] = useState("");
     const navigate = useNavigate();
-    const pushNotif = useNotif();
 
     useEffect(() => {
         if (userSelected !== null) {

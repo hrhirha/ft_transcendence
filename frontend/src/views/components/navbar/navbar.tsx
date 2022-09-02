@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition, faHouse, faRankingStar, faComments, faPowerOff } from "@fortawesome/free-solid-svg-icons";
 import { Brand } from "views/components/brand/brand";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { User } from "controller/user/user";
 import { useNotif } from "views/components/notif/notif";

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FriendsManager } from "views/pages/profile/friends_manager/friends_manager";
 import { ProfileInfos } from "views/pages/profile/profile_infos/profile_infos";
 import {faUserSlash, faUserCheck, faUserMinus, faUserXmark, faUserPlus, faUsersGear, faHistory, faComment, faGamepad} from "@fortawesome/free-solid-svg-icons";
@@ -6,8 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { post_friendreq_accept, post_friendreq_cancel, post_friendreq_decline, post_friendreq_send } from "controller/user/friendreq";
 import { post_friend_block, post_friend_unblock, post_friend_unfriend } from "controller/user/friends";
 import { MatchsHistory } from "./matchs_history/matchs_history";
-import { history, SocketContext } from "index";
-import { dm_started } from "controller/chat_socket/interface";
+import { history } from "index";
 
 
 export enum userType {

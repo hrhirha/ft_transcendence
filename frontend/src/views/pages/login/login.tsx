@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Brand } from "views/components/brand/brand";
 import { Logo1337, Logo42 } from 'assets';
 import { env } from "index";
