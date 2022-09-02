@@ -4,6 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import * as cookieParser from 'cookie-parser';
 import { Request, Response } from 'express';
 import { join } from 'path';
+import { env } from 'process';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma/prisma.service';
 import { HOST, PORT } from './utils';

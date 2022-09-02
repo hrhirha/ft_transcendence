@@ -24,11 +24,13 @@ import axios from "axios";
 import _ from 'lodash';
 import "views/style/index.scss";
 
+console.log(process.env);
 export const env = _.mapKeys(_.pickBy(process.env, (value, key) => {
   return _.startsWith(key, 'REACT_APP_');
 }), (value, key) => {
     return _.camelCase(_.replace(key, 'REACT_APP_', ''));
 });
+
 
 export default axios.create({
   baseURL : `http://${env.apiHost}:${env.apiPort}`,
