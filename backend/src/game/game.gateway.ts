@@ -178,7 +178,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             true: this.tab[d.roomId].user2.restart;
             if (this.tab[d.roomId].user1.restart && this.tab[d.roomId].user2.restart)
             {
-                const newid  = await this.prisma.game.create({
+                
+                console.log("this.tab[d.roomId].user1.userId = " , this.tab[d.roomId].user1.userId);
+                console.log("this.tab[d.roomId].user2.userId = " , this.tab[d.roomId].user2.userId);
+                let newid = await this.prisma.game.create({
                     data: {
                         map: this.tab[d.roomId].mapUrl,
                         user_game:
@@ -334,6 +337,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
+        client.data.usrId = user.id;
         if (client.data.obj)
         {
             this.server.to(client.data.obj.roomId).emit("updateScore", {
@@ -416,6 +420,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             client.disconnect();
             return user;
         }
+        client.data.usrId = user.id;
+
         if (client.data.obj)
         {
             this.server.to(client.data.obj.roomId).emit("updateScore", {
@@ -553,7 +559,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             }
         });
         await this.insertSocketData(soc[0], user, "player1", connection.id, mapUrl);
-        await this.insertSocketData(client, user, "player2", connection.id, mapUrl);
+        await this.insertSocketData(client, newUser, "player2", connection.id, mapUrl);
+        if (type !== "ultimateQue")
+            this.server.to(connection.id).emit('startGame');
+
     }
     @SubscribeMessage('watcher')
     async newWatcher(client: Socket, roomId: string)
