@@ -174,10 +174,10 @@ export default class PingPong extends Phaser.Scene
                 if (this.End)
                     return ;
                 this.focus = focus;
-                if (this.isPlayer && !this.goal)
+                if (this.isPlayer)
                 {
                     this.input.keyboard.enabled = focus;
-                    if (!this.counter)
+                    if (!this.goal && this.gameIsStarted)
                         this.ball.body.enable = focus;
                 }
                 if (!focus)
@@ -598,10 +598,11 @@ export default class PingPong extends Phaser.Scene
         {
             if (this.focus)
             {
+                this.counterTimer.text = "";
                 this.focusTxt.text = "";
                 this.counterTimer.text = "";
                 
-                if (this.counter)
+                if (this.goal)
                     this.counter.setText('' + this.formatTime(this.initialTime)).setOrigin(0.5);
                 this.focusTxt = undefined;
                 this.counterTimer = undefined;
@@ -727,7 +728,7 @@ export default class PingPong extends Phaser.Scene
     {
         if (!this.focus)
         {
-            if (this.counter)
+            if (this.goal)
                 this.counter.text = "";
             
             this.focusMode = true;
