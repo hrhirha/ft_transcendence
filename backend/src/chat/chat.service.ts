@@ -1107,15 +1107,16 @@ export class ChatService {
             }
         });
 
-        // filter messages sent before the user joined the room
-
+        
         if (!room.is_channel)
         {
             room['user'] = room.user_rooms.find(ur => ur.uid !== uid).user;
         }
-
+        
         room['is_banned'] = my_ur.is_banned;
         room['is_muted'] = my_ur.is_muted;
+
+        // filter messages sent before the user joined the room
         const jt = my_ur.joined_time;
         const msgs = room.messages.filter((message) => {
             return message.timestamp > jt;
@@ -1160,6 +1161,7 @@ export class ChatService {
                 OR: [
                     {
                         // case of channel
+                        room: { is_channel: true, },
                         is_banned: false,
                         OR: [
                             {
@@ -1181,7 +1183,7 @@ export class ChatService {
                                 {
                                     recievedReq: {
                                         some: {
-                                            snd_id: uid2, rcv_id: uid1,
+                                            snd_id: uid2,
                                             status: friend_status.ACCEPTED,
                                         }
                                     }
@@ -1189,7 +1191,7 @@ export class ChatService {
                                 {
                                     sentReq: {
                                         some: {
-                                            snd_id: uid1, rcv_id: uid2,
+                                            rcv_id: uid2,
                                             status: friend_status.ACCEPTED,
                                         }
                                     }
@@ -1215,7 +1217,6 @@ export class ChatService {
                 reason: 'not a member, banned or muted, blocked'
             });
         return true;
-
     }
 
     private async _add_msg_to_db(uid: string, data: AddMessageDto, type: string = msg_type.TXT)
