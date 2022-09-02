@@ -1,5 +1,5 @@
-export const HOST = process.env.HOST || '127.0.0.1';
-export const PORT = Number(process.env.PORT) || 3001;
+export const HOST = process.env.REACT_APP_API_HOST || '127.0.0.1';
+export const PORT = Number(process.env.REACT_APP_API_PORT) || 3001;
 
 export const room_type = {
     PUBLIC: 'PUBLIC',
