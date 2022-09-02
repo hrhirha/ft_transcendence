@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 import * as cookieParser from 'cookie-parser';
 import { Request, Response } from 'express';
 import { join } from 'path';
+import { env } from 'process';
 import { AppModule } from './app.module';
 import { PrismaService } from './prisma/prisma.service';
 import { HOST, PORT } from './utils';
@@ -81,6 +82,7 @@ async function createRanks() {
 }
 
 async function bootstrap() {
+  console.log(process.env);
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors({
     origin: `http://${HOST}:3000`,

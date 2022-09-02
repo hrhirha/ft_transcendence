@@ -249,8 +249,7 @@ export default class PingPong extends Phaser.Scene
                             this.restartText.destroy();
                         return ;
                     }
-                    this.leave = this.add.text(this.w / 2 , this.h / 2.1 , "Second Player Left The Game", { fontSize: "35px",
-                    fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+                    this.endMatchSprite = this.add.sprite(this.w / 2 , this.h / 2, 'endMatch').setOrigin(0.5, 0.5).setScale(0.3);
                     const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 170 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
                     this.leave = this.add.text(this.w / 2 , this.h / 2 + 170 , "Exit", { fontSize: "35px",
                     fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
@@ -300,8 +299,7 @@ export default class PingPong extends Phaser.Scene
             });
 
             this.soc.on("leave", () => {
-                this.leave = this.add.text(this.w / 2 , this.h / 2 , "One Of players left the Game", { fontSize: "35px",
-                fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
+                this.endMatchSprite = this.add.sprite(this.w / 2 , this.h / 2, 'endMatch').setOrigin(0.5, 0.5).setScale(0.3);
                 const exitBg = this.add.sprite(this.w / 2 , this.h / 2 + 85 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
                 this.leave = this.add.text(this.w / 2 , this.h / 2 + 85 , "Exit", { fontSize: "35px",
                 fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
@@ -334,7 +332,7 @@ export default class PingPong extends Phaser.Scene
                 this.waiting = this.add.text(this.w / 2 , this.h / 2 + 150 , "Waiting ...", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setOrigin(0.5);
             });
             this.soc.on("restart", (img) => {
-                this.add.image(this.w/2, this.h/2 - 100, img).setOrigin(0.5).setScale(0.4);
+                this.endMatchSprite = this.add.sprite(this.w / 2 , this.h / 2 - 80, 'endMatch').setOrigin(0.5, 0.5).setScale(0.3);
                 this.buttonBg = this.add.sprite(this.w / 2 , this.h / 2 + 85, 'normalButton').setInteractive().setOrigin(0.5).setScale(0.3);
                 this.restartText = this.add.text(this.w / 2 , this.h / 2 + 85 , "Replay", { fontSize: "35px",
                 fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
