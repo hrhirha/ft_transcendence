@@ -60,8 +60,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         
         if (client.data.obj == undefined)
         {
-            this.ultimateQue = (this.ultimateQue && client.id === this.ultimateQue.user.id) ? null : this.ultimateQue;
-            this.normaleQue = (this.normaleQue && client.id === this.normaleQue.user.id) ? null : this.normaleQue;
+            this.ultimateQue = (this.ultimateQue && client.data?.usrId === this.ultimateQue.user.id) ? null : this.ultimateQue;
+            this.normaleQue = (this.normaleQue && client.data?.usrId === this.normaleQue.user.id) ? null : this.normaleQue;
             return ;
         }
 
@@ -155,7 +155,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
         {
-            client.disconnect();
+
+            // client.disconnect();
             return user;
         }
     }
@@ -166,7 +167,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
         {
-            client.disconnect();
+            // client.disconnect();
             return user;
         }
         
@@ -216,7 +217,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
         {
-            client.disconnect();
+            // client.disconnect();
             return user;
         }
         if (client.data.obj && client.data.obj.isPlayer)
@@ -306,7 +307,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
         {
-            client.disconnect();
+            // client.disconnect();
             return user;
         }
         if (client.data.obj && client.data.obj.player === "player1" && (client.data.obj.lScore != d.lScore || client.data.obj.rScore != d.rScore))
@@ -331,10 +332,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         userId: string
     })
     {
+        console.log("normaleQue");
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
         {
-            client.disconnect();
+            // client.disconnect();
             return user;
         }
         client.data.usrId = user.id;
@@ -414,10 +416,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         userId: string
     })
     {
+        console.log("ultimateQue");
+
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
         {
-            client.disconnect();
+            // client.disconnect();
             return user;
         }
         client.data.usrId = user.id;
@@ -495,7 +499,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
         {
-            client.disconnect();
+            // client.disconnect();
             return user;
         }
         this.server.to(client.data.obj.roomId).emit("updateScore", {
@@ -516,7 +520,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             if (s.data.usrId == userId)
                 return s;
         });
-        console.log("Is private Game" );
         if (!soc.length)
         {
             client.emit("waiting", {
@@ -570,12 +573,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
         {
-            client.disconnect();
+            // client.disconnect();
             return user;
         }
         this.tab[roomId].vues += 1;
         
-        console.log(this.tab[roomId].mapUrl);
         client.data.obj = {
             roomId,
             isPlayer: false,
@@ -662,7 +664,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
         {
-            client.disconnect();
+            // client.disconnect();
             return user;
         }
 
@@ -693,7 +695,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         const user =(await this.jwt.getUserFromSocket(client));
         if (!user)
         {
-            client.disconnect();
+            // client.disconnect();
             return user;
         }
         if (!client.data.obj)

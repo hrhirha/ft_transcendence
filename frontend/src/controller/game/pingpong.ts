@@ -574,14 +574,14 @@ export default class PingPong extends Phaser.Scene
         this.focusTimer -=  (this.focusMode) ? 1 : 0; // One second
         this.initialTime -= (!this.focusMode) ? 1 : 0; // One second
         if ( !this.focusMode && this.counter)
-        this.counter.setText('' + this.formatTime(this.initialTime)).setOrigin(0.5);
+        this.counter.text = '' + this.formatTime(this.initialTime);
         if (this.focusMode &&  this.counterTimer)
-        this.counterTimer.setText('' + this.formatTime(this.focusTimer)).setOrigin(0.5);
+        this.counterTimer.text = '' + this.formatTime(this.focusTimer);
         
         if (!this.focusMode && this.initialTime <= 0)
         {
             this.goal = false;
-            this.counter.text = "";
+            this.counter.text = ""; 
             this.counter = undefined;
             this.timedEvent = undefined;
             this.initialTime = 0;
@@ -602,8 +602,8 @@ export default class PingPong extends Phaser.Scene
                 this.focusTxt.text = "";
                 this.counterTimer.text = "";
                 
-                if (this.goal)
-                    this.counter.setText('' + this.formatTime(this.initialTime)).setOrigin(0.5);
+                if (this.counter)
+                    this.counter.text = '' + this.formatTime(this.initialTime);
                 this.focusTxt = undefined;
                 this.counterTimer = undefined;
                 this.timedEventFocus = undefined;
@@ -728,7 +728,7 @@ export default class PingPong extends Phaser.Scene
     {
         if (!this.focus)
         {
-            if (this.goal)
+            if (this.counter)
                 this.counter.text = "";
             
             this.focusMode = true;
@@ -755,6 +755,11 @@ export default class PingPong extends Phaser.Scene
 
     update () : void
     {
+        // if (this.soc.disconnected)
+        // {
+        //     window.location.href = "/";
+        // }
+            
         if (this.exitEmited || this.goal || !this.gameIsStarted || !this.isPlayer || this.map)
             return ;
         // ///// check For the  movment ////////////////
