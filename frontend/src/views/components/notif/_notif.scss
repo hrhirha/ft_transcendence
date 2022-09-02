@@ -74,13 +74,14 @@ section.notif {
     width: 100%;
     list-style: none;
     padding: .5rem 0;
+    margin-top: .5rem;
     li.action {
       cursor: pointer;
-      padding: .5rem .75rem;
+      padding: .3rem .75rem;
       font-size: $fsize * .8;
       font-family: $LFont;
       line-height: 1.25;
-      border-radius: .5rem;
+      border-radius: 5rem;
     }
   }
   z-index: 100;

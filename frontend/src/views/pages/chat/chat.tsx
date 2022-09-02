@@ -6,7 +6,7 @@ import { CreateNewChat } from "views/pages/chat/create_chat/create_chat";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChatHomeVector, NoConversations } from "assets";
-import { management_memeber, chats, dm_started, management_password, receive_message, room_created, user_joined, user_left, user_unbanned, user_muted, message_deleted, user_info, messages, dms, info_room, others } from "chat_socket/interface";
+import { management_memeber, chats, dm_started, management_password, receive_message, room_created, user_joined, user_left, user_unbanned, user_muted, message_deleted, user_info, messages, dms, info_room, others } from "controller/chat_socket/interface";
 import { getIDQuery, history, SocketContext } from "index";
 
 enum chatTabs {

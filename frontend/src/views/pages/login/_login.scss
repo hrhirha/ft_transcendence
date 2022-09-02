@@ -4,11 +4,11 @@ main#loginPage {
     min-height: 100vh;
     > div {
         @include _flex(column, space-evenly, center);
-        @include _gradientBg($dark2, $dark3, 180);
+        @include _gradientBg(rgba($dark2, .25), rgba($dark2, .7), 180);
         min-width: 275px;
         max-width: 280px;
         min-height: 20rem;
-        border-radius: .75rem;
+        border-radius: 1rem;
         padding: 1.5rem .75rem;
         h4 {
             text-align: center;

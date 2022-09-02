@@ -5,7 +5,7 @@ import { DefaultGame, UltimateGame } from 'assets';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useContext, useEffect, useState } from 'react';
 import { SocketContext } from 'index';
-import { management_memeber } from 'chat_socket/interface';
+import { management_memeber } from 'controller/chat_socket/interface';
 import { useNotif } from 'views/components/notif/notif';
 
 export const  MemeberCard:React.FC<{

@@ -6,7 +6,7 @@ import { Chat_msg } from "views/pages/chat/chat_msg/chat_msg";
 import { BannedFromChat, BgVectors, GroupIcon, NoConversations } from "assets";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { ChatRoomSettings } from "views/pages/chat/chat_room_settings/chat_room_settings";
-import { messages, msgs, receive_message, room_msgs } from "chat_socket/interface";
+import { messages, msgs, receive_message, room_msgs } from "controller/chat_socket/interface";
 import { getIDQuery, history, SocketContext } from "index";
 import { validPassword } from "../create_chat/create_chat";
 

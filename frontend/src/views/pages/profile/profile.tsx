@@ -7,7 +7,7 @@ import { post_friendreq_accept, post_friendreq_cancel, post_friendreq_decline, p
 import { post_friend_block, post_friend_unblock, post_friend_unfriend } from "controller/user/friends";
 import { MatchsHistory } from "./matchs_history/matchs_history";
 import { history, SocketContext } from "index";
-import { dm_started } from "chat_socket/interface";
+import { dm_started } from "controller/chat_socket/interface";
 
 
 export enum userType {

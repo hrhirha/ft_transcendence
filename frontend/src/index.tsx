@@ -15,14 +15,14 @@ import { get_me, User } from 'controller/user/user';
 import { Notif, useNotif } from 'views/components/notif/notif';
 import { Loading } from 'views/components/loading/loading';
 import { NavBar } from 'views/components/navbar/navbar';
-import { ChatSocket } from "chat_socket";
-import { challenge_data, receive_message } from 'chat_socket/interface';
+import { ChatSocket } from "controller/chat_socket";
+import { challenge_data, receive_message } from 'controller/chat_socket/interface';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGamepad, faUserGroup } from '@fortawesome/free-solid-svg-icons';
 import { CircleAvatar } from 'views/components/circle_avatar/circle_avatar';
-import "views/style/index.scss";
 import axios from "axios";
 import _ from 'lodash';
+import "views/style/index.scss";
 
 export const env = _.mapKeys(_.pickBy(process.env, (value, key) => {
   return _.startsWith(key, 'REACT_APP_');

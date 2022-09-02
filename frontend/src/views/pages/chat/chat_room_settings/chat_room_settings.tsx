@@ -1,7 +1,7 @@
 import { faArrowRightFromBracket, faCheck, faClose, faGamepad, faKey, faLockOpen, faPenToSquare, faTrash, faTrashCan, faUser, faUsers, faUserSlash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GroupIcon } from "assets";
-import { management_memeber, management_password, room_msgs, user_info } from "chat_socket/interface";
+import { management_memeber, management_password, room_msgs, user_info } from "controller/chat_socket/interface";
 import { getIDQuery, SocketContext } from "index";
 import { useContext, useEffect, useState } from "react";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
