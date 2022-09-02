@@ -1053,6 +1053,12 @@ export class ChatService {
                                 fullName: true,
                                 imageUrl: true,
                                 status: true,
+                                sentReq: {
+                                    select: { rcv_id: true, status: true, }
+                                },
+                                recievedReq: {
+                                    select: { snd_id: true, status: true, }
+                                }
                             }
                         }
                     }
@@ -1110,9 +1116,13 @@ export class ChatService {
         
         if (!room.is_channel)
         {
-            room['user'] = room.user_rooms.find(ur => ur.uid !== uid).user;
+            const usr = room.user_rooms.find(ur => ur.uid !== uid).user;
+            const req = usr.sentReq.find(sr => sr.rcv_id === uid) || usr.recievedReq.find(rr => rr.snd_id === uid) || null;
+            usr['relation'] = req ? req.status : relation_status.NONE;
+            delete usr.sentReq && delete usr.recievedReq;
+            room['user'] = usr;
         }
-        
+
         room['is_banned'] = my_ur.is_banned;
         room['is_muted'] = my_ur.is_muted;
 
