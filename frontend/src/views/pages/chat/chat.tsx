@@ -33,7 +33,8 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
         return (
             <div className="noConversations">
                 <img src={NoConversations} alt="empty chat"/>
-                <span>No Conversations Here</span>
+                <h6>Nothing Here</h6>
+                <span>There are no chats in this tab !</span>
             </div>
         );
     }

@@ -93,7 +93,7 @@ main#chatPage {
                 background-color: $dark2;
             }
         }
-        
+
         ul#chatTabs {
             @include _flex(row, space-between, center);
             @include _selectionOff();
@@ -120,7 +120,6 @@ main#chatPage {
                     padding: .25rem;
                 }
             }
-            
             li.active {
                 background-color: $purple;
                 color: $light1;
@@ -132,7 +131,6 @@ main#chatPage {
             overflow-y: auto;
             max-height: 100%;
             margin-bottom: .5rem;
-            
             @media (max-width: $xs) {
                 max-height: none;
             }
@@ -144,29 +142,32 @@ main#chatPage {
                 margin-top: 1rem;
                 width: 75%
             }
-            span {
+            h6 {
                 font-family: $BFont;
+                font-size: $fsize;
+                max-width: 75%;
+                color: $light3;
+            }
+            span {
+                margin-top: .25rem;
                 max-width: 85%;
                 color: $light3;
+                font-size: $fsize * .75;
             }
         }
         #chatHome {
             @include _flex(column, center, center);
             @include _selectionOff();
             height: 100%;
-
             img {
                 width: 20rem;
-
                 @media (max-width: $xs) {
                     width: 17rem;
                 }
             }
-
             button {
                 @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: $purple, $bgcolor2: $light6, $font: $BFont);
                 padding: .5rem 2rem;
-
                 svg {
                     margin-right: .5rem;
                 }
