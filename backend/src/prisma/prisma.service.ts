@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
-import {  } from 'src/user/dto';
-import { friend_status } from 'src/utils';
 
 @Injectable()
 export class PrismaService extends PrismaClient {

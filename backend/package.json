@@ -5,7 +5,9 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
-  "prisma": {"schema": "../schema.prisma"},
+  "prisma": {
+    "schema": "../schema.prisma"
+  },
   "scripts": {
     "db:dev:up": "docker-compose up -d db-dev",
     "db:dev:rm": "docker-compose rm -sfv db-dev",

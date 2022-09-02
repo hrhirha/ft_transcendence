@@ -5,7 +5,7 @@ import { EditFullNameDto, EditUsernameDto, UserIdDto } from './dto';
 import { UserService } from './user.service';
 import { Request } from 'express'
 import { diskStorage } from 'multer';
-import { PrismaClient, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { Jwt2FAAuthGuard } from 'src/auth/guard/jwt-2fa-auth.guard';
 import { randomUUID } from 'crypto';
 import { createReadStream } from 'fs';

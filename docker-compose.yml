@@ -4,16 +4,14 @@ services:
     env_file: .env
     build: .
     command: 'sh start.sh'
-    volumes:
-     - .:/usr/app
+    # volumes:
+    #  - .:/usr/app
     ports:
      - "3000:3000"
      - "3001:3001"
     depends_on:
       db-dev:
         condition: service_healthy
-    # environment:
-    #   DB_HOST: db-dev
 
   db-dev:
     image: postgres:14.2

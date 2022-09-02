@@ -1,7 +1,6 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { PrismaClient } from '@prisma/client';
 import * as cookieParser from 'cookie-parser';
 import { Request, Response } from 'express';
 import { join } from 'path';
@@ -80,7 +79,8 @@ async function createRanks() {
   catch (e) {}
 }
 
-async function bootstrap() {
+async function bootstrap()
+{
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableCors({
     origin: `http://${HOST}:3000`,
