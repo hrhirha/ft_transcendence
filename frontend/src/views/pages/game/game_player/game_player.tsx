@@ -1,15 +1,13 @@
 import { faGamepad, faLeaf } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Match } from "controller/user/matchs";
-import { env, history } from "index";
-import React, { useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import { env, game_socket, history } from "index";
+import React, { useEffect, useRef, useState } from "react";
 import { MatchCard } from "views/components/match_card/match_card";
 import { useNotif } from "views/components/notif/notif";
 import { GameView } from "views/pages/game/game_view/game_view";
 
 export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) =>  {
-    const [socket] = useState(io(`ws://${env.apiHost}:${env.apiPort}/game`, {withCredentials: true}));
     const pushNotif = useNotif();
     const [winner, setWinner] = useState<string>("");
     const [viewers, setViewers] = useState<number>(0);
@@ -22,38 +20,31 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
             p2: 0
         }
     });
-    
+
     useEffect(() => {
-        // socket.connect();
+        game_socket.connect();
         const unblock = history.block((tx) => {
-                pushNotif({
-                    id: "LEAVEGAME",
-                    type: "info",
-                    time: 15000,
-                    icon: <FontAwesomeIcon icon={faGamepad}/>,
-                    title: "Confirmation",
-                    description: "Are you sure you want to leave the game?",
-                    actions: [
-                        {title: "Cancel", color: "#6970d4", action: () => {}},
-                        {title: "Leave the game", color: "#313348", action: () => {
-                            socket.disconnect();
-                            unblock();
-                            tx.retry();
-                        }}
-                    ] 
-                });
-          });
-        document.addEventListener("visibilitychange", event => {
-            socket.emit("isActive", (document.visibilityState === "visible"));
+            pushNotif({
+                id: "LEAVEGAME",
+                type: "info",
+                time: 15000,
+                icon: <FontAwesomeIcon icon={faGamepad}/>,
+                title: "Confirmation",
+                description: "Are you sure you want to leave the game?",
+                actions: [
+                    {title: "Cancel", color: "#6970d4", action: () => {}},
+                    {title: "Leave the game", color: "#313348", action: () => {
+                        game_socket.disconnect();
+                        unblock();
+                        tx.retry();
+                    }}
+                ] 
+            });
         });
-    }, []);
-
-    useEffect(() => {
-        window.addEventListener("beforeunload",null);
-    });
-
-    useEffect(() => {
-        socket.on("matchWinner", (win) => {
+        document.addEventListener("visibilitychange", event => {
+            game_socket.emit("isActive", (document.visibilityState === "visible"));
+        });
+        game_socket.on("matchWinner", (win) => {
             setWinner(win);
         })
         .on("keepWatching", () => {
@@ -79,14 +70,15 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
         }).on("joined", (players) => {
             setMatchData(oldData => ({...oldData, p1: players.p1, p2: players.p2}));
         });
-    }, [socket]);
+    }, []);
+
     return (
         <main id="gamePage" className="container">
             <div className="row">
                 <div className="col-12 col-md-9">
                     {matchData && <MatchCard match={matchData} winnerId={winner} viewers={viewers}/>}
                     <GameView
-                        gameSocket={socket}
+                        gameSocket={game_socket}
                         isUltimate={ultimateGame}
                         watcher={false}
                         roomId={""}

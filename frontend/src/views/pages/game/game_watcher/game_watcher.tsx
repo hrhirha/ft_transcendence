@@ -2,14 +2,13 @@ import { faChevronCircleLeft, faChevronCircleRight } from "@fortawesome/free-sol
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { WatchEmptyState } from "assets";
 import { get_ongoing_matchs, Match } from "controller/user/matchs";
-import { env } from "index";
-import React, { useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import { env, game_socket } from "index";
+import React, { useEffect, useRef, useState } from "react";
+import { io, Socket } from "socket.io-client";
 import { MatchCard } from "views/components/match_card/match_card";
 import { GameView } from "views/pages/game/game_view/game_view";
 
 export const GameWatcher:React.FC = () =>  {
-    const [socket] = useState(io(`ws://${env.apiHost}:${env.apiPort}/game`, {withCredentials: true}));
     const [ongoingMatchs, setMatchs] = useState<Array<Match>>([]);
     const [winner, setWinner] = useState<string>("");
     const [currentMatch, setCurrentMatch] = useState<number>(0);
@@ -22,18 +21,19 @@ export const GameWatcher:React.FC = () =>  {
         } catch(e: any) {}
     };
     useEffect(() => {
+        game_socket.connect();
         updateMatche();
     },[]);
 
     useEffect(() => {
-        socket.disconnect();
+        game_socket.disconnect();
         updateMatche();
-        socket.removeAllListeners();
-        socket.connect();
+        game_socket.removeAllListeners();
+        game_socket.connect();
     },[currentMatch]);
 
     useEffect(() => {
-        socket.on("matchWinner", (win) => {
+        game_socket.on("matchWinner", (win) => {
             setWinner(win);
         }).on("vues", (vues) => {
             setViewers(vues);
@@ -59,7 +59,7 @@ export const GameWatcher:React.FC = () =>  {
                 return m;
             }));
         });
-    }, [socket]);
+    }, [game_socket]);
 
     return (
         <section id="gameWatcher" className="container">
@@ -71,7 +71,7 @@ export const GameWatcher:React.FC = () =>  {
                         <MatchCard match={ongoingMatchs[currentMatch]} winnerId={winner} viewers={viewers}/>
                         {currentMatch > 0 && <FontAwesomeIcon icon={faChevronCircleLeft} className="navButton" title="Previous game"  onClick={() => setCurrentMatch((m) => m - 1)}/>}
                     </div>}
-                    {ongoingMatchs.length > 0 && <GameView gameSocket={socket} watcher={true} roomId={ongoingMatchs[currentMatch]?.id}/>}
+                    {ongoingMatchs.length > 0 && <GameView gameSocket={game_socket} watcher={true} roomId={ongoingMatchs[currentMatch]?.id}/>}
                 </div>
             </div>
         </section>

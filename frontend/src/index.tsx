@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Login } from 'views/pages/login/login';
 import { Routes, Route, unstable_HistoryRouter as Router } from 'react-router-dom'
@@ -23,20 +23,18 @@ import { CircleAvatar } from 'views/components/circle_avatar/circle_avatar';
 import axios from "axios";
 import _ from 'lodash';
 import "views/style/index.scss";
+import { io } from 'socket.io-client';
 
-console.log(process.env);
 export const env = _.mapKeys(_.pickBy(process.env, (value, key) => {
   return _.startsWith(key, 'REACT_APP_');
 }), (value, key) => {
     return _.camelCase(_.replace(key, 'REACT_APP_', ''));
 });
 
-
 export default axios.create({
   baseURL : `http://${env.apiHost}:${env.apiPort}`,
   withCredentials: true 
 });
-
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -44,11 +42,12 @@ const root = ReactDOM.createRoot(
 
 export const SocketContext = createContext(null); //create socket context
 export const history = createBrowserHistory();
-const class_socket = new ChatSocket();
+export const game_socket = io(`ws://${env.apiHost}:${env.apiPort}/game`, {withCredentials: true});
 export const getIDQuery = () => {
   const searchParams = new URLSearchParams(history.location.search);
   return searchParams.get('id');
 }
+const class_socket = new ChatSocket();
 
 const PongApp:React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
@@ -91,7 +90,6 @@ const PongApp:React.FC = () => {
           });
         }
       }).on("challenge_requested", (data: challenge_data) => {
-        console.log(data.invite);
         if (data.invite)
         {
           pushNotif({

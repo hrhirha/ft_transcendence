@@ -26,10 +26,13 @@ const config: Phaser.Types.Core.GameConfig = {
 
 export const GameView:React.FC<{gameSocket: Socket, isUltimate?: boolean, watcher?: boolean, roomId: string}> = ({gameSocket, isUltimate, watcher, roomId}) => {
     const [game, setGame] = useState<Phaser.Game>();
-    const setNewGame = () =>  setGame(() => {
+    const setNewGame = () =>  setGame((oldGame) => {
         const newGame = new Phaser.Game(config);
         let privateGame : {userId: string} = null;
 
+        if (oldGame !== undefined)
+            oldGame.destroy(true);
+            
         if (JSON.parse(window.localStorage.getItem("privateGame")) !== null) {
             privateGame = JSON.parse(window.localStorage.getItem("privateGame"));
             window.localStorage.removeItem("privateGame");

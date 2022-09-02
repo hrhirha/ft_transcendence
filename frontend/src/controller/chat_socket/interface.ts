@@ -10,6 +10,7 @@ export interface user_info {
     is_owner?: boolean,
     is_banned?: boolean,
     is_muted?: boolean,
+    relation?: string
 }
 interface room {
     id:  string,

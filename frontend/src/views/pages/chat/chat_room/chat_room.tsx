@@ -98,11 +98,11 @@ const ChatRoomBody:React.FC<{messages: msgs[], roomId: string, chatRef: React.Le
 }
 
 
-const ChatRoomFooter:React.FC<{muted: boolean, send_message : Function}> = ({muted, send_message}) => {
+const ChatRoomFooter:React.FC<{blocked: boolean, muted: boolean, send_message : Function}> = ({blocked, muted, send_message}) => {
     const [msg, setMsg] = useState<string>("");
 
     return <div id="chatRoomFooter">
-       {!muted && <form id="messageForm">
+       {!muted && !blocked && <form id="messageForm">
             <input type="text" placeholder="Type your Message Here" value={msg} onChange={(e)=>setMsg(e.target.value.trim() !== "" ? e.target.value : "")}/>
             <button id="sendMessage" onClick={(e) =>{
                 e.preventDefault();
@@ -115,6 +115,7 @@ const ChatRoomFooter:React.FC<{muted: boolean, send_message : Function}> = ({mut
             </button>
         </form>}
         {muted && <div id="muted"><FontAwesomeIcon icon={faCommentSlash} />You are muted, you can't send messages</div>}
+        {blocked && <div id="muted"><FontAwesomeIcon icon={faCommentSlash} />You can't send messages</div>}
     </div>;
 }
 
@@ -182,7 +183,6 @@ export const ChatRoom:React.FC = () => {
                 </button>
             </div>
         );
-
     return (
         <>
         {showSettings && <ChatRoomSettings room= {roominfo} onClose={() => setShowSettings(false)}/>}
@@ -196,7 +196,7 @@ export const ChatRoom:React.FC = () => {
                 showSettings={() => setShowSettings(true)}
             />
             <ChatRoomBody messages={messages} roomId={roominfo.id} chatRef={lastChat}/>
-            <ChatRoomFooter muted={roominfo.is_muted } send_message={(msg : string) => class_socket.send_message({rid : getIDQuery(), msg :msg})}/>
+            <ChatRoomFooter blocked={roominfo.user !== undefined && roominfo.user.relation === "BLOCKED"} muted={roominfo.is_muted } send_message={(msg : string) => class_socket.send_message({rid : getIDQuery(), msg :msg})}/>
         </section>}
     </>
     );

@@ -9,7 +9,7 @@ export const NotFound:React.FC = () => {
         <main id="notFound">
             <div className='container'>
                 <img alt="Page Not Found" src={NotFound404}/>
-                <h3>There is nothing here !</h3>
+                <h3>Nothing here !</h3>
                 <NavLink to="/" >
                     <FontAwesomeIcon icon={faHome} />
                     Go Home
