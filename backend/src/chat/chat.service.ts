@@ -153,7 +153,7 @@ export class ChatService {
         if (!room)
             throw new WsException('room not found or not protected');
         if (!(await argon2.verify(room.password, dto.old_password)))
-            throw new WsException('invalid old_password');
+            throw new WsException({code: "INVALIDPASS", error: 'invalid old_password'});
 
         dto.new_password = await argon2.hash(dto.new_password);
         const r = await this._prismaS.room.update({
@@ -196,7 +196,7 @@ export class ChatService {
         if (!room)
             throw new WsException('room not found or not protected');
         if (!(await argon2.verify(room.password, dto.old_password)))
-            throw new WsException('invalid old_password');
+            throw new WsException({code: "INVALIDPASS", error: 'invalid old_password'});
 
         const r = await this._prismaS.room.update({
             data: {
@@ -331,9 +331,9 @@ export class ChatService {
         if (r.type === room_type.PROTECTED)
         {
             if (!room.password)
-                throw new WsException('protected room requires a password');
+                throw new WsException({type: "NOPASS", error: 'protected room requires a password'});
             if (!(await argon2.verify(r.password, room.password)))
-                throw new WsException('invalid password');
+                throw new WsException({type: "INVALIDPASS", error: 'invalid password'});
         }
 
         const up_r = await this._prismaS.room.update({
