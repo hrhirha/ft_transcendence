@@ -67,7 +67,8 @@ const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>,
     }
 
     return (
-    <form id="manageMembers" onSubmit={(e) => {e.preventDefault(); 
+    <form id="manageMembers" onSubmit={(e) => {
+        e.preventDefault(); 
         class_socket.edit_room({rid : room.id, name : channelTitle, uids: selectedUsers.map((u : user_info )=> u.id)});
     }} >
         <input type="text" className={`inputStyle ${validChannelTitel(channelTitle) ? "":"error"}`} value={channelTitle} onChange={(e) => {setChannelTitle(e.target.value)}} placeholder="Channel Title" />
@@ -89,17 +90,17 @@ const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>,
                 {passwordEditState === 1 && <input type="password" placeholder="Password"  className={`inputStyle ${validPassword(newPassword) ? "":"error"}`} value={newPassword} onChange={(e) => setNewPassword(e.target.value)}/>}
             </>}
             {passwordEditState === 1 && validPassword(newPassword) &&
-            <button onClick={() => savePassword()} className="save">
+            <button type="button" onClick={() => savePassword()} className="save">
                 <FontAwesomeIcon icon={faCheck}/>
                 Save password
             </button>}
             {passwordEditState === 2 && validPassword(newPassword) && validPassword(oldPassword) &&
-            <button onClick={() => savePassword()} className="save">
+            <button type="button" onClick={() => savePassword()} className="save">
                 <FontAwesomeIcon icon={faPenToSquare}/>
                 Update password
             </button>}
             {passwordEditState === 3 && validPassword(oldPassword) &&
-            <button onClick={() => savePassword()} className="cancel">
+            <button type="button" onClick={() => savePassword()} className="cancel">
                 <FontAwesomeIcon icon={faClose}/>
                 Remove password
             </button>}
@@ -136,7 +137,6 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
     const navigate = useNavigate();
     const class_socket = useContext(SocketContext);
     const [members, setMembers] = useState<user_info[]>([]);
-    //const [users, setUsers] = useState<user_info[]>([]);
     const [owner, setOwner] = useState<boolean>(false);
     const [editable, setEditable] = useState<boolean>(false);
     const pushNotif = useNotif();

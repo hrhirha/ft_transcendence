@@ -30,7 +30,11 @@ const JoinChat:React.FC<{room :room_msgs}> = ({room}) => {
 
     useEffect(() => {
         setIsProtected(room.type === "PROTECTED");
+    }, [room]);
+
+    useEffect(() => {
         class_socket.socket.on("invalid_password", () => {
+            console.log("invalid password");
             pushNotif({
                 id: "invalid_password",
                 type: "error",
@@ -39,7 +43,7 @@ const JoinChat:React.FC<{room :room_msgs}> = ({room}) => {
                 description: "Invalid password",
             });
         });
-    }, [room]);
+    }, []);
 
     const joinNow = () => {
         class_socket.join_room({id : room.id, password : channelPassword === "" ? null : channelPassword});
