@@ -15,7 +15,7 @@ export const validChannelTitel = (title: string) => {
 }
 
 export const validPassword = (password: string) => {
-    return  password.trim() != "" && /[A-Z]+/.test(password) && /\w{5,}/.test(password) && /[\!\@\#\$\&\*\?\-\=\+]+/.test(password) && /\d+/.test(password);
+    return  password.trim() != "" && /[A-Z]+/.test(password) && /[\_\!\@\#\$\&\*\?\-\=\+\.]+/.test(password) && /\d+/.test(password) && password.length >= 8;
 }
 
 export const UserCheckedCard:React.FC<{avatar: string, fullName: string, onRemove: Function}> = ({avatar, fullName, onRemove}) => {

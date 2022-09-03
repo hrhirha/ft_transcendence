@@ -1,6 +1,6 @@
 import { faClose, faLock, faQrcode, faQuestion, faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { env } from "process";
+import { env } from "index";
 import React, { useState } from "react";
 import { useNotif } from "../notif/notif";
 
