@@ -42,7 +42,7 @@ const root = ReactDOM.createRoot(
 
 export const SocketContext = createContext(null); //create socket context
 export const history = createBrowserHistory();
-export const game_socket = io(`ws://${env.apiHost}:${env.apiPort}/game`, {withCredentials: true});
+export const game_socket = io(`ws://${env.apiHost}:${env.apiPort}/game`, {withCredentials: true, closeOnBeforeunload: false});
 export const getIDQuery = () => {
   const searchParams = new URLSearchParams(history.location.search);
   return searchParams.get('id');

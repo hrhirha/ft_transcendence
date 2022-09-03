@@ -32,7 +32,8 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
                 title: "Confirmation",
                 description: "Are you sure you want to leave the game?",
                 actions: [
-                    {title: "Cancel", color: "#6970d4", action: () => {}},
+                    {title: "Cancel", color: "#6970d4", action: () => {
+                    }},
                     {title: "Leave the game", color: "#313348", action: () => {
                         game_socket.disconnect();
                         unblock();
@@ -41,7 +42,8 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
                 ] 
             });
         });
-        document.addEventListener("visibilitychange", event => {
+        window.addEventListener("visibilitychange", event => {
+            console.log(event);
             game_socket.emit("isActive", (document.visibilityState === "visible"));
         });
         game_socket.on("matchWinner", (win) => {

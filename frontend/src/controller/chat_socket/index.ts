@@ -63,7 +63,8 @@ export class ChatSocket {
     constructor() {
         this.socket = io(`ws://${env.apiHost}:${env.apiPort}/chat`,
         {
-            withCredentials: true
+            withCredentials: true,
+            closeOnBeforeunload: false
         });
     }
 
