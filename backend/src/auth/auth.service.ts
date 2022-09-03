@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, NotAcceptableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
@@ -38,7 +38,7 @@ export class AuthService {
             }
         });
 
-        let referer = req.header("Referer") || `http://${HOST}:3000`;
+        let referer = req.header("Referer") || `http://${HOST}:3000/`;
         if (user.isTfaEnabled)
             referer += "checkpoint";
 
@@ -53,12 +53,35 @@ export class AuthService {
         const payload = { sub: id, is2fauthenticated };
 
         const secret = this._configS.get('JWT_ACCESS_SECRET');
-        const exp_time = this._configS.get('JWT_ACCESS_EXP');
+        const jwt_exp = this._configS.get<string>('JWT_ACCESS_EXP');
+        if (!(/^\d+[smhd]?$/.test(jwt_exp)))
+            throw new NotAcceptableException("invalid format for JWT_ACCESS_EXP");
+        let exp_time = this._to_seconds(jwt_exp);
+
         const options = { secret, expiresIn: exp_time };
 
         const access_token = this._jwtS.sign(payload, options);
 
         return `access_token=${access_token}; Path=/; Max-Age=${exp_time}; HttpOnly; SameSite=Lax`;
+    }
+
+    private _to_seconds(t: string)
+    {
+        const suffix = t.substring(t.length-1);
+        if (suffix.match(/^[0-9]+$/))
+            return Number(t) / 1e3;
+        let tn = Number(t.substring(0, t.length-1));
+        if (suffix === "s")
+            return tn;
+        tn *= 60;
+        if (suffix === "m")
+            return tn;
+        tn *= 60;
+        if (suffix === "h")
+            return tn;
+        tn *= 24;
+        if (suffix === "d")
+            return tn;
     }
 
     async getUserFromToken(token: string)

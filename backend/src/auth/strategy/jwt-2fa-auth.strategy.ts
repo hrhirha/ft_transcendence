@@ -15,7 +15,7 @@ export class Jwt2FAAuthStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
                 return req?.cookies?.access_token;
             }]),
             secretOrKey: config.get('JWT_ACCESS_SECRET'),
-            expiresIn: config.get('JWT_ACCESS_EXP'),
+            // expiresIn: config.get('JWT_ACCESS_EXP'),
         });
     }
 

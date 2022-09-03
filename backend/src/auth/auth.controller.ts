@@ -1,7 +1,8 @@
-import { Controller, ForbiddenException, Get, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Controller, ForbiddenException, Get, HttpStatus, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { GetUserProfile } from 'src/user/decorator';
 import { UserDto } from 'src/user/dto';
+import { HOST } from 'src/utils';
 import { AuthService } from './auth.service';
 import { OAUth42Guard } from './guard';
 import { Jwt2FAAuthGuard } from './guard/jwt-2fa-auth.guard';
@@ -26,7 +27,8 @@ export class AuthController {
         catch (e)
         {
             console.log({code: e.code, message: e.message});
-            throw new UnauthorizedException('login failed');
+            req.res.setHeader('Location', `http://${HOST}:3000/`).status(HttpStatus.PERMANENT_REDIRECT);
+            // throw new UnauthorizedException('login failed');
         }
     }
 
