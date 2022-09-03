@@ -333,9 +333,9 @@ export class ChatService {
         if (r.type === room_type.PROTECTED)
         {
             if (!room.password)
-                throw new WsException({type: "NOPASS", error: 'protected room requires a password'});
+                throw new WsException({code: "NOPASS", error: 'protected room requires a password'});
             if (!(await argon2.verify(r.password, room.password)))
-                throw new WsException({type: "INVALIDPASS", message: 'invalid password'});
+                throw new WsException({code: "INVALIDPASS", message: 'invalid password'});
         }
 
         const up_r = await this._prismaS.room.update({
