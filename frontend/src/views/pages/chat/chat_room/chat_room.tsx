@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClose, faComments, faCommentSlash, faGamepad, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
+import { faClose, faComments, faCommentSlash, faGamepad, faKey, faPaperPlane} from "@fortawesome/free-solid-svg-icons";
 import { Chat_msg } from "views/pages/chat/chat_msg/chat_msg";
 import { BannedFromChat, BgVectors, GroupIcon, NoConversations } from "assets";
 import React, { useContext, useEffect, useRef, useState } from "react";
@@ -25,10 +25,20 @@ interface HeaderProps {
 const JoinChat:React.FC<{room :room_msgs}> = ({room}) => {
     const [isProtected, setIsProtected] = useState<boolean>();
     const [channelPassword, setPassword] = useState<string>("");
+    const pushNotif = useNotif();
     const class_socket = useContext(SocketContext);
 
     useEffect(() => {
         setIsProtected(room.type === "PROTECTED");
+        class_socket.socket.on("invalid_password", () => {
+            pushNotif({
+                id: "invalid_password",
+                type: "error",
+                icon: <FontAwesomeIcon icon={faKey}/> ,
+                title: "error",
+                description: "Invalid password",
+            });
+        });
     }, [room]);
 
     const joinNow = () => {

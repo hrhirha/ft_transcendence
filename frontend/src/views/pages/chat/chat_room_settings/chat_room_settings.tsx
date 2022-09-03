@@ -42,12 +42,18 @@ const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>,
                 title: "success",
                 description: "Password updated successfully",
             });
-        })
-
-        class_socket.socket.on("room_edited", (data : any)=>{
+        }).on("room_edited", (data : any)=>{
             console.log(data)
             callback(data);
-        }) 
+        }).on("invalid_password", () => {
+            pushNotif({
+                id: "invalid_password",
+                type: "error",
+                icon: <FontAwesomeIcon icon={faKey}/> ,
+                title: "error",
+                description: "Invalid password",
+            });
+        });
 
     }, []);
 
