@@ -1,16 +1,18 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
-import { faCameraRotate, faCheck, faClose, faPen, faPercent, faTableTennisPaddleBall, faTrophy } from "@fortawesome/free-solid-svg-icons";
+import { faCameraRotate, faCheck, faClose, faGamepad, faPen, faPercent, faTableTennisPaddleBall, faTrophy } from "@fortawesome/free-solid-svg-icons";
 import { buttons, userType } from "views/pages/profile/profile";
 import { Numeral } from "views/components/numeral/numeral";
 import { patch_avatar_upload, patch_edit_fullname } from "controller/user/edit";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { get_me, get_user_by_username, userDefault, User } from "controller/user/user";
 import { useNotif } from "views/components/notif/notif";
 import { TwoFAButton, TwoFACard } from "views/components/twofa_card/twofa";
 import { disableTFA, enableTFA } from "controller/auth/auth";
 import { useNavigate, useParams } from "react-router-dom";
+import { SocketContext } from "index";
+import { dm_started } from "controller/chat_socket/interface";
 
 
 const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, stat: number}) => {
@@ -30,6 +32,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
     const [userImage, setUserImage] = useState<any>();
     const [enable2fa, setEnable2fa] = useState<boolean>(false);
     const [detectUpdates, setUpdates] = useState<{avatar: boolean, name: boolean}>({avatar: false, name: false});
+    const class_socket = useContext(SocketContext);
     const pushNotif = useNotif();
     const username = useParams();
     const navigate = useNavigate();
@@ -152,6 +155,54 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
         }
     };
 
+    const sentPlayInvite = (user: User, ultimate: boolean) => {
+       try {
+            class_socket.challenge({
+                id: user.id,
+                type: ultimate ? "ultimateQue" : "normaleQue",
+                invite: true
+            });
+            pushNotif({
+                id: `INVITATIONSENTTO${user.id}`,
+                type: "info",
+                time: 10000,
+                icon: <FontAwesomeIcon icon={faGamepad}/>,
+                title: "Game Invitation",
+                description: `You have invited <b>${user.fullName}</b> to play ${ultimate ? "an <b>ULTIMATE" : "a <b>NORMAL"} GAME</b>, please wait for his answer!`
+            });
+        } catch(e: any) {
+            pushNotif({
+                id: "GAMEINVITATIOERROR",
+                type: "info",
+                time: 8000,
+                icon: <FontAwesomeIcon icon={faGamepad}/>,
+                title: "Game Invitation",
+                description: e.message
+            });
+        }
+    }
+
+    const inviteToPlay = (user: User) => {
+        pushNotif({
+            id: `GAMEINVITATION`,
+            type: "info",
+            time: 7000,
+            icon: <FontAwesomeIcon icon={faGamepad}/>,
+            title: "Game Invitation",
+            description: `Which game you want to play with <b>${user.fullName}</b> ?`,
+            actions: [
+                {title: "Normal Game", color: "#6970d4", action: async () => sentPlayInvite(user, false)},
+                {title: "Ultimate Game", color: "#6970d4", action: async () => sentPlayInvite(user, true)}
+            ] 
+        });        
+    }
+
+    useEffect(() => {
+        class_socket.socket.on("dm_started", (data : dm_started)=>{
+            navigate("/chat?id=" + data.room.id);
+        });
+    }, []);
+
     useEffect(() => {
         getUserData();
     }, [userProfile, username]);
@@ -194,7 +245,10 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                         return (
                             <button key={`${button.text.replace(' ', '')}`} className={`btn${button.text.replace(' ', '')}`} onClick={async () => {
                                 try {
-                                    await button.onClick(userInfos?.id);
+                                    await button.onClick(userInfos?.id, 
+                                        (button.type === 5
+                                            && ((button.text === "Message" ?  (userId) => class_socket.start_dm(userId): null)
+                                            || (button.text === "Invite" ? (uid) => inviteToPlay(userInfos) : null))));
                                     await getUserData();
                                 }
                                 catch(e: any) {

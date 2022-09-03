@@ -94,7 +94,7 @@ export const InvitePlayerForm:React.FC<{callback: Function}> = ({callback}) => {
                         pushNotif({
                             id: `GAMEINVITATION`,
                             type: "info",
-                            time: 15000,
+                            time: 7000,
                             icon: <FontAwesomeIcon icon={faGamepad}/>,
                             title: "Game Invitation",
                             description: `Which game you want to play with <b>${user.fullName}</b> ?`,

@@ -68,25 +68,13 @@ export const buttons = [
         type: userType.friendProfile,
         icon: faComment,
         text: 'Message',
-        onClick: async (userId: string, action?: Function) => {
-            // const class_socket = useContext(SocketContext);
-            // class_socket.start_dm(userId);
-            // class_socket.socket.on("dm_started", (data : dm_started)=>{
-            //     history.replace("/chat?id" + data.room.id);
-            // });
-            action && action(userId);
-        }
+        onClick: async (userId: string, action?: Function) => action && action(userId)
     },
     {
         type: userType.friendProfile,
         icon: faGamepad,
         text: 'Invite',
-        onClick: async (userId: string, action?: Function) => {
-            window.localStorage.setItem("privateGame", JSON.stringify({"userId": userId}));
-            //send invite to play
-            history.replace("/play");
-            action && action(userId);
-        }
+        onClick: async (userId: string, action?: Function) => action && action(userId)
     },
     {
         type: userType.blocked,

@@ -6,9 +6,10 @@ import { Chat_msg } from "views/pages/chat/chat_msg/chat_msg";
 import { BannedFromChat, BgVectors, GroupIcon, NoConversations } from "assets";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { ChatRoomSettings } from "views/pages/chat/chat_room_settings/chat_room_settings";
-import { messages, msgs, receive_message, room_msgs } from "controller/chat_socket/interface";
+import { messages, msgs, receive_message, room_msgs, user_info } from "controller/chat_socket/interface";
 import { getIDQuery, history, SocketContext } from "index";
 import { validPassword } from "../create_chat/create_chat";
+import { useNotif } from "views/components/notif/notif";
 
 
 interface HeaderProps {
@@ -16,6 +17,7 @@ interface HeaderProps {
     fullName: string,
     image: string,
     status: string,
+    user?: user_info,
     showSettings: Function,
     onClose: Function,
 }
@@ -47,6 +49,51 @@ const JoinChat:React.FC<{room :room_msgs}> = ({room}) => {
 
 const ChatRoomHeader = (Props : HeaderProps) => {
     const navigate = useNavigate();
+    const class_socket = useContext(SocketContext);
+    const pushNotif = useNotif();
+
+    const sentInvite = (user: user_info, ultimate: boolean) => {
+        try {
+            class_socket.challenge({
+                id: user.id,
+                type: ultimate ? "ultimateQue" : "normaleQue",
+                invite: true
+            });
+            pushNotif({
+                id: `INVITATIONSENTTO${user.id}`,
+                type: "info",
+                time: 10000,
+                icon: <FontAwesomeIcon icon={faGamepad}/>,
+                title: "Game Invitation",
+                description: `You have invited <b>${user.fullName}</b> to play ${ultimate ? "an <b>ULTIMATE" : "a <b>NORMAL"} GAME</b>, please wait for his answer!`
+            });
+        } catch(e: any) {
+            pushNotif({
+                id: "GAMEINVITATIOERROR",
+                type: "info",
+                time: 8000,
+                icon: <FontAwesomeIcon icon={faGamepad}/>,
+                title: "Game Invitation",
+                description: e.message
+            });
+        }
+    }
+
+    const inviteToPlay = (user: user_info) => {
+        pushNotif({
+            id: `GAMEINVITATION`,
+            type: "info",
+            time: 7000,
+            icon: <FontAwesomeIcon icon={faGamepad}/>,
+            title: "Game Invitation",
+            description: `Which game you want to play with <b>${user.fullName}</b> ?`,
+            actions: [
+                {title: "Normal Game", color: "#6970d4", action: async () => sentInvite(user, false)},
+                {title: "Ultimate Game", color: "#6970d4", action: async () => sentInvite(user, true)}
+            ] 
+        });        
+    }
+
     return (
     <div id="chatRoomHeader">
         <div className="userInfos" onClick={() => {
@@ -62,7 +109,7 @@ const ChatRoomHeader = (Props : HeaderProps) => {
             </div>
         </div>
         <div className="roomOptions">
-            {Props.status !== "Channel" && <button id="inviteToPlay" onClick={() => alert("invite to play")} title="invite to play">
+            {Props.status !== "Channel" && <button id="inviteToPlay" onClick={() => inviteToPlay(Props.user)} title="invite to play">
                 <FontAwesomeIcon icon={faGamepad}/>
             </button>}
             <button id="closeChatRoom" onClick={() => Props.onClose()} title="close">
@@ -192,6 +239,7 @@ export const ChatRoom:React.FC = () => {
                 fullName={roominfo && ((roominfo.is_channel) ? roominfo.name :roominfo.user.fullName)}
                 image= {roominfo && ((roominfo.is_channel) ? null :roominfo.user.imageUrl)}
                 status= {roominfo && ((roominfo.is_channel) ? "Channel" :roominfo.user.status)}
+                user={roominfo && ((roominfo.is_channel) ? null :roominfo.user)}
                 onClose={() => navigate("/chat", {replace : true})}
                 showSettings={() => setShowSettings(true)}
             />
