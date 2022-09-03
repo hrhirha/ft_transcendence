@@ -160,7 +160,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         catch (e)
         {
             console.log({code: e.code, message: e.message});
-            if (e.code === "INVALIDPASS")
+            if (e.error.code === "INVALIDPASS")
             {
                 client.emit('invalid_password');
                 return ;
@@ -183,7 +183,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         catch (e)
         {
             console.log({code: e.code, message: e.message});
-            if (e.code === "INVALIDPASS")
+            if (e.error.code === "INVALIDPASS")
             {
                 client.emit('invalid_password');
                 return ;
@@ -240,7 +240,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         catch (e)
         {
             console.log({code: e.code, message: e.message});
-            if (e.code === "INVALIDPASS")
+            if (e.error.code === "INVALIDPASS")
             {
                 client.emit('invalid_password');
                 return ;
