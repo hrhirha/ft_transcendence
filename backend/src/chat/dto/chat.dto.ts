@@ -1,4 +1,4 @@
-import { ArrayMinSize, IsArray, IsBoolean, IsDefined, isNotEmpty, IsNotEmpty, IsOptional, IsString, Matches } from "class-validator";
+import { ArrayMinSize, IsArray, IsBoolean, IsDefined, isNotEmpty, IsNotEmpty, IsOptional, IsString, Matches, MinLength } from "class-validator";
 
 export class NewRoomDto
 {
@@ -20,10 +20,11 @@ export class NewRoomDto
 
     @IsString()
     @IsOptional()
-    @Matches(/\w{5,}/, { message: "password should be at least 8 characters long" })
+    @Matches(/[a-z]+/, { message: "password should contain at least one lowercase" })
     @Matches(/[A-Z]+/, { message: "password should contain at least one UPPERCASE" })
     @Matches(/\d+/, { message: "password should contain at least one number" })
-    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/, { message: "password should contain at least one special character !@#$&*?-=+" })
+    @Matches(/[\_\!\@\#\$\&\*\?\-\=\+\.]+/, { message: "password should contain at least one special character !@#$&*?-=+." })
+    @MinLength(8)
     password?: string;
 
     @IsDefined()
@@ -44,10 +45,11 @@ export class OldRoomDto
 
     @IsString()
     @IsOptional()
-    @Matches(/\w{5,}/, { message: "password should be at least 8 characters long" })
+    @Matches(/[a-z]+/, { message: "password should contain at least one lowercase" })
     @Matches(/[A-Z]+/, { message: "password should contain at least one UPPERCASE" })
     @Matches(/\d+/, { message: "password should contain at least one number" })
-    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/, { message: "password should contain at least one special character !@#$&*?-=+" })
+    @Matches(/[\_\!\@\#\$\&\*\?\-\=\+\.]+/, { message: "password should contain at least one special character !@#$&*?-=+." })
+    @MinLength(8)
     password?: string;
 }
 
@@ -81,10 +83,11 @@ export class SetPasswordDto
 
     @IsString()
     @IsOptional()
-    @Matches(/\w{5,}/, { message: "password should be at least 8 characters long" })
+    @Matches(/[a-z]+/, { message: "password should contain at least one lowercase" })
     @Matches(/[A-Z]+/, { message: "password should contain at least one UPPERCASE" })
     @Matches(/\d+/, { message: "password should contain at least one number" })
-    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/, { message: "password should contain at least one special character !@#$&*?-=+" })
+    @Matches(/[\_\!\@\#\$\&\*\?\-\=\+\.]+/, { message: "password should contain at least one special character !@#$&*?-=+." })
+    @MinLength(8)
     new_password: string;
 }
 
@@ -97,18 +100,20 @@ export class ChangePasswordDto
 
     @IsString()
     @IsOptional()
-    @Matches(/\w{5,}/, { message: "password should be at least 8 characters long" })
+    @Matches(/[a-z]+/, { message: "password should contain at least one lowercase" })
     @Matches(/[A-Z]+/, { message: "password should contain at least one UPPERCASE" })
     @Matches(/\d+/, { message: "password should contain at least one number" })
-    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/, { message: "password should contain at least one special character !@#$&*?-=+" })
+    @Matches(/[\_\!\@\#\$\&\*\?\-\=\+\.]+/, { message: "password should contain at least one special character !@#$&*?-=+." })
+    @MinLength(8)
     new_password: string;
 
     @IsString()
     @IsOptional()
-    @Matches(/\w{5,}/, { message: "password should be at least 8 characters long" })
+    @Matches(/[a-z]+/, { message: "password should contain at least one lowercase" })
     @Matches(/[A-Z]+/, { message: "password should contain at least one UPPERCASE" })
     @Matches(/\d+/, { message: "password should contain at least one number" })
-    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/, { message: "password should contain at least one special character !@#$&*?-=+" })
+    @Matches(/[\_\!\@\#\$\&\*\?\-\=\+\.]+/, { message: "password should contain at least one special character !@#$&*?-=+." })
+    @MinLength(8)
     old_password: string;
 }
 
@@ -121,10 +126,11 @@ export class RemovePasswordDto
 
     @IsString()
     @IsOptional()
-    @Matches(/\w{5,}/, { message: "password should be at least 8 characters long" })
+    @Matches(/[a-z]+/, { message: "password should contain at least one lowercase" })
     @Matches(/[A-Z]+/, { message: "password should contain at least one UPPERCASE" })
     @Matches(/\d+/, { message: "password should contain at least one number" })
-    @Matches(/[\!\@\#\$\&\*\?\-\=\+]+/, { message: "password should contain at least one special character !@#$&*?-=+" })
+    @Matches(/[\_\!\@\#\$\&\*\?\-\=\+\.]+/, { message: "password should contain at least one special character !@#$&*?-=+." })
+    @MinLength(8)
     old_password: string;
 }
 

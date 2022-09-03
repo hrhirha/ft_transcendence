@@ -160,6 +160,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         catch (e)
         {
             console.log({code: e.code, message: e.message});
+            if (e.code === "INVALIDPASS")
+            {
+                client.emit('invalid_password');
+                return ;
+            }
             throw new WsException('failed to change password');
         }
     }
@@ -178,6 +183,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         catch (e)
         {
             console.log({code: e.code, message: e.message});
+            if (e.code === "INVALIDPASS")
+            {
+                client.emit('invalid_password');
+                return ;
+            }
             throw new WsException('failed to remove password');
         }
     }
@@ -230,6 +240,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         catch (e)
         {
             console.log({code: e.code, message: e.message});
+            if (e.code === "INVALIDPASS")
+            {
+                client.emit('invalid_password');
+                return ;
+            }
             throw new WsException('failed to join room');
         }
     }
