@@ -276,6 +276,17 @@ export default class PingPong extends Phaser.Scene
                 }
                 if (!this.End && this.data.is_player)
                 {
+                    console.log(this.rightScore, this.leftScore);
+                    this.soc.emit('endGame', {
+                        player: this.data.player,
+                        rscore: (this.data.player === "player2") ? this.bestOf : this.rightScore,
+                        lscore: (this.data.player === "player1") ? this.bestOf : this.leftScore, 
+                        userId: this.data.userId,
+                        roomId: this.data.roomId,
+                        status: "",
+                        forSave: false,
+                    });
+
                     if (this.ball)
                         this.ball.destroy();
                     if (this.paddle)
@@ -337,6 +348,13 @@ export default class PingPong extends Phaser.Scene
                 }
                 this.soc.disconnect();
                 this.scene.stop();
+            });
+            this.soc.on("updateScore", (score) => {
+              if (this.isPlayer && this.data.player === "player2")
+              {
+                this.leftScore = score.score1;
+                this.rightScore = score.score2;
+              }
             });
 
             this.soc.on("watcherEndMatch", () => {
@@ -412,15 +430,6 @@ export default class PingPong extends Phaser.Scene
     {
         if (this.replayClick)
             return ;
-        this.soc.emit('endGame', {
-            player: this.data.player,
-            rscore: (this.data.player === "player2") ? this.bestOf : this.rightScore,
-            lscore: (this.data.player === "player1") ? this.bestOf : this.leftScore, 
-            userId: this.data.userId,
-            roomId: this.data.roomId,
-            status: "",
-            forSave: false,
-        });
         this.replayClick = true;
         this.gameIsStarted = false;
         this.End = false;

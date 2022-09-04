@@ -11,6 +11,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { ChatService } from 'src/chat/chat.service';
 import { ArgumentMetadata, HttpException, UsePipes, ValidationPipe } from '@nestjs/common';
 import { user_status } from 'src/utils';
+import { Console } from 'console';
 export class WsValidationPipe extends ValidationPipe
 {
     async transform(value: any, metadata: ArgumentMetadata) {
@@ -69,6 +70,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         {
             if (!this.tab[client.data.obj.roomId].endGame)
             {
+                console.log("endGame = ", client.data.obj);
                 try
                 {
                     let factor = (client.data.bestOf == 5) ? { facWin: 5, losFac: 2 } : { facWin: 15, losFac: 5};
@@ -80,11 +82,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         
                         const u = (await this.prisma.userGame.update({
                             data: {
-                                score: (client.data.obj.player == "player1") ? client.data.obj.rScore : client.data.obj.lScore,
+                                score: (client.data.obj.player === "player1") ? client.data.obj.lScore : client.data.obj.rScore,
                                 user: {         
-                                    update: {  
+                                    update: {
                                         score: {
-                                            increment: (client.data.obj.player  == "player1") ? client.data.obj.rScore * winner :  client.data.obj.lScore * winner,
+                                            increment: (client.data.obj.player  == "player1") ? client.data.obj.lScore * winner :  client.data.obj.rScore * winner,
                                         },
                                         wins: {
                                             increment: ((client.data.obj.player == "player1" && client.data.obj.lScore == client.data.bestOf) ||
@@ -180,8 +182,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
             if (this.tab[d.roomId].user1.restart && this.tab[d.roomId].user2.restart)
             {
                 
-                console.log("this.tab[d.roomId].user1.userId = " , this.tab[d.roomId].user1.userId);
-                console.log("this.tab[d.roomId].user2.userId = " , this.tab[d.roomId].user2.userId);
                 let newid = await this.prisma.game.create({
                     data: {
                         map: this.tab[d.roomId].mapUrl,
@@ -231,11 +231,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
                     const ranks = await this.prisma.rank.findMany({ select: { id: true, require: true, } });
                     const u = (await this.prisma.userGame.update({ 
                         data: {
-                            score: (d.player == "player1") ? d.rscore :  d.lscore,
+                            score: (d.player == "player1") ? d.lscore :  d.rscore,
                             user: {
                                 update: {  
                                     score: {
-                                        increment: (d.player == "player1") ? d.rscore * winner :  d.lscore * winner,
+                                        increment: (d.player == "player1") ? d.lscore * winner :  d.rscore * winner,
                                     },
                                     wins: {
                                         increment: ((d.player == "player1" && d.lscore == client.data.bestOf) ||
@@ -360,7 +360,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         {
             if (this.normaleQue && this.normaleQue.user.id == user.id)
             {
-                console.log("herre");
                 this.normaleQue.soc.disconnect();
             }
             this.normaleQue = {
@@ -700,6 +699,11 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         }
         if (!client.data.obj)
             return ;
+        if (client.data.obj && client.data.obj.player == "player2")
+        {
+            client.data.obj.lScore = data.lScore;
+            client.data.obj.rScore = data.rScore;
+        }
         client.broadcast.to(data.roomId).emit('recv', data);
     }
 }
