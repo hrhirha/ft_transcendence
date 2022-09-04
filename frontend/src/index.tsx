@@ -73,6 +73,8 @@ const PongApp:React.FC = () => {
     useEffect(() => {
       authCheck(history.location.pathname);
       history.listen(async ({ action, location }) => {
+        if (location.pathname !== "/watcher" && location.pathname !== "/play" && location.pathname !== "/play/ultimate")
+          game_socket.disconnect();
         await authCheck(location.pathname);
       });
       class_socket.socket.on("receive_message", (message : receive_message)=>{

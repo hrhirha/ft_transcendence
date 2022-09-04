@@ -21,7 +21,12 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
     });
 
     useEffect(() => {
-        game_socket.connect();
+        if (game_socket.disconnected)
+        {
+            game_socket.removeAllListeners();
+            game_socket.connect();
+            console.log("reconnect");
+        }
         const unblock = history.block((tx) => {
             pushNotif({
                 id: "LEAVEGAME",
@@ -75,7 +80,7 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
         <main id="gamePage" className="container">
             <div className="row">
                 <div className="col-12 col-md-9">
-                    {matchData && <MatchCard match={matchData} winnerId={winner}/>}
+                    {matchData && <MatchCard match={matchData} winnerId={winner} showViewrs={true}/>}
                     <GameView
                         gameSocket={game_socket}
                         isUltimate={ultimateGame}

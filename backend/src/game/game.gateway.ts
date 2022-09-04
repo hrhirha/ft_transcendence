@@ -59,7 +59,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         if (!user)  
             return user;
         
-        if (client.data.obj == undefined)
+        if (!client.data.obj)
         {
             this.ultimateQue = (this.ultimateQue && client.data?.usrId === this.ultimateQue.user.id) ? null : this.ultimateQue;
             this.normaleQue = (this.normaleQue && client.data?.usrId === this.normaleQue.user.id) ? null : this.normaleQue;
@@ -553,7 +553,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         if (!user)
             return user;
         this.tab[roomId].vues += 1;
-        
         client.data.obj = {
             roomId,
             isPlayer: false,

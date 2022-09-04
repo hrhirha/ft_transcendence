@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 import Phaser from "phaser";
 import PingPong from "controller/game/pingpong";
+import { game_socket } from "index";
 
 const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,

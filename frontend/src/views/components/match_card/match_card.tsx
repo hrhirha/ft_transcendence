@@ -32,8 +32,8 @@ const PlayerData:React.FC<{player: User, left: boolean, winner: boolean}> = ({pl
     );
 }
 
-export const MatchCard:React.FC<{match: Match, winnerId?: string}> = ({match, winnerId}) => {
-    const [viewers, setViewers] = useState<number>(null);
+export const MatchCard:React.FC<{match: Match, winnerId?: string, showViewrs?: boolean}> = ({match, winnerId, showViewrs = false}) => {
+    const [viewers, setViewers] = useState<number>(0);
 
     useEffect(() => {
         game_socket.on("vues", (vues: number) => {
@@ -48,9 +48,9 @@ export const MatchCard:React.FC<{match: Match, winnerId?: string}> = ({match, wi
         <div className="scoreBoard">
             <span className="score">{match.score.p1}</span>
             
-            {viewers != null && <span className="viewers">
+            {showViewrs && <span className="viewers">
                 <FontAwesomeIcon icon={faEye}/>
-                {viewers && <Numeral value={viewers}/>}
+                <Numeral value={viewers}/>
             </span>}
             <img className="gameType" src={match.is_ultimate ? UltimateGame : DefaultGame} alt="Game Type"/>
             <span className="score">{match.score.p2}</span>

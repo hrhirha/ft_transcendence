@@ -42,8 +42,8 @@ export const Chat_msg = (Props : Props) => {
   return (
     <div ref={Props.chatRef} className={notifMsg ? "msgNotif" : (Props.display_image ? "mtop " : " ")+( myMessage ? "sent" : "receive")}>
         {!notifMsg && Props.display_image && <CircleAvatar avatarURL={Props.image} dimensions={30} status = {null}/>}
-        <span className={!Props.display_image ? "first_msg" : "msg"}>{Props.msg === "deleted" ? <span className='deleted'><FontAwesomeIcon icon={faBan}/> this message has been deleted</span> : Props.msg}</span>
-        {!notifMsg && myMessage && Props.msg !== "deleted"
+        <span className={!Props.display_image ? "first_msg" : "msg"}>{Props.type === "MSG_DELETED" ? <span className='deleted'><FontAwesomeIcon icon={faBan}/> {Props.msg}</span> : Props.msg}</span>
+        {!notifMsg && myMessage && Props.type !== "MSG_DELETED"
           && <i title='Delete' onClick={() => removeMessage()}>
               <FontAwesomeIcon icon={faTrashCan} />
             </i>}

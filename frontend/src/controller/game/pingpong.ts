@@ -73,11 +73,6 @@ export default class PingPong extends Phaser.Scene
         userId: string
     })
     {
-        if (msoc.disconnected)
-        {
-            msoc.connect();
-            msoc.removeAllListeners();
-        }
         super("");
         this.roomId = roomId;
         this.isPlayer = isPlayer;
@@ -179,7 +174,7 @@ export default class PingPong extends Phaser.Scene
                 if (this.End)
                     return ;
                 this.focus = focus;
-                if (this.isPlayer && !focus)
+                if (this.isPlayer)
                 {
                     this.input.keyboard.enabled = focus;
                     if (!this.goal && this.gameIsStarted)
@@ -621,13 +616,6 @@ export default class PingPong extends Phaser.Scene
                 this.focusTxt = undefined;
                 this.counterTimer = undefined;
                 this.timedEventFocus = undefined;
-                
-                if (this.isPlayer)
-                {
-                    this.input.keyboard.enabled = true;
-                    if (!this.goal && this.gameIsStarted)
-                        this.ball.body.enable = true;
-                }
                 this.focusTimer = 0;
                 this.focusMode = false;
                 return ;
