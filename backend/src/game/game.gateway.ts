@@ -508,7 +508,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
         client.data.obj.roomId = d.newRoom;
         client.leave(d.oldData.roomId);
         client.join(d.newRoom);
-        client.emit("keepWatching"); // keep watching emit to the front end to remove the Winner panel -- aimad
+        client.emit("keepWatching", d.newRoom); // keep watching emit to the front end to remove the Winner panel -- aimad
         client.emit("restartGame");
     }
 

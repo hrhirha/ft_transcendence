@@ -12,7 +12,6 @@ export const GameWatcher:React.FC = () =>  {
     const [ongoingMatchs, setMatchs] = useState<Array<Match>>([]);
     const [winner, setWinner] = useState<string>("");
     const [currentMatch, setCurrentMatch] = useState<number>(0);
-    const [viewers, setViewers] = useState<number>(0);
 
     const updateMatche  = async () => {
         try {
@@ -35,8 +34,6 @@ export const GameWatcher:React.FC = () =>  {
     useEffect(() => {
         game_socket.on("matchWinner", (win) => {
             setWinner(win);
-        }).on("vues", (vues) => {
-            setViewers(vues);
         }).on("updateScore", (score) => {
             setMatchs(oldMatches => oldMatches.map((m, i) => {
                 if (i === currentMatch)
@@ -50,7 +47,7 @@ export const GameWatcher:React.FC = () =>  {
             else
                 updateMatche();
         })
-        .on("keepWatching", () => {
+        .on("keepWatching", (roomId: string) => {
             setWinner("");
         }).on("joinStream", ({p1, p2, score1, score2}) => {
             setMatchs(oldMatches => oldMatches.map((m, i) => {
@@ -61,6 +58,13 @@ export const GameWatcher:React.FC = () =>  {
         });
     }, [game_socket]);
 
+    // const nextMatch = () => {
+    //     if (ongoingMatchs.length > 1)
+    //         setCurrentMatch(curr => curr + 1);
+    //     else
+    //         updateMatche();
+    // };
+
     return (
         <section id="gameWatcher" className="container">
             <div className="row">
@@ -68,7 +72,7 @@ export const GameWatcher:React.FC = () =>  {
                     {ongoingMatchs.length === 0 && <img className="noLiveGames" src={WatchEmptyState}/>}
                     {ongoingMatchs.length > 0 && <div className="navGames">
                         {ongoingMatchs.length - 1 > currentMatch && <FontAwesomeIcon icon={faChevronCircleRight} className="navButton next" title="Next game" onClick={() => setCurrentMatch((m) => m + 1)}/>}
-                        <MatchCard match={ongoingMatchs[currentMatch]} winnerId={winner} viewers={viewers}/>
+                        <MatchCard match={ongoingMatchs[currentMatch]} winnerId={winner}/>
                         {currentMatch > 0 && <FontAwesomeIcon icon={faChevronCircleLeft} className="navButton" title="Previous game"  onClick={() => setCurrentMatch((m) => m - 1)}/>}
                     </div>}
                     {ongoingMatchs.length > 0 && <GameView gameSocket={game_socket} watcher={true} roomId={ongoingMatchs[currentMatch]?.id}/>}

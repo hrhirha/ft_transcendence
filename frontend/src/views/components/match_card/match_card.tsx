@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { DefaultGame, UltimateGame, WinnerCrown } from "assets";
 import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,7 @@ import { User } from "controller/user/user";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import { Numeral } from "../numeral/numeral";
+import { game_socket } from "index";
 
 const PlayerData:React.FC<{player: User, left: boolean, winner: boolean}> = ({player, left, winner}) => {
     const navigate = useNavigate();
@@ -31,7 +32,15 @@ const PlayerData:React.FC<{player: User, left: boolean, winner: boolean}> = ({pl
     );
 }
 
-export const MatchCard:React.FC<{match: Match, winnerId?: string, viewers?: number}> = ({match, winnerId, viewers = null}) => {
+export const MatchCard:React.FC<{match: Match, winnerId?: string}> = ({match, winnerId}) => {
+    const [viewers, setViewers] = useState<number>(null);
+
+    useEffect(() => {
+        game_socket.on("vues", (vues: number) => {
+            setViewers(vues);
+        })
+    }, []);
+
     return (
     <section className="matchCard" id={match.id}>
 

@@ -10,7 +10,6 @@ import { GameView } from "views/pages/game/game_view/game_view";
 export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) =>  {
     const pushNotif = useNotif();
     const [winner, setWinner] = useState<string>("");
-    const [viewers, setViewers] = useState<number>(0);
     const [matchData, setMatchData] = useState<Match>({
         is_ultimate: ultimateGame,
         p1: null,
@@ -51,8 +50,6 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
         })
         .on("keepWatching", () => {
             setWinner("");
-        }).on("vues", (vues) => {
-            setViewers(vues);
         }).on("leaveTheGame", () => {
             setWinner("");
         })
@@ -78,7 +75,7 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
         <main id="gamePage" className="container">
             <div className="row">
                 <div className="col-12 col-md-9">
-                    {matchData && <MatchCard match={matchData} winnerId={winner} viewers={viewers}/>}
+                    {matchData && <MatchCard match={matchData} winnerId={winner}/>}
                     <GameView
                         gameSocket={game_socket}
                         isUltimate={ultimateGame}

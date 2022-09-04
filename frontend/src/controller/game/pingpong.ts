@@ -349,13 +349,6 @@ export default class PingPong extends Phaser.Scene
                 this.soc.disconnect();
                 this.scene.stop();
             });
-            this.soc.on("updateScore", (score) => {
-              if (this.isPlayer && this.data.player === "player2")
-              {
-                this.leftScore = score.score1;
-                this.rightScore = score.score2;
-              }
-            });
 
             this.soc.on("watcherEndMatch", () => {
                 this.endMatchSprite = this.add.sprite(this.w / 2 , this.h / 2, 'endMatch').setOrigin(0.5, 0.5).setScale(0.3);
