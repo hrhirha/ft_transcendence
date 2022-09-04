@@ -308,7 +308,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const sockets = await this.server.fetchSockets();
 
             sockets.forEach((s) => {
-                s.data.username === ur.ur.user.username && s.join(member.rid);
+                s.data.username === ur.ur.user.username && s.leave(member.rid);
             });
             client.emit('user_removed', {uid: ur.ur.user.id, rid: ur.ur.room.id});
             this.server.to(member.rid).emit('receive_message', ur.msg);
