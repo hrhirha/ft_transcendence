@@ -163,15 +163,15 @@ const ChatRoomFooter:React.FC<{blocked: boolean, muted: boolean, send_message : 
     const [msg, setMsg] = useState<string>("");
 
     return <div id="chatRoomFooter">
-       {!muted && !blocked && <form id="messageForm">
-            <input type="text" placeholder="Type your Message Here" value={msg} onChange={(e)=>setMsg(e.target.value.trim() !== "" ? e.target.value : "")}/>
-            <button id="sendMessage" onClick={(e) =>{
+       {!muted && !blocked && <form id="messageForm" onSubmit={(e) =>{
                 e.preventDefault();
                 if (msg.trim() !== "") {
                     send_message(msg.trim());
                 }
                 setMsg("");
             }}>
+            <input type="text" placeholder="Type your Message Here" value={msg} onChange={(e) => setMsg(e.target.value.trim() !== "" ? e.target.value : "")}/>
+            <button type="submit" id="sendMessage">
                 <FontAwesomeIcon icon={faPaperPlane}/>
             </button>
         </form>}

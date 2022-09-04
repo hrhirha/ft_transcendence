@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Login } from 'views/pages/login/login';
 import { Routes, Route, unstable_HistoryRouter as Router } from 'react-router-dom'
@@ -24,6 +24,7 @@ import axios from "axios";
 import _ from 'lodash';
 import "views/style/index.scss";
 import { io } from 'socket.io-client';
+import { SetupAccount } from 'views/pages/setup_account/setup_account';
 
 export const env = _.mapKeys(_.pickBy(process.env, (value, key) => {
   return _.startsWith(key, 'REACT_APP_');
@@ -60,10 +61,11 @@ const PongApp:React.FC = () => {
           window.localStorage.setItem("user", JSON.stringify(me));
           if (history.location.pathname === "/login"
             || history.location.pathname === "/checkpoint")
+            // || history.location.pathname === "/setup")
             history.replace("/");
       }
       catch(err: any) {
-          if (path !== "/login" && path !== "/checkpoint")
+          if (path !== "/login" && path !== "/checkpoint" && path !== "/setup")
             history.replace("/login");
           setHideNavBar(true);
       }
@@ -150,6 +152,7 @@ const PongApp:React.FC = () => {
               <Routes>
                   <Route path="/login" element={<Login/>}/>
                   <Route path="/checkpoint" element={<Checkpoint/>} />
+                  <Route path="/setup" element={<SetupAccount/>} />
                   <Route path="/" element={<Home/>} />
                   <Route path="/leader_board" element={<LeaderBoard/>} />
                   <Route path="/play" element={<GamePlayer ultimateGame={false}/>} />

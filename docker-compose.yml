@@ -7,8 +7,10 @@ services:
     # volumes:
     #  - .:/usr/app
     ports:
-     - "${PORT}:${PORT}"
-     - "${REACT_APP_API_PORT}:${REACT_APP_API_PORT}"
+      - '3000:3000'
+      - '3001:3001'
+    #  - "${PORT}:${PORT}"
+    #  - "${REACT_APP_API_PORT}:${REACT_APP_API_PORT}"
     depends_on:
       db-dev:
         condition: service_healthy

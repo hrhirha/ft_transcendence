@@ -33,9 +33,12 @@ section#invitePlayer {
                 margin-bottom: 1rem;
                 h2 {
                     font-size: $fsize * 1.5;
+                    b {
+                        font-size: $fsize * 1.05;
+                    }
                 }
                 svg {
-                    font-size: $fsize * 2.25;
+                    font-size: $fsize * 2;
                 }
             }
         }

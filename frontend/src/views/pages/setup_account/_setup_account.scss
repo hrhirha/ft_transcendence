@@ -1,0 +1,109 @@
+main#setupAccount {
+    @include _flex(column, center, center);
+    @include _selectionOff();
+    min-height: 100vh;
+    form.setupAccount {
+        @include _flex(column, space-evenly, center);
+        @include _gradientBg(rgba($dark2, .25), rgba($dark2, .7), 180);
+        min-width: 275px;
+        max-width: 280px;
+        min-height: 20rem;
+        border-radius: 1rem;
+        padding: 1.5rem .75rem;
+
+        .sectionTitle {
+            @include _flex(row, center, center);
+            max-width: 15rem;
+            margin: .5rem auto;
+            svg {
+                font-size: $fsize * 2.4;
+                path {
+                    color: $gold;
+                }
+            }
+            h2 {
+                margin-left: .5rem;
+                font-family: $XBFont;
+                color: $light3;
+                text-transform: uppercase;
+                font-size: $fsize * 1.25;
+                line-height: .8;
+                width: min-content;
+                b {
+                    font-family: $XBFont;
+                    color: $light3;
+                    line-height: 1;
+                    font-size: $fsize * 2;
+                }
+            }
+            @media (max-width: $sm) {
+                margin-bottom: 1rem;
+                h2 {
+                    font-size: $fsize * .9;
+                    b {
+                        font-size: $fsize * 1.5;
+                    }
+                }
+                svg {
+                    font-size: $fsize * 1.75;
+                }
+            }
+        }
+
+        .avatar {
+            margin: 2rem auto;
+            position: relative;
+            > span.option {
+                @include _flex(row, center, center);
+                @include _square(1.25rem);
+                position: absolute;
+                cursor: pointer;
+                background-color: $purple;
+                padding: .25rem;
+                border-radius: 50%;
+                border: 2px solid $light2;
+                &#removeAvatar {
+                    background-color: $red;
+                    top: 1.5rem;
+                    right: -.75rem;
+                }
+                &#updateAvatar {
+                    bottom: 1.5rem;
+                    right: -.75rem;
+                }
+            }
+        }
+
+        input {
+            @include _textOverflow(15rem);
+            text-transform: capitalize;
+            margin: .5rem auto;
+            border: none;
+            background: rgba($dark1, .5);
+            font-family: $BFont;
+            font-size: $fsize;
+            text-align: center;
+            padding: .5rem 1rem;
+            border-radius: 5rem;
+            outline: none;
+            width: 75%;
+            &::placeholder {
+                color: $light4;
+            }
+        }
+
+        > button {
+            @include _flex(row, center, center);
+            @include _roundedButtonStyle();
+            font-family: $BFont;
+            padding: .45rem .5rem;
+            min-width: 10rem;
+            margin-top: 1.25rem;
+            svg {
+                width: 1.5rem;
+                margin-right: .2rem;
+            }
+        }
+        
+    }
+}
