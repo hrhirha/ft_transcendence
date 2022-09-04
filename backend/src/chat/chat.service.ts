@@ -748,19 +748,42 @@ export class ChatService {
 
     async deleteMessage(user: UserDto, msg: DeleteMessageDto)
     {
-        const del =  await this._prismaS.message.updateMany({
-            data: {
-                msg: 'deleted',
-                type: msg_type.DEL,
-            },
-            where: {
-                id: msg.id,
-                uid: user.id,
-                rid: msg.rid,
-            },
+        await this._prismaS.$transaction(async () => {
+            const del =  await this._prismaS.message.updateMany({
+                data: {
+                    msg: 'this message hase been deleted',
+                    type: msg_type.DEL,
+                },
+                where: {
+                    id: msg.id,
+                    uid: user.id,
+                    rid: msg.rid,
+                },
+            });
+            if (del.count === 0)
+                throw new WsException('unable to delete message');
+    
+            const room = await this._prismaS.room.findUnique({
+                where: { id: msg.rid },
+            });
+    
+            await this._prismaS.room.updateMany({
+                where: {
+                    id: msg.rid,
+                    messages: {
+                        some: {
+                            id: msg.id,
+                            type: msg_type.DEL,
+                            timestamp: {equals: room.lst_msg_ts}
+                        }
+                    }
+                },
+                data: {
+                    lst_msg: 'this message hase been deleted',
+                    lst_msg_ts: null,
+                }
+            });
         });
-        if (del.count === 0)
-            throw new WsException('unable to delete message');
         return {success: true}
     }
 
