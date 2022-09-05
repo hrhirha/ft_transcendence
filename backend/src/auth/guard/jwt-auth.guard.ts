@@ -8,7 +8,6 @@ export class JwtAuthGuard extends AuthGuard('jwt')
 
     handleRequest<TUser = any>(err: any, user: any, info: any, context: any, status?: any): TUser
     {
-        console.log({guard: 'jwt'})
         if (err || !user)
         {
             throw new UnauthorizedException({error: err?.message || "invalid access token"});
@@ -19,9 +18,9 @@ export class JwtAuthGuard extends AuthGuard('jwt')
             if (req.path === '/auth/setup' || req.path === '/auth/logout')
                 return user;
 
-            req.res.setHeader('Location', `http://${HOST}:3000/setup`);
-            throw new HttpException("", HttpStatus.TEMPORARY_REDIRECT);
-            // throw new ForbiddenException({error: 'you must setup your account first'});
+            // req.res.setHeader('Location', `http://${HOST}:3000/setup`);
+            // throw new HttpException("", HttpStatus.TEMPORARY_REDIRECT);
+            throw new ForbiddenException({error: 'you must setup your account first'});
         }
         return user;
     }

@@ -57,15 +57,16 @@ export class AuthService {
         return user;
     }
 
-    async setup(user: User, imageUrl: string, dto: SetupDto)
+    async setup(user: User, path: string, dto: SetupDto)
     {
+        const imageUrl = path === "" ? "" : `http://${HOST}:${PORT}/${path}`;
         const u = await this._prismaS.user.update({
             where: {
                 email: user.email,
             },
             data: {
                 ...dto,
-                imageUrl: `http://${HOST}:${PORT}/${imageUrl}`,
+                imageUrl,
             }
         });
         return u;
