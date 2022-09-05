@@ -1,10 +1,11 @@
 import { HttpStatus, Injectable, NotAcceptableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { User } from '@prisma/client';
 import { Request } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UserDto } from 'src/user/dto';
-import { HOST } from 'src/utils';
+import { SetupDto } from 'src/user/dto';
+import { HOST, PORT } from 'src/utils';
 
 @Injectable()
 export class AuthService {
@@ -15,13 +16,20 @@ export class AuthService {
         private _prismaS: PrismaService,
     ){}
 
-    async login(dto: UserDto, req: Request)
+    async login(dto: User, req: Request)
     {
+        let referer = `http://${HOST}:3000/`;
+
         const user = await this._prismaS.user.upsert({
-            where: {username: dto.username, },
+            where: {
+                email: dto.email,
+            },
             update: {},
             create: {
-                ...dto,
+                email: dto.email,
+                fullName: "",
+                username: "",
+                imageUrl: "",
                 rank: {connect: {title: 'Wood'}}
             },
             select: {
@@ -37,9 +45,9 @@ export class AuthService {
                 status: true,
             }
         });
-
-        let referer = req.header("Referer") || `http://${HOST}:3000/`;
-        if (user.isTfaEnabled)
+        if (user.username === "")
+            referer += "setup";
+        else if (user.isTfaEnabled)
             referer += "checkpoint";
 
         const cookie = this.getCookieWithJwtAccessToken(user.id);
@@ -47,6 +55,20 @@ export class AuthService {
             .setHeader('Location', referer)
             .status(HttpStatus.PERMANENT_REDIRECT);
         return user;
+    }
+
+    async setup(user: User, imageUrl: string, dto: SetupDto)
+    {
+        const u = await this._prismaS.user.update({
+            where: {
+                email: user.email,
+            },
+            data: {
+                ...dto,
+                imageUrl: `http://${HOST}:${PORT}/${imageUrl}`,
+            }
+        });
+        return u;
     }
 
     getCookieWithJwtAccessToken(id: string, is2fauthenticated = false) {

@@ -1,11 +1,11 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { UserDto } from '../dto';
 
 export const GetUserProfile = createParamDecorator(
   (data: string | undefined, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
-    const dto: UserDto = {
+    const dto = {
         username: request.user.username,
+        email: request.user._json.email,
         fullName: request.user.displayName,
         imageUrl: request.user._json.image_url,
     };

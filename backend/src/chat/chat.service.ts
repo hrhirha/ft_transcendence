@@ -395,7 +395,7 @@ export class ChatService {
 
     async editRoom(user: UserDto, data: EditRoomDto)
     {
-        const old_room = await this._is_owner(user.id, data.rid);
+        const old_room = await this._is_admin(user.id, data.rid);
         
         let messages = [];
         for (let uid of data.uids)
@@ -470,7 +470,7 @@ export class ChatService {
 
     async removeUser(user: UserDto, member: UserRoomDto)
     {
-        await this._is_owner(user.id, member.rid);
+        await this._is_admin(user.id, member.rid);
 
         const ur = await this._prismaS.userRoom.delete({
             where: {
@@ -1112,6 +1112,12 @@ export class ChatService {
                                 fullName: true,
                                 imageUrl: true,
                                 status: true,
+                                recievedReq: {
+                                    where: {
+                                        snd_id: uid,
+                                        status: friend_status.BLOCKED,
+                                    },
+                                }
                             }
                         },
                     }
@@ -1154,7 +1160,7 @@ export class ChatService {
         // filter messages sent before the user joined the room
         const jt = my_ur.joined_time;
         const msgs = room.messages.filter((message) => {
-            return message.timestamp > jt;
+            return message.timestamp > jt && message.user.recievedReq.length === 0 && delete message.user.recievedReq;
         });
 
         delete room.user_rooms;
@@ -1335,13 +1341,13 @@ export class ChatService {
         return r.messages[0];
     }
 
-    private async _is_owner(uid: string, rid: string)
+    private async _is_admin(uid: string, rid: string)
     {
         const ur = await this._prismaS.userRoom.findMany({
             where: {
                 uid,
                 rid,
-                is_owner: true
+                is_admin: true,
             },
             select: {
                 uid: true,

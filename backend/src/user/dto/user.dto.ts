@@ -60,3 +60,18 @@ export class EditFullNameDto {
     @Matches(/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(\-[a-zA-Z]+)*\.?))+$/, { message: "fullName can only contain a-z A-Z - . SP" })
     fullName: string;
 }
+
+export class SetupDto {
+    @IsDefined()
+    @IsString()
+    @IsNotEmpty()
+    @Matches(/^[\w-]{4,20}$/m, { message: "username can only contain a-z A-Z 0-9 -" })
+    username: string;
+
+    @IsDefined()
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(40)
+    @Matches(/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(\-[a-zA-Z]+)*\.?))+$/, { message: "fullName can only contain a-z A-Z - . SP" })
+    fullName: string;
+}

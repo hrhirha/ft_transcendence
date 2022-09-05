@@ -23,7 +23,15 @@ export class Jwt2FAAuthStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
         const user = await this._prisma.user.findUnique({
             where: { id: payload.sub, },
         });
-        if (user && (!user.isTfaEnabled || payload.is2fauthenticated))
-            return cb(null, user);
+        console.log({strategy: 'jwt-2fa'});
+        if (!user)
+            return cb({error: 'NOTLOGGED', message: 'not logged in'}, null)
+        if (user.username === "")
+            return cb(null, user, 'SETUP');
+        if (user.isTfaEnabled && !payload.is2fauthenticated)
+            return cb({error: '2FA', message: 'invalid two-factor authentication'}, null);
+
+        // if (user && user.username !== "" && (!user.isTfaEnabled || payload.is2fauthenticated))
+        return cb(null, user);
     }
 }

@@ -15,6 +15,7 @@ model User {
   updatedAt     DateTime @updatedAt
 
   username      String @unique
+  email         String @unique
   fullName      String?
   imageUrl      String
 

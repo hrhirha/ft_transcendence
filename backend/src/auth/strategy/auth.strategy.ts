@@ -8,6 +8,7 @@ import { HOST, PORT } from "src/utils";
 @Injectable()
 export class OAuth42Strategy extends PassportStrategy(Strategy, '42') {
     constructor (config: ConfigService) {
+        console.log({strategy: 'oauth-2fa'});
         let path: string;
         if (!process.env.CALLBACK || !process.env.CLIENT_ID || !process.env.CLIENT_SECRET)
         {

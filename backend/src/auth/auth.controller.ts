@@ -1,11 +1,16 @@
-import { Controller, ForbiddenException, Get, HttpStatus, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, HttpStatus, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { User } from '@prisma/client';
+import { randomUUID } from 'crypto';
+import { diskStorage } from 'multer';
 import { Request } from 'express';
 import { GetUserProfile } from 'src/user/decorator';
-import { UserDto } from 'src/user/dto';
-import { HOST } from 'src/utils';
+import { HOST, PORT } from 'src/utils';
 import { AuthService } from './auth.service';
 import { OAUth42Guard } from './guard';
 import { Jwt2FAAuthGuard } from './guard/jwt-2fa-auth.guard';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { SetupDto } from 'src/user/dto';
 
 @Controller('auth')
 export class AuthController {
@@ -14,7 +19,7 @@ export class AuthController {
 
     @UseGuards(OAUth42Guard)
     @Get('login')
-    async login(@GetUserProfile() dto: UserDto, @Req() req: Request)
+    async login(@GetUserProfile() dto: User, @Req() req: Request)
     {
         // const token = req?.cookies?.access_token;
         // if (token && await this._authS.getUserFromToken(token))
@@ -22,13 +27,48 @@ export class AuthController {
         try
         {
             const u = await this._authS.login(dto, req);
-            return {success: true};
+            return u;
         }
         catch (e)
         {
             console.log({code: e.code, message: e.message});
             req.res.setHeader('Location', `http://${HOST}:3000/`).status(HttpStatus.PERMANENT_REDIRECT);
             // throw new UnauthorizedException('login failed');
+        }
+    }
+
+    @UseGuards(Jwt2FAAuthGuard)
+    @Post('setup')
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            destination: './uploads',
+            filename(req, file, callback) {
+               const name = randomUUID() + file.originalname.slice(file.originalname.lastIndexOf('.'));
+               callback(null, name);
+            },
+        }),
+        fileFilter(req, file, callback) {
+            if (!file.originalname.match(/\.((j|J)(p|P)(g|G)|(j|J)(p|P)(e|E)(g|G)|(p|P)(n|N)(g|G)|(g|G)(i|I)(f|F))$/))
+                return callback(new ForbiddenException('format not allowed'), false)
+            return callback(null, true);
+        },
+    }))
+    async setup(@Req() req: Request, @UploadedFile() file: any, @Body() dto: SetupDto)
+    {
+        const user =  req.user as User;
+        if (user.username !== "")
+            throw new ForbiddenException({error: 'account has already been set up'});
+        try
+        {
+            console.log({user, file, dto});
+            const _prisma = new PrismaService();
+    
+            const u = this._authS.setup(user, file.path, dto);
+            return u;
+        }
+        catch (e)
+        {
+            throw new ForbiddenException({error: 'unable to setup this account'});
         }
     }
 
