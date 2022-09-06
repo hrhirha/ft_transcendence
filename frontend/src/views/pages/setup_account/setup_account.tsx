@@ -3,16 +3,15 @@ import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { User, userDefault } from "controller/user/user";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCameraRotate, faClose, faTrash, faUserCheck, faUserPen } from "@fortawesome/free-solid-svg-icons";
-import { setupAccount } from "controller/user/edit";
+import { getSetupData, setupAccount } from "controller/user/edit";
 import { useNotif } from "views/components/notif/notif";
 import { history } from "index";
 
 export const SetupAccount:React.FC = () =>  {
-    const [userInfos, setUserInfos] = useState<User>(userDefault);
     const [userAvatar, setUserAvatar] = useState<any>(null);
     const [fullName, setFullName] = useState<string>("");
     const [username, setUsername] = useState<string>("");
-    const [avatarUrl, setAvatarUrl] = useState<string>(userInfos?.imageUrl);
+    const [avatarUrl, setAvatarUrl] = useState<string>("");
     const pushNotif = useNotif();
 
     const submitData = async (e) => {
@@ -60,14 +59,14 @@ export const SetupAccount:React.FC = () =>  {
         const lastName = fullName.toLowerCase().substring(fullName.indexOf(' ') + 1).replace(/ /g, "-")
         return (`${firstName[0]}${lastName}`).substring(0, 8);
     }
-    useEffect(() => {
-        setUsername(genereateUsername("Full Name Here"));
-        
-        // (async () => {
-        //     const file = await urlToFile("https://static.saltinourhair.com/wp-content/uploads/2017/04/23115137/most-beautiful-riad-marrakech-morocco.jpg");
-        //     setUserAvatar(file);
-        //     setAvatarUrl(URL.createObjectURL(file));
-        // })();
+    useEffect(() => {        
+        (async () => {
+            const res = await getSetupData();
+            const file = await urlToFile(res.imageUrl);
+            setFullName(res.fullName);
+            setUsername(genereateUsername(res.fullName));
+            setAvatarUrl(URL.createObjectURL(file));
+        })();
     }, []);
 
     return (

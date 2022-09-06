@@ -52,3 +52,13 @@ export async function setupAccount(image : File, fullName : string, username : s
     }
 }
 
+
+export async function getSetupData() {
+    try {
+        const res = await api.get('/auth/profile');
+        return res.data;
+    } catch(e: any) {
+        throw (e.response.data);
+    }
+}
+
