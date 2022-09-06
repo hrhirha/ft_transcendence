@@ -56,10 +56,8 @@ export class AuthController {
             throw new ForbiddenException({error: 'account has already been set up'});
         try
         {
-            const _prisma = new PrismaService();
             const path = file ? file.path : "";
-
-            const u = this._authS.setup(user, path, dto);
+            const u = await this._authS.setup(user, path, dto);
             return u;
         }
         catch (e)

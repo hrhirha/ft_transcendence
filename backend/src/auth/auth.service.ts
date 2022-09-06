@@ -66,7 +66,8 @@ export class AuthService {
                 email: user.email,
             },
             data: {
-                ...dto,
+                username: dto.username,
+                fullName: dto.fullName,
                 imageUrl,
             }
         });

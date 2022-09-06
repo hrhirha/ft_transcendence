@@ -62,6 +62,11 @@ export class EditFullNameDto {
 }
 
 export class SetupDto {
+
+    @IsOptional()
+    @IsString()
+    file?: string;
+
     @IsDefined()
     @IsString()
     @IsNotEmpty()
