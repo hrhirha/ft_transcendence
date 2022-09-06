@@ -29,6 +29,8 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
     const [editMode, setEditMode] = useState<boolean>(false);
     const [userInfos, setUserInfos] = useState<User>(userDefault);
     const [fullName, setFullName] = useState<string>();
+    const [userName, setUserName] = useState<string>();
+    const [avatarUrl, setAvatarUrl] = useState<string>(userInfos?.imageUrl);
     const [userImage, setUserImage] = useState<any>();
     const [enable2fa, setEnable2fa] = useState<boolean>(false);
     const [detectUpdates, setUpdates] = useState<{avatar: boolean, name: boolean}>({avatar: false, name: false});
@@ -46,6 +48,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
         f.addEventListener("change", (e : any) => {
             const [file] = e.target.files;
             setUserImage(file);
+            setAvatarUrl(URL.createObjectURL(file));
             setUpdates({avatar: true, name: detectUpdates.name});
         });
         f.click();
@@ -127,6 +130,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
             {
                 const me: User = await get_me();
                 setUserInfos(me);
+                setAvatarUrl(me.imageUrl);
                 setFullName(me.fullName);
             }
             else 
@@ -134,6 +138,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                 try {
                     const user: User = await get_user_by_username(username.username!);
                     setUserInfos(user);
+                    setAvatarUrl(user.imageUrl);
                     setFullName(user.fullName);
                     if (user.relation === null)
                         navigate("/profile", {replace: true});
@@ -218,7 +223,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
             </button>}
             <div className="profileData">
                 <div className="avatar">
-                    <CircleAvatar avatarURL={(userImage && URL.createObjectURL(userImage)) || userInfos?.imageUrl} dimensions={120} status={null}/>
+                    <CircleAvatar avatarURL={avatarUrl} dimensions={120} status={null}/>
                     <span className="achievement"><img src={userInfos.rank.icon} title={userInfos.rank.title} alt="achievement" /></span>
                     {editMode && <span className="editAvatar" title="Change Your Avatar" onClick={updateAvatar}>
                         <FontAwesomeIcon icon={faCameraRotate}/>
@@ -229,6 +234,10 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                         setFullName(e.target.value);
                         setUpdates({name: true, avatar: detectUpdates.avatar});
                     }} value={fullName}/>}
+                    {userName && <input type="text" disabled={!editMode} className="userName" placeholder="Username" onChange={(e) => {
+                        setFullName(e.target.value);
+                        setUpdates({name: true, avatar: detectUpdates.avatar});
+                    }} value={userName}/>}
                     <span className="userName">@{userInfos?.username}</span>
                     <div className="stats">
                         <StatCard icon={faTableTennisPaddleBall} title="Games" stat={Number(userInfos?.wins + userInfos?.loses)}/>

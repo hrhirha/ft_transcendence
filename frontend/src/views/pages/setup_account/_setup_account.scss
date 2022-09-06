@@ -71,12 +71,18 @@ main#setupAccount {
                     bottom: 1.5rem;
                     right: -.75rem;
                 }
+                &.disabled {
+                    opacity: .5;
+                    cursor: not-allowed;
+                }
+            }
+            > span#circleAvatar {
+                border: 4px solid $light4;
             }
         }
 
         input {
             @include _textOverflow(15rem);
-            text-transform: capitalize;
             margin: .5rem auto;
             border: none;
             background: rgba($dark1, .5);

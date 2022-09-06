@@ -34,3 +34,21 @@ export async function patch_avatar_upload(image : File) {
 }
 
 
+export async function setupAccount(image : File, fullName : string, username : string) {
+    try {
+
+        const formData = new FormData();
+        formData.append("file", image);
+        formData.append("fullName", fullName);
+        formData.append("username", username);
+        const res = await api.post('/auth/setup', formData, {
+            headers: {
+            'Content-Type': 'multipart/form-data'
+            }
+        });
+        return res.data;
+    } catch(e: any) {
+        throw (e.response.data);
+    }
+}
+

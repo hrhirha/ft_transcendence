@@ -41,13 +41,13 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
-export const SocketContext = createContext(null); //create socket context
-export const history = createBrowserHistory();
-export const game_socket = io(`ws://${env.apiHost}:${env.apiPort}/game`, {withCredentials: true, closeOnBeforeunload: false});
 export const getIDQuery = () => {
   const searchParams = new URLSearchParams(history.location.search);
   return searchParams.get('id');
 }
+export const SocketContext = createContext(null); //create socket context
+export const history = createBrowserHistory();
+export const game_socket = io(`ws://${env.apiHost}:${env.apiPort}/game`, {withCredentials: true, closeOnBeforeunload: false});
 const class_socket = new ChatSocket();
 
 const PongApp:React.FC = () => {
@@ -55,19 +55,21 @@ const PongApp:React.FC = () => {
     const [hideNavBar, setHideNavBar] = useState<boolean>(true);
     const pushNotif = useNotif();
     const authCheck = async (path) => {
-      setHideNavBar(false);
       try {
           const me: User = await get_me();
           window.localStorage.setItem("user", JSON.stringify(me));
           if (history.location.pathname === "/login"
-            || history.location.pathname === "/checkpoint")
-            // || history.location.pathname === "/setup")
+            || history.location.pathname === "/checkpoint"
+            || history.location.pathname === "/setup")
             history.replace("/");
+        setHideNavBar(false);
       }
       catch(err: any) {
-          if (path !== "/login" && path !== "/checkpoint" && path !== "/setup")
+        setHideNavBar(true);
+        if (err.statusCode === 401 && path !== "/login" && path !== "/checkpoint")
             history.replace("/login");
-          setHideNavBar(true);
+        else if (err.statusCode === 403 && path !== "/setup")
+            history.replace("/setup");
       }
       setLoading(false);
     }

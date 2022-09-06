@@ -11,7 +11,7 @@ interface Props {
 }
 
 export const CircleAvatar:React.FC<Props> = (Props) => {
-    return (<span id="circleAvatar" style={{backgroundImage: `url(${Props.avatarURL === null ? UserIcon : Props.avatarURL})`,
+    return (<span id="circleAvatar" style={{backgroundImage: `url(${!Props.avatarURL ? UserIcon : Props.avatarURL})`,
     minWidth: Props.dimensions,
     minHeight: Props.dimensions,
     maxWidth: Props.dimensions,
