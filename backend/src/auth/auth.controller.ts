@@ -4,7 +4,7 @@ import { User } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { diskStorage } from 'multer';
 import { Request } from 'express';
-import { GetUserProfile } from 'src/user/decorator';
+import { GetUser, GetUserProfile } from 'src/user/decorator';
 import { HOST, PORT } from 'src/utils';
 import { AuthService } from './auth.service';
 import { OAUth42Guard } from './guard';
@@ -21,9 +21,6 @@ export class AuthController {
     @Get('login')
     async login(@GetUserProfile() dto: User, @Req() req: Request)
     {
-        // const token = req?.cookies?.access_token;
-        // if (token && await this._authS.getUserFromToken(token))
-        //     throw new ForbiddenException({success: false, message: "already logged in"});
         try
         {
             const u = await this._authS.login(dto, req);
@@ -33,7 +30,6 @@ export class AuthController {
         {
             console.log({code: e.code, message: e.message});
             req.res.setHeader('Location', `http://${HOST}:3000/`).status(HttpStatus.PERMANENT_REDIRECT);
-            // throw new UnauthorizedException('login failed');
         }
     }
 
@@ -70,6 +66,16 @@ export class AuthController {
         {
             throw new ForbiddenException({error: 'unable to setup this account'});
         }
+    }
+
+    @UseGuards(Jwt2FAAuthGuard)
+    @Get('profile')
+    getProfile(@GetUser() dto: User)
+    {
+        return {
+            fullName: dto.fullName,
+            imageUrl: dto.imageUrl,
+        };
     }
 
     @UseGuards(Jwt2FAAuthGuard)

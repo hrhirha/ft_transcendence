@@ -27,9 +27,9 @@ export class AuthService {
             update: {},
             create: {
                 email: dto.email,
-                fullName: "",
+                fullName: dto.fullName,
                 username: "",
-                imageUrl: "",
+                imageUrl: dto.imageUrl,
                 rank: {connect: {title: 'Wood'}}
             },
             select: {
@@ -46,7 +46,7 @@ export class AuthService {
             }
         });
         if (user.username === "")
-            referer += "setup";
+            referer += `setup`;
         else if (user.isTfaEnabled)
             referer += "checkpoint";
 
@@ -54,6 +54,7 @@ export class AuthService {
         req.res.setHeader('Set-Cookie', cookie)
             .setHeader('Location', referer)
             .status(HttpStatus.PERMANENT_REDIRECT);
+
         return user;
     }
 

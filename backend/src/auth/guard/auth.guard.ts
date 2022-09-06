@@ -14,7 +14,6 @@ export class OAUth42Guard extends AuthGuard('42') {
 
     handleRequest<TUser = any>(err: any, user: any, info: any, context: any, status?: any): TUser
     {
-        console.log({guard: 'oauth'})
         if (err || !user) {
             context.getRequest().res.setHeader('Location', `http://${HOST}:3000/login`);
             throw new HttpException("authentication failed", HttpStatus.PERMANENT_REDIRECT);

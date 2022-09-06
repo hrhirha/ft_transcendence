@@ -15,11 +15,9 @@ export class JwtAuthGuard extends AuthGuard('jwt')
         if (info === 'SETUP')
         {
             const req = context.getRequest();
-            if (req.path === '/auth/setup' || req.path === '/auth/logout')
+            if (req.path === '/auth/setup' || req.path === '/auth/logout' || req.path === '/auth/profile')
                 return user;
 
-            // req.res.setHeader('Location', `http://${HOST}:3000/setup`);
-            // throw new HttpException("", HttpStatus.TEMPORARY_REDIRECT);
             throw new ForbiddenException({error: 'you must setup your account first'});
         }
         return user;
