@@ -1,10 +1,11 @@
 import Phaser from "phaser";
 import { NormalField, UltimateField, Ball, Paddle, YouWin, YouLose, RedButton, NormalButton, EndMatch } from "assets";
 import { Socket } from "socket.io-client";
+import { timingSafeEqual } from "crypto";
 
 export default class PingPong extends Phaser.Scene
 {
-    swipeDirection: any;
+    swipeDirection: string;
     connection: boolean = true;
     isClicking: boolean = true;
     bestOf: number = 5;
@@ -271,7 +272,6 @@ export default class PingPong extends Phaser.Scene
                 }
                 if (!this.End && this.data.is_player)
                 {
-                    console.log(this.rightScore, this.leftScore);
                     this.soc.emit('endGame', {
                         player: this.data.player,
                         rscore: (this.data.player === "player2") ? this.bestOf : this.rightScore,
@@ -583,12 +583,18 @@ export default class PingPong extends Phaser.Scene
         this.focusTimer -=  (this.focusMode) ? 1 : 0; // One second
         this.initialTime -= (!this.focusMode) ? 1 : 0; // One second
         if ( !this.focusMode && this.counter)
-        this.counter.text = '' + this.formatTime(this.initialTime);
+            this.counter.text = '' + this.formatTime(this.initialTime);
         if (this.focusMode &&  this.counterTimer)
-        this.counterTimer.text = '' + this.formatTime(this.focusTimer);
+            this.counterTimer.text = '' + this.formatTime(this.focusTimer);
         
         if (!this.focusMode && this.initialTime <= 0)
         {
+            if (this.mobile)
+            {
+                this.input.activePointer.y = 300;
+                this.isClicking = false;
+                this.swipeDirection = "";
+            }
             this.goal = false;
             this.counter.text = ""; 
             this.counter = undefined;
@@ -801,17 +807,18 @@ export default class PingPong extends Phaser.Scene
         }
         else if (this.mobile && this.focus && !this.End)
         {
-            if(!this.input.activePointer.isDown && this.isClicking === true) {
-                if(Math.abs(this.input.activePointer.upY - this.input.activePointer.downY) >= 50) {
-                    if(this.input.activePointer.upY < this.input.activePointer.downY) {
-                        this.swipeDirection = "up";
-                    } else if(this.input.activePointer.upY > this.input.activePointer.downY) {
-                        this.swipeDirection = "down";
-                    }
-                }
-                this.isClicking = false;
-            } else if(this.input.activePointer.isDown && this.isClicking === false) {
-                this.isClicking = true;
+
+            if(Math.round(this.input.activePointer.y - this.paddle.y) < 0) 
+            {
+                this.swipeDirection = "up";
+            }
+            else if(Math.round(this.input.activePointer.y) - (this.paddle.y + this.paddle.width) > 0) 
+            {
+                this.swipeDirection = "down";
+            }
+            else
+            {
+                this.swipeDirection = "";
             }
         
             if(this.swipeDirection === "down" && this.paddle.y < 530) {
@@ -821,19 +828,20 @@ export default class PingPong extends Phaser.Scene
                         this.paddle.body.updateFromGameObject();
                     }
                 } else {
-                    this.paddle.y += 8;
+                    this.paddle.y += 15;
                     if('updateFromGameObject' in this.paddle.body) {
                         this.paddle.body.updateFromGameObject();
                     }
                 }
             } else if(this.swipeDirection === "up" && this.paddle.y > 15) {
+
                 if(Math.abs(this.paddle.y - 15) <= 10) {
                     this.paddle.y = 15 ;
                     if('updateFromGameObject' in this.paddle.body) {
                         this.paddle.body.updateFromGameObject();
                     }
                 } else {
-                    this.paddle.y -= 8;
+                    this.paddle.y -= 15;
                     if('updateFromGameObject' in this.paddle.body) {
                         this.paddle.body.updateFromGameObject();
                     }
@@ -881,7 +889,7 @@ export default class PingPong extends Phaser.Scene
 
             if (this.data.is_player && !this.End)
             {
-                this.goal = true;
+                // this.goal = true;
                 if (this.data.is_player && this.data.player === "player1")
                 {
                     this.soc.emit('sendToWatcher', {
@@ -897,7 +905,7 @@ export default class PingPong extends Phaser.Scene
                         newEmit: false,
                     });
                 }
-                this.scene.restart();
+                // this.scene.restart();
             }
             
         }
@@ -912,7 +920,7 @@ export default class PingPong extends Phaser.Scene
 
             if (this.data.is_player && !this.End)
             {
-                this.goal = true;
+                // this.goal = true;
                 if (this.data.is_player && this.data.player === "player1")
                 {
                     this.soc.emit('sendToWatcher', {
@@ -928,7 +936,7 @@ export default class PingPong extends Phaser.Scene
                         newEmit: false,
                     });
                 }
-                this.scene.restart();
+                // this.scene.restart();
             }
         }
     }
