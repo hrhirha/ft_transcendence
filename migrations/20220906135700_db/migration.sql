@@ -49,6 +49,7 @@ CREATE TABLE "rooms" (
     "password" TEXT,
     "lst_msg" TEXT DEFAULT E'',
     "lst_msg_ts" TIMESTAMP(3),
+    "lst_msg_snd" TEXT,
 
     CONSTRAINT "rooms_pkey" PRIMARY KEY ("id")
 );

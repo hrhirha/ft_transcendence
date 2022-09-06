@@ -78,6 +78,7 @@ model Room {
 
   lst_msg     String? @default("")
   lst_msg_ts  DateTime?
+  lst_msg_snd String?
 
   messages    Message[]
   user_rooms  UserRoom[]

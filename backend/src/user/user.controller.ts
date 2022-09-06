@@ -279,7 +279,8 @@ export class UserController {
     {
         try
         {
-            return await this._userS.getBlockedFriends(user.id);
+            const blocks = await this._userS.getBlockedFriends(user.id);
+            return blocks.blocked;
         }
         catch (e)
         {
