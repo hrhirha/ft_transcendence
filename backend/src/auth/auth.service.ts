@@ -28,12 +28,13 @@ export class AuthService {
             create: {
                 email: dto.email,
                 fullName: dto.fullName,
-                username: "",
+                username: dto.username,
                 imageUrl: dto.imageUrl,
                 rank: {connect: {title: 'Wood'}}
             },
             select: {
                 id: true,
+                setup: true,
                 username: true,
                 fullName: true,
                 imageUrl: true,
@@ -45,7 +46,7 @@ export class AuthService {
                 status: true,
             }
         });
-        if (user.username === "")
+        if (!user.setup)
             referer += `setup`;
         else if (user.isTfaEnabled)
             referer += "checkpoint";
@@ -66,6 +67,7 @@ export class AuthService {
                 email: user.email,
             },
             data: {
+                setup: true,
                 username: dto.username,
                 fullName: dto.fullName,
                 imageUrl,

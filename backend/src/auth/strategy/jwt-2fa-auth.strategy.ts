@@ -25,7 +25,7 @@ export class Jwt2FAAuthStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
         });
         if (!user)
             return cb({error: 'NOTLOGGED', message: 'not logged in'}, null)
-        if (user.username === "")
+        if (!user.setup)
             return cb(null, user, 'SETUP');
         if (user.isTfaEnabled && !payload.is2fauthenticated)
             return cb({error: '2FA', message: 'invalid two-factor authentication'}, null);

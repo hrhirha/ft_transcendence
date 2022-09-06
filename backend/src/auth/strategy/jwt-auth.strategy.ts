@@ -26,7 +26,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         });
         if (!user)
             return cb({error: 'NOTLOGGED', message: 'not logged in'}, null)
-        if (user.username === "")
+        if (!user.setup)
             return cb(null, user, 'SETUP');
 
         // if (user && user.username !== "" && (!user.isTfaEnabled || payload.is2fauthenticated))

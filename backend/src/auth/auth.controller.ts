@@ -52,7 +52,7 @@ export class AuthController {
     async setup(@Req() req: Request, @UploadedFile() file: any, @Body() dto: SetupDto)
     {
         const user =  req.user as User;
-        if (user.username !== "")
+        if (user.setup)
             throw new ForbiddenException({error: 'account has already been set up'});
         try
         {
@@ -71,6 +71,7 @@ export class AuthController {
     getProfile(@GetUser() dto: User)
     {
         return {
+            username: dto.username,
             fullName: dto.fullName,
             imageUrl: dto.imageUrl,
         };
