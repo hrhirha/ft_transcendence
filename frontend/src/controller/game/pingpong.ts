@@ -889,7 +889,7 @@ export default class PingPong extends Phaser.Scene
 
             if (this.data.is_player && !this.End)
             {
-                // this.goal = true;
+                this.goal = true;
                 if (this.data.is_player && this.data.player === "player1")
                 {
                     this.soc.emit('sendToWatcher', {
@@ -905,7 +905,7 @@ export default class PingPong extends Phaser.Scene
                         newEmit: false,
                     });
                 }
-                // this.scene.restart();
+                this.scene.restart();
             }
             
         }
@@ -920,7 +920,7 @@ export default class PingPong extends Phaser.Scene
 
             if (this.data.is_player && !this.End)
             {
-                // this.goal = true;
+                this.goal = true;
                 if (this.data.is_player && this.data.player === "player1")
                 {
                     this.soc.emit('sendToWatcher', {
@@ -936,7 +936,7 @@ export default class PingPong extends Phaser.Scene
                         newEmit: false,
                     });
                 }
-                // this.scene.restart();
+                this.scene.restart();
             }
         }
     }
