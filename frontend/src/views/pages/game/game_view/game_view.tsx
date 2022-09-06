@@ -55,10 +55,5 @@ export const GameView:React.FC<{gameSocket: Socket, isUltimate?: boolean, watche
             setNewGame();
         }
     }, [roomId]);
-    return (
-        <>
-            <section id="gameView"></section>
-            <button onClick={(e) => {}}>UP</button>
-        </>
-    );
+    return (<section id="gameView"></section>);
 }

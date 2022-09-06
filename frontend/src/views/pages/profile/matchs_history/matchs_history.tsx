@@ -18,7 +18,7 @@ const NoHistroy = () => {
         <div className="noHistory">
             <img src={EmptyHistory} alt="no history" />
             <p>No matchs history yet</p>
-            {location.pathname === '/profile' && <button className="playGame" onClick={() => navigate("/", {replace: true})}>
+            {location.pathname === '/profile' && <button className="playGame" onClick={() => navigate("/")}>
                 <FontAwesomeIcon icon={faGamepad} />
                 Play One
             </button>}

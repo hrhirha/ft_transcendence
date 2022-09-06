@@ -19,7 +19,7 @@ const BoardRow:React.FC<{index: number, user: User}> = ({index, user}) => {
             {index === 3 && <span><FontAwesomeIcon icon={faMedal}/></span>}
             {index > 3 && <span><Numeral value={index} /></span>}
         </td>
-        <td onClick={() => navigate(`/u/${user.username}`, {replace: true})}>
+        <td onClick={() => navigate(`/u/${user.username}`)}>
             <CircleAvatar avatarURL={user.imageUrl} dimensions={40} status={null}/>
             <span className="fullName">{user.fullName}</span>
         </td>

@@ -58,7 +58,7 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
                     navigate({
                         pathname: '/chat',
                         search: `?id=${room.id}`,
-                    }, {replace: true});
+                    });
                 }}
             />)}</>);
     }
@@ -80,7 +80,7 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
                     navigate({
                         pathname: '/chat',
                         search: `?id=${other.id}`,
-                    }, {replace: true});
+                    });
                 }}
             />)}</>);
     }
@@ -101,7 +101,7 @@ const ListChats:React.FC<{tab: chatTabs, activeChat: string | null, onSelectItem
                     navigate({
                         pathname: '/chat',
                         search: `?id=${dms.room.id}`,
-                    }, {replace: true});
+                    });
                 }}
             />)}</>);
 }
@@ -138,14 +138,14 @@ export const Chat:React.FC = () => {
             navigate({
                 pathname: '/chat',
                 search: `?id=${data.room.id}`,
-            }, {replace: true});
+            });
             class_socket.get_chats();
         }).on("room_created", (data : room_created)=>{
             setShowNewChatForm(false);
             navigate({
                 pathname: '/chat',
                 search: `?id=${data.id}`,
-            }, {replace: true});
+            });
             class_socket.get_chats();
             
         }).on("status_update", () =>{
@@ -167,11 +167,11 @@ export const Chat:React.FC = () => {
              class_socket.get_chats();
         }).on("room_deleted", (data : {id : string})=> {
             if(getIDQuery() !== null && getIDQuery() === data.id)
-                navigate(`/chat`, {replace: true})
+                navigate(`/chat`)
             class_socket.get_chats();
         }).on("user_banned", (data : management_memeber)=>{
             //if(getIDQuery() === data.rid && JSON.parse(window.localStorage.getItem("user")).id === data.uid)
-            //    navigate(`/chat`, {replace: true});
+            //    navigate(`/chat`);
             //class_socket.get_chats();
         })
         

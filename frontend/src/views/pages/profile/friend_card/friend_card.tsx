@@ -7,6 +7,7 @@ import { buttons, userType } from 'views/pages/profile/profile'
 interface Props {
 	type: userType,
 	user: User;
+	status: string;
 	action: Function
 }
 
@@ -15,9 +16,9 @@ export const FriendCard = (Props : Props) => {
 
 	return (
 		<div className="friendCard">
-			<div className="friendInfos" onClick={() => navigate(`/u/${Props.user.username}`, {replace: true})}>
+			<div className="friendInfos" onClick={() => navigate(`/u/${Props.user.username}`)}>
 				<div className='avatar'>
-					<CircleAvatar avatarURL={Props.user.imageUrl} dimensions={85} status={null}/>
+					<CircleAvatar avatarURL={Props.user.imageUrl} dimensions={85} status={Props.status}/>
 				</div>
 				<h6>{Props.user.fullName} </h6>
 				<span>@{Props.user.username} </span>

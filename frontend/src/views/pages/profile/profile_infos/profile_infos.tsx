@@ -132,6 +132,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                 setUserInfos(me);
                 setAvatarUrl(me.imageUrl);
                 setFullName(me.fullName);
+                setUserName(me.username);
             }
             else 
             {
@@ -140,13 +141,14 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                     setUserInfos(user);
                     setAvatarUrl(user.imageUrl);
                     setFullName(user.fullName);
+                    setUserName(user.username);
                     if (user.relation === null)
-                        navigate("/profile", {replace: true});
+                        navigate("/profile");
                     if (user.relation === "blocked")
-                        navigate("/notfound", {replace: true});
+                        navigate("/notfound");
                 }
                 catch(e) {
-                    navigate("/notfound", {replace: true});
+                    navigate("/notfound");
                 }
             }
         } catch (err: any) {
@@ -230,15 +232,14 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                     </span>}
                 </div>
                 <div className="profileMoreData">
-                    {fullName && <input type="text" disabled={!editMode} className="fullName" placeholder="Full Name" onChange={(e) => {
+                    {fullName !== null && <input type="text" disabled={!editMode} className="fullName" placeholder="Full Name" onChange={(e) => {
                         setFullName(e.target.value);
                         setUpdates({name: true, avatar: detectUpdates.avatar});
                     }} value={fullName}/>}
-                    {userName && <input type="text" disabled={!editMode} className="userName" placeholder="Username" onChange={(e) => {
-                        setFullName(e.target.value);
+                    {userName !== null && <input className="userName" type="text" disabled={!editMode} placeholder="Username" onChange={(e) => {
+                        setUserName(e.target.value.trim());
                         setUpdates({name: true, avatar: detectUpdates.avatar});
                     }} value={userName}/>}
-                    <span className="userName">@{userInfos?.username}</span>
                     <div className="stats">
                         <StatCard icon={faTableTennisPaddleBall} title="Games" stat={Number(userInfos?.wins + userInfos?.loses)}/>
                         <StatCard icon={faTrophy} title="Wins" stat={Number(userInfos?.wins)}/>

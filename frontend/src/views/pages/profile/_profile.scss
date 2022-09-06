@@ -86,7 +86,7 @@
         .btnAccept, .btnAddFriend, .btnMessage, .btnInvite {
             @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($purple, .5), $bgcolor2: $purple);
         }
-        .btnDecline, .btnCancle, .btnPending {
+        .btnDecline, .btnCancel, .btnPending {
             @include _roundedButtonStyle($txtcolor: $light1, $bgcolor1: rgba($dark1, .5), $bgcolor2: $dark2);
         }
         .btnBlock {
