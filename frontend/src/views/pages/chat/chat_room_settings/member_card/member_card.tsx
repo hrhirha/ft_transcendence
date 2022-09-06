@@ -137,7 +137,7 @@ export const  MemeberCard:React.FC<{
                         <FontAwesomeIcon icon={faUserGear}/>
                         Set As Admin
                     </div>,
-                    permession === 2 && !owner && <div onClick={() => removeMember()} title="Remove user" >
+                    permession > 0 && !owner && <div onClick={() => removeMember()} title="Remove user" >
                         <FontAwesomeIcon icon={faUserXmark}/>
                         Remove user
                     </div>

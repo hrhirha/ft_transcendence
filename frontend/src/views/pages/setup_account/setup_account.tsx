@@ -64,6 +64,7 @@ export const SetupAccount:React.FC = () =>  {
             const res = await getSetupData();
             const file = await urlToFile(res.imageUrl);
             setFullName(res.fullName);
+            setUserAvatar(file);
             setUsername(genereateUsername(res.fullName));
             setAvatarUrl(URL.createObjectURL(file));
         })();

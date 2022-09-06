@@ -61,7 +61,6 @@ export const buttons = [
         onClick: async (userId: string, action?: Function) => {
             await post_friend_block(userId);
             action && action(userId);
-            window.location.pathname = "/";
         }
     },
     {
@@ -88,7 +87,7 @@ export const buttons = [
     {
         type: userType.pending,
         icon: faUserXmark,
-        text: 'Cancle',
+        text: 'Cancel',
         onClick: async (userId: string, action?: Function) => {
             await post_friendreq_cancel(userId);
             action && action(userId);

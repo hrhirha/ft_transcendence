@@ -93,7 +93,7 @@ section#profileInfos {
                 width: 100%;
                 margin: 0;
             }
-            input.fullName {
+            input.fullName, input.userName {
                 @include _textOverflow(15rem);
                 text-transform: capitalize;
                 border: none;
@@ -111,12 +111,13 @@ section#profileInfos {
                 background: transparent;
                 max-width: auto;
             }
-            span.userName {
+            input.userName {
                 text-transform: lowercase;
                 font-family: $LFont;
                 font-size: $fsize * 1.15;
                 padding: 0 1rem;
                 color: $light3;
+                margin: .25rem;
             }
             .stats {
                 @include _flex(row, space-evenly, center);

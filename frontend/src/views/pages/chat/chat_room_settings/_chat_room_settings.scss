@@ -111,6 +111,7 @@ section#chatRoomSettings {
                 outline: none;
                 text-align: center;
                 margin: .25rem auto;
+                margin-bottom: .5rem;
                 &::placeholder {
                     color: $light4;
                 }
@@ -170,8 +171,8 @@ section#chatRoomSettings {
                 }
             }
             .actions {
-                @include _flex(row, space-between, center);
-                width: 90%;
+                @include _flex(row, space-evenly, center);
+                width: 100%;
             }
             .save, .cancel {
                 @include _roundedButtonStyle();

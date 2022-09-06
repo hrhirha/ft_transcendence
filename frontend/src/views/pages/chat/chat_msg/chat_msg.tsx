@@ -34,7 +34,7 @@ export const Chat_msg = (Props : Props) => {
         {title: "Delete", color: "#6970d4", action: () => {
             class_socket.delete_message({id : Props.msgId,  rid : Props.roomId});
         }},
-        {title: "Cancle", color: "#6970d4", action: () => {}},
+        {title: "Cancel", color: "#6970d4", action: () => {}},
       ]
     });
   }

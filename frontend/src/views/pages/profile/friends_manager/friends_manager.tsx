@@ -96,6 +96,7 @@ export const FriendsManager:React.FC = () => {
                     && friendsList.map((friend: User) => 
                     <FriendCard
                         key={`${friend.id}`}
+                        status={activeTab === tabs.friends ? friend.status : ""}
                         type={activeTab.valueOf()}
                         user={friend}
                         action={(id: string) => {setFriendsList(friendsList.filter((u) => u.id !== id))}}

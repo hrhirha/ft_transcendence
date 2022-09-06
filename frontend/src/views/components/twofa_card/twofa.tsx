@@ -28,7 +28,7 @@ export const TwoFACard:React.FC<{enabled: boolean, onClose: Function, onSubmit: 
                     if (Number.isInteger(Number(val)) && val.length < 7)
                     setCode(val);
                 }} value={code}/>
-                <button  onClick={() => onSubmit(code)} className="confirm">Confirme</button>
+                <button  onClick={() => onSubmit(code)} className="confirm">Confirm</button>
                 {!enabled && <span className="help" onClick={() => pushNotif({
                     id: "HOWTOUSE2FA",
                     type: "info",

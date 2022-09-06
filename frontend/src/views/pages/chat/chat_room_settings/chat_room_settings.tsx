@@ -14,7 +14,7 @@ import { User } from "controller/user/user";
 import { UserCheckedCard, validChannelTitel, validPassword } from "../create_chat/create_chat";
 
 
-const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>, callback: Function}> = ({room, members, callback}) => {
+const EditChatRoomSettings:React.FC<{owner: boolean, room: room_msgs, members: Array<user_info>, callback: Function}> = ({owner, room, members, callback}) => {
     const [selectedUsers, setSelectedUsers] = useState<user_info[]>([]);
     const [exceptUsers, setExceptUsers] = useState<string[]>(members.map(u => u.id));
     const [passwordEditState, setPasswordEditState] = useState<number>(0);
@@ -72,7 +72,7 @@ const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>,
         class_socket.edit_room({rid : room.id, name : channelTitle, uids: selectedUsers.map((u : user_info )=> u.id)});
     }} >
         <input type="text" className={`inputStyle ${validChannelTitel(channelTitle) ? "":"error"}`} value={channelTitle} onChange={(e) => {setChannelTitle(e.target.value)}} placeholder="Channel Title" />
-        <div className="managePassword">
+        {owner && <div className="managePassword">
             {room.type === "PROTECTED" &&
                 <>
                     {passwordEditState === 0 && <span className="passwordBtn" onClick={() => setPasswordEditState(2)}><FontAwesomeIcon icon={faKey}/> Edit Password</span>}
@@ -104,7 +104,7 @@ const EditChatRoomSettings:React.FC<{room: room_msgs, members: Array<user_info>,
                 <FontAwesomeIcon icon={faClose}/>
                 Remove password
             </button>}
-        </div>
+        </div>}
         <span className="addMem"><FontAwesomeIcon icon={faUsers} />Add members</span>
         <UserSearchForm exceptUsers={exceptUsers} callback={(userSelected: User) => {
             setSelectedUsers([...selectedUsers, userSelected]);
@@ -137,7 +137,6 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
     const navigate = useNavigate();
     const class_socket = useContext(SocketContext);
     const [members, setMembers] = useState<user_info[]>([]);
-    const [owner, setOwner] = useState<boolean>(false);
     const [editable, setEditable] = useState<boolean>(false);
     const pushNotif = useNotif();
     const [permession, setPermession] = useState<number>(0);
@@ -147,8 +146,6 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
         class_socket.get_members({id : getIDQuery()});
         class_socket.socket.on("members", (data : user_info[])=>{
             setMembers(data);
-
-            setOwner(data.find((u) => u.is_owner === true && u.id === JSON.parse(window.localStorage.getItem("user")).id ) !== undefined)
             if(data.find((u) => u.is_owner === true && u.id === JSON.parse(window.localStorage.getItem("user")).id ) !== undefined)
                 setPermession(2);
             else if(data.find((u) => u.is_admin === true && u.id === JSON.parse(window.localStorage.getItem("user")).id ) !== undefined)
@@ -216,7 +213,7 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
             actions: [
                 {title: "Leave Channel", color: "#6970d4", action: () => {
                     class_socket.leave_room({id : getIDQuery()})
-                    navigate(`/chat`, {replace: true})
+                    navigate(`/chat`)
                 }},
             ]
         });
@@ -267,16 +264,16 @@ export const ChatRoomSettings:React.FC<{room : room_msgs, onClose: Function}> = 
                                 banned={member.is_banned}
                                 muted={member.is_muted}
                                 onClick={
-                                    () => navigate(`/u/${member.username}`, {replace: true})}
+                                    () => navigate(`/u/${member.username}`)}
                             />
                         )
                     }
                 </div></>}
-                {editable && <EditChatRoomSettings room={room} members={members} callback={settingsEdit}/>}
+                {editable && <EditChatRoomSettings owner={permession === 2} room={room} members={members} callback={settingsEdit}/>}
                 {!editable && <div className="channelOptions">
-                    {owner && <span onClick={() => editChannel()}><FontAwesomeIcon icon={faPenToSquare}/>Edit Channel</span>}
-                    {owner && <span className="delete" onClick={() => deleteChannel()}><FontAwesomeIcon icon={faTrash}/>Delete Channel</span>}
-                    {!owner && <span className="leave" onClick={() => leaveChannel()}><FontAwesomeIcon icon={faArrowRightFromBracket}/>Leave Channel</span>}
+                    {permession > 0 && <span onClick={() => editChannel()}><FontAwesomeIcon icon={faPenToSquare}/>Edit Channel</span>}
+                    {permession > 1 && <span className="delete" onClick={() => deleteChannel()}><FontAwesomeIcon icon={faTrash}/>Delete Channel</span>}
+                    {permession < 2 && <span className="leave" onClick={() => leaveChannel()}><FontAwesomeIcon icon={faArrowRightFromBracket}/>Leave Channel</span>}
                 </div>}
             </div>
         </section>

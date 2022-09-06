@@ -12,7 +12,7 @@ export const Checkpoint:React.FC = () =>  {
     const TFAAuth = async () => {
         try {
             await TFAauthenticate(code);
-            navigate("/", {replace: true});
+            navigate("/");
         } catch(e: any) {
             setError(e.message);
         } 
