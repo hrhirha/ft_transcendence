@@ -19,7 +19,7 @@ export const SetupAccount:React.FC = () =>  {
         try {
             if (!/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(-[a-zA-Z]+)*\.?))+$/.test(fullName!) || fullName!.length > 40)
                 throw(Error("Full Name can only contain a-z SP A-Z - . and max length 40"));
-            if (/[\w]{4,20}$/.test(username!) === false)
+            if (/[\w-]{4,20}$/.test(username!) === false)
                 throw(Error("Userame can only contain a-z and max length 20"));
             await setupAccount(userAvatar, fullName, username);
             history.replace("/");
