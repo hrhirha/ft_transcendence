@@ -491,7 +491,7 @@ export class UserService {
     async getBlockedFriends(id: string) {
         const freqs = await this._prismaS.friendReq.findMany({
             where: {
-                snd_id: id,
+                // snd_id: id,
                 status: friend_status.BLOCKED,
             },
             orderBy: {
@@ -517,13 +517,13 @@ export class UserService {
                 }
             }
         });
-        let friends = [];
+        let blocked = [];
+        let blocked_by = [];
         for (let req of freqs)
         {
-            const friend = req.sender.id === id ? req.receiver : req.sender;
-            const status = req.status;
-            friends.push(friend);
+            req.sender.id === id && blocked.push(req.receiver);
+            req.receiver.id === id && blocked_by.push(req.sender);
         }
-        return friends;
+        return {blocked, blocked_by};
     }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
 import * as argon2 from 'argon2'
 import { Socket } from 'socket.io';
@@ -386,7 +386,6 @@ export class ChatService {
             },
         });
 
-        console.log({ur});
         if (ur.count === 0)
             throw new WsException('owner can not leave');
         const msg = await this._add_msg_to_db(user.id, {rid: room.id, msg: `${user.username} left`}, msg_type.NOTIF);
@@ -471,6 +470,17 @@ export class ChatService {
     async removeUser(user: UserDto, member: UserRoomDto)
     {
         await this._is_admin(user.id, member.rid);
+
+        const arr = await this._prismaS.userRoom.findUnique({
+            where: {
+                uid_rid: { ...member, }
+            },
+            select: {
+                is_owner: true,
+            }
+        });
+        if (arr.is_owner)
+            throw new WsException({error: 'you can not remove the owner of this room'});
 
         const ur = await this._prismaS.userRoom.delete({
             where: {
@@ -741,9 +751,10 @@ export class ChatService {
         if (dm.length === 2)
             dm_uid = dm[0].user.id === user.id ? dm[1].user.id : dm[0].user.id;
 
-        await this._can_send_msg(user.id, dm_uid, data.rid)
+        await this._can_send_msg(user.id, dm_uid, data.rid);
+        const msg =  await this._add_msg_to_db(user.id, data);
 
-        return await this._add_msg_to_db(user.id, data);
+        return msg;
     }
 
     async deleteMessage(user: UserDto, msg: DeleteMessageDto)
@@ -780,7 +791,7 @@ export class ChatService {
                 },
                 data: {
                     lst_msg: 'this message hase been deleted',
-                    lst_msg_ts: null,
+                    lst_msg_ts: undefined,
                 }
             });
         });
@@ -820,6 +831,7 @@ export class ChatService {
                 type: true,
                 lst_msg: true,
                 lst_msg_ts: true,
+                lst_msg_snd: true,
                 user_rooms: {
                     select: {
                         uid: true,
@@ -834,24 +846,29 @@ export class ChatService {
         });
 
         let joined = [];
-        rooms.forEach((room) => {
+        for (let room of rooms)
+        {
             let owner, me;
-            room.user_rooms.forEach((ur) => {
+            let msg_from_blocked: boolean;
+
+            room.user_rooms.forEach(ur => {
                 if (ur.is_owner) owner = ur;
                 if (ur.uid === user.id) me = ur;
             });
             const jt = me.joined_time;
- 
-            room.lst_msg_ts < jt && (room.lst_msg = "") && (room.lst_msg_ts = null);
-            me.is_banned && (room.lst_msg = 'you are banned') && (room.lst_msg_ts = null);
+            const blks = await this._user.getBlockedFriends(user.id);
+            msg_from_blocked = blks.blocked.find(b =>  b.id === room.lst_msg_snd);
 
+            (room.lst_msg_ts < jt || msg_from_blocked) && (room.lst_msg = "") && (room.lst_msg_ts = undefined);
+            me.is_banned && (room.lst_msg = 'you are banned') && (room.lst_msg_ts = undefined);
+            
             room["unread"] = me.unread;
             room['owner'] = owner.uid;
             room["is_banned"] = me.is_banned,
             room["is_muted"] = me.is_muted,
             delete room.user_rooms;
             joined.push(room);
-        });
+        }
         return joined;
     }
 
@@ -1248,7 +1265,7 @@ export class ChatService {
                     select: {
                         is_channel: true,
                     }
-                }
+                },
             }
         });
     
@@ -1257,6 +1274,7 @@ export class ChatService {
                 message: 'you can not send messages in this room at this moment',
                 reason: 'not a member, banned or muted, blocked'
             });
+
         return true;
     }
 
@@ -1267,6 +1285,7 @@ export class ChatService {
             data: {
                 lst_msg: data.msg,
                 lst_msg_ts: ts,
+                lst_msg_snd: uid,
                 messages: {
                     create : { uid, msg: data.msg, timestamp: ts, type }
                 },

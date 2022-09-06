@@ -462,28 +462,39 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             throw new WsException('you must login first');
         try
         {
-            const m = await this._chat.sendMessage(u, data);
+            const snd = await this._chat.sendMessage(u, data);
 
             // filter banned users and blocked friends
             const urs = await this._chat.getRoomMembers(u.id, data.rid);
+            const blocks = await this._userS.getBlockedFriends(u.id);
             const uname_blk_lst = [];
+            
+            for (let b of blocks.blocked_by)
+                    uname_blk_lst.push(b.username);
+            
             for (let ur of urs.members)
             {
                 ur.is_banned && uname_blk_lst.push(ur.username);
             }
             if (!urs.is_channel)
             {
-                const blocks = await this._userS.getBlockedFriends(u.id);
-                for (let b of blocks)
+                for (let b of blocks.blocked)
                     uname_blk_lst.push(b.username);
             }
 
-            const sockets = (await this.server.fetchSockets()).filter((s)=>{ return uname_blk_lst.indexOf(s.data.username) >= 0 });
             let blk_lst = [];
+            const sockets = await this.server.fetchSockets();
             for (let s of sockets)
-                blk_lst.push(s.id);
+            {
+                if (uname_blk_lst.find((name) => s.data.username === name))
+                {
+                    blk_lst.push(s.id);
+                }
+            }
 
-            this.server.except(blk_lst).to(data.rid).emit('receive_message', m);
+            console.log(uname_blk_lst);
+            console.log(blk_lst);
+            this.server.except(blk_lst).to(data.rid).emit('receive_message', snd);
             return ;
         }
         catch (e)
