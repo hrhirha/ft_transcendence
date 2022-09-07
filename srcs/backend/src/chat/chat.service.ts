@@ -564,11 +564,6 @@ export class ChatService {
         const ur = await this._prismaS.userRoom.update({
             data: {
                 is_banned: true,
-                bans: {
-                    create: {
-                        start: new Date,
-                    }
-                }
             },
             where: {
                 uid_rid: {
@@ -613,24 +608,9 @@ export class ChatService {
         if (!ur0.is_banned)
             throw new WsException('user already unbanned');
 
-        const mid = ur0.bans[0].id;
         const ur = await this._prismaS.userRoom.update({
             data: {
                 is_banned: false,
-                bans: {
-                    update: {
-                        where: {
-                            id_uid_rid: {
-                                id: mid,
-                                uid: user_room.uid,
-                                rid: user_room.rid,
-                            }
-                        },
-                        data: {
-                            end: new Date
-                        }
-                    }
-                }
             },
             where: {
                 uid_rid: {
@@ -1408,17 +1388,6 @@ export class ChatService {
             },
             select: {
                 is_banned: true,
-                bans: {
-                    where: {
-                        uid: ur.uid,
-                        rid: ur.rid,
-                    },
-                    select: {
-                        id: true
-                    },
-                    orderBy: { start: "desc" },
-                    take: 1,
-                },
             },
         });
     }

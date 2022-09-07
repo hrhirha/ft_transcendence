@@ -92,7 +92,7 @@ export class UserController {
             },
         }),
         fileFilter(req, file, callback) {
-            if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/))
+            if (!file.originalname.match(/\.((j|J)(p|P)(g|G)|(j|J)(p|P)(e|E)(g|G)|(p|P)(n|N)(g|G)|(g|G)(i|I)(f|F))$/))
                 return callback(new ForbiddenException('format not allowed'), false)
             return callback(null, true);
         },

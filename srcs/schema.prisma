@@ -119,7 +119,7 @@ model UserRoom {
   is_admin      Boolean @default(false)
 
   is_banned     Boolean @default(false)
-  bans          UserBan[]
+  // bans          UserBan[]
   
   is_muted      Boolean @default(false)
   unmute_at     DateTime?
@@ -159,15 +159,15 @@ model UserGame {
   @@map("user_games")
 }
 
-model UserBan {
-  id    String @id @default(cuid())
-  uid   String
-  rid   String
-  ur    UserRoom @relation(fields: [uid,rid], references: [uid, rid], onDelete: Cascade)
+// model UserBan {
+//   id    String @id @default(cuid())
+//   uid   String
+//   rid   String
+//   ur    UserRoom @relation(fields: [uid,rid], references: [uid, rid], onDelete: Cascade)
   
-  start DateTime
-  end   DateTime?
+//   start DateTime
+//   end   DateTime?
 
-  @@unique([id, uid, rid])
-  @@map("user_bans")
-}
+//   @@unique([id, uid, rid])
+//   @@map("user_bans")
+// }
