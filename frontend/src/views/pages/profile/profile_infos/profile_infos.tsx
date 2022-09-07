@@ -4,7 +4,7 @@ import { CircleAvatar } from "views/components/circle_avatar/circle_avatar";
 import { faCameraRotate, faCheck, faClose, faGamepad, faPen, faPercent, faTableTennisPaddleBall, faTrophy } from "@fortawesome/free-solid-svg-icons";
 import { buttons, userType } from "views/pages/profile/profile";
 import { Numeral } from "views/components/numeral/numeral";
-import { patch_avatar_upload, patch_edit_fullname } from "controller/user/edit";
+import { patch_avatar_upload, patch_edit_fullname, patch_edit_username } from "controller/user/edit";
 import { useContext, useEffect, useState } from "react";
 import { get_me, get_user_by_username, userDefault, User } from "controller/user/user";
 import { useNotif } from "views/components/notif/notif";
@@ -28,12 +28,12 @@ const StatCard = ({icon, title, stat}: {icon: IconDefinition, title: string, sta
 export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => {
     const [editMode, setEditMode] = useState<boolean>(false);
     const [userInfos, setUserInfos] = useState<User>(userDefault);
-    const [fullName, setFullName] = useState<string>();
-    const [userName, setUserName] = useState<string>();
+    const [fullName, setFullName] = useState<string>("");
+    const [userName, setUserName] = useState<string>("");
     const [avatarUrl, setAvatarUrl] = useState<string>(userInfos?.imageUrl);
     const [userImage, setUserImage] = useState<any>();
     const [enable2fa, setEnable2fa] = useState<boolean>(false);
-    const [detectUpdates, setUpdates] = useState<{avatar: boolean, name: boolean}>({avatar: false, name: false});
+    const [detectUpdates, setUpdates] = useState<{avatar: boolean, name: boolean, username: boolean}>({avatar: false, name: false, username: false});
     const class_socket = useContext(SocketContext);
     const pushNotif = useNotif();
     const username = useParams();
@@ -49,7 +49,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
             const [file] = e.target.files;
             setUserImage(file);
             setAvatarUrl(URL.createObjectURL(file));
-            setUpdates({avatar: true, name: detectUpdates.name});
+            setUpdates({avatar: true, name: detectUpdates.name, username: detectUpdates.username});
         });
         f.click();
     }
@@ -58,14 +58,18 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
         try {
             if (detectUpdates.name && (!/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(-[a-zA-Z]+)*\.?))+$/.test(fullName!) || fullName!.length > 40))
                 throw(Error("Full Name can only contain a-z SP A-Z - . and max length 40"));
+            if (detectUpdates.username && (!/[\w-]{4,20}$/.test(userName!) || userName!.length > 20))
+                throw(Error("Username can only contain a-z - and max length 20"));
             if (detectUpdates.name)
                 await patch_edit_fullname(fullName!);
             if (detectUpdates.avatar)
                 await patch_avatar_upload(userImage);
+            if (detectUpdates.username)
+                await patch_edit_username(userName!);
             if (detectUpdates.avatar || detectUpdates.name)
             {
                 await getUserData();
-                setUpdates({avatar: false, name: false});
+                setUpdates({avatar: false, name: false, username: false});
                 pushNotif({
                     id: "UPDATEPROFILESUCCESS",
                     type: "success",
@@ -234,12 +238,12 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
                 <div className="profileMoreData">
                     {fullName !== null && <input type="text" disabled={!editMode} className="fullName" placeholder="Full Name" onChange={(e) => {
                         setFullName(e.target.value);
-                        setUpdates({name: true, avatar: detectUpdates.avatar});
+                        setUpdates({name: true, avatar: detectUpdates.avatar, username: detectUpdates.username});
                     }} value={fullName}/>}
                     {userName !== null && <input className="userName" type="text" disabled={!editMode} placeholder="Username" onChange={(e) => {
-                        setUserName(e.target.value.trim());
-                        setUpdates({name: true, avatar: detectUpdates.avatar});
-                    }} value={userName}/>}
+                        setUserName(e.target.value.trim().substring(1));
+                        setUpdates({name: detectUpdates.name, avatar: detectUpdates.avatar, username: true});
+                    }} value={`@${userName}`}/>}
                     <div className="stats">
                         <StatCard icon={faTableTennisPaddleBall} title="Games" stat={Number(userInfos?.wins + userInfos?.loses)}/>
                         <StatCard icon={faTrophy} title="Wins" stat={Number(userInfos?.wins)}/>

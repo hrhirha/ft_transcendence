@@ -115,9 +115,16 @@ section#profileInfos {
                 text-transform: lowercase;
                 font-family: $LFont;
                 font-size: $fsize * 1.15;
-                padding: 0 1rem;
+                padding: .1rem .5rem;
                 color: $light3;
-                margin: .25rem;
+                margin: .2rem;
+                margin-bottom: 0;
+                max-width: 12rem;
+                line-height: 1;
+                &:disabled {
+                    position: relative;
+                    bottom: .25rem
+                }
             }
             .stats {
                 @include _flex(row, space-evenly, center);
