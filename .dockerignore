@@ -1,6 +1,6 @@
-node_modules
-*/node_modules
-*/dist
+srcs/node_modules
+srcs/*/node_modules
+srcs/*/dist
 .git
 .gitignore
-*/.gitignore
+srcs/*/.gitignore
