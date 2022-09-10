@@ -213,7 +213,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 if (s.data.username === other.username)
                 {
                     s.join(r.room.id);
-                    // this.server.to(s.id).emit('dm_started', { room: r.room, user: me, is_blocked: r.is_blocked  });
                 }
             });
         }
@@ -492,8 +491,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
                 }
             }
 
-            console.log(uname_blk_lst);
-            console.log(blk_lst);
             this.server.except(blk_lst).to(data.rid).emit('receive_message', snd);
             return ;
         }
@@ -533,8 +530,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const d = await this._chat.getOpponent(u, dto);
             const sockets = await this.server.fetchSockets();
 
-            const so = sockets.find(s=>{ return s.data.username === d.username });
-            so && this.server.to(so.id).emit('challenge_requested', { user: u, type: dto.type, invite: dto.invite });
+            for (let s of sockets)
+            {
+                if (s.data.username === d.username)
+                    this.server.to(s.id).emit('challenge_requested', { user: u, type: dto.type, invite: dto.invite });
+            }
         }
         catch (e)
         {

@@ -24,7 +24,6 @@ export const TwoFACard:React.FC<{enabled: boolean, onClose: Function, onSubmit: 
                 {!enabled && <img src={`http://${env.apiHost}:${env.apiPort}/2fa/generate`} alt="qrcode"/>}
                 <input type="text" className="twofaCode" placeholder="CODE HERE" onChange={(e) => {
                     const val = e.target.value.trim();
-                    console.log(Number.isInteger(Number(val)), val.length < 7);
                     if (Number.isInteger(Number(val)) && val.length < 7)
                     setCode(val);
                 }} value={code}/>

@@ -59,7 +59,7 @@ export const ProfileInfos:React.FC<{userProfile: boolean}> = ({userProfile}) => 
             if (detectUpdates.name && (!/^([a-zA-Z]+-?[a-zA-Z]+)( ([a-zA-Z]+(-[a-zA-Z]+)*\.?))+$/.test(fullName!) || fullName!.length > 40))
                 throw(Error("Full Name can only contain a-z SP A-Z - . and max length 40"));
             if (detectUpdates.username && (!/[\w-]{4,20}$/.test(userName!) || userName!.length > 20))
-                throw(Error("Username can only contain a-z - and max length 20"));
+                throw(Error("Username can only contain a-z A-Z 0-9 - and max length 20"));
             if (detectUpdates.name)
                 await patch_edit_fullname(fullName!);
             if (detectUpdates.avatar)

@@ -43,7 +43,6 @@ const EditChatRoomSettings:React.FC<{owner: boolean, room: room_msgs, members: A
                 description: "Password updated successfully",
             });
         }).on("room_edited", (data : any)=>{
-            console.log(data)
             callback(data);
         }).on("invalid_password", () => {
             pushNotif({

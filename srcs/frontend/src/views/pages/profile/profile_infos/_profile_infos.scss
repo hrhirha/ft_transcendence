@@ -112,7 +112,7 @@ section#profileInfos {
                 max-width: auto;
             }
             input.userName {
-                text-transform: lowercase;
+                text-transform: initial;
                 font-family: $LFont;
                 font-size: $fsize * 1.15;
                 padding: .1rem .5rem;

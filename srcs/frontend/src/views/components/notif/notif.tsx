@@ -23,13 +23,15 @@ const NotifCard:React.FC<{notif: Notification, onClose: Function}> = ({notif, on
         }, notif.time);
     }, []);
 
+    if (notif.description)
+
     return (
     <section className={`notif ${notif.type}`} >
         <FontAwesomeIcon icon={faClose} onClick={() => onClose()}/>
         <span className="icon">{notif.icon}</span>
         <div className="infos">
             <h6 className="title">{notif.title}</h6>
-            <p className="description" dangerouslySetInnerHTML={{ __html: notif.description.substr(0, 150)+(notif.description.length > 150 ? "..." : "")}}/>
+            {typeof(notif.description) === "string" && <p className="description" dangerouslySetInnerHTML={{ __html: notif.description.substr(0, 150)+(notif.description.length > 150 ? "..." : "")}}/>}
             {notif.actions && <ul className="actions">
                 {notif.actions.map((a, k) => {
                     return (k < 2)

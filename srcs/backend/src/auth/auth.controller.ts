@@ -53,7 +53,7 @@ export class AuthController {
     {
         const user =  req.user as User;
         if (user.setup)
-            throw new ForbiddenException({error: 'account has already been set up'});
+            throw new ForbiddenException({message: 'account has already been set up'});
         try
         {
             const path = file ? file.path : "";
@@ -62,7 +62,7 @@ export class AuthController {
         }
         catch (e)
         {
-            throw new ForbiddenException({error: 'unable to setup this account'});
+            throw new ForbiddenException({message: 'unable to setup this account'});
         }
     }
 
@@ -71,7 +71,6 @@ export class AuthController {
     getProfile(@GetUser() dto: User)
     {
         return {
-            username: dto.username,
             fullName: dto.fullName,
             imageUrl: dto.imageUrl,
         };

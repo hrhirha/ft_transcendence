@@ -74,6 +74,7 @@ export default class PingPong extends Phaser.Scene
         userId: string
     })
     {
+
         super("");
         this.roomId = roomId;
         this.isPlayer = isPlayer;
@@ -769,19 +770,6 @@ export default class PingPong extends Phaser.Scene
 
     update () : void
     {
-        if (this.soc.disconnected)
-        {
-            this.add.text(this.w / 2, this.h / 2, "You can Not play This Game", { fontSize: "60px", 
-            fontFamily: "Poppins_B", align: "center"}).setOrigin(0.5);
-            this.buttonBg = this.add.sprite(this.w / 2 , this.h / 1.20 , 'redButton').setInteractive().setOrigin(0.5).setScale(0.3);
-            this.leave = this.add.text(this.w / 2 , this.h / 1.20 , "Leave", { fontSize: "35px", fontFamily: "Poppins_B", align: "center" }).setInteractive().setOrigin(0.5);
-            this.buttonBg.on('pointerdown', () => {
-                this.leaveFunc();
-            }, this);
-            this.leave.on('pointerdown', () => {
-                this.leaveFunc();
-            }, this);
-        }
             
         if (this.exitEmited || this.goal || !this.gameIsStarted || !this.isPlayer || this.map || !this.focus || this.End)
             return ;

@@ -4,18 +4,16 @@ services:
     env_file: srcs/.env
     build: .
     command: 'sh start.sh'
-    # volumes:
-    #  - .:/usr/app
+    volumes:
+      - ./srcs/:/usr/app
     ports:
       - '3000:3000'
       - '1337:1337'
-    #  - "${PORT}:${PORT}"
-    #  - "${REACT_APP_API_PORT}:${REACT_APP_API_PORT}"
     depends_on:
-      db-dev:
+      db:
         condition: service_healthy
 
-  db-dev:
+  db:
     image: postgres:14.2
     restart: always
     environment:

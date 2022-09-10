@@ -39,7 +39,6 @@ export const InvitePlayerForm:React.FC<{callback: Function}> = ({callback}) => {
     const getFriends = async () => {
         try {
             const allUsers = await get_friends();
-            console.log(allUsers);
             setAllUsers(allUsers);
         } catch(e: any) {
 

@@ -21,11 +21,12 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
     });
 
     useEffect(() => {
+
         if (game_socket.disconnected)
         {
+            console.log("Reconnect The Game Socket");
             game_socket.removeAllListeners();
             game_socket.connect();
-            console.log("reconnect");
         }
         const unblock = history.block((tx) => {
             pushNotif({
@@ -47,7 +48,6 @@ export const GamePlayer:React.FC<{ultimateGame: boolean}> = ({ultimateGame}) => 
             });
         });
         window.addEventListener("visibilitychange", event => {
-            console.log(event);
             game_socket.emit("isActive", (document.visibilityState === "visible"));
         });
         game_socket.on("matchWinner", (win) => {

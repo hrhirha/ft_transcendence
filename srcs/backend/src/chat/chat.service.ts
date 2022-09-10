@@ -784,8 +784,6 @@ export class ChatService {
 
         if (u.relation === relation_status.BLOCKED)
             throw new WsException('your friend status is blocked');
-        if (u.status === user_status.INGAME)
-            throw new WsException('user already playing');
         return u;
     }
 

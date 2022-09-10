@@ -91,7 +91,7 @@ const PongApp:React.FC = () => {
             title: (message.room.is_channel ? message.room.name : message.user.fullName),
             description: message.room.is_channel ? `<b>${message.user.username} : </b>${message.msg}</>` : message.msg,
             actions: [
-              {title: "Go Chat", color: "#6970d4", action: () => history.replace(`/chat?id=${message.room.id}`)},
+              {title: "Go Chat", color: "#6970d4", action: () => window.open(`/chat?id=${message.room.id}`, '_self')},
             ]
           });
         }
@@ -114,9 +114,9 @@ const PongApp:React.FC = () => {
                   invite: false
                 })
                 if (data.type === "ultimateQue")
-                  history.replace("/play/ultimate");
+                  window.open("/play/ultimate", "_slef");
                 else
-                  history.replace("/play");
+                  window.open("/play", "_self");
               }},
               {title: "Decline", color: "#6970d4", action: () => {
                 //TODO: send decline

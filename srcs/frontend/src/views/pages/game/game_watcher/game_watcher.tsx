@@ -31,7 +31,6 @@ export const GameWatcher:React.FC = () =>  {
         {
             game_socket.removeAllListeners();
             game_socket.connect();
-            console.log("reconnect");
         }
     }, []);
 

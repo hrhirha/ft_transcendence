@@ -28,7 +28,7 @@ export class AuthService {
             create: {
                 email: dto.email,
                 fullName: dto.fullName,
-                username: dto.username,
+                username: dto.email,
                 imageUrl: dto.imageUrl,
                 rank: {connect: {title: 'Wood'}}
             },

@@ -43,7 +43,6 @@ export const UserSearchForm:React.FC<{callback: Function, exceptUsers?: Array<St
             setShowSuggestions(true);
             setSuggestions([]);
             setUserSelected(null);
-            console.log(friends, exceptUsers);
             friends.forEach((user: any, key: number) => {
                 if (exceptUsers && exceptUsers.find(uid => uid === user.id) !== undefined)
                     return;

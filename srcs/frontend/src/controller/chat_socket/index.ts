@@ -224,7 +224,6 @@ export class ChatSocket {
         this.socket.emit("remove_admin", remove_admin);
     }
     challenge(challenge: {id: string, type: string, invite: boolean}) {
-        console.log(challenge)
         this.socket.emit("challenge", challenge);
     }
   }

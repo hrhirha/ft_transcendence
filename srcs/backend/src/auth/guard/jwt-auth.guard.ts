@@ -10,7 +10,7 @@ export class JwtAuthGuard extends AuthGuard('jwt')
     {
         if (err || !user)
         {
-            throw new UnauthorizedException({error: err?.message || "invalid access token"});
+            throw new UnauthorizedException({message: err?.message || "invalid access token"});
         }
         if (info === 'SETUP')
         {
@@ -18,7 +18,7 @@ export class JwtAuthGuard extends AuthGuard('jwt')
             if (req.path === '/auth/setup' || req.path === '/auth/logout' || req.path === '/auth/profile')
                 return user;
 
-            throw new ForbiddenException({error: 'you must setup your account first'});
+            throw new ForbiddenException({message: 'you must setup your account first'});
         }
         return user;
     }
