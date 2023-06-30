@@ -40,9 +40,19 @@ We focussed on three areas while working on this project:
 * Matchmaking system
 * Multiple maps and achievements
 
-## Run
+## Usage
 
-Make sure `docker` and `docker-compose` are intalled, then run
+Clone this repo, then copy `env.example` to `.env` and modify it.
+
+```sh
+git clone https://github.com/hrhirha/ft_transcendence.git
+cd ft_transcendence
+cp srcs/env.example srcs/.env
+```
+
+Make sure `docker` and `docker-compose` are intalled.
+
+Finally run the following command:
 
 ```sh
 docker-compose up --build
