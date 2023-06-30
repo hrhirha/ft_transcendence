@@ -1,12 +1,59 @@
 # ft_transcendence
 Final Common Core Project at 1337 (42_cursus)
 
-"No more C! No more C++! This project is about doing something you’ve never done before. Remind yourself the beginning of your journey in computer science. Look at you now. Time to shine!" : 42
+## Description
 
-# Description:
-This is a group project which is about creating a website for the mighty Pong contest! where things like:
-• Security concerns
-• User Account
-• Chat
-• Game
-are the main things in the project.
+The aim of the project is to create a web application that will allow users to chat and play the PingPong game with eachothers.
+
+## Stack
+
+* Programming language : TypeScript
+* Frontend : ReactJS
+* Backend : NestJS
+* Database : PostgreSQL
+
+## Components
+
+We focussed on three areas while working on this project:
+
+### User Account
+
+* Authentication using the OAuth system of 42 intranet
+* Unique usernames
+* Ability to edit the username and avatar
+* Two-Factor authentication using an authenticator app such as `Google Authenticator`
+* Friends management: add, remove, block
+* Stats such as wins, losses, achievements and a match history
+
+### Chat
+
+* Chat rooms: public, private and password protected
+* Direct messages
+* Different user roles in channels: owner, administrator and standard user
+ - channel owner: change channel type, set new administrators
+ - administrator: can kick, ban or mute other users.
+* Game invitation from chat interface
+
+### Game
+
+* Play live PingPong games with other players
+* Matchmaking system
+* Multiple maps and achievements
+
+## Run
+
+Make sure `docker` and `docker-compose` are intalled, then run
+
+```sh
+docker-compose up --build
+```
+
+## Screenshots
+[TODO]
+
+## Demo
+[TODO]
+
+## Team
+
+This work has been done by [Aimad Bahdir](https://github.com/AimadBahdir), [Walid Ben Said](https://github.com/wben-sai), [Ismail Bouhiri](https://github.com/ismailbouhiri) and [myself](https://github.com/hrhirha)
